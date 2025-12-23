@@ -16,4 +16,6 @@ class TimKerja extends Model
         'nama_tim',
         'id_ketua',
     ];
+
+    public $timestamps = true;
 }

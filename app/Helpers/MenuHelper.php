@@ -14,20 +14,18 @@ class MenuHelper
             ],
             [
                 'icon' => 'dashboard',
-                'name' => 'Monitoring Kegiatan',
+                'name' => 'Tagihan Kerja',
                 'subItems' => [
-                    ['name' => 'Tagihan Kerja', 'path' => '/calendar'],
                     ['name' => 'Kalender Kegiatan', 'path' => '/calendar'],
-                    ['name' => 'Bidang Statistik Sosial', 'path' => '/calendar'],
-                ],
-            ],
-            [
-                'icon' => 'dashboard',
-                'name' => 'Peringkat dan Nilai',
-                'subItems' => [
-                    ['name' => 'Rekapitulasi Nilai', 'path' => '/calendar'],
-                    ['name' => 'Peringkat Tahunan', 'path' => '/calendar'],
-                    ['name' => 'Peringkat Bulanan', 'path' => '/calendar'],
+                    ['name' => 'Kepala', 'path' => '/'],
+                    ['name' => 'Sub Bagian Umum', 'path' => '/'],
+                    ['name' => 'Fungsi Statistik Sosial', 'path' => '/'],
+                    ['name' => 'Fungsi Statistik produksi', 'path' => '/'],
+                    ['name' => 'Fungsi Statistik distribusi', 'path' => '/'],
+                    ['name' => 'Fungsi Neraca', 'path' => '/'],
+                    ['name' => 'Fungsi SPBE', 'path' => '/bidang-kerja'],
+                    ['name' => 'Fungsi Kehumasan', 'path' => '/'],
+                    ['name' => 'Detail Kegiatan', 'path' => '/detail-kegiatan'],
                 ],
             ],
             [
@@ -36,10 +34,14 @@ class MenuHelper
                 'subItems' => [
                     ['name' => 'Tim Kerja', 'path' => '/tim-kerja', 'pro' => false],
                     ['name' => 'RK Ketua', 'path' => '/rk-ketua', 'pro' => false],
-                    ['name' => 'Proyek', 'path' => '/dll'],
-                    ['name' => 'RK Anggota', 'path' => '/dll'],
                 ],
             ],
+        ];
+    }
+
+    public static function getOthersItems()
+    {
+        return [
             [
                 'icon' => 'calendar',
                 'name' => 'Calendar',
@@ -72,12 +74,6 @@ class MenuHelper
                     ['name' => '404 Error', 'path' => '/error-404', 'pro' => false]
                 ],
             ],
-        ];
-    }
-
-    public static function getOthersItems()
-    {
-        return [
             [
                 'icon' => 'charts',
                 'name' => 'Charts',

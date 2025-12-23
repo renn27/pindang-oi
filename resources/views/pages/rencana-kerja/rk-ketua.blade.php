@@ -172,7 +172,7 @@
                     <!-- sebelahan -->
                     <div class="flex flex-col gap-2 md:flex-row md:items-center">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
-                            *Tim Kerja
+                            Unit Kerja
                         </label>
                         <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent w-full md:w-3/4">
                             <select

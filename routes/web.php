@@ -50,6 +50,11 @@ Route::get('/rk-ketua', function () {
     return view('pages.rencana-kerja.rk-ketua', ['title' => 'Rencana Kerja Ketua']);
 })->name('rk-ketua');
 
+// daftar kegiatan
+Route::get('/daftar-kegiatan', function () {
+    return view('pages.rencana-kerja.daftar-kegiatan', ['title' => 'Daftar Kegiatan']);
+})->name('daftar-kegiatan');
+
 
 
 
@@ -114,29 +119,26 @@ Route::get('/videos', function () {
     return view('pages.ui-elements.videos', ['title' => 'Videos']);
 })->name('videos');
 
+
+//crud tabel tim kerja
+
 Route::get('/tim-kerjates', [TimKerjaController::class, 'index']);
-Route::get('/tim-kerja/data', [TimKerjaController::class, 'data'])
-    ->name('tim-kerja.data');
+Route::get('/tim-kerja/data', [TimKerjaController::class, 'data'])->name('tim-kerja.data');
+Route::post('/tim-kerja', [TimKerjaController::class, 'store'])->name('tim-kerja.store');
+Route::put('/tim-kerja/{id}', [TimKerjaController::class, 'update'])->name('tim-kerja.update');
+Route::delete('/tim-kerja/{id}', [TimKerjaController::class, 'destroy'])->name('tim-kerja.destroy');
 
+//halaman bidang kerja
+Route::get('/bidang-kerja', function () {
+    return view('pages.bidang-kerja', ['title' => 'Bidang Kerja']);
+})->name('bidang-kerja');
 
+//halaman bidang kerja 2
+Route::get('/bidang-kerja2', function () {
+    return view('pages.bidang-kerja2', ['title' => 'Bidang Kerja 2']);
+})->name('bidang-kerja2');
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//halaman detail kegiatan
+Route::get('/detail-kegiatan', function () {
+    return view('pages.detail-kegiatan', ['title' => 'Bidang Kerja']);
+})->name('detail-kegiatan');
