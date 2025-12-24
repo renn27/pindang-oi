@@ -11,11 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bidangs', function (Blueprint $table) {
-            $table->id('id_bidang');
-            $table->string('nama_bidang');
-            $table->string('slug')->unique();
-            $table->string('detail_bidang');
+        Schema::create('pegawais', function (Blueprint $table) {
+            $table->uuid('id_pegawai')->primary();
+            $table->string('username');
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->string('nama_pegawai');
+            $table->string('jabatan');
+            $table->text('alamat')->nullable();
+            $table->string('photo')->nullable();
             $table->timestamps();
             $table->softDeletes(); // Menambahkan kolom deleted_at
         });
@@ -26,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bidangs');
+        Schema::dropIfExists('pegawais');
     }
 };

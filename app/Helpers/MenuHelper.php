@@ -17,9 +17,16 @@ class MenuHelper
             ],
             [
                 'icon' => 'dashboard',
-                'name' => 'Tagihan Kerja',
-                'subItems' => [ $bidangItems,
+                'name' => 'Admin',
+                'subItems' => [
+                    ['name' => 'Bidang Kerja', 'path' => '/bidang-kerja', 'pro' => false],
+                    ['name' => 'Tim Kerja', 'path' => '#', 'pro' => false],
                 ],
+            ],
+            [
+                'icon' => 'dashboard',
+                'name' => 'Tagihan Kerja',
+                'subItems' => $bidangItems
             ],
             [
                 'icon' => 'dashboard',
@@ -42,7 +49,8 @@ class MenuHelper
                 'name' => 'Rencana Kinerja',
                 'subItems' => [
                     ['name' => 'Tim Kerja', 'path' => '/tim-kerja', 'pro' => false],
-                    ['name' => 'RK Ketua', 'path' => '/rk-ketua', 'pro' => false],
+                    ['name' => 'RK Ketua', 'path' => '/rencana-kerja', 'pro' => false],
+                    ['name' => 'RK Ketua Lama', 'path' => '/rk-ketua', 'pro' => false],
                 ],
             ],
         ];
