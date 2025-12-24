@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TimKerjaController;
+use App\Http\Controllers\BidangController;
+
 
 // dashboard pages
 Route::get('/', function () {
@@ -142,3 +144,25 @@ Route::get('/bidang-kerja2', function () {
 Route::get('/detail-kegiatan', function () {
     return view('pages.detail-kegiatan', ['title' => 'Bidang Kerja']);
 })->name('detail-kegiatan');
+
+// Routes untuk Bidang (Dinamis)
+Route::prefix('bidang')->group(function () {
+    // Halaman utama bidang
+    Route::get('/', [BidangController::class, 'index'])->name('bidang.index');
+    
+    // Halaman detail bidang
+    Route::get('/{id}', [BidangController::class, 'show'])->name('bidang.show');
+    
+    // Sub-halaman untuk tiap bidang
+    Route::get('/{id}/kegiatan', [BidangController::class, 'kegiatan'])->name('bidang.kegiatan');
+    Route::get('/{id}/laporan', [BidangController::class, 'laporan'])->name('bidang.laporan');
+    
+    // Route khusus untuk beberapa bidang (contoh)
+    Route::get('/spbe/kegiatan', function () {
+        $bidang = \App\Models\Bidang::where('nama_bidang', 'like', '%SPBE%')->first();
+        if ($bidang) {
+            return redirect()->route('bidang.kegiatan', $bidang->id_bidang);
+        }
+        return redirect()->route('bidang.index');
+    })->name('bidang.spbe');
+});

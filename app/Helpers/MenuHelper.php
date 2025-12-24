@@ -1,11 +1,14 @@
 <?php
 
 namespace App\Helpers;
+use App\Models\Bidang;
 
 class MenuHelper
 {
     public static function getMainNavItems()
     {
+        // Ambil data bidang dari database
+        $bidangItems = Bidang::getNavItems();
         return [
             [
                 'icon' => 'dashboard',
@@ -15,6 +18,12 @@ class MenuHelper
             [
                 'icon' => 'dashboard',
                 'name' => 'Tagihan Kerja',
+                'subItems' => [ $bidangItems,
+                ],
+            ],
+            [
+                'icon' => 'dashboard',
+                'name' => 'Tagihan Kerja Lama',
                 'subItems' => [
                     ['name' => 'Kalender Kegiatan', 'path' => '/calendar'],
                     ['name' => 'Kepala', 'path' => '/'],
