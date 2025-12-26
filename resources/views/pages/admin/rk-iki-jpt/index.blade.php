@@ -52,8 +52,10 @@
             shadow-theme-xs hover:bg-gray-50 hover:text-gray-800
             dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400
             dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
-            @click="$dispatch('open-smart-modal', {
-                mode:'create'})">
+                @click="$dispatch('open-smart-modal', {
+                    modalId: 'modal-rencana-jpt',
+                    mode: 'create'
+            })">
             Tambah RK JPT
         </button>
     </div>
@@ -67,7 +69,12 @@
         </div>
 
         <!-- BODY -->
-        <div class="flex-1 px-6 py-5">
+        <div class="flex-1 px-6 py-5"
+            @open-smart-modal.window="
+            if ($event.detail.modalId !== 'modal-rencana-jpt') return;
+            mode    = $event.detail.mode ?? 'create'
+            itemId  = $event.detail.id ?? null
+            formData = $event.detail.data ?? { tahun: '', nama_rencana_jpt: '' }">
             <form x-bind:action="mode === 'edit'
                     ? '{{ url('rencana-indikator-jpt/rencana') }}/' + itemId
                     : '{{ route('rencana-indikator-jpt.rencana.store') }}'"
@@ -87,7 +94,6 @@
                         <select name="tahun" x-model="formData.tahun"
                                 class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
                                 required>
-                            <option value="2024">2024</option>
                             <option value="2025">2025</option>
                             <option value="2026">2026</option>
                             <option value="2027">2027</option>
@@ -104,6 +110,52 @@
                         placeholder="Masukkan rencana kerja JPT"
                         class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                 </div>
+
+                <!-- OPSIONAL: Tambah IKI saat CREATE -->
+                <template x-if="mode === 'create'">
+                    <div class="mt-2" x-data="{ addIki: false, ikis: [''] }">
+
+                        <!-- Toggle -->
+                        <div class="flex items-center gap-2 mb-3">
+                            <input type="checkbox" x-model="addIki"
+                                class="rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+                            <span class="text-sm text-gray-700 dark:text-gray-300">
+                                Tambah IKI JPT sekaligus
+                            </span>
+                        </div>
+
+                        <!-- List IKI -->
+                        <template x-if="addIki">
+                            <div class="space-y-3 border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+                                <template x-for="(iki, index) in ikis" :key="index">
+                                    <div class="flex gap-2 items-center">
+                                        <input type="text"
+                                                :name="`ikis[${index}]`"
+                                                x-model="ikis[index]"
+                                                placeholder="Nama Indikator Kinerja Individu (IKI)"
+                                                class="flex-1 h-10 rounded-lg border border-gray-300 px-3 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+
+                                        <!-- Remove -->
+                                        <button type="button"
+                                                @click="ikis.splice(index,1)"
+                                                x-show="ikis.length > 1"
+                                                class="text-red-500 hover:text-red-700 text-sm">
+                                            ✕
+                                        </button>
+                                    </div>
+                                </template>
+
+                                <!-- Add IKI -->
+                                <button type="button"
+                                        @click="ikis.push('')"
+                                        class="text-sm text-brand-600 hover:text-brand-800">
+                                    + Tambah IKI
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
 
                 <!-- FOOTER -->
                 <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-800">
@@ -122,7 +174,86 @@
         </div>
     </x-ui.smart-modal>
 
+    <x-ui.smart-modal id="modal-indikator-jpt" class="max-w-xl">
+        <!-- HEADER -->
+        <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
+            <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90">
+                Tambah Indikator JPT
+            </h4>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Tambahkan indikator untuk rencana kerja
+            </p>
+        </div>
 
+        <!-- BODY -->
+        <div class="flex-1 px-6 py-5"
+            x-data="{
+                rkId: null,
+                rkNama: '',
+            }"
+            @open-smart-modal.window="
+                if ($event.detail.modalId === 'modal-indikator-jpt') {
+                    rkId   = $event.detail.rk_id
+                    rkNama = $event.detail.rk_nama
+                }">
+            <form
+                method="POST"
+                :action="`{{ url('rencana-indikator-jpt') }}/${rkId}/indikator`"
+                class="grid grid-cols-1 gap-y-5"
+            >
+                @csrf
+
+                <!-- RK (DISABLED) -->
+                <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                        Rencana Kerja JPT
+                    </label>
+                    <input
+                        type="text"
+                        x-model="rkNama"
+                        disabled
+                        class="md:w-3/4 h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800
+                            dark:border-gray-700 dark:bg-gray-800 dark:text-white/70 cursor-not-allowed"
+                    >
+                </div>
+
+                <!-- INPUT IKI -->
+                <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                        Indikator JPT
+                    </label>
+                    <input
+                        type="text"
+                        name="nama_indikator_jpt"
+                        placeholder="Masukkan indikator kinerja"
+                        required
+                        class="md:w-3/4 h-11 rounded-lg border border-gray-300 px-4 text-sm
+                            focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
+                            dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                    >
+                </div>
+
+                <!-- FOOTER -->
+                <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-800">
+                    <div class="flex justify-end gap-3">
+                        <button type="button"
+                                @click="open = false"
+                                class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium
+                                    text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                            Batal
+                        </button>
+
+                        <button type="submit"
+                                class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium
+                                    text-white hover:bg-brand-600">
+                            Simpan
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </x-ui.smart-modal>
 
     <!-- Tabel Utama -->
     <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden">
@@ -184,6 +315,7 @@
                                         <div class="py-1">
                                             <button class="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                                             @click="$dispatch('open-smart-modal', {
+                                                modalId: 'modal-rencana-jpt',
                                                 mode: 'edit',
                                                 id: {{ $rencanaJpt->id }},
                                                 data: {
@@ -218,7 +350,12 @@
                                             </form>
 
 
-                                            <button onclick="openAddIkiModal()" class="w-full text-left px-3 py-2 text-sm text-green-600 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
+                                            <button class="w-full text-left px-3 py-2 text-sm text-green-600 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                                                @click="$dispatch('open-smart-modal', {
+                                                modalId: 'modal-indikator-jpt',
+                                                rk_id: '{{ $rencanaJpt->id }}',
+                                                rk_nama: '{{ $rencanaJpt->nama_rencana_jpt }}'
+                                            })" >
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                                 </svg>
@@ -315,6 +452,8 @@
             </table>
         </div>
     </div>
+
+
 
     @push('scripts')
     <script>

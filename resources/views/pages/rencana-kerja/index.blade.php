@@ -119,7 +119,7 @@
         </div>
     </x-common.component-card>
 
-    <x-ui.smart-modal id="modal-rencana-jpt" class="max-w-xl">
+    {{-- <x-ui.smart-modal id="modal-rencana-jpt" class="max-w-xl">
         <div class="relative flex h-[90vh] w-full max-w-[700px] flex-col overflow-hidden
                 rounded-3xl bg-white dark:bg-gray-900">
             <!-- HEADER (FIXED) -->
@@ -285,18 +285,113 @@
             </div>
         </div>
 
-    </x-ui.smart-modal>
+    </x-ui.smart-modal> --}}
 
     <x-ui.modal x-data="{ open: false }" @open-rk-ketua-modal.window="open = true" :isOpen="false"
         class="max-w-[700px]">
         <div class="relative flex h-[90vh] w-full max-w-[700px] flex-col overflow-hidden
                 rounded-3xl bg-white dark:bg-gray-900">
 
-
+            <!-- HEADER (FIXED) -->
+            <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
+                <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90" >Tambah Rencana Kerja Ketua</h4>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Masukkan rencana kerja ketua baru</p>
+            </div>
 
             <!-- BODY (SCROLL DI SINI) -->
             <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
+                <form class="grid grid-cols-1 gap-y-5">
+                    @csrf
+                    <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            Tahun
+                        </label>
+                        <div class="md:w-3/4 h-11 flex items-center rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                            2025
+                        </div>
+                    </div>
 
+                    <!-- sebelahan -->
+                    <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            Rencana Kinerja JPT
+                        </label>
+                        <textarea readonly oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" class="w-full md:w-3/4 resize-none overflow-hidden rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-800 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">Terwujudnya penyedia data dan insight statistik kesejahteraan rakyat yang berkualitas</textarea>
+                    </div>
+
+                    <!-- sebelahan -->
+                    <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            IKI JPT
+                        </label>
+                        <textarea
+                            readonly
+                            oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+                            class="w-full md:w-3/4 resize-none overflow-hidden rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-800 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">Persentase Publikasi/Laporan statistik kesejahteraan rakyat yang berkualitas
+                        </textarea>
+                    </div>
+
+                    <!-- sebelahan -->
+                    <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            Unit Kerja
+                        </label>
+                        <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent w-full md:w-3/4">
+                            <select
+                                class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                                :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
+                                <option value="" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                                    tim 1
+                                </option>
+                                <option value="" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                                    tim 2
+                                </option>
+                                <option value="" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                                    tim 3
+                                </option>
+                                <option value="" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                                    tim 3
+                                </option>
+                            </select>
+                            <span
+                                class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- sebelahan -->
+                    <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            Nama Ketua
+                        </label>
+                        <input readonly ="text" value="Ifone Arma"
+                            class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+
+                    </div>
+
+                    <!-- sebelahan -->
+                    <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            *Rencana Kinerja Ketua
+                        </label>
+                        <textarea placeholder="Enter a description..." type="text" rows="6" class="w-full md:w-3/4 dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"></textarea>
+                    </div>
+
+                    <!-- sebelahan (CONTOH) -->
+                    <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            Tim Kerja
+                        </label>
+                        <input type="text" placeholder="Tulis nama tim"
+                            class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                    </div>
+
+                </form>
             </div>
 
             <!-- FOOTER (FIXED) -->

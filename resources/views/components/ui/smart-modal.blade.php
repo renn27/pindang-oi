@@ -4,6 +4,7 @@
 ])
 
 <div x-data="{
+    modalId: '{{ $attributes->get('id') }}',
     open: @js($isOpen),
     mode: 'create',
     formData: {},
@@ -27,6 +28,7 @@ x-show="open"
 x-cloak
 @keydown.escape.window="open = false"
 @open-smart-modal.window="
+    if ($event.detail.modalId !== modalId) return;
     open = true;
     mode = $event.detail.mode || 'create';
     formData = $event.detail.data || {};
