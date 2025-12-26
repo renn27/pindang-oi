@@ -4,7 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TimKerjaController;
 use App\Http\Controllers\BidangController;
+use App\Http\Controllers\IndikatorJPTController;
 use App\Http\Controllers\KegiatanController;
+use App\Http\Controllers\RencanaJPTController;
 
 // dashboard pages
 Route::get('/', function () {
@@ -43,6 +45,24 @@ Route::prefix('bidang-kerja')->group(function () {
     Route::get('/create', [BidangController::class, 'create'])->name('bidang.create');
     Route::post('/', [BidangController::class, 'store'])->name('bidang.store');
     Route::get('/{slug}', [BidangController::class, 'show'])->name('bidang.show');
+});
+
+Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(function () {
+
+    // ROUTE UNTUK RENCANA JPT
+    Route::prefix('rencana')->name('rencana.')->group(function () {
+        Route::get('/', [RencanaJPTController::class, 'index'])->name('index');
+        Route::post('/', [RencanaJPTController::class, 'store'])->name('store');
+        Route::put('/{rencanaJpt}', [RencanaJPTController::class, 'update'])->name('update');
+        Route::delete('/{rencanaJpt}', [RencanaJPTController::class, 'delete'])->name('delete');
+    });
+
+    // ROUTE UNTUK INDIKATOR JPT
+    Route::prefix('{rencanaJpt}/indikator')->name('indikator.')->group(function () {
+        Route::post('/', [IndikatorJPTController::class, 'store'])->name('store');
+        Route::put('/{indikatorJPT}', [IndikatorJPTController::class, 'update'])->name('update');
+        Route::delete('/{indikatorJPT}', [IndikatorJPTController::class, 'delete'])->name('delete');
+    });
 });
 
 // CRUD KEGIATAN BY KETUA

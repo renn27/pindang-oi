@@ -12,17 +12,17 @@ class BidangController extends Controller
     public function index()
     {
         $bidangs = Bidang::all();
-        return view('pages.bidang-kerja.index', ['title' => 'Seluruh Bidang Kerja', 'bidangs' => $bidangs]);
+        return view('pages.admin.bidang-kerja.index', ['title' => 'Seluruh Bidang Kerja', 'bidangs' => $bidangs]);
     }
 
     public function show($slug)
     {
         $bidang = Bidang::with('kegiatans.pegawai')->where('slug', $slug)->firstOrFail();
-        return view('pages.bidang-kerja.show', ['title' => $bidang->nama_bidang, 'bidang' => $bidang, 'kegiatans' => $bidang->kegiatans]);
+        return view('pages.admin.bidang-kerja.show', ['title' => $bidang->nama_bidang, 'bidang' => $bidang, 'kegiatans' => $bidang->kegiatans]);
     }
 
     public function create() {
-        return view('pages.bidang-kerja.create', ['title' => 'Tambah Bidang Kerja']);
+        return view('pages.admin.bidang-kerja.create', ['title' => 'Tambah Bidang Kerja']);
     }
 
     public function store(Request $request) {

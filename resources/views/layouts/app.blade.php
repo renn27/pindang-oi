@@ -90,8 +90,11 @@
             }
         })();
     </script>
-    
+
 </head>
+
+
+
 
 <body
     x-data="{ 'loaded': true}"
@@ -131,8 +134,34 @@
 
     </div>
 
-</body>
+    @push('scripts')
+        @if (session('success'))
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    SwalHelper.success(@js(session('success')))
+                })
+            </script>
+        @endif
 
+        @if (session('error'))
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    SwalHelper.error(@js(session('error')))
+                })
+            </script>
+        @endif
+
+        @if (session('info'))
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    SwalHelper.info(@js(session('info')))
+                })
+            </script>
+        @endif
+    @endpush
+
+</body>
 @stack('scripts')
+
 
 </html>

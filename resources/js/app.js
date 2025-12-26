@@ -1,6 +1,10 @@
 import './bootstrap';
 import Alpine from 'alpinejs';
 import ApexCharts from 'apexcharts';
+import SweetAlertHelper from './helpers/sweetalert';
+
+// Attach to window object
+window.Swal = SweetAlertHelper;
 
 // flatpickr
 import flatpickr from 'flatpickr';

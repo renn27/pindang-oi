@@ -20,7 +20,15 @@ class MenuHelper
                 'name' => 'Admin',
                 'subItems' => [
                     ['name' => 'Bidang Kerja', 'path' => '/bidang-kerja', 'pro' => false],
+                    ['name' => 'RK & IKI Pimpinan', 'path' => '/rk-iki-jpt', 'pro' => false],
                     ['name' => 'Tim Kerja', 'path' => '#', 'pro' => false],
+                ],
+            ],
+            [
+                'icon' => 'dashboard',
+                'name' => 'Pimpinan',
+                'subItems' => [
+                    ['name' => 'RK & IKI Pimpinan', 'path' => '/rencana-indikator-jpt/rencana', 'pro' => false],
                 ],
             ],
             [
@@ -28,22 +36,22 @@ class MenuHelper
                 'name' => 'Tagihan Kerja',
                 'subItems' => $bidangItems
             ],
-            [
-                'icon' => 'dashboard',
-                'name' => 'Tagihan Kerja Lama',
-                'subItems' => [
-                    ['name' => 'Kalender Kegiatan', 'path' => '/calendar'],
-                    ['name' => 'Kepala', 'path' => '/'],
-                    ['name' => 'Sub Bagian Umum', 'path' => '/'],
-                    ['name' => 'Fungsi Statistik Sosial', 'path' => '/'],
-                    ['name' => 'Fungsi Statistik produksi', 'path' => '/'],
-                    ['name' => 'Fungsi Statistik distribusi', 'path' => '/'],
-                    ['name' => 'Fungsi Neraca', 'path' => '/'],
-                    ['name' => 'Fungsi SPBE', 'path' => '/bidang-kerja'],
-                    ['name' => 'Fungsi Kehumasan', 'path' => '/'],
-                    ['name' => 'Detail Kegiatan', 'path' => '/detail-kegiatan'],
-                ],
-            ],
+            // [
+            //     'icon' => 'dashboard',
+            //     'name' => 'Tagihan Kerja Lama',
+            //     'subItems' => [
+            //         ['name' => 'Kalender Kegiatan', 'path' => '/calendar'],
+            //         ['name' => 'Kepala', 'path' => '/'],
+            //         ['name' => 'Sub Bagian Umum', 'path' => '/'],
+            //         ['name' => 'Fungsi Statistik Sosial', 'path' => '/'],
+            //         ['name' => 'Fungsi Statistik produksi', 'path' => '/'],
+            //         ['name' => 'Fungsi Statistik distribusi', 'path' => '/'],
+            //         ['name' => 'Fungsi Neraca', 'path' => '/'],
+            //         ['name' => 'Fungsi SPBE', 'path' => '/bidang-kerja'],
+            //         ['name' => 'Fungsi Kehumasan', 'path' => '/'],
+            //         ['name' => 'Detail Kegiatan', 'path' => '/detail-kegiatan'],
+            //     ],
+            // ],
             [
                 'icon' => 'dashboard',
                 'name' => 'Rencana Kinerja',
@@ -56,71 +64,71 @@ class MenuHelper
         ];
     }
 
-    public static function getOthersItems()
-    {
-        return [
-            [
-                'icon' => 'calendar',
-                'name' => 'Calendar',
-                'path' => '/calendar',
-            ],
-            [
-                'icon' => 'user-profile',
-                'name' => 'User Profile',
-                'path' => '/profile',
-            ],
-            [
-                'name' => 'Forms',
-                'icon' => 'forms',
-                'subItems' => [
-                    ['name' => 'Form Elements', 'path' => '/form-elements', 'pro' => false],
-                ],
-            ],
-            [
-                'name' => 'Tables',
-                'icon' => 'tables',
-                'subItems' => [
-                    ['name' => 'Basic Tables', 'path' => '/basic-tables', 'pro' => false]
-                ],
-            ],
-            [
-                'name' => 'Pages',
-                'icon' => 'pages',
-                'subItems' => [
-                    ['name' => 'Blank Page', 'path' => '/blank', 'pro' => false],
-                    ['name' => '404 Error', 'path' => '/error-404', 'pro' => false]
-                ],
-            ],
-            [
-                'icon' => 'charts',
-                'name' => 'Charts',
-                'subItems' => [
-                    ['name' => 'Line Chart', 'path' => '/line-chart', 'pro' => false],
-                    ['name' => 'Bar Chart', 'path' => '/bar-chart', 'pro' => false]
-                ],
-            ],
-            [
-                'icon' => 'ui-elements',
-                'name' => 'UI Elements',
-                'subItems' => [
-                    ['name' => 'Alerts', 'path' => '/alerts', 'pro' => false],
-                    ['name' => 'Avatar', 'path' => '/avatars', 'pro' => false],
-                    ['name' => 'Badge', 'path' => '/badge', 'pro' => false],
-                    ['name' => 'Buttons', 'path' => '/buttons', 'pro' => false],
-                    ['name' => 'Images', 'path' => '/image', 'pro' => false],
-                    ['name' => 'Videos', 'path' => '/videos', 'pro' => false],
-                ],
-            ],
-            [
-                'icon' => 'authentication',
-                'name' => 'Authentication',
-                'subItems' => [
-                    ['name' => 'Sign In', 'path' => '/signin', 'pro' => false],
-                    ['name' => 'Sign Up', 'path' => '/signup', 'pro' => false],
-                ],
-            ],
-        ];
-    }
+    // public static function getOthersItems()
+    // {
+    //     return [
+    //         [
+    //             'icon' => 'calendar',
+    //             'name' => 'Calendar',
+    //             'path' => '/calendar',
+    //         ],
+    //         [
+    //             'icon' => 'user-profile',
+    //             'name' => 'User Profile',
+    //             'path' => '/profile',
+    //         ],
+    //         [
+    //             'name' => 'Forms',
+    //             'icon' => 'forms',
+    //             'subItems' => [
+    //                 ['name' => 'Form Elements', 'path' => '/form-elements', 'pro' => false],
+    //             ],
+    //         ],
+    //         [
+    //             'name' => 'Tables',
+    //             'icon' => 'tables',
+    //             'subItems' => [
+    //                 ['name' => 'Basic Tables', 'path' => '/basic-tables', 'pro' => false]
+    //             ],
+    //         ],
+    //         [
+    //             'name' => 'Pages',
+    //             'icon' => 'pages',
+    //             'subItems' => [
+    //                 ['name' => 'Blank Page', 'path' => '/blank', 'pro' => false],
+    //                 ['name' => '404 Error', 'path' => '/error-404', 'pro' => false]
+    //             ],
+    //         ],
+    //         [
+    //             'icon' => 'charts',
+    //             'name' => 'Charts',
+    //             'subItems' => [
+    //                 ['name' => 'Line Chart', 'path' => '/line-chart', 'pro' => false],
+    //                 ['name' => 'Bar Chart', 'path' => '/bar-chart', 'pro' => false]
+    //             ],
+    //         ],
+    //         [
+    //             'icon' => 'ui-elements',
+    //             'name' => 'UI Elements',
+    //             'subItems' => [
+    //                 ['name' => 'Alerts', 'path' => '/alerts', 'pro' => false],
+    //                 ['name' => 'Avatar', 'path' => '/avatars', 'pro' => false],
+    //                 ['name' => 'Badge', 'path' => '/badge', 'pro' => false],
+    //                 ['name' => 'Buttons', 'path' => '/buttons', 'pro' => false],
+    //                 ['name' => 'Images', 'path' => '/image', 'pro' => false],
+    //                 ['name' => 'Videos', 'path' => '/videos', 'pro' => false],
+    //             ],
+    //         ],
+    //         [
+    //             'icon' => 'authentication',
+    //             'name' => 'Authentication',
+    //             'subItems' => [
+    //                 ['name' => 'Sign In', 'path' => '/signin', 'pro' => false],
+    //                 ['name' => 'Sign Up', 'path' => '/signup', 'pro' => false],
+    //             ],
+    //         ],
+    //     ];
+    // }
 
     public static function getMenuGroups()
     {
@@ -129,10 +137,10 @@ class MenuHelper
                 'title' => 'Menu',
                 'items' => self::getMainNavItems()
             ],
-            [
-                'title' => 'Others',
-                'items' => self::getOthersItems()
-            ]
+            // [
+            //     'title' => 'Others',
+            //     'items' => self::getOthersItems()
+            // ]
         ];
     }
 
