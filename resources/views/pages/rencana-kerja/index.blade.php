@@ -119,27 +119,26 @@
         </div>
     </x-common.component-card>
 
-    <x-ui.modal x-data="{ open: false }" @open-rk-ketua-modal.window="open = true" :isOpen="false"
-        class="max-w-[700px]">
+    <x-ui.smart-modal id="modal-rencana-jpt" class="max-w-xl">
         <div class="relative flex h-[90vh] w-full max-w-[700px] flex-col overflow-hidden
                 rounded-3xl bg-white dark:bg-gray-900">
-
             <!-- HEADER (FIXED) -->
             <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
-                <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90">
-                    Add Rencana Kinerja Ketua
-                </h4>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Tambahkan rencana kinerja ketua baru
-                </p>
+                <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90" x-text="mode === 'create' ? 'Tambah Rencana Kerja Ketua' : 'Edit Rencana Kerja Ketua'"></h4>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400" x-text="mode === 'create' ? 'Masukkan rencana kerja ketua baru' : 'Edit rencana kerja ketua'"></p>
             </div>
 
-            <!-- BODY (SCROLL DI SINI) -->
+            <!-- BODY -->
             <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
-                <form class="grid grid-cols-1 gap-y-5">
-                    <!-- input-input kamu, ga aku ubah -->
+                <form x-bind:action="mode === 'edit'
+                        ? '{{ url('rencana-kerja/') }}/' + itemId
+                        : '{{ route('rencana.store') }}'"
+                    method="POST" class="grid grid-cols-1 gap-y-5">
+                    @csrf
+                    <template x-if="mode === 'edit'">
+                        <input type="hidden" name="_method" value="PUT">
+                    </template>
 
-                    <!-- sebelahan -->
                     <div class="flex flex-col gap-2 md:flex-row md:items-center">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
                             Tahun
@@ -231,6 +230,73 @@
 
 
                 </form>
+
+                <form x-bind:action="mode === 'edit'
+                        ? '{{ url('rencana-indikator-jpt/rencana') }}/' + itemId
+                        : '{{ route('rencana-indikator-jpt.rencana.store') }}'"
+                    method="POST" class="grid grid-cols-1 gap-y-5">
+                    @csrf
+                    <template x-if="mode === 'edit'">
+                        <input type="hidden" name="_method" value="PUT">
+                    </template>
+
+
+                    <!-- Field 1: Tahun -->
+                    <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            Tahun
+                        </label>
+                        <div class="md:w-3/4">
+                            <select name="tahun" x-model="formData.tahun"
+                                    class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                                    required>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                                <option value="2027">2027</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Field 2: Nama Rencana -->
+                    <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            Rencana Kerja JPT
+                        </label>
+                        <input type="text" x-model="formData.nama_rencana_jpt" name="nama_rencana_jpt"
+                            placeholder="Masukkan rencana kerja JPT"
+                            class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-800">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                            <button @click="open = false" type="button"
+                                    class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
+                                Batal
+                            </button>
+                            <button type="submit"
+                                    class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
+                                <span x-text="mode === 'create' ? 'Simpan Data' : 'Update Data'"></span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </x-ui.smart-modal>
+
+    <x-ui.modal x-data="{ open: false }" @open-rk-ketua-modal.window="open = true" :isOpen="false"
+        class="max-w-[700px]">
+        <div class="relative flex h-[90vh] w-full max-w-[700px] flex-col overflow-hidden
+                rounded-3xl bg-white dark:bg-gray-900">
+
+
+
+            <!-- BODY (SCROLL DI SINI) -->
+            <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
+
             </div>
 
             <!-- FOOTER (FIXED) -->

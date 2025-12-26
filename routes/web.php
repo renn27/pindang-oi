@@ -47,6 +47,7 @@ Route::prefix('bidang-kerja')->group(function () {
     Route::get('/{slug}', [BidangController::class, 'show'])->name('bidang.show');
 });
 
+// CRUD RK IKI JPT BY PIMPINAN
 Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(function () {
 
     // ROUTE UNTUK RENCANA JPT
@@ -69,6 +70,7 @@ Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(fu
 Route::prefix('rencana-kerja')->group(function () {
     Route::get('/', [KegiatanController::class, 'index'])->name('rencana.index');
     Route::post('/', [KegiatanController::class, 'store'])->name('rencana.store');
+    Route::put('/{rencanaKerja}', [KegiatanController::class, 'update'])->name('rencana.update');
     Route::get('/{slug}', [KegiatanController::class, 'show'])->name('rencana.show');
 });
 
