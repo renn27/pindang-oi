@@ -20,10 +20,32 @@ class RencanaJPTController extends Controller
         $validatedData = $request->validate([
             'tahun' => 'required|integer',
             'nama_rencana_jpt' => 'required|string|max:255',
+            'ikis' => 'nullable|array',
+            'ikis.*' => 'nullable|string|max:255',
+
         ]);
 
         try {
-            RencanaJPT::create($validatedData);
+
+            DB::transaction(function () use ($validatedData) {
+
+                // Pisahkan ikis
+                $ikis = $validatedData['ikis'] ?? [];
+
+                $rencana = RencanaJPT::create([
+                    'tahun' => $validatedData['tahun'],
+                    'nama_rencana_jpt' => $validatedData['nama_rencana_jpt'],
+                ]);
+
+                // 2️⃣ Simpan IKI JPT (jika ada)
+                if (!empty($ikis)) {
+                    foreach ($ikis as $iki) {
+                        $rencana->indikatorjpts()->create([
+                            'nama_indikator_jpt' => $iki,
+                        ]);
+                    }
+                }
+            });
 
             // Redirect dengan flash message
             return redirect()->route('rencana-indikator-jpt.rencana.index')

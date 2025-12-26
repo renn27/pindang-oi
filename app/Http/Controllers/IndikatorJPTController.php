@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\IndikatorJPT;
 use Illuminate\Http\Request;
+use App\Models\RencanaJPT;
 
 class IndikatorJPTController extends Controller
 {
@@ -14,26 +15,23 @@ class IndikatorJPTController extends Controller
         return view('pages.admin.rk-iki-jpt.index', ['title' => 'Rencana Kerja dan IKI Pimpinan', 'rencanaJpts' => $rencanaJpts]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, RencanaJPT $rencanaJpt)
     {
         $validatedData = $request->validate([
-            'id_rencana_jpt' => 'required|integer',
             'nama_indikator_jpt' => 'required|string|max:255',
         ]);
 
         try {
-            $indikatorJpt = IndikatorJPT::create($validatedData);
+            $rencanaJpt->indikatorjpts()->create($validatedData);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Indikator JPT berhasil ditambahkan',
-                'data' => $indikatorJpt
-            ]);
+            // Redirect dengan flash message
+            return redirect()->route('rencana-indikator-jpt.rencana.index')
+                ->with('success', 'Indikator JPT berhasil ditambahkan!');
+
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menambahkan Indikator JPT: ' . $e->getMessage()
-            ], 500);
+            return redirect()->back()
+                ->with('error', 'Gagal menambahkan Indikator JPT. Silakan coba lagi.')
+                ->withInput();
         }
     }
 
