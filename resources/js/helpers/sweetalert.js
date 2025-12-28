@@ -71,67 +71,48 @@ const SwalHelper = {
         })
     },
 
-    // confirmDelete(formId, itemName = 'data ini') {
-    //     return Swal.fire({
-    //         ...baseConfig,
-    //         icon: 'warning',
-    //         title: 'Hapus Data?',
-    //         html: `
-    //             <p>
-    //                 Yakin ingin menghapus <b>${itemName}</b>?<br>
-    //                 <span class="text-red-500">Data akan dihapus permanen.</span>
-    //             </p>
-    //         `,
-    //         showCancelButton: true,
-    //         confirmButtonText: 'Ya, Hapus',
-    //         cancelButtonText: 'Batal',
-    //         backdrop: `
-    //             rgba(0,0,0,0.4)
-    //             backdrop-blur(2px)
-    //         `
-    //     }).then(result => {
-    //         if (result.isConfirmed) {
-    //             document.getElementById(formId).submit()
-    //         }
-    //     })
-    // }
-
     confirmDelete(formId, itemName = 'data ini') {
         return Swal.fire({
             ...baseConfig,
+            showConfirmButton: false,
             html: `
-            <div class="flex flex-col">
+            <div class="flex flex-col text-left">
 
                 <!-- HEADER -->
-                <div class="border-b px-6 py-4 text-left">
-                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">
+                <div class="px-6 pt-6 pb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                         Hapus Data?
                     </h3>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        Konfirmasi penghapusan data
-                    </p>
                 </div>
 
                 <!-- BODY -->
-                <div class="px-6 py-5 text-sm text-gray-600 dark:text-gray-300">
-                    Yakin ingin menghapus <b>${itemName}</b>?<br>
-                    <span class="text-red-500">
-                        Data akan dihapus permanen.
-                    </span>
+                <div class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                    Apakah kamu yakin ingin menghapus
+                    <span class="font-semibold text-gray-900 dark:text-white">
+                        ${itemName}
+                    </span>?
+                    <div class="mt-3 rounded-lg bg-red-50 dark:bg-red-500/10 px-4 py-3 text-red-600 dark:text-red-400 text-sm">
+                        Data yang sudah dihapus tidak dapat dikembalikan.
+                    </div>
                 </div>
 
                 <!-- FOOTER -->
-                <div class="border-t px-6 py-4 flex justify-end gap-3">
+                <div class="px-6 pb-6 pt-4 flex justify-end gap-3">
                     <button id="swal-cancel"
-                        class="px-4 py-2 rounded-lg border bg-white text-sm
-                            dark:bg-gray-800 dark:border-gray-700">
+                        class="px-4 py-2 rounded-lg border border-gray-300
+                            bg-white text-sm font-medium text-gray-700
+                            hover:bg-gray-50
+                            dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300">
                         Batal
                     </button>
                     <button id="swal-confirm"
-                        class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm hover:bg-red-700">
+                        class="px-4 py-2 rounded-lg bg-red-600
+                            text-white text-sm font-semibold
+                            hover:bg-red-700 focus:ring-2 focus:ring-red-500">
                         Ya, Hapus
                     </button>
                 </div>
+
             </div>
             `,
             didOpen: () => {
@@ -146,6 +127,9 @@ const SwalHelper = {
             }
         })
     }
+
+
+
 
 
 }

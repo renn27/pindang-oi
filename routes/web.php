@@ -61,8 +61,8 @@ Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(fu
     // ROUTE UNTUK INDIKATOR JPT
     Route::prefix('{rencanaJpt}/indikator')->name('indikator.')->group(function () {
         Route::post('/', [IndikatorJPTController::class, 'store'])->name('store');
-        Route::put('/{indikatorJPT}', [IndikatorJPTController::class, 'update'])->name('update');
-        Route::delete('/{indikatorJPT}', [IndikatorJPTController::class, 'delete'])->name('delete');
+        Route::put('/{indikatorJpt}', [IndikatorJPTController::class, 'update'])->name('update');
+        Route::delete('/{indikatorJpt}', [IndikatorJPTController::class, 'delete'])->name('delete');
     });
 });
 
