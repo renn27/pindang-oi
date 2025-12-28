@@ -20,7 +20,7 @@ class MenuHelper
                 'name' => 'Admin',
                 'subItems' => [
                     ['name' => 'Bidang Kerja', 'path' => '/bidang-kerja', 'pro' => false],
-                    ['name' => 'RK & IKI Pimpinan', 'path' => '/rk-iki-jpt', 'pro' => false],
+                    // ['name' => 'RK & IKI Pimpinan', 'path' => '/rencana-indikator-jpt/rencana', 'pro' => false],
                     ['name' => 'Tim Kerja', 'path' => '#', 'pro' => false],
                 ],
             ],

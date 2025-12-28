@@ -7,17 +7,17 @@
     modalId: '{{ $attributes->get('id') }}',
     open: @js($isOpen),
     mode: 'create',
-    formData: {},
     itemId: null,
+    formData: {},
     init() {
         this.$watch('open', value => {
             if (value) {
                 document.body.style.overflow = 'hidden';
-                // Reset form jika mode create
+                {{-- // Reset form jika mode create
                 if (this.mode === 'create') {
                     this.formData = {};
                     this.itemId = null;
-                }
+                } --}}
             } else {
                 document.body.style.overflow = 'unset';
             }
