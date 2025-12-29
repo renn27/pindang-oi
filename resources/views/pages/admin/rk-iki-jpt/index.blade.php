@@ -66,8 +66,10 @@
             if ($event.detail.modalId !== 'modal-rencana-jpt') return;
 
             mode    = $event.detail.mode ?? 'create'
-            itemId  = $event.detail.id ?? null
+
+            itemKey  = $event.detail.key ?? null
             formData = $event.detail.data ?? { tahun: '', nama_rencana_jpt: '' }">
+            
         <!-- HEADER -->
         <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
             <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90" x-text="mode === 'create' ? 'Tambah Rencana Kerja JPT' : 'Edit Rencana Kerja JPT'"></h4>
@@ -76,9 +78,8 @@
 
         <!-- BODY -->
         <div class="flex-1 px-6 py-5">
-
             <form :action="mode === 'edit'
-                    ? `{{ url('rencana-indikator-jpt/rencana') }}/${itemId}`
+                    ? `{{ url('rencana-indikator-jpt/rencana') }}/${itemKey}`
                     : `{{ route('rencana-indikator-jpt.rencana.store') }}`"
                 method="POST" class="grid grid-cols-1 gap-y-5">
                 @csrf
@@ -182,7 +183,7 @@
                 if ($event.detail.modalId !== 'modal-indikator-jpt') return;
 
                 mode        = $event.detail.mode ?? 'create'
-                itemId      = $event.detail.id ?? null
+                itemKey      = $event.detail.key ?? null
                 formData = {
                     id_rencana_jpt: null,
                     nama_rencana_jpt: '',
@@ -206,8 +207,10 @@
             <form
                 method="POST"
                 :action="mode === 'edit'
-                ? `{{ url('rencana-indikator-jpt') }}/${formData.id_rencana_jpt}/indikator/${itemId}`
+
+                ? `{{ url('rencana-indikator-jpt') }}/${formData.id_rencana_jpt}/indikator/${itemKey}`
                 : `{{ url('rencana-indikator-jpt') }}/${formData.id_rencana_jpt}/indikator`"
+
                 class="grid grid-cols-1 gap-y-5">
 
                 @csrf
@@ -330,7 +333,7 @@
                                             @click="$dispatch('open-smart-modal', {
                                                 modalId: 'modal-rencana-jpt',
                                                 mode: 'edit',
-                                                id: {{ $rencanaJpt->id }},
+                                                key: {{ $rencanaJpt->id }},
                                                 data: {
                                                     tahun: '{{ $rencanaJpt->tahun }}',
                                                     nama_rencana_jpt: '{{ $rencanaJpt->nama_rencana_jpt }}'
@@ -412,7 +415,7 @@
                                                                 @click="$dispatch('open-smart-modal', {
                                                                     modalId: 'modal-indikator-jpt',
                                                                     mode: 'edit',
-                                                                    id: {{ $indikator->id }},
+                                                                    key: {{ $indikator->id }},
                                                                     data: {
                                                                         id_rencana_jpt: '{{ $rencanaJpt->id }}',
                                                                         nama_rencana_jpt: '{{ $rencanaJpt->nama_rencana_jpt }}',

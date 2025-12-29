@@ -45,8 +45,8 @@ Route::prefix('bidang-kerja')->group(function () {
     Route::get('/create', [BidangController::class, 'create'])->name('bidang.create');
     Route::post('/', [BidangController::class, 'store'])->name('bidang.store');
     Route::get('/{slug}', [BidangController::class, 'show'])->name('bidang.show');
-    Route::put('/{slug}', [BidangController::class, 'update'])->name('bidang.update');
-    Route::delete('/{slug}', [BidangController::class, 'delete'])->name('bidang.delete');
+    Route::put('/{bidang:slug}', [BidangController::class, 'update'])->name('bidang.update');
+    Route::delete('/{bidang:slug}', [BidangController::class, 'delete'])->name('bidang.delete');
 });
 
 // CRUD RK IKI JPT BY PIMPINAN
