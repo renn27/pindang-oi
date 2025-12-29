@@ -45,6 +45,11 @@ Route::prefix('bidang-kerja')->group(function () {
     Route::get('/create', [BidangController::class, 'create'])->name('bidang.create');
     Route::post('/', [BidangController::class, 'store'])->name('bidang.store');
     Route::get('/{slug}', [BidangController::class, 'show'])->name('bidang.show');
+<<<<<<< Updated upstream
+=======
+    Route::put('/{bidang:slug}', [BidangController::class, 'update'])->name('bidang.update');
+    Route::delete('/{bidang:slug}', [BidangController::class, 'delete'])->name('bidang.delete');
+>>>>>>> Stashed changes
 });
 
 // CRUD RK IKI JPT BY PIMPINAN

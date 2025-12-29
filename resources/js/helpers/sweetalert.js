@@ -127,11 +127,6 @@ const SwalHelper = {
             }
         })
     }
-
-
-
-
-
 }
 
 // global

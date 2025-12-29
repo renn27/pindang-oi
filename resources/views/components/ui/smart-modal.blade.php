@@ -7,17 +7,24 @@
     modalId: '{{ $attributes->get('id') }}',
     open: @js($isOpen),
     mode: 'create',
+<<<<<<< Updated upstream
+=======
+    itemKey: null,
+>>>>>>> Stashed changes
     formData: {},
     itemId: null,
     init() {
         this.$watch('open', value => {
             if (value) {
                 document.body.style.overflow = 'hidden';
+<<<<<<< Updated upstream
                 // Reset form jika mode create
                 if (this.mode === 'create') {
                     this.formData = {};
                     this.itemId = null;
                 }
+=======
+>>>>>>> Stashed changes
             } else {
                 document.body.style.overflow = 'unset';
             }
@@ -32,7 +39,7 @@ x-cloak
     open = true;
     mode = $event.detail.mode || 'create';
     formData = $event.detail.data || {};
-    itemId = $event.detail.id || null;"
+    itemKey = $event.detail.key || null;"
 class="modal fixed inset-0 z-99999 flex items-center justify-center overflow-hidden overscroll-none p-5"
 {{ $attributes->except('class') }}>
 

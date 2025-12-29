@@ -61,7 +61,18 @@
     </div>
 
     <!-- Modal untuk Rencana JPT -->
+<<<<<<< Updated upstream
     <x-ui.smart-modal id="modal-rencana-jpt" class="max-w-xl">
+=======
+    <x-ui.smart-modal id="modal-rencana-jpt" class="max-w-xl"
+            @open-smart-modal.window="
+
+            if ($event.detail.modalId !== 'modal-rencana-jpt') return;
+
+            mode    = $event.detail.mode ?? 'create'
+            itemKey  = $event.detail.key ?? null
+            formData = $event.detail.data ?? { tahun: '', nama_rencana_jpt: '' }">
+>>>>>>> Stashed changes
         <!-- HEADER -->
         <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
             <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90" x-text="mode === 'create' ? 'Tambah Rencana Kerja JPT' : 'Edit Rencana Kerja JPT'"></h4>
@@ -69,6 +80,7 @@
         </div>
 
         <!-- BODY -->
+<<<<<<< Updated upstream
         <div class="flex-1 px-6 py-5"
             @open-smart-modal.window="
             if ($event.detail.modalId !== 'modal-rencana-jpt') return;
@@ -78,6 +90,13 @@
             <form x-bind:action="mode === 'edit'
                     ? '{{ url('rencana-indikator-jpt/rencana') }}/' + itemId
                     : '{{ route('rencana-indikator-jpt.rencana.store') }}'"
+=======
+        <div class="flex-1 px-6 py-5">
+
+            <form :action="mode === 'edit'
+                    ? `{{ url('rencana-indikator-jpt/rencana') }}/${itemKey}`
+                    : `{{ route('rencana-indikator-jpt.rencana.store') }}`"
+>>>>>>> Stashed changes
                 method="POST" class="grid grid-cols-1 gap-y-5">
                 @csrf
                 <template x-if="mode === 'edit'">
@@ -175,7 +194,22 @@
     </x-ui.smart-modal>
 
     <!-- Modal untuk Indikator JPT -->
+<<<<<<< Updated upstream
     <x-ui.smart-modal id="modal-indikator-jpt" class="max-w-xl">
+=======
+    <x-ui.smart-modal id="modal-indikator-jpt" class="max-w-xl"
+            @open-smart-modal.window="
+                if ($event.detail.modalId !== 'modal-indikator-jpt') return;
+
+                mode        = $event.detail.mode ?? 'create'
+                itemKey      = $event.detail.key ?? null
+                formData = {
+                    id_rencana_jpt: null,
+                    nama_rencana_jpt: '',
+                    nama_indikator_jpt: '',
+                    ...($event.detail.data ?? {})
+                }">
+>>>>>>> Stashed changes
         <!-- HEADER -->
         <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
             <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90"
@@ -210,8 +244,13 @@
             <form
                 method="POST"
                 :action="mode === 'edit'
+<<<<<<< Updated upstream
                 ? `{{ url('rencana-indikator-jpt') }}/${rkId}/indikator/${indikatorId}`
                 : `{{ url('rencana-indikator-jpt') }}/${rkId}/indikator`"
+=======
+                ? `{{ url('rencana-indikator-jpt') }}/${formData.id_rencana_jpt}/indikator/${itemKey}`
+                : `{{ url('rencana-indikator-jpt') }}/${formData.id_rencana_jpt}/indikator`"
+>>>>>>> Stashed changes
                 class="grid grid-cols-1 gap-y-5">
 
                 @csrf

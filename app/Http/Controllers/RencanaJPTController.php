@@ -92,5 +92,4 @@ class RencanaJPTController extends Controller
                 ->with('error', 'Gagal menghapus Rencana JPT');
         }
     }
-
 }
