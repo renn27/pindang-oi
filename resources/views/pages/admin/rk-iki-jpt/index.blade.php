@@ -54,25 +54,22 @@
             dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
                 @click="$dispatch('open-smart-modal', {
                     modalId: 'modal-rencana-jpt',
-                    mode: 'create'
             })">
             Tambah RK JPT
         </button>
     </div>
 
     <!-- Modal untuk Rencana JPT -->
-<<<<<<< Updated upstream
-    <x-ui.smart-modal id="modal-rencana-jpt" class="max-w-xl">
-=======
     <x-ui.smart-modal id="modal-rencana-jpt" class="max-w-xl"
             @open-smart-modal.window="
 
             if ($event.detail.modalId !== 'modal-rencana-jpt') return;
 
             mode    = $event.detail.mode ?? 'create'
+
             itemKey  = $event.detail.key ?? null
             formData = $event.detail.data ?? { tahun: '', nama_rencana_jpt: '' }">
->>>>>>> Stashed changes
+            
         <!-- HEADER -->
         <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
             <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90" x-text="mode === 'create' ? 'Tambah Rencana Kerja JPT' : 'Edit Rencana Kerja JPT'"></h4>
@@ -80,23 +77,10 @@
         </div>
 
         <!-- BODY -->
-<<<<<<< Updated upstream
-        <div class="flex-1 px-6 py-5"
-            @open-smart-modal.window="
-            if ($event.detail.modalId !== 'modal-rencana-jpt') return;
-            mode    = $event.detail.mode ?? 'create'
-            itemId  = $event.detail.id ?? null
-            formData = $event.detail.data ?? { tahun: '', nama_rencana_jpt: '' }">
-            <form x-bind:action="mode === 'edit'
-                    ? '{{ url('rencana-indikator-jpt/rencana') }}/' + itemId
-                    : '{{ route('rencana-indikator-jpt.rencana.store') }}'"
-=======
         <div class="flex-1 px-6 py-5">
-
             <form :action="mode === 'edit'
                     ? `{{ url('rencana-indikator-jpt/rencana') }}/${itemKey}`
                     : `{{ route('rencana-indikator-jpt.rencana.store') }}`"
->>>>>>> Stashed changes
                 method="POST" class="grid grid-cols-1 gap-y-5">
                 @csrf
                 <template x-if="mode === 'edit'">
@@ -194,9 +178,6 @@
     </x-ui.smart-modal>
 
     <!-- Modal untuk Indikator JPT -->
-<<<<<<< Updated upstream
-    <x-ui.smart-modal id="modal-indikator-jpt" class="max-w-xl">
-=======
     <x-ui.smart-modal id="modal-indikator-jpt" class="max-w-xl"
             @open-smart-modal.window="
                 if ($event.detail.modalId !== 'modal-indikator-jpt') return;
@@ -209,7 +190,6 @@
                     nama_indikator_jpt: '',
                     ...($event.detail.data ?? {})
                 }">
->>>>>>> Stashed changes
         <!-- HEADER -->
         <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
             <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90"
@@ -223,40 +203,21 @@
         </div>
 
         <!-- BODY -->
-        <div class="flex-1 px-6 py-5"
-            x-data="{
-                mode: 'create',
-                rkId: null,
-                rkNama: '',
-                indikatorId: null,
-                formData: {
-                    nama_indikator_jpt: ''
-                }
-            }"
-            @open-smart-modal.window="
-                if ($event.detail.modalId !== 'modal-indikator-jpt') return;
-
-                mode        = $event.detail.mode ?? 'create'
-                rkId        = $event.detail.rk_id
-                rkNama      = $event.detail.rk_nama
-                indikatorId = $event.detail.id ?? null
-                formData    = $event.detail.data ?? { nama_indikator_jpt: '' }">
+        <div class="flex-1 px-6 py-5">
             <form
                 method="POST"
                 :action="mode === 'edit'
-<<<<<<< Updated upstream
-                ? `{{ url('rencana-indikator-jpt') }}/${rkId}/indikator/${indikatorId}`
-                : `{{ url('rencana-indikator-jpt') }}/${rkId}/indikator`"
-=======
+
                 ? `{{ url('rencana-indikator-jpt') }}/${formData.id_rencana_jpt}/indikator/${itemKey}`
                 : `{{ url('rencana-indikator-jpt') }}/${formData.id_rencana_jpt}/indikator`"
->>>>>>> Stashed changes
+
                 class="grid grid-cols-1 gap-y-5">
 
                 @csrf
                 <template x-if="mode === 'edit'">
                     <input type="hidden" name="_method" value="PUT">
                 </template>
+
 
                 <!-- RK (DISABLED) -->
                 <div class="flex flex-col gap-2 md:flex-row md:items-center">
@@ -265,7 +226,8 @@
                     </label>
                     <input
                         type="text"
-                        x-model="rkNama"
+                        name="nama_rencana_jpt"
+                        x-model="formData.nama_rencana_jpt"
                         disabled
                         class="md:w-3/4 h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800
                             dark:border-gray-700 dark:bg-gray-800 dark:text-white/70 cursor-not-allowed"
@@ -371,7 +333,7 @@
                                             @click="$dispatch('open-smart-modal', {
                                                 modalId: 'modal-rencana-jpt',
                                                 mode: 'edit',
-                                                id: {{ $rencanaJpt->id }},
+                                                key: {{ $rencanaJpt->id }},
                                                 data: {
                                                     tahun: '{{ $rencanaJpt->tahun }}',
                                                     nama_rencana_jpt: '{{ $rencanaJpt->nama_rencana_jpt }}'
@@ -403,12 +365,13 @@
                                             </button>
                                         </form>
 
-
                                         <button class="w-full text-left px-3 py-2 text-sm text-green-600 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                                             @click="$dispatch('open-smart-modal', {
                                             modalId: 'modal-indikator-jpt',
-                                            rk_id: '{{ $rencanaJpt->id }}',
-                                            rk_nama: '{{ $rencanaJpt->nama_rencana_jpt }}'
+                                            data: {
+                                                id_rencana_jpt: '{{ $rencanaJpt->id }}',
+                                                nama_rencana_jpt: '{{ $rencanaJpt->nama_rencana_jpt }}'
+                                            }
                                         })" >
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -452,10 +415,10 @@
                                                                 @click="$dispatch('open-smart-modal', {
                                                                     modalId: 'modal-indikator-jpt',
                                                                     mode: 'edit',
-                                                                    id: {{ $indikator->id }},
-                                                                    rk_id: '{{ $rencanaJpt->id }}',
-                                                                    rk_nama: '{{ $rencanaJpt->nama_rencana_jpt }}',
+                                                                    key: {{ $indikator->id }},
                                                                     data: {
+                                                                        id_rencana_jpt: '{{ $rencanaJpt->id }}',
+                                                                        nama_rencana_jpt: '{{ $rencanaJpt->nama_rencana_jpt }}',
                                                                         nama_indikator_jpt: '{{ $indikator->nama_indikator_jpt }}'
                                                                     }
                                                                 })">
@@ -495,13 +458,6 @@
                                 @else
                                     <div class="text-center py-4">
                                         <p class="text-sm text-gray-500 dark:text-gray-400">Belum ada indikator kerja.</p>
-                                        <a href="#"
-                                            class="inline-flex items-center mt-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
-                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                            </svg>
-                                            Tambah Indikator Pertama
-                                        </a>
                                     </div>
                                 @endif
                             </div>

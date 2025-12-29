@@ -7,24 +7,12 @@
     modalId: '{{ $attributes->get('id') }}',
     open: @js($isOpen),
     mode: 'create',
-<<<<<<< Updated upstream
-=======
     itemKey: null,
->>>>>>> Stashed changes
     formData: {},
-    itemId: null,
     init() {
         this.$watch('open', value => {
             if (value) {
                 document.body.style.overflow = 'hidden';
-<<<<<<< Updated upstream
-                // Reset form jika mode create
-                if (this.mode === 'create') {
-                    this.formData = {};
-                    this.itemId = null;
-                }
-=======
->>>>>>> Stashed changes
             } else {
                 document.body.style.overflow = 'unset';
             }
