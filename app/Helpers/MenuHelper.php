@@ -56,9 +56,10 @@ class MenuHelper
                 'icon' => 'dashboard',
                 'name' => 'Rencana Kinerja',
                 'subItems' => [
-                    ['name' => 'Tim Kerja', 'path' => '/tim-kerja', 'pro' => false],
-                    ['name' => 'RK Ketua', 'path' => '/rencana-kerja', 'pro' => false],
-                    ['name' => 'RK Ketua Lama', 'path' => '/rk-ketua', 'pro' => false],
+                    // ['name' => 'Tim Kerja', 'path' => '/tim-kerja', 'pro' => false],
+                    ['name' => 'Kegiatan/RK Ketua', 'path' => '/rencana-kerja', 'pro' => false],
+                    ['name' => 'Sub Kegiatan/RK Anggota', 'path' => '/rencana-kerja/sub-kegiatan', 'pro' => false],
+                    // ['name' => 'RK Ketua Lama', 'path' => '/rk-ketua', 'pro' => false],
                 ],
             ],
         ];

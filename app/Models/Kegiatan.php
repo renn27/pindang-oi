@@ -29,7 +29,11 @@ class Kegiatan extends Model
         return $this->belongsTo(Bidang::class, 'id_bidang', 'id_bidang');
     }
 
-    public function pegawai() {
+    public function penanggungJawab() { // pegawai diganti sebagai penanggung jawab supaya lebih jelas
         return $this->belongsTo(Pegawai::class, 'id_penanggung_jawab', 'id_pegawai');
+    }
+
+    public function subKegiatans() {
+        return $this->hasMany(SubKegiatan::class, 'id_kegiatan', 'id_kegiatan');
     }
 }

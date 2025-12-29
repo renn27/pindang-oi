@@ -14,6 +14,12 @@ class KegiatanController extends Controller
         return view('pages.rencana-kerja.index', ['title' => 'Seluruh Rencana Kerja', 'kegiatans' => $kegiatans]);
     }
 
+    public function subKegiatan()
+    {
+        $kegiatans = Kegiatan::all();
+        return view('pages.rencana-kerja.detail-kegiatan', ['title' => 'Sub Kegiatan', 'kegiatans' => $kegiatans]);
+    }
+
     public function show($slug)
     {
         $bidang = Bidang::where('slug', $slug)->firstOrFail();

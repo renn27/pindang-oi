@@ -69,6 +69,7 @@ Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(fu
 // CRUD KEGIATAN BY KETUA
 Route::prefix('rencana-kerja')->group(function () {
     Route::get('/', [KegiatanController::class, 'index'])->name('rencana.index');
+    Route::get('/sub-kegiatan', [KegiatanController::class, 'subKegiatan'])->name('rencana.sub.kegiatan');
     Route::post('/', [KegiatanController::class, 'store'])->name('rencana.store');
     Route::put('/{rencanaKerja}', [KegiatanController::class, 'update'])->name('rencana.update');
     Route::get('/{slug}', [KegiatanController::class, 'show'])->name('rencana.show');

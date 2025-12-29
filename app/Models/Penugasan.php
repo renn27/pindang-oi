@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Penugasan extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    protected $table = 'penugasans';
+    protected $primaryKey = 'id_penugasan';
+    public $incrementing = false;
+    public $timestamps = true;
+
+    protected $fillable = [
+        'id_anggota',
+        'id_sub_kegiatan',
+        'target',
+        'tanggal_mulai',
+        'tanggal_selesai',
+        'status',
+    ];
+
+    public function anggota() { // pegawai diganti sebagai anggota supaya lebih jelas
+        return $this->belongsTo(Pegawai::class, 'id_anggota', 'id_pegawai');
+    }
+
+    public function subKegiatan() {
+        return $this->belongsTo(SubKegiatan::class, 'id_sub_kegiatan', 'id_sub_kegiatan');
+    }
+
+    public function pengirimans() {
+        return $this->hasMany(Pengiriman::class, 'id_penugasan', 'id_penugasan');
+    }
+
+}
