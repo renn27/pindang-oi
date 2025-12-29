@@ -55,7 +55,7 @@ class Bidang extends Model
 
     // Relationships
     public function kegiatans() {
-        return $this->hasMany(Kegiatan::class, 'id_bidang', 'id_bidang')->whereNull('deleted_at');
+        return $this->hasMany(Kegiatan::class, 'id_bidang', 'id_bidang');
     }
 }
 

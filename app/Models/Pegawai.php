@@ -25,7 +25,15 @@ class Pegawai extends Model
         'photo',
     ];
 
-    public function kegiatans() {
-        return $this->hasMany(Kegiatan::class, 'id_penanggung_jawab', 'id_pegawai')->whereNull('deleted_at');
+    public function kegiatanYangDipimpin() {
+        return $this->hasMany(Kegiatan::class, 'id_penanggung_jawab', 'id_pegawai');
+    }
+
+    public function penugasanSebagaiAnggota() {
+        return $this->hasMany(Penugasan::class, 'id_anggota', 'id_pegawai');
+    }
+
+    public function penerimaanSebagaiPenerima() {
+        return $this->hasMany(Penerimaan::class, 'id_penerima', 'id_pegawai');
     }
 }
