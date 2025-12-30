@@ -7,9 +7,7 @@ class MenuHelper
 {
     public static function getMainNavItems()
     {
-        // Ambil data bidang dari database
-        $bidangItems = Bidang::getNavItems();
-        return [
+        $menus = [
             [
                 'icon' => 'dashboard',
                 'name' => 'Dashboard',
@@ -19,117 +17,35 @@ class MenuHelper
                 'icon' => 'dashboard',
                 'name' => 'Admin',
                 'subItems' => [
-                    ['name' => 'Bidang Kerja', 'path' => '/bidang-kerja', 'pro' => false],
-                    // ['name' => 'RK & IKI Pimpinan', 'path' => '/rencana-indikator-jpt/rencana', 'pro' => false],
-                    ['name' => 'Tim Kerja', 'path' => '#', 'pro' => false],
+                    ['name' => 'Bidang Kerja', 'path' => '/bidang-kerja'],
+                    ['name' => 'Tim Kerja', 'path' => '#'],
                 ],
             ],
             [
                 'icon' => 'dashboard',
                 'name' => 'Pimpinan',
                 'subItems' => [
-                    ['name' => 'RK & IKI Pimpinan', 'path' => '/rencana-indikator-jpt/rencana', 'pro' => false],
+                    ['name' => 'RK & IKI Pimpinan', 'path' => '/rencana-indikator-jpt/rencana'],
                 ],
             ],
             [
                 'icon' => 'dashboard',
                 'name' => 'Tagihan Kerja',
-                'subItems' => $bidangItems
+                'subItems' => Bidang::getNavItems(),
             ],
-            // [
-            //     'icon' => 'dashboard',
-            //     'name' => 'Tagihan Kerja Lama',
-            //     'subItems' => [
-            //         ['name' => 'Kalender Kegiatan', 'path' => '/calendar'],
-            //         ['name' => 'Kepala', 'path' => '/'],
-            //         ['name' => 'Sub Bagian Umum', 'path' => '/'],
-            //         ['name' => 'Fungsi Statistik Sosial', 'path' => '/'],
-            //         ['name' => 'Fungsi Statistik produksi', 'path' => '/'],
-            //         ['name' => 'Fungsi Statistik distribusi', 'path' => '/'],
-            //         ['name' => 'Fungsi Neraca', 'path' => '/'],
-            //         ['name' => 'Fungsi SPBE', 'path' => '/bidang-kerja'],
-            //         ['name' => 'Fungsi Kehumasan', 'path' => '/'],
-            //         ['name' => 'Detail Kegiatan', 'path' => '/detail-kegiatan'],
-            //     ],
-            // ],
             [
                 'icon' => 'dashboard',
                 'name' => 'Rencana Kinerja',
                 'subItems' => [
-                    // ['name' => 'Tim Kerja', 'path' => '/tim-kerja', 'pro' => false],
-                    ['name' => 'Kegiatan/RK Ketua', 'path' => '/rencana-kerja', 'pro' => false],
-                    ['name' => 'Sub Kegiatan/RK Anggota', 'path' => '/rencana-kerja/sub-kegiatan', 'pro' => false],
-                    // ['name' => 'RK Ketua Lama', 'path' => '/rk-ketua', 'pro' => false],
+                    ['name' => 'Kegiatan/RK Ketua', 'path' => '/rencana-kerja'],
+                    ['name' => 'Sub Kegiatan/RK Anggota', 'path' => '/rencana-kerja/sub-kegiatan'],
                 ],
             ],
         ];
+
+        return array_map(fn ($menu) => self::normalizeMenuItem($menu), $menus);
     }
 
-    // public static function getOthersItems()
-    // {
-    //     return [
-    //         [
-    //             'icon' => 'calendar',
-    //             'name' => 'Calendar',
-    //             'path' => '/calendar',
-    //         ],
-    //         [
-    //             'icon' => 'user-profile',
-    //             'name' => 'User Profile',
-    //             'path' => '/profile',
-    //         ],
-    //         [
-    //             'name' => 'Forms',
-    //             'icon' => 'forms',
-    //             'subItems' => [
-    //                 ['name' => 'Form Elements', 'path' => '/form-elements', 'pro' => false],
-    //             ],
-    //         ],
-    //         [
-    //             'name' => 'Tables',
-    //             'icon' => 'tables',
-    //             'subItems' => [
-    //                 ['name' => 'Basic Tables', 'path' => '/basic-tables', 'pro' => false]
-    //             ],
-    //         ],
-    //         [
-    //             'name' => 'Pages',
-    //             'icon' => 'pages',
-    //             'subItems' => [
-    //                 ['name' => 'Blank Page', 'path' => '/blank', 'pro' => false],
-    //                 ['name' => '404 Error', 'path' => '/error-404', 'pro' => false]
-    //             ],
-    //         ],
-    //         [
-    //             'icon' => 'charts',
-    //             'name' => 'Charts',
-    //             'subItems' => [
-    //                 ['name' => 'Line Chart', 'path' => '/line-chart', 'pro' => false],
-    //                 ['name' => 'Bar Chart', 'path' => '/bar-chart', 'pro' => false]
-    //             ],
-    //         ],
-    //         [
-    //             'icon' => 'ui-elements',
-    //             'name' => 'UI Elements',
-    //             'subItems' => [
-    //                 ['name' => 'Alerts', 'path' => '/alerts', 'pro' => false],
-    //                 ['name' => 'Avatar', 'path' => '/avatars', 'pro' => false],
-    //                 ['name' => 'Badge', 'path' => '/badge', 'pro' => false],
-    //                 ['name' => 'Buttons', 'path' => '/buttons', 'pro' => false],
-    //                 ['name' => 'Images', 'path' => '/image', 'pro' => false],
-    //                 ['name' => 'Videos', 'path' => '/videos', 'pro' => false],
-    //             ],
-    //         ],
-    //         [
-    //             'icon' => 'authentication',
-    //             'name' => 'Authentication',
-    //             'subItems' => [
-    //                 ['name' => 'Sign In', 'path' => '/signin', 'pro' => false],
-    //                 ['name' => 'Sign Up', 'path' => '/signup', 'pro' => false],
-    //             ],
-    //         ],
-    //     ];
-    // }
 
     public static function getMenuGroups()
     {
@@ -138,16 +54,58 @@ class MenuHelper
                 'title' => 'Menu',
                 'items' => self::getMainNavItems()
             ],
-            // [
-            //     'title' => 'Others',
-            //     'items' => self::getOthersItems()
-            // ]
         ];
     }
 
-    public static function isActive($path)
-    {
-        return request()->is(ltrim($path, '/'));
+    // private static function hasActiveSubItem(array $items): bool {
+    //     return collect($items)->contains('is_active', true);
+    // }
+
+    /**
+     * ===============================
+     * NORMALIZE MENU (FINAL VERSION)
+     * ===============================
+     */
+    private static function normalizeMenuItem(array $item): array {
+        $currentPath = trim(request()->path(), '/');
+
+        // ===============================
+        // MENU TANPA SUB
+        // ===============================
+        if (isset($item['path']) && empty($item['subItems'])) {
+
+            // JANGAN OVERRIDE is_active JIKA SUDAH ADA (Bidang)
+            if (!isset($item['is_active'])) {
+                if ($item['path'] === '/') {
+                    $item['is_active'] = $currentPath === '';
+                } else {
+                    $itemPath = trim($item['path'], '/');
+                    $item['is_active'] = request()->is($itemPath . '*');
+                }
+            }
+
+            return $item;
+        }
+
+        // ===============================
+        // MENU DENGAN SUB
+        // ===============================
+        if (!empty($item['subItems'])) {
+
+            $item['subItems'] = array_map(
+                fn ($sub) => self::normalizeMenuItem($sub),
+                $item['subItems']
+            );
+
+            // 🔥 PARENT ACTIVE JIKA ADA CHILD ACTIVE
+            $hasActiveChild = collect($item['subItems'])
+                ->contains(fn ($sub) => $sub['is_active'] === true);
+
+            $item['is_active'] = $hasActiveChild;
+            $item['is_open']   = $hasActiveChild;
+        }
+
+        return $item;
     }
 
     public static function getIconSvg($iconName)
