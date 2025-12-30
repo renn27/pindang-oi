@@ -22,10 +22,6 @@ class Bidang extends Model
         'detail_bidang',
     ];
 
-    protected $dates = [
-        'deleted_at' // Tambahkan ini untuk soft delete
-    ];
-
     public static function getNavItems() {
         $currentBidang = request()->route('bidang');
 
@@ -45,8 +41,6 @@ class Bidang extends Model
             })
             ->toArray();
     }
-
-
 
     // Generate slug from nama_bidang
     protected static function sluggable()
