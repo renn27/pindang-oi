@@ -15,6 +15,14 @@ class RencanaJPTController extends Controller
         return view('pages.main.admin.rk-iki-jpt.index', ['title' => 'Rencana Kerja dan IKI Pimpinan', 'rencanaJpts' => $rencanaJpts]);
     }
 
+    public function indikator(RencanaJPT $rencanaJpt)
+    {
+        return $rencanaJpt->indikatorJpts()
+            ->orderBy('nama_indikator_jpt')
+            ->get(['id', 'nama_indikator_jpt']);
+    }
+
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([

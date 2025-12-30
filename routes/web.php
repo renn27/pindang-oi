@@ -50,8 +50,11 @@ Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(fu
         Route::delete('/{rencanaJpt}', [RencanaJPTController::class, 'delete'])->name('delete');
     });
 
+
     // ROUTE UNTUK INDIKATOR JPT
     Route::prefix('{rencanaJpt}/indikator')->name('indikator.')->group(function () {
+        // Select data IKI By RK
+        Route::get('/', [RencanaJPTController::class, 'indikator'])->name('rencana-jpt.indikator');
         Route::post('/', [IndikatorJPTController::class, 'store'])->name('store');
         Route::put('/{indikatorJpt}', [IndikatorJPTController::class, 'update'])->name('update');
         Route::delete('/{indikatorJpt}', [IndikatorJPTController::class, 'delete'])->name('delete');
@@ -70,6 +73,7 @@ Route::prefix('bidang-kerja')->group(function () {
 // CRUD BIDANG KERJA BY ADMIN
 Route::prefix('kegiatan')->group(function () {
     Route::get('/bidang/{bidang:slug}', [KegiatanController::class, 'index'])->name('kegiatan.index');
+    Route::post('/bidang/{bidang:slug}', [KegiatanController::class, 'store'])->name('kegiatan.store');
 });
 
 

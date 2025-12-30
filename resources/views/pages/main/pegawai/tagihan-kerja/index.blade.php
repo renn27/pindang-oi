@@ -56,7 +56,7 @@
                     dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400
                     dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
                     @click="$dispatch('open-smart-modal', {
-                    modalId: 'modal-kegiatan-rk-ketua',
+                        modalId: 'modal-kegiatan-rk-ketua',
             })">
                 <!-- icon -->
                 <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none"
@@ -96,185 +96,200 @@
 
             <!-- BODY (SCROLL DI SINI) -->
             <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
-                <form :action="" method="" class="grid grid-cols-1 gap-y-5">
-                    <!-- input-input kamu, ga aku ubah -->
+                <form action="{{ route('kegiatan.store', $bidang->slug) }}"
+                    method="POST"
+                    class="grid grid-cols-1 gap-y-5">
+                    @csrf
+                    <!-- Nama Bidang (readonly tampilan) -->
                     <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Nama Kegiatan
-                    </label>
-                    <input type="text" placeholder="Contoh : SNLIK2026"
-                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                    </div>
-                    <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Nama Ketua
-                    </label>
-                    <input type="text" placeholder="Ketik untuk cari nama"
-                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            Bidang
+                        </label>
+
+                        <input
+                            type="text"
+                            value="{{ $bidang->nama_bidang }}"
+                            disabled
+                            class="w-full h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800
+                                dark:border-gray-700 dark:bg-gray-800 dark:text-white/70 cursor-not-allowed">
                     </div>
 
-                    <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Tahun Kegiatan
-                    </label>
-                    <input type="text" placeholder="2025"
-                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                    <!-- ID Bidang (yang benar-benar dikirim ke backend) -->
+                    <input type="hidden" name="id_bidang" value="{{ $bidang->id_bidang }}">
+
+                    {{-- Nama Ketua / Penanggung Jawab --}}
+                    <div x-data="{
+                        open: false,
+                        search: '',
+                        selectedId: '',
+                        highlightedIndex: -1,
+                        pegawais: @js($pegawais),
+
+                        filtered() {
+                            if (this.search.length === 0) return [];
+                            return this.pegawais.filter(p =>
+                                p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase())
+                            );
+                        },
+
+                        selectPegawai(p) {
+                            this.search = p.nama_pegawai;
+                            this.selectedId = p.id_pegawai;
+                            this.open = false;
+                            this.highlightedIndex = -1;
+                        },
+
+                        highlightNext() {
+                            if (this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++;
+                        },
+
+                        highlightPrev() {
+                            if (this.highlightedIndex > 0) this.highlightedIndex--;
+                        },
+
+                        selectHighlighted() {
+                            if (this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]);
+                        }
+                    }">
+                        <!-- Input search -->
+                        <input
+                            type="text"
+                            x-model="search"
+                            @input="open = search.length > 0; if(search==='') selectedId='';"
+                            @focus="open = search.length > 0"
+                            @keydown.arrow-down.prevent="highlightNext()"
+                            @keydown.arrow-up.prevent="highlightPrev()"
+                            @keydown.enter.prevent="selectHighlighted()"
+                            placeholder="Ketik untuk cari nama"
+                            class="h-11 w-full rounded-lg border px-4 py-2 text-sm"
+                        >
+
+                        <!-- Hidden input -->
+                        <input type="hidden" name="id_penanggung_jawab" :value="selectedId" required>
+
+                        <!-- Dropdown -->
+                        <div x-show="open" x-transition class="absolute z-50 mt-1 w-full rounded-lg border bg-white max-h-60 overflow-y-auto">
+                            <template x-if="filtered().length === 0">
+                                <div class="px-4 py-2 text-sm text-gray-500">Data tidak ditemukan</div>
+                            </template>
+
+                            <template x-for="(pegawai, index) in filtered()" :key="pegawai.id_pegawai">
+                                <div
+                                    @click="selectPegawai(pegawai)"
+                                    :class="{'bg-blue-100 dark:bg-blue-600': highlightedIndex===index, 'hover:bg-gray-100 dark:hover:bg-gray-800': highlightedIndex!==index}"
+                                    class="cursor-pointer px-4 py-2 text-sm"
+                                    x-text="pegawai.nama_pegawai"
+                                ></div>
+                            </template>
+                        </div>
                     </div>
 
+
+                    {{-- Tahun Kegiatan --}}
                     <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        RK JPT
-                    </label>
-                    <input type="text" placeholder="Masukkan rk jpt"
-                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            Tahun Kegiatan
+                        </label>
+                        <input type="text" name="tahun_kegiatan"
+                            class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                     </div>
 
+                    {{-- Rencana JPT --}}
                     <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        IKI JPT
-                    </label>
-                    <input type="text" placeholder="Masukkan iki jpt"
-                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            Rencana JPT
+                        </label>
+                        <select
+                            id="rk_jpt"
+                            name="rk_jpt"
+                            class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">
+                            <option value="">-- Pilih RK JPT --</option>
+                            @foreach ($rkJpts as $rk)
+                                <option value="{{ $rk->id }}">
+                                    {{ $rk->nama_rencana_jpt }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Indikator JPT --}}
+                    <div>
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            Indikator JPT
+                        </label>
+                        <select
+                            id="iki_jpt"
+                            name="iki_jpt"
+                            class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">
+                            <option value="">-- Harap pilih RK dulu --</option>
+                        </select>
+                    </div>
+
+                    {{-- Nama Kegiatan --}}
+                    <div>
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            Nama Kegiatan
+                        </label>
+                        <input type="text" name="nama_rk_kegiatan" placeholder="Contoh : SNLIK2026"
+                            class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                    </div>
+                    <!-- FOOTER -->
+                    <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-800">
+                        <div class="flex justify-end gap-3">
+                            <button type="button"
+                                    @click="open = false"
+                                    class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium
+                                        text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                Batal
+                            </button>
+
+                            <button type="submit"
+                                class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600">
+                                <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
+                            </button>
+                        </div>
                     </div>
                 </form>
-            </div>
-
-            <!-- FOOTER (FIXED) -->
-            <div
-            class="shrink-0 border-t border-gray-200 px-6 py-3
-                        dark:border-gray-800">
-            <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                <button
-                @click="open = false"
-                type="button"
-                class="flex w-full justify-center rounded-lg border
-                                border-gray-300 bg-white px-4 py-2.5 text-sm
-                                font-medium text-gray-700 hover:bg-gray-50
-                                dark:border-gray-700 dark:bg-gray-800
-                                dark:text-gray-400 dark:hover:bg-white/[0.03]
-                                sm:w-auto">
-                Close
-                </button>
-
-                <button
-                @click="saveProfile"
-                type="button"
-                class="flex w-full justify-center rounded-lg
-                                bg-brand-500 px-4 py-2.5 text-sm font-medium
-                                text-white hover:bg-brand-600 sm:w-auto">
-                Save Changes
-                </button>
-            </div>
             </div>
         </div>
     </x-ui.smart-modal>
 
-    <x-ui.modal
-        x-data="{ open: false }"
-        @open-add-subkegiatan-modal.window="open = true"
-        :isOpen="false"
-        class="max-w-[700px]">
-        <div
-            class="relative flex h-[90vh] w-full max-w-[700px] flex-col overflow-hidden
-                    rounded-3xl bg-white dark:bg-gray-900">
+    <div class="space-y-6">
+        @foreach ($kegiatans as $kegiatan)
+            <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden">
+                <!-- Header Card -->
+                <div class="bg-white dark:bg-white/[0.03] px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+                                {{ $kegiatan->nama_rk_kegiatan }}
+                            </h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                Ketua: {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }} •
+                                Tahun: {{ $kegiatan->tahun_kegiatan }} •
+                                RK JPT: {{ $kegiatan->rencanaJpt->nama_rencana_jpt ?? '-' }} •
+                                IKI JPT: {{ $kegiatan->indikatorJpt->nama_indikator_jpt ?? '-' }}
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <!-- Tombol Edit -->
+                            <button
+                                class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]">
+                                Edit
+                            </button>
 
-            <!-- HEADER (FIXED) -->
-            <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
-            <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90">
-                Tambah Sub Kegiatan
-            </h4>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Tambahkan data Sub kegiatan baru
-            </p>
+                            <!-- Tombol Hapus -->
+                            <button
+                                class="flex items-center gap-2 rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 dark:border-red-700 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30">
+                                Hapus
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <!-- BODY (SCROLL DI SINI) -->
-            <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
-            <form class="grid grid-cols-1 gap-y-5">
-                <!-- input-input kamu, ga aku ubah -->
-                <div>
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Nama Sub Kegiatan
-                </label>
-                <input type="text" placeholder="Contoh : SNLIK2026"
-                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                </div>
-                <div>
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Jenis Kegiatan
-                </label>
-                <input type="text"
-                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                </div>
-                <div>
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Satuan Target
-                </label>
-                <input type="text"
-                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                </div>
-                <div>
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Tanggal Mulai
-                </label>
-                <x-form.date-picker
-                    id="tanggal_mulai"
-                    name="date_pick"
-                    placeholder="Date Picker"
-                    defaultDate="{{ now()->format('Y-m-d') }}" />
-                </div>
-                <div>
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Tanggal Selesai
-                </label>
-                <x-form.date-picker
-                    id="tanggal_akhir"
-                    name="date_pick"
-                    placeholder="Date Picker"
-                    defaultDate="{{ now()->format('Y-m-d') }}" />
-                </div>
-
-                <div>
-                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                    Keterangan
-                </label>
-                <input type="text"
-                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                </div>
-
-
-            </form>
-            </div>
-
-            <!-- FOOTER (FIXED) -->
-            <div
-            class="shrink-0 border-t border-gray-200 px-6 py-3
-                        dark:border-gray-800">
-            <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                <button
-                @click="open = false"
-                type="button"
-                class="flex w-full justify-center rounded-lg border
-                                border-gray-300 bg-white px-4 py-2.5 text-sm
-                                font-medium text-gray-700 hover:bg-gray-50
-                                dark:border-gray-700 dark:bg-gray-800
-                                dark:text-gray-400 dark:hover:bg-white/[0.03]
-                                sm:w-auto">
-                Close
-                </button>
-
-                <button
-                @click="saveProfile"
-                type="button"
-                class="flex w-full justify-center rounded-lg
-                                bg-brand-500 px-4 py-2.5 text-sm font-medium
-                                text-white hover:bg-brand-600 sm:w-auto">
-                Save Changes
-                </button>
-            </div>
-            </div>
-        </div>
-    </x-ui.modal>
+        @endforeach
+    </div>
+{{--
 
     <!-- Container untuk Card Kegiatan -->
     <div class="space-y-6">
@@ -454,8 +469,37 @@
             </table>
             </div>
         </div>
-    </div>
+    </div> --}}
 
+    <script>
+        const rkSelect  = document.getElementById('rk_jpt');
+        const ikiSelect = document.getElementById('iki_jpt');
+
+        rkSelect.addEventListener('change', function () {
+            const rkId = this.value;
+
+            // reset IKI
+            ikiSelect.innerHTML = '';
+
+            if (!rkId) {
+                ikiSelect.innerHTML = '<option value="">Harap pilih RK terlebih dahulu</option>';
+                return;
+            }
+
+            ikiSelect.innerHTML = '<option value="">-- Pilih IKI JPT --</option>';
+
+            fetch(`/rencana-indikator-jpt/${rkId}/indikator`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(iki => {
+                        const option = document.createElement('option');
+                        option.value = iki.id;
+                        option.textContent = iki.nama_indikator_jpt;
+                        ikiSelect.appendChild(option);
+                    });
+                });
+        });
+    </script>
 
 @endsection
 
@@ -624,6 +668,114 @@
         </table>
     </div>
 </div> --}}
+
+{{-- <x-ui.modal
+    x-data="{ open: false }"
+    @open-add-subkegiatan-modal.window="open = true"
+    :isOpen="false"
+    class="max-w-[700px]">
+    <div
+        class="relative flex h-[90vh] w-full max-w-[700px] flex-col overflow-hidden
+                rounded-3xl bg-white dark:bg-gray-900">
+
+        <!-- HEADER (FIXED) -->
+        <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
+        <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90">
+            Tambah Sub Kegiatan
+        </h4>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Tambahkan data Sub kegiatan baru
+        </p>
+        </div>
+
+        <!-- BODY (SCROLL DI SINI) -->
+        <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
+        <form class="grid grid-cols-1 gap-y-5">
+            <!-- input-input kamu, ga aku ubah -->
+            <div>
+            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Nama Sub Kegiatan
+            </label>
+            <input type="text" placeholder="Contoh : SNLIK2026"
+                class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+            </div>
+            <div>
+            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Jenis Kegiatan
+            </label>
+            <input type="text"
+                class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+            </div>
+            <div>
+            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Satuan Target
+            </label>
+            <input type="text"
+                class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+            </div>
+            <div>
+            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Tanggal Mulai
+            </label>
+            <x-form.date-picker
+                id="tanggal_mulai"
+                name="date_pick"
+                placeholder="Date Picker"
+                defaultDate="{{ now()->format('Y-m-d') }}" />
+            </div>
+            <div>
+            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Tanggal Selesai
+            </label>
+            <x-form.date-picker
+                id="tanggal_akhir"
+                name="date_pick"
+                placeholder="Date Picker"
+                defaultDate="{{ now()->format('Y-m-d') }}" />
+            </div>
+
+            <div>
+            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Keterangan
+            </label>
+            <input type="text"
+                class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+            </div>
+
+
+        </form>
+        </div>
+
+        <!-- FOOTER (FIXED) -->
+        <div
+        class="shrink-0 border-t border-gray-200 px-6 py-3
+                    dark:border-gray-800">
+        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <button
+            @click="open = false"
+            type="button"
+            class="flex w-full justify-center rounded-lg border
+                            border-gray-300 bg-white px-4 py-2.5 text-sm
+                            font-medium text-gray-700 hover:bg-gray-50
+                            dark:border-gray-700 dark:bg-gray-800
+                            dark:text-gray-400 dark:hover:bg-white/[0.03]
+                            sm:w-auto">
+            Close
+            </button>
+
+            <button
+            @click="saveProfile"
+            type="button"
+            class="flex w-full justify-center rounded-lg
+                            bg-brand-500 px-4 py-2.5 text-sm font-medium
+                            text-white hover:bg-brand-600 sm:w-auto">
+            Save Changes
+            </button>
+        </div>
+        </div>
+    </div>
+</x-ui.modal> --}}
+
 
 {{-- <x-ui.modal
     x-data="{ open: false }"
