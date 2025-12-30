@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-common.page-breadcrumb pageTitle="Fungsi SPBE" />
+    <x-common.page-breadcrumb pageTitle="{{$title}}" />
 
     <!-- Bagian Tahun -->
     <div class="flex flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6 mb-6">

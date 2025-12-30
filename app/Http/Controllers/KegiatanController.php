@@ -8,16 +8,23 @@ use App\Models\Kegiatan;
 
 class KegiatanController extends Controller
 {
-    public function index()
+    public function index(Bidang $bidang)
     {
-        $kegiatans = Kegiatan::all();
-        return view('pages.rencana-kerja.index', ['title' => 'Seluruh Rencana Kerja', 'kegiatans' => $kegiatans]);
+
+        $kegiatans = $bidang->kegiatans()->with('subKegiatans.pegawai')->get();
+
+        return view('pages.main.pegawai.tagihan-kerja.index', [
+            'title' => 'Kegiatan '. $bidang->nama_bidang,
+            'bidang' => $bidang,
+            'kegiatans' => $kegiatans
+        ]);
+
     }
 
     public function subKegiatan()
     {
         $kegiatans = Kegiatan::all();
-        return view('pages.rencana-kerja.detail-kegiatan', ['title' => 'Sub Kegiatan', 'kegiatans' => $kegiatans]);
+        return view('pages.main.pegawai.tagihan-kerja.detail-kegiatan', ['title' => 'Sub Kegiatan', 'kegiatans' => $kegiatans]);
     }
 
     public function show($slug)

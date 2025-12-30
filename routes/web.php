@@ -39,16 +39,6 @@ Route::get('/basic-tables', function () {
 })->name('basic-tables');
 
 
-// CRUD BIDANG KERJA BY ADMIN
-Route::prefix('bidang-kerja')->group(function () {
-    Route::get('/', [BidangController::class, 'index'])->name('bidang.index');
-    Route::get('/create', [BidangController::class, 'create'])->name('bidang.create');
-    Route::post('/', [BidangController::class, 'store'])->name('bidang.store');
-    Route::get('/{slug}', [BidangController::class, 'show'])->name('bidang.show');
-    Route::put('/{bidang:slug}', [BidangController::class, 'update'])->name('bidang.update');
-    Route::delete('/{bidang:slug}', [BidangController::class, 'delete'])->name('bidang.delete');
-});
-
 // CRUD RK IKI JPT BY PIMPINAN
 Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(function () {
 
@@ -67,6 +57,21 @@ Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(fu
         Route::delete('/{indikatorJpt}', [IndikatorJPTController::class, 'delete'])->name('delete');
     });
 });
+
+// CRUD BIDANG KERJA BY ADMIN
+Route::prefix('bidang-kerja')->group(function () {
+    Route::get('/', [BidangController::class, 'index'])->name('bidang.index');
+    Route::get('/create', [BidangController::class, 'create'])->name('bidang.create');
+    Route::post('/', [BidangController::class, 'store'])->name('bidang.store');
+    Route::put('/{bidang:slug}', [BidangController::class, 'update'])->name('bidang.update');
+    Route::delete('/{bidang:slug}', [BidangController::class, 'delete'])->name('bidang.delete');
+});
+
+// CRUD BIDANG KERJA BY ADMIN
+Route::prefix('kegiatan')->group(function () {
+    Route::get('/bidang/{bidang:slug}', [KegiatanController::class, 'index'])->name('kegiatan.index');
+});
+
 
 // CRUD KEGIATAN BY KETUA
 Route::prefix('rencana-kerja')->group(function () {

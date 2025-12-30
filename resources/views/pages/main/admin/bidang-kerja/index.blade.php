@@ -12,13 +12,6 @@
                 Tampilkan Data Tahun
             </label>
         </div>
-        {{--
-        <a href="{{ route('bidang.create') }}"
-        class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white
-                shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-            Tambah Data
-        </a> --}}
-
 
         <!-- Dropdown -->
         <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent w-full sm:w-auto">
@@ -234,38 +227,6 @@
                 </tbody>
             </table>
         </div>
-
-
-
-            {{-- <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead>
-                    <tr class="bg-gray-50 dark:bg-gray-800/50">
-                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-16">
-                        No.
-                    </th>
-                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Nama Bidang
-                    </th>
-                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32">
-                        Detail Bidang
-                    </th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
-
-                    @foreach ($bidangs as $bidang)
-                        <!-- Bidang Integrasi Pengolahan Dan Diseminasi Statistik -->
-                        <tr class="bg-gray-100 dark:bg-gray-800">
-                            <td colspan="5" class="px-4 py-3">
-                                <span class="text-sm font-semibold text-gray-800 dark:text-white">
-                                    {{ $bidang->nama_bidang }}
-                                </span>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table> --}}
-        </div>
     </div>
 
     {{-- Handle Slug Otomatis --}}
@@ -295,5 +256,4 @@
         });
     });
     </script>
-
 @endsection

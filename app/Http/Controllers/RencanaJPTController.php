@@ -12,7 +12,7 @@ class RencanaJPTController extends Controller
     {
         $rencanaJpts = RencanaJPT::with(['indikatorjpts'])->get();
 
-        return view('pages.admin.rk-iki-jpt.index', ['title' => 'Rencana Kerja dan IKI Pimpinan', 'rencanaJpts' => $rencanaJpts]);
+        return view('pages.main.admin.rk-iki-jpt.index', ['title' => 'Rencana Kerja dan IKI Pimpinan', 'rencanaJpts' => $rencanaJpts]);
     }
 
     public function store(Request $request)

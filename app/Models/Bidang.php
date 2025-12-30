@@ -26,22 +26,27 @@ class Bidang extends Model
         'deleted_at' // Tambahkan ini untuk soft delete
     ];
 
-    // Method untuk mendapatkan data bidang dalam format array navbar
-    public static function getNavItems()
-    {
-        $bidangs = self::whereNull('deleted_at')->orderBy('nama_bidang')->get();
+    public static function getNavItems() {
+        $currentBidang = request()->route('bidang');
 
-        $navItems = [];
-        foreach ($bidangs as $bidang) {
-            $navItems[] = [
-                'name' => $bidang->nama_bidang,
-                'path' => '/bidang-kerja/' . $bidang->slug, // atau slug jika ada
-                'icon' => 'dashboard', // default icon
-            ];
-        }
+        return self::whereNull('deleted_at')
+            ->orderBy('nama_bidang')
+            ->get()
+            ->map(function ($bidang) use ($currentBidang) {
+                $isActive = $currentBidang
+                    && $currentBidang->slug === $bidang->slug;
 
-        return $navItems;
+                return [
+                    'name'      => $bidang->nama_bidang,
+                    'path'      => route('kegiatan.index', $bidang->slug),
+                    'icon'      => 'dashboard',
+                    'is_active' => $isActive, // 🔥 JANGAN DIUBAH LAGI
+                ];
+            })
+            ->toArray();
     }
+
+
 
     // Generate slug from nama_bidang
     protected static function sluggable()
