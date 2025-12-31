@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Kegiatan;
 use App\Models\SubKegiatan;
+use App\Models\Pegawai;
 
 class SubKegiatanController extends Controller
 {
@@ -42,9 +43,13 @@ class SubKegiatanController extends Controller
     }
 
     public function show(Kegiatan $kegiatan, SubKegiatan $subKegiatan) {
+        // Data referensi untuk dropdown modal
+        $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
+
         return view('pages.main.pegawai.tagihan-kerja.detail-sub-kegiatan', [
             'kegiatan' => $kegiatan,
             'subKegiatan' => $subKegiatan,
+            'pegawais' => $pegawais
         ]);
     }
 
