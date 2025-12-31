@@ -7,7 +7,7 @@
         <!-- Header Kegiatan -->
         <div class="mb-8">
             <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">
-            Penyiapan Peta SNLIK26
+            {{$subKegiatan->nama_sub_kegiatan}}
             </h1>
 
             <!-- Informasi Kegiatan dalam Tabel Format -->
@@ -19,7 +19,7 @@
                     Sub Kegiatan
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">
-                    Penyiapan Peta SNLIK26
+                    {{$subKegiatan->nama_sub_kegiatan}}
                     </td>
                 </tr>
                 <tr>
@@ -27,7 +27,7 @@
                     Jenis Kegiatan
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">
-                    SNLIK26
+                    {{$subKegiatan->jenis_kegiatan}}
                     </td>
                 </tr>
                 <tr>
@@ -35,7 +35,7 @@
                     Tanggal Mulai
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">
-                    01 Januari 2026
+                    {{$subKegiatan->tanggal_mulai->format('d M Y')}}
                     </td>
                 </tr>
                 <tr>
@@ -43,7 +43,7 @@
                     Tanggal Berakhir
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">
-                    10 Januari 2026
+                    {{$subKegiatan->tanggal_selesai->format('d M Y')}}
                     </td>
                 </tr>
                 <tr>
@@ -51,15 +51,15 @@
                     Satuan Target
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">
-                    Peta
+                    {{$subKegiatan->satuan_target}}
                     </td>
                 </tr>
                 <tr>
                     <td class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-800/50">
-                    Keterangan
+                    Status
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">
-                    keterangan keterangan
+                    {{$subKegiatan->status}}
                     </td>
                 </tr>
                 </tbody>

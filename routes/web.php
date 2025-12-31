@@ -7,6 +7,7 @@ use App\Http\Controllers\BidangController;
 use App\Http\Controllers\IndikatorJPTController;
 use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\RencanaJPTController;
+use App\Http\Controllers\SubKegiatanController;
 
 // dashboard pages
 Route::get('/', function () {
@@ -70,10 +71,18 @@ Route::prefix('bidang-kerja')->group(function () {
     Route::delete('/{bidang:slug}', [BidangController::class, 'delete'])->name('bidang.delete');
 });
 
-// CRUD BIDANG KERJA BY ADMIN
 Route::prefix('kegiatan')->group(function () {
+    // Kegiatan
     Route::get('/bidang/{bidang:slug}', [KegiatanController::class, 'index'])->name('kegiatan.index');
     Route::post('/bidang/{bidang:slug}', [KegiatanController::class, 'store'])->name('kegiatan.store');
+
+    // Sub Kegiatan
+    Route::prefix('/{kegiatan:id_kegiatan}/sub-kegiatan')->group(function () {
+        Route::post('/', [SubKegiatanController::class, 'store'])->name('sub.kegiatan.store'); // create
+        Route::get('/{subKegiatan}', [SubKegiatanController::class, 'show'])->name('sub.kegiatan.show'); // edit
+        Route::put('/{subKegiatan}', [SubKegiatanController::class, 'update'])->name('sub.kegiatan.update'); // edit
+        Route::delete('/{subKegiatan}', [SubKegiatanController::class, 'delete'])->name('sub.kegiatan.delete'); // delete
+    });
 });
 
 
