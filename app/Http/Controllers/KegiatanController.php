@@ -69,10 +69,10 @@ class KegiatanController extends Controller
                 ->route('kegiatan.index', $bidang->slug)
                 ->with('success', 'Kegiatan berhasil ditambahkan.');
         } catch (\Exception $e) {
-            dd($e->getMessage());
-            // return redirect()->back()
-            //     ->with('error', 'Gagal menambahkan Kegiatan. Silakan coba lagi.')
-            //     ->withInput();
+            // dd($e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Gagal menambahkan Kegiatan. Silakan coba lagi.')
+                ->withInput();
         }
     }
 }
