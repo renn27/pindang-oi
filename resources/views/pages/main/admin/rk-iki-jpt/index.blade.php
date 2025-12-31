@@ -69,7 +69,7 @@
 
             itemKey  = $event.detail.key ?? null
             formData = $event.detail.data ?? { tahun: '', nama_rencana_jpt: '' }">
-            
+
         <!-- HEADER -->
         <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
             <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90" x-text="mode === 'create' ? 'Tambah Rencana Kerja JPT' : 'Edit Rencana Kerja JPT'"></h4>

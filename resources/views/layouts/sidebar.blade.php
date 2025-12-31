@@ -4,7 +4,7 @@
 @endphp
 
 <aside
-    class="fixed top-0 left-0 h-screen w-[290px] bg-white border-r border-gray-200"
+    class="fixed top-0 left-0 h-screen w-[290px] bg-white dark:text-white dark:bg-gray-900 dark:border-gray-800 border-r border-gray-200"
     x-data="{
         openSubmenus: {},
         toggle(key) {
