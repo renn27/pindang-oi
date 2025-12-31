@@ -299,18 +299,14 @@
 
             <!-- HEADER (FIXED) -->
             <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
-            <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90">
-                Tambah Sub Kegiatan
-            </h4>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Tambahkan data Sub kegiatan baru
-            </p>
+                <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90" x-text="mode === 'create' ? 'Tambah Sub Kegiatan/RK Anggota' : 'Edit Sub Kegiatan/RK Anggota'"></h4>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400" x-text="mode === 'create' ? 'Masukkan sub kegiatan yang baru' : 'Edit sub kegiatan yang sudah ada'"></p>
             </div>
 
             <!-- BODY (SCROLL DI SINI) -->
             <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
                 <form :action="mode === 'edit'
-                        ? `/sub-kegiatan/${itemKey}`
+                        ? `kegiatan/${formData.id_kegiatan}/sub-kegiatan/${itemKey}`
                         : `/kegiatan/${formData.id_kegiatan}/sub-kegiatan`"
                     method="POST"
                     class="grid grid-cols-1 gap-y-5">

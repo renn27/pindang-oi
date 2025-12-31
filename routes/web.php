@@ -6,6 +6,7 @@ use App\Http\Controllers\TimKerjaController;
 use App\Http\Controllers\BidangController;
 use App\Http\Controllers\IndikatorJPTController;
 use App\Http\Controllers\KegiatanController;
+use App\Http\Controllers\PenugasanController;
 use App\Http\Controllers\RencanaJPTController;
 use App\Http\Controllers\SubKegiatanController;
 
@@ -71,6 +72,7 @@ Route::prefix('bidang-kerja')->group(function () {
     Route::delete('/{bidang:slug}', [BidangController::class, 'delete'])->name('bidang.delete');
 });
 
+// CRUD KEGIATAN & SUB KEGIATAN BY KETUA TIM
 Route::prefix('kegiatan')->group(function () {
     // Kegiatan
     Route::get('/bidang/{bidang:slug}', [KegiatanController::class, 'index'])->name('kegiatan.index');
@@ -83,6 +85,13 @@ Route::prefix('kegiatan')->group(function () {
         Route::put('/{subKegiatan}', [SubKegiatanController::class, 'update'])->name('sub.kegiatan.update'); // edit
         Route::delete('/{subKegiatan}', [SubKegiatanController::class, 'delete'])->name('sub.kegiatan.delete'); // delete
     });
+});
+
+// CRUD PENUGASAN  BY KETUA TIM
+Route::prefix('sub-kegiatan/{subKegiatan}/penugasan')->group(function () {
+    Route::post('/', [PenugasanController::class, 'store'])->name('penugasan.store'); // create
+    Route::put('/{penugasan}', [PenugasanController::class, 'update'])->name('penugasan.update'); // edit
+    Route::delete('/{penugasan}', [PenugasanController::class, 'delete'])->name('penugasan.delete'); // delete
 });
 
 
