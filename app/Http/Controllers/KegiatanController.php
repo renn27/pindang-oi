@@ -30,17 +30,12 @@ class KegiatanController extends Controller
         ]);
     }
 
-    public function subKegiatan()
-    {
-        $kegiatans = Kegiatan::all();
-        return view('pages.main.pegawai.tagihan-kerja.detail-kegiatan', ['title' => 'Sub Kegiatan', 'kegiatans' => $kegiatans]);
-    }
 
-    public function show($slug)
-    {
-        $bidang = Bidang::where('slug', $slug)->firstOrFail();
-        return view('pages.rencana-kerja.show', ['title' => $bidang->nama_bidang, 'bidang' => $bidang]);
-    }
+    // public function show($slug)
+    // {
+    //     $bidang = Bidang::where('slug', $slug)->firstOrFail();
+    //     return view('pages.rencana-kerja.show', ['title' => $bidang->nama_bidang, 'bidang' => $bidang]);
+    // }
 
     public function store(Request $request, Bidang $bidang) {
         // dd($request->all());

@@ -25,6 +25,11 @@ class Penugasan extends Model
         'status',
     ];
 
+    // protected $casts = [
+    //     'tanggal_mulai'   => 'date',
+    //     'tanggal_selesai' => 'date',
+    // ];
+
     public function anggota() { // pegawai diganti sebagai anggota supaya lebih jelas
         return $this->belongsTo(Pegawai::class, 'id_anggota', 'id_pegawai');
     }
