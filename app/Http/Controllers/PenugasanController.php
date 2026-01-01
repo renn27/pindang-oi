@@ -12,7 +12,7 @@ class PenugasanController extends Controller
 
         $validated = $request->validate([
             'id_anggota' => ['required', 'exists:pegawais,id_pegawai',],
-            'target' => ['required', 'string', 'max:255'],
+            'target' => ['required', 'integer', 'max:255'],
             'tanggal_mulai' => ['required', 'date', 'date_format:Y-m-d'],
             'tanggal_selesai' => ['required',
                                     'date',
@@ -39,6 +39,7 @@ class PenugasanController extends Controller
                 ->withInput();
         }
     }
+
     public function update() {}
     public function delete() {}
 }

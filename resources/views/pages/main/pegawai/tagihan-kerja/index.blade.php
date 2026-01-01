@@ -330,7 +330,7 @@
                     </div>
 
                     <!-- ID Bidang (yang benar-benar dikirim ke backend) -->
-                    <input type="hidden" name="id_kegiatan" :value="formData.id_kegiatan">
+                    {{-- <input type="hidden" name="id_kegiatan" :value="formData.id_kegiatan"> --}}
 
                     <div>
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
@@ -485,6 +485,9 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32">
                                 Jenis
                                 </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32">
+                                Jumlah Anggota
+                                </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-40">
                                 Tanggal Mulai
                                 </th>
@@ -519,6 +522,9 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-400 text-center">
                                     {{ $subkegiatan->jenis_kegiatan }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-400 text-center">
+                                    {{ $subkegiatan->penugasans->count() }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-400 text-center">
                                     {{ $subkegiatan->tanggal_mulai->format('d M Y') }}

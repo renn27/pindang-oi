@@ -25,10 +25,10 @@ class Penugasan extends Model
         'status',
     ];
 
-    // protected $casts = [
-    //     'tanggal_mulai'   => 'date',
-    //     'tanggal_selesai' => 'date',
-    // ];
+    protected $casts = [
+        'tanggal_mulai'   => 'date',
+        'tanggal_selesai' => 'date',
+    ];
 
     public function anggota() { // pegawai diganti sebagai anggota supaya lebih jelas
         return $this->belongsTo(Pegawai::class, 'id_anggota', 'id_pegawai');
@@ -42,4 +42,8 @@ class Penugasan extends Model
         return $this->hasMany(Pengiriman::class, 'id_penugasan', 'id_penugasan');
     }
 
+    public function latestPengiriman() {
+        return $this->hasOne(Pengiriman::class, 'id_penugasan', 'id_penugasan')
+            ->latest('created_at');
+    }
 }
