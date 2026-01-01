@@ -6,6 +6,8 @@ use App\Http\Controllers\TimKerjaController;
 use App\Http\Controllers\BidangController;
 use App\Http\Controllers\IndikatorJPTController;
 use App\Http\Controllers\KegiatanController;
+use App\Http\Controllers\PenerimaanController;
+use App\Http\Controllers\PengirimanController;
 use App\Http\Controllers\PenugasanController;
 use App\Http\Controllers\RencanaJPTController;
 use App\Http\Controllers\SubKegiatanController;
@@ -79,7 +81,7 @@ Route::prefix('kegiatan')->group(function () {
     Route::post('/bidang/{bidang:slug}', [KegiatanController::class, 'store'])->name('kegiatan.store');
 
     // Sub Kegiatan
-    Route::prefix('/{kegiatan:id_kegiatan}/sub-kegiatan')->group(function () {
+    Route::prefix('{kegiatan:id_kegiatan}/sub-kegiatan')->group(function () {
         Route::post('/', [SubKegiatanController::class, 'store'])->name('sub.kegiatan.store'); // create
         Route::get('/{subKegiatan}', [SubKegiatanController::class, 'show'])->name('sub.kegiatan.show'); // edit
         Route::put('/{subKegiatan}', [SubKegiatanController::class, 'update'])->name('sub.kegiatan.update'); // edit
@@ -88,10 +90,23 @@ Route::prefix('kegiatan')->group(function () {
 });
 
 // CRUD PENUGASAN  BY KETUA TIM
-Route::prefix('sub-kegiatan/{subKegiatan}/penugasan')->group(function () {
-    Route::post('/', [PenugasanController::class, 'store'])->name('penugasan.store'); // create
-    Route::put('/{penugasan}', [PenugasanController::class, 'update'])->name('penugasan.update'); // edit
-    Route::delete('/{penugasan}', [PenugasanController::class, 'delete'])->name('penugasan.delete'); // delete
+Route::prefix('sub-kegiatan/{subKegiatan:id_sub_kegiatan}')->group(function () {
+    // CRUD PENUGASAN BY KETUA TIM
+    Route::prefix('penugasan')->group(function () {
+        Route::post('/', [PenugasanController::class, 'store'])->name('penugasan.store'); // create
+        Route::put('/{penugasan}', [PenugasanController::class, 'update'])->name('penugasan.update'); // edit
+        Route::delete('/{penugasan}', [PenugasanController::class, 'delete'])->name('penugasan.delete'); // delete
+
+        // CRUD PENGIRIMAN BY ANGGOTA TIM
+        Route::prefix('{penugasan:id_penugasan}/pengirimans')->group(function () {
+            Route::post('/', [PengirimanController::class, 'store'])->name('pengiriman.store'); // create
+
+            Route::prefix('{pengirimans:id_pengiriman}/penerimaan')->group(function () {
+                Route::post('/', [PenerimaanController::class, 'store'])->name('penerimaan.store'); // create
+            });
+        });
+
+    });
 });
 
 
