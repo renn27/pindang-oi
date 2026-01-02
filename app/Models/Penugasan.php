@@ -44,6 +44,18 @@ class Penugasan extends Model
 
     public function latestPengiriman() {
         return $this->hasOne(Pengiriman::class, 'id_penugasan', 'id_penugasan')
-            ->latest('created_at');
+            ->latestOfMany('tanggal_pengiriman');
     }
+
+    public function latestPenerimaan() {
+        return $this->hasOneThrough(
+            Penerimaan::class,   // model akhir
+            Pengiriman::class,   // model perantara
+            'id_penugasan',      // FK di Pengiriman ke Penugasan
+            'id_pengiriman',     // FK di Penerimaan ke Pengiriman
+            'id_penugasan',      // local key di Penugasan
+            'id_pengiriman'      // local key di Pengiriman
+        )->latestOfMany('tanggal_penerimaan');
+    }
+
 }

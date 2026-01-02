@@ -292,7 +292,7 @@
 
                     <!-- BODY (SCROLL DI SINI) -->
                     <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
-                        <form :action="`/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${formData.id_penugasan}/pengiriman`"
+                        <form :action="`/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${formData.id_penugasan}/pengirimans`"
                             method="POST" class="grid grid-cols-1 gap-y-5">
                             @csrf
                             <!-- Id Penugasan (readonly tampilan) -->
@@ -644,6 +644,9 @@
                                     <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                                     Target
                                     </th>
+                                    <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                                    Deadline
+                                    </th>
                                     <th colspan="3" class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                                     Pengiriman
                                     </th>
@@ -692,15 +695,19 @@
                                         <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-400 text-center">
                                             {{ $penugasan->target ?? '-' }}
                                         </td>
+                                        <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-400 text-center">
+                                            {{ $penugasan->tanggal_selesai->translatedFormat('D, d M Y') ?? '-' }}
+                                        </td>
 
                                         {{-- PENGIRIMAN --}}
                                         <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-400">
                                             <div>
-                                                <div class="text-xs text-gray-500 dark:text-gray-400 pl-4">
-                                                    {{ $penugasan->latestPengiriman->tanggal_pengiriman->translatedFormat('D, d M Y') ?? 'belum dikirim' }}
-                                                    Jumlah : {{ $penugasan->latestPengiriman->jumlah_dikirim ?? '-' }}
-                                                    Dikirim melalui {{ $penugasan->latestPengiriman->media_pengiriman ?? '-' }}
-                                                </div>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 pl-4">
+                                                    {{ $penugasan->latestPengiriman?->tanggal_pengiriman?->translatedFormat('D, d M Y') ?? 'belum dikirim' }}
+                                                </p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 pl-4">Jumlah : {{ $penugasan->latestPengiriman->jumlah_dikirim ?? '-' }}
+                                                </p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 pl-4">Dikirim melalui {{ $penugasan->latestPengiriman->media_pengiriman ?? '-' }}</p>
                                             </div>
                                         </td>
 
@@ -721,17 +728,18 @@
                                         {{-- PENERIMAAN --}}
                                         <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-400">
                                             <div>
-                                                <div class="flex items-center">
-                                                    <span class="text-gray-500 dark:text-gray-400 mr-2">•</span>
-                                                    <span>
-                                                        {{ optional($penugasan->tanggal_terima)->format('D, d M Y') ?? '-' }}
-                                                    </span>
-                                                </div>
-                                                <div class="text-xs text-gray-500 dark:text-gray-400 pl-4">
-                                                    Jumlah: {{ $penugasan->jumlah_terima ?? '-' }}
-                                                </div>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 pl-4">
+                                                    {{ $penugasan->latestPenerimaan?->tanggal_penerimaan?->translatedFormat('D, d M Y') ?? 'belum diterima' }}
+                                                </p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 pl-4">
+                                                    Jumlah: {{ $penugasan->latestPenerimaan?->jumlah_diterima ?? '-' }}
+                                                </p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400 pl-4">
+                                                    Diterima melalui: {{ $penugasan->latestPengiriman?->media_pengiriman ?? '-' }}
+                                                </p>
                                             </div>
                                         </td>
+
 
                                         <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-400 text-center">
                                             {{ $penugasan->rr_terima ? $penugasan->rr_terima.'%' : '-' }}
@@ -748,12 +756,12 @@
                                         </td>
 
                                         <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-400 text-center">
-                                            <a href="{{ $penugasan->bukti_dukung ?: 'https://www.youtube.com/' }}"
+                                            <a href="{{ $penugasan->latestPengiriman?->bukti_dukung ?: 'https://www.youtube.com/' }}"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 title="{{ $penugasan->bukti_dukung ? 'Buka bukti dukung' : 'Belum ada bukti dukung' }}"
                                                 class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
-                                                {{ $penugasan->bukti_dukung ? 'Lihat Bukti' : 'Belum Ada' }}
+                                                {{ $penugasan->latestPengiriman?->bukti_dukung ? 'Lihat Bukti' : 'Belum Ada' }}
                                             </a>
                                         </td>
                                         <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-400 text-center border-r border-gray-200 dark:border-gray-800">
@@ -852,14 +860,17 @@
                                                             data: {
                                                                 id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                                 nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
-                                                                historiData: @js($penugasan->pengirimans->map(fn($p) => [
-                                                                    'tanggal_pengiriman' => $p->tanggal_pengiriman->translatedFormat('d F Y'),
-                                                                    'jumlah_dikirim' => $p->jumlah_dikirim,
-                                                                    'media_pengiriman' => $p->media_pengiriman,
-                                                                    'bukti_dukung' => $p->bukti_dukung,
-                                                                    'status' => $p->penerimaan?->status ?? 'Belum Diproses', // Diterima / Revisi
-                                                                ]))
-                                                            }
+                                                                historiData: @js(
+                                                                    $penugasan->pengirimans
+                                                                        ->sortByDesc(fn($p) => $p->tanggal_pengiriman) // sort sebelum format
+                                                                        ->map(fn($p) => [
+                                                                            'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
+                                                                            'jumlah_dikirim' => $p->jumlah_dikirim,
+                                                                            'media_pengiriman' => $p->media_pengiriman,
+                                                                            'bukti_dukung' => $p->bukti_dukung,
+                                                                            'status' => $p->penerimaan?->status ?? 'Belum Diproses',
+                                                                        ])
+                                                                )}
                                                         })">
                                                         <!-- Icon -->
                                                         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -878,7 +889,7 @@
                                                                 data: {
                                                                     id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
                                                                     id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                                    id_pengiriman: '{{ $penugasan->latestPengiriman->id_pengiriman }}',
+                                                                    id_pengiriman: '{{ $penugasan->latestPengiriman?->id_pengiriman }}',
                                                                     nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
                                                                 }
                                                             })">

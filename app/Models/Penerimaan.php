@@ -25,6 +25,10 @@ class Penerimaan extends Model
         'catatan',
     ];
 
+    protected $casts = [
+        'tanggal_penerimaan'   => 'date',
+    ];
+
     public function penerima() { // pegawai diganti sebagai penerima supaya lebih jelas
         return $this->belongsTo(Pegawai::class, 'id_penerima', 'id_pegawai');
     }
