@@ -11,37 +11,28 @@ use App\Http\Controllers\PengirimanController;
 use App\Http\Controllers\PenugasanController;
 use App\Http\Controllers\RencanaJPTController;
 use App\Http\Controllers\SubKegiatanController;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Pegawai;
+
+// UNTUK SIMULASI ROLE (ADMIN & PIMPINAN)
+Route::get('/login-as/{username}', function ($username) {
+    $pegawai = Pegawai::where('username', $username)->firstOrFail();
+    // dd($pegawai);
+    Auth::login($pegawai);
+
+    // langsung dd
+    // dd(Auth::user());
+    return redirect()->route('dashboard');
+});
 
 // dashboard pages
 Route::get('/', function () {
-    return view('pages.dashboard', ['title' => 'Pindang Dashboard']);
+    $user = Auth::user(); // <-- INI KUNCI NYA
+    return view('pages.dashboard', [
+        'title' => 'Pindang Dashboard',
+        'user'  => $user,
+    ]);
 })->name('dashboard');
-
-// dll pages
-Route::get('/dll', function () {
-    return view('pages.dashboard.ecommerce', ['title' => 'E-commerce Dashboard']);
-})->name('dll');
-
-// calender pages
-Route::get('/calendar', function () {
-    return view('pages.calender', ['title' => 'Calendar']);
-})->name('calendar');
-
-// profile pages
-Route::get('/profile', function () {
-    return view('pages.profile', ['title' => 'Profile']);
-})->name('profile');
-
-// form pages
-Route::get('/form-elements', function () {
-    return view('pages.form.form-elements', ['title' => 'Form Elements']);
-})->name('form-elements');
-
-// tables pages
-Route::get('/basic-tables', function () {
-    return view('pages.tables.basic-tables', ['title' => 'Basic Tables']);
-})->name('basic-tables');
-
 
 // CRUD RK IKI JPT BY PIMPINAN
 Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(function () {
@@ -135,6 +126,33 @@ Route::get('/rk-ketua', function () {
 Route::get('/daftar-kegiatan', function () {
     return view('pages.rencana-kerja.daftar-kegiatan', ['title' => 'Daftar Kegiatan']);
 })->name('daftar-kegiatan');
+
+
+// dll pages
+Route::get('/dll', function () {
+    return view('pages.dashboard.ecommerce', ['title' => 'E-commerce Dashboard']);
+})->name('dll');
+
+// calender pages
+Route::get('/calendar', function () {
+    return view('pages.calender', ['title' => 'Calendar']);
+})->name('calendar');
+
+// profile pages
+Route::get('/profile', function () {
+    return view('pages.profile', ['title' => 'Profile']);
+})->name('profile');
+
+// form pages
+Route::get('/form-elements', function () {
+    return view('pages.form.form-elements', ['title' => 'Form Elements']);
+})->name('form-elements');
+
+// tables pages
+Route::get('/basic-tables', function () {
+    return view('pages.tables.basic-tables', ['title' => 'Basic Tables']);
+})->name('basic-tables');
+
 
 
 
