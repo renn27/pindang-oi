@@ -6,6 +6,7 @@ use App\Http\Controllers\TimKerjaController;
 use App\Http\Controllers\BidangController;
 use App\Http\Controllers\IndikatorJPTController;
 use App\Http\Controllers\KegiatanController;
+use App\Http\Controllers\MasterKegiatanController;
 use App\Http\Controllers\PenerimaanController;
 use App\Http\Controllers\PengirimanController;
 use App\Http\Controllers\PenugasanController;
@@ -121,6 +122,14 @@ Route::get('/tim-kerja', function () {
 Route::get('/rk-ketua', function () {
     return view('pages.rencana-kerja.rk-ketua', ['title' => 'Rencana Kerja Ketua']);
 })->name('rk-ketua');
+
+Route::prefix('/rk-ketua')->group(function () {
+    Route::get('/', [MasterKegiatanController::class, 'index'])->name('rencana.index');
+    Route::get('/sub-kegiatan', [MasterKegiatanController::class, 'subKegiatan'])->name('rencana.sub.kegiatan');
+    Route::post('/', [MasterKegiatanController::class, 'store'])->name('rencana.store');
+    Route::put('/{rencanaKerja}', [MasterKegiatanController::class, 'update'])->name('rencana.update');
+    Route::get('/{slug}', [MasterKegiatanController::class, 'show'])->name('rencana.show');
+});
 
 // daftar kegiatan
 Route::get('/daftar-kegiatan', function () {

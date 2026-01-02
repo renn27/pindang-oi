@@ -37,7 +37,7 @@ class MenuHelper
                 'icon' => 'dashboard',
                 'name' => 'Rencana Kinerja',
                 'subItems' => [
-                    ['name' => 'Kegiatan/RK Ketua', 'path' => '/rencana-kerja'],
+                    ['name' => 'Kegiatan/RK Ketua', 'path' => '/rk-ketua'],
                     ['name' => 'Sub Kegiatan/RK Anggota', 'path' => '/rencana-kerja/sub-kegiatan'],
                 ],
             ],
