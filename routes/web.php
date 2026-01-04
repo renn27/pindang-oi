@@ -123,6 +123,12 @@ Route::get('/rk-ketua', function () {
     return view('pages.rencana-kerja.rk-ketua', ['title' => 'Rencana Kerja Ketua']);
 })->name('rk-ketua');
 
+// ✅ ROUTE BARU UNTUK SIMPAN MASTER KEGIATAN
+Route::post('/master-kegiatan', [MasterKegiatanController::class, 'store'])
+    ->name('master-kegiatan.store');
+
+
+
 Route::prefix('/rk-ketua')->group(function () {
     Route::get('/', [MasterKegiatanController::class, 'index'])->name('rencana.index');
     Route::get('/sub-kegiatan', [MasterKegiatanController::class, 'subKegiatan'])->name('rencana.sub.kegiatan');
