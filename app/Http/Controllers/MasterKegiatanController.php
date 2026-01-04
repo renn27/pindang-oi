@@ -12,7 +12,7 @@ use Illuminate\Validation\Rule;
 class MasterKegiatanController extends Controller
 {
     public function index() {
-        
+
         // Data referensi untuk dropdown modal
         $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
         $rkJpts   = RencanaJPT::orderBy('nama_rencana_jpt')->get(['id', 'nama_rencana_jpt']);
@@ -25,13 +25,6 @@ class MasterKegiatanController extends Controller
             'bidangs'    => $bidangs,
         ]);
     }
-
-
-    // public function show($slug)
-    // {
-    //     $bidang = Bidang::where('slug', $slug)->firstOrFail();
-    //     return view('pages.rencana-kerja.show', ['title' => $bidang->nama_bidang, 'bidang' => $bidang]);
-    // }
 
     public function store(Request $request, Bidang $bidang) {
         // dd($request->all());
