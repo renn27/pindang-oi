@@ -206,14 +206,14 @@
                             this.highlightedIndex = -1;
                         },
 
-                        highlightNext() {
-                            if(this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++;
+                        highlightNext() { 
+                            if(this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++; 
                         },
-                        highlightPrev() {
-                            if(this.highlightedIndex > 0) this.highlightedIndex--;
+                        highlightPrev() { 
+                            if(this.highlightedIndex > 0) this.highlightedIndex--; 
                         },
-                        selectHighlighted() {
-                            if(this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]);
+                        selectHighlighted() { 
+                            if(this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]); 
                         }
                     }">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
@@ -253,7 +253,7 @@
                                         <div
                                             @click="selectPegawai(pegawai)"
                                             :class="{
-                            'bg-brand-50 dark:bg-brand-900/30': highlightedIndex===index,
+                            'bg-brand-50 dark:bg-brand-900/30': highlightedIndex===index, 
                             'hover:bg-gray-50 dark:hover:bg-gray-700': highlightedIndex!==index
                         }"
                                             class="cursor-pointer px-4 py-3 text-sm text-gray-700 dark:text-gray-300"
@@ -407,7 +407,7 @@
                 <h5 class="text-sm font-semibold text-gray-800 dark:text-white/90">
                     RK Anggota ${rkAnggotaCounter}
                 </h5>
-                <button type="button" onclick="hapusRKAnggota('${sectionId}')"
+                <button type="button" onclick="hapusRKAnggota('${sectionId}')" 
                     class="rounded-lg p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -425,7 +425,7 @@
                     <input name="rk_anggota[]" type="text" placeholder="Masukkan rk anggota"
                         class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                 </div>
-
+                
                 <div class="flex flex-col gap-2 md:flex-row md:items-center">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
                         Satuan Target
@@ -478,11 +478,11 @@
                 </div>
 
                 <div id="detail-${sectionId}" class="space-y-4"></div>
-
+                
                 <div class="flex flex-col gap-2 md:flex-row md:items-center">
                     <div class="md:w-1/4"></div>
                     <div class="md:w-3/4">
-                        <button type="button" onclick="tambahDetailAnggota('${sectionId}')"
+                        <button type="button" onclick="tambahDetailAnggota('${sectionId}')" 
                             class="flex items-center gap-2 rounded-lg border border-dashed border-gray-300 bg-transparent px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-white/[0.03]">
                             <svg class="fill-current" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M8 3.5C8.27614 3.5 8.5 3.72386 8.5 4V7.5H12C12.2761 7.5 12.5 7.72386 12.5 8C12.5 8.27614 12.2761 8.5 12 8.5H8.5V12C8.5 12.2761 8.27614 12.5 8 12.5C7.72386 12.5 7.5 12.2761 7.5 12V8.5H4C3.72386 8.5 3.5 8.27614 3.5 8C3.5 7.72386 3.72386 7.5 4 7.5H7.5V4C7.5 3.72386 7.72386 3.5 8 3.5Z" fill=""/>
@@ -550,14 +550,14 @@
             <h6 class="text-xs font-medium text-gray-700 dark:text-gray-300">
                 Anggota ${detailAnggotaCounter[sectionId]}
             </h6>
-            <button type="button" onclick="hapusDetailAnggota('${detailId}')"
+            <button type="button" onclick="hapusDetailAnggota('${detailId}')" 
                 class="rounded-lg p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-gray-700">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </button>
         </div>
-
+        
         <div class="space-y-3">
             <!-- Kolom Nama Anggota dengan Alpine Search (PERBAIKAN) -->
             <div class="relative flex flex-col gap-2 md:flex-row md:items-center"
@@ -570,7 +570,7 @@
 
                     filtered() {
                         if(this.search.length === 0) return [];
-                        return this.pegawais.filter(p =>
+                        return this.pegawais.filter(p => 
                             p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase())
                         );
                     },
@@ -582,20 +582,20 @@
                         this.highlightedIndex = -1;
                     },
 
-                    highlightNext() {
-                        if(this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++;
+                    highlightNext() { 
+                        if(this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++; 
                     },
-                    highlightPrev() {
-                        if(this.highlightedIndex > 0) this.highlightedIndex--;
+                    highlightPrev() { 
+                        if(this.highlightedIndex > 0) this.highlightedIndex--; 
                     },
-                    selectHighlighted() {
-                        if(this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]);
+                    selectHighlighted() { 
+                        if(this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]); 
                     }
                  }">
                 <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
                     Nama Anggota
                 </label>
-
+                
                 <div class="relative md:w-3/4">
                     <!-- Input search -->
                     <input
@@ -610,13 +610,13 @@
                         class="detail-nama-anggota dark:bg-dark-900 h-10 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">
 
                     <!-- Hidden input untuk menyimpan ID -->
-                    <input type="hidden"
-                           name="detail_id_anggota[${sectionId}][]"
+                    <input type="hidden" 
+                           name="detail_id_anggota[${sectionId}][]" 
                            x-model="selectedId">
 
                     <!-- Hidden input untuk menyimpan Nama -->
-                    <input type="hidden"
-                           name="detail_nama_anggota[${sectionId}][]"
+                    <input type="hidden" 
+                           name="detail_nama_anggota[${sectionId}][]" 
                            x-model="search">
 
                     <!-- Dropdown -->
@@ -636,7 +636,7 @@
                                 <div
                                     @click="selectPegawai(pegawai)"
                                     :class="{
-                                        'bg-brand-50 dark:bg-brand-900/30': highlightedIndex===index,
+                                        'bg-brand-50 dark:bg-brand-900/30': highlightedIndex===index, 
                                         'hover:bg-gray-50 dark:hover:bg-gray-700': highlightedIndex!==index
                                     }"
                                     class="cursor-pointer px-3 py-2 text-xs text-gray-700 dark:text-gray-300"
@@ -675,7 +675,7 @@
                         defaultDate="{{ now()->format('Y-m-d') }}" />
                 </div>
             </div>
-
+            
             <!-- Tanggal Akhir -->
             <div class="flex flex-col gap-2 md:flex-row md:items-center">
                 <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
@@ -812,7 +812,7 @@
                         Bagian ${sectionIndex + 1}
                     </span>
                 </div>
-
+                
                 <div class="space-y-3">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
@@ -824,7 +824,7 @@
                             <span class="block text-sm text-gray-800 dark:text-white/90">${satuanTarget || '-'}</span>
                         </div>
                     </div>
-
+                    
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tanggal Mulai</span>
@@ -835,7 +835,7 @@
                             <span class="block text-sm text-gray-800 dark:text-white/90">${tanggalAkhir || '-'}</span>
                         </div>
                     </div>
-
+                    
                     <div>
                         <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Keterangan</span>
                             <span class="block text-sm text-gray-800 dark:text-white/90">${keterangan || '-'}</span>
@@ -920,7 +920,7 @@
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-1">DATA RENCANA KINERJA KETUA</h3>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Review data sebelum disimpan ke database</p>
             </div>
-
+            
             <!-- Data Utama -->
             <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                 <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">DATA KETUA</h4>
@@ -958,7 +958,7 @@
                     </div>
                 </div>
             </div>
-
+            
             <!-- Data RK Anggota -->
             <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                 <div class="flex items-center justify-between mb-3">
@@ -967,7 +967,7 @@
                         ${sections.length} bagian
                     </span>
                 </div>
-
+                
                 ${sections.length > 0 ? `
                     <div class="space-y-4">
                         ${detailHTML}
@@ -983,7 +983,7 @@
                     </div>
                 `}
             </div>
-
+            
             <!-- Note -->
             <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
                 <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
