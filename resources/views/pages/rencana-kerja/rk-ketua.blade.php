@@ -65,39 +65,55 @@
         "
     :isOpen="false"
     class="max-w-[900px]">
-    <div class="relative flex h-[90vh] w-full max-w-[900px] flex-col overflow-hidden
+
+    @if (session('success'))
+    <script>
+        alert("{{ session('success') }}");
+    </script>
+    @endif
+
+    @if (session('error'))
+    <script>
+        alert("{{ session('error') }}");
+    </script>
+    @endif
+
+    <form id="masterKegiatanForm"
+        method="POST"
+        action="{{ route('master-kegiatan.store') }}">
+        @csrf
+        <div class="relative flex h-[90vh] w-full max-w-[900px] flex-col overflow-hidden
                 rounded-3xl bg-white dark:bg-gray-900">
 
-        <!-- HEADER (FIXED) -->
-        <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90">
-                        Add Rencana Kinerja Ketua
-                    </h4>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        Tambahkan rencana kinerja ketua baru
-                    </p>
+            <!-- HEADER (FIXED) -->
+            <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90">
+                            Add Rencana Kinerja Ketua
+                        </h4>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Tambahkan rencana kinerja ketua baru
+                        </p>
+                    </div>
+                    <button @click="open = false"
+                        class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
-                <button @click="open = false"
-                    class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800">
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
             </div>
-        </div>
 
-        <!-- BODY (SCROLLABLE) -->
-        <div class="flex-1 overflow-y-auto px-6 py-5">
-            <form action="">
+            <!-- BODY (SCROLLABLE) -->
+            <div class="flex-1 overflow-y-auto px-6 py-5">
                 <div class="grid grid-cols-1 gap-y-5">
                     <!-- Tahun -->
                     <div class="flex flex-col gap-2 md:flex-row md:items-center">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
                             Tahun
                         </label>
-                        <input type="text" id="tahunInput" value="{{ now()->format('Y') }}"
+                        <input type="text" name="tahun_kegiatan" id="tahunInput" value="{{ now()->format('Y') }}"
                             class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                     </div>
 
@@ -111,13 +127,13 @@
                             name="rk_jpt"
                             x-model="formData.rk_jpt"
                             @change="
-                                    formData.iki_jpt = '';
-                                    formData.ikiOptions = [];
-                                    if(formData.rk_jpt){
-                                        fetch(`/rencana-indikator-jpt/${formData.rk_jpt}/indikator`)
-                                            .then(res => res.json())
-                                            .then(data => formData.ikiOptions = data);
-                                }"
+                                formData.iki_jpt = '';
+                                formData.ikiOptions = [];
+                                if(formData.rk_jpt){
+                                    fetch(`/rencana-indikator-jpt/${formData.rk_jpt}/indikator`)
+                                        .then(res => res.json())
+                                        .then(data => formData.ikiOptions = data);
+                            }"
                             class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">
                             <option value="">-- Pilih RK JPT --</option>
                             @foreach ($rkJpts as $rk)
@@ -131,27 +147,16 @@
                     {{-- Indikator JPT --}}
                     <div class="flex flex-col gap-2 md:flex-row md:items-center">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
-                            Indikator JPT
+                            IKI JPT
                         </label>
-
                         <select
                             id="iki_jpt"
                             name="iki_jpt"
                             x-model="formData.iki_jpt"
                             class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">
-
-                            <!-- OPTION DINAMIS -->
-                            <option value=""
-                                x-text="formData.rk_jpt
-                                    ? '-- Pilih IKI JPT --'
-                                    : '-- Harap pilih RK JPT dulu --'">
-                            </option>
-
+                            <option value="">-- Harap pilih RK dulu --</option>
                             <template x-for="iki in formData.ikiOptions" :key="iki.id">
-                                <option
-                                    :value="iki.id"
-                                    x-text="iki.nama_indikator_jpt">
-                                </option>
+                                <option :value="iki.id" x-text="iki.nama_indikator_jpt" :selected="formData.iki_jpt == iki.id"></option>
                             </template>
                         </select>
                     </div>
@@ -164,7 +169,7 @@
                         <div class="relative z-20 bg-transparent w-full md:w-3/4">
                             <select
                                 id="bidang"
-                                name="bidang"
+                                name="id_bidang"
                                 class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                                 @foreach ($bidangs as $bidang)
                                 <option value="{{ $bidang->id_bidang }}">
@@ -180,37 +185,38 @@
                         </div>
                     </div>
 
-                    {{-- Kolom Nama Ketua/Penanggung Jawab --}}
+                    {{-- Kolom Ketua --}}
                     <div class="relative flex flex-col gap-2 md:flex-row md:items-center"
                         x-data="{
-                            open: false,
-                            search: '',
-                            selectedId: '',
-                            highlightedIndex: -1,
-                            pegawais: @js($pegawais),
+                        open: false,
+                        search: '',
+                        selectedId: '',
+                        highlightedIndex: -1,
+                        pegawais: @js($pegawais),
 
-                            filtered() {
-                                if(this.search.length === 0) return [];
-                                return this.pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase()));
-                            },
+                        <select
+                            id="iki_jpt"
+                            name="iki_jpt"
+                            x-model="formData.iki_jpt"
+                            class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">
 
-                            selectPegawai(p) {
-                                this.search = p.nama_pegawai;
-                                this.selectedId = p.id_pegawai;
-                                this.open = false;
-                                this.highlightedIndex = -1;
-                            },
+                            <!-- OPTION DINAMIS -->
+                            <option value=""
+                                x-text="formData.rk_jpt
+                                    ? '-- Pilih IKI JPT --'
+                                    : '-- Harap pilih RK JPT dulu --'">
+                            </option>
 
-                            highlightNext() {
-                                if(this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++;
-                            },
-                            highlightPrev() {
-                                if(this.highlightedIndex > 0) this.highlightedIndex--;
-                            },
-                            selectHighlighted() {
-                                if(this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]);
-                            }
-                        }">
+                        highlightNext() {
+                            if(this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++;
+                        },
+                        highlightPrev() {
+                            if(this.highlightedIndex > 0) this.highlightedIndex--;
+                        },
+                        selectHighlighted() {
+                            if(this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]);
+                        }
+                    }">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
                             Nama Ketua
                         </label>
@@ -248,9 +254,9 @@
                                         <div
                                             @click="selectPegawai(pegawai)"
                                             :class="{
-                                'bg-brand-50 dark:bg-brand-900/30': highlightedIndex===index,
-                                'hover:bg-gray-50 dark:hover:bg-gray-700': highlightedIndex!==index
-                            }"
+                            'bg-brand-50 dark:bg-brand-900/30': highlightedIndex===index,
+                            'hover:bg-gray-50 dark:hover:bg-gray-700': highlightedIndex!==index
+                        }"
                                             class="cursor-pointer px-4 py-3 text-sm text-gray-700 dark:text-gray-300"
                                             x-text="pegawai.nama_pegawai">
                                         </div>
@@ -271,7 +277,7 @@
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
                             Rencana Kinerja Ketua
                         </label>
-                        <input type="text" placeholder="Tulis rencana kinerja ketua" id="nama_rk_kegiatan" name="nama_rk_kegiatan"
+                        <input type="text" placeholder="Tulis rencana kinerja ketua" name="nama_rk_kegiatan" id="rkKetua"
                             class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                     </div>
 
@@ -283,95 +289,44 @@
                     <!-- TOMBOL TAMBAH RK ANGGOTA -->
                     <div class="flex flex-col gap-2 md:flex-row md:items-center">
                         <div class="md:w-1/4"></div>
-                            <div class="md:w-3/4">
-                                <button type="button" @click="tambahRKAnggota()"
-                                    class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]">
-                                    <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M9 3.75C9.41421 3.75 9.75 4.08579 9.75 4.5V8.25H13.5C13.9142 8.25 14.25 8.58579 14.25 9C14.25 9.41421 13.9142 9.75 13.5 9.75H9.75V13.5C9.75 13.9142 9.41421 14.25 9 14.25C8.58579 14.25 8.25 13.9142 8.25 13.5V9.75H4.5C4.08579 9.75 3.75 9.41421 3.75 9C3.75 8.58579 4.08579 8.25 4.5 8.25H8.25V4.5C8.25 4.08579 8.58579 3.75 9 3.75Z" fill="" />
-                                    </svg>
-                                    Tambah RK Anggota
-                                </button>
-                            </div>
+                        <div class="md:w-3/4">
+                            <button type="button" @click="tambahRKAnggota()"
+                                class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03]">
+                                <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M9 3.75C9.41421 3.75 9.75 4.08579 9.75 4.5V8.25H13.5C13.9142 8.25 14.25 8.58579 14.25 9C14.25 9.41421 13.9142 9.75 13.5 9.75H9.75V13.5C9.75 13.9142 9.41421 14.25 9 14.25C8.58579 14.25 8.25 13.9142 8.25 13.5V9.75H4.5C4.08579 9.75 3.75 9.41421 3.75 9C3.75 8.58579 4.08579 8.25 4.5 8.25H8.25V4.5C8.25 4.08579 8.58579 3.75 9 3.75Z" fill="" />
+                                </svg>
+                                Tambah RK Anggota
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </form>
-        </div>
-
-        <!-- FOOTER (FIXED) -->
-        <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-800">
-            <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                <button @click="open = false" type="button"
-                    class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
-                    Close
-                </button>
-
-                <button id="saveAllButton" type="button"
-                    class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
-                    Save All Changes
-                </button>
-            </div>
-        </div>
-    </div>
-    </x-ui.modal>
-
-
-    <!-- Modal Konfirmasi -->
-    <x-ui.modal
-        x-data="{ open: false }"
-        @open-confirmation-modal.window="open = true"
-        :isOpen="false"
-        class="max-w-[800px]">
-        <div class="relative flex h-[80vh] w-full max-w-[800px] flex-col overflow-hidden
-                rounded-3xl bg-white dark:bg-gray-900">
-
-            <!-- HEADER -->
-            <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h4 class="text-xl font-semibold text-gray-800 dark:text-white/90">
-                            Konfirmasi Data
-                        </h4>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            Review data sebelum disimpan
-                        </p>
-                    </div>
-                    <button @click="open = false"
-                        class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
             </div>
 
-            <!-- BODY -->
-            <div class="flex-1 overflow-y-auto px-6 py-5">
-                <div id="confirmationContent" class="space-y-6">
-                    <!-- Content akan diisi oleh JavaScript -->
-                </div>
-            </div>
-
-            <!-- FOOTER -->
+            <!-- FOOTER (FIXED) -->
             <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-800">
                 <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                     <button @click="open = false" type="button"
                         class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
-                        Batal
+                        Close
                     </button>
 
-                    <button onclick="confirmSave()" type="button"
-                        class="flex w-full justify-center rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 sm:w-auto">
-                        Ya, Simpan Data
+                    <button id="saveAllButton" type="button"
+                        class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
+                        Save All Changes
                     </button>
                 </div>
             </div>
         </div>
+    </form>
 </x-ui.smart-modal>
 
 <!-- Modal Konfirmasi -->
-{{-- <x-ui.modal
+<x-ui.modal
+
     x-data="{ open: false }"
     @open-confirmation-modal.window="open = true"
+    @close-confirmation-modal.window="open = false"
+    id="modal-confirmation"
     :isOpen="false"
     class="max-w-[800px]">
     <div class="relative flex h-[80vh] w-full max-w-[800px] flex-col overflow-hidden
@@ -432,9 +387,8 @@
 <script>
     const app = document.getElementById('app');
 
-    const pegawais = app?.dataset.pegawais
-    ? JSON.parse(app.dataset.pegawais)
-    : [];
+    const pegawais = app?.dataset.pegawais ?
+        JSON.parse(app.dataset.pegawais) : [];
     // Variabel global untuk menyimpan data
     let rkAnggotaCounter = 0;
     let detailAnggotaCounter = {};
@@ -444,7 +398,8 @@
         console.log('✅ Tombol Tambah RK Anggota diklik!');
 
         rkAnggotaCounter++;
-        const sectionId = 'rk-anggota-' + rkAnggotaCounter;
+        const sectionIndex = rkAnggotaCounter;
+        const sectionId = `rk-anggota-${sectionIndex}`;
         detailAnggotaCounter[sectionId] = 0;
 
         const sectionHTML = `
@@ -460,6 +415,8 @@
                     </svg>
                 </button>
             </div>
+
+            <input type="hidden" name="rk_section_keys[]" value="${sectionId}">
 
             <div class="space-y-4">
                 <div class="flex flex-col gap-2 md:flex-row md:items-center">
@@ -477,6 +434,17 @@
                     <input name="satuan_target[]" type="text" placeholder="Masukkan satuan target"
                         class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                 </div>
+                <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                        Status
+                    </label>
+                    <select name="status[]"
+                        class="md:w-3/4 dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm">
+                        <option value="Belum Mulai" selected>Belum Mulai</option>
+                        <option value="Berjalan">Berjalan</option>
+                        <option value="Selesai">Selesai</option>
+                    </select>
+                </div>
 
                 <!-- Tanggal Mulai dan Tanggal Akhir untuk Detail Anggota -->
                 <div class="flex flex-col gap-2 md:flex-row md:items-center">
@@ -485,7 +453,6 @@
                     </label>
                     <div class="md:w-3/4">
                         <x-form.date-picker
-                            id="tanggal_mulai[]"
                             name="tanggal_mulai[]"
                             placeholder="Tanggal Mulai"
                             defaultDate="{{ now()->format('Y-m-d') }}" />
@@ -497,7 +464,6 @@
                     </label>
                     <div class="md:w-3/4">
                         <x-form.date-picker
-                            id="tanggal_akhir[]"
                             name="tanggal_akhir[]"
                             placeholder="Tanggal Akhir"
                             defaultDate="{{ now()->format('Y-m-d') }}" />
@@ -705,7 +671,6 @@
                 </label>
                 <div class="md:w-3/4">
                     <x-form.date-picker
-                        id="detail_tanggal_mulai[${sectionId}][]"
                         name="detail_tanggal_mulai[${sectionId}][]"
                         placeholder="Tanggal Mulai"
                         defaultDate="{{ now()->format('Y-m-d') }}" />
@@ -719,7 +684,6 @@
                 </label>
                 <div class="md:w-3/4">
                     <x-form.date-picker
-                        id="detail_tanggal_selesai[${sectionId}][]"
                         name="detail_tanggal_selesai[${sectionId}][]"
                         placeholder="Tanggal Akhir"
                         defaultDate="{{ now()->format('Y-m-d') }}" />
@@ -763,6 +727,20 @@
     }
 
     function saveAll(event) {
+        const rkKetuaInput = document.getElementById('rkKetua');
+        const rkKetua = rkKetuaInput ? rkKetuaInput.value : '';
+
+        const ketuaIdInput = document.querySelector('input[name="id_penanggung_jawab"]');
+        const idKetua = ketuaIdInput ? ketuaIdInput.value : '';
+        if (!rkKetua) {
+            alert('Rencana Kinerja Ketua wajib diisi');
+            return;
+        }
+
+        if (!idKetua) {
+            alert('Nama Ketua wajib dipilih');
+            return;
+        }
         try {
             console.log('✅ saveAll() function dipanggil');
 
@@ -1050,29 +1028,24 @@
 
     // Fungsi untuk menyimpan data saat tombol "Ya, Simpan Data" diklik
     function confirmSave() {
-        // Tutup modal konfirmasi
-        document.dispatchEvent(new CustomEvent('close-confirmation-modal'));
+        window.dispatchEvent(new CustomEvent('close-confirmation-modal', {
+            detail: {
+                modalId: 'modal-confirmation'
+            }
+        }));
 
-        // Tutup modal utama
-        document.dispatchEvent(new CustomEvent('close-rk-ketua-modal'));
+        const form = document.getElementById('masterKegiatanForm');
+        if (!form) {
+            alert('Form tidak ditemukan');
+            return;
+        }
 
-        // Tampilkan alert sukses
-        setTimeout(() => {
-            alert('Data berhasil disimpan ke database!');
-        }, 300);
+        form.submit();
     }
 
     // Event listener untuk tombol Save di modal utama
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('saveAllButton')?.addEventListener('click', saveAll);
-
-        // Event untuk menutup modal konfirmasi
-        document.addEventListener('close-confirmation-modal', function() {
-            const modal = document.querySelector('[x-data] [x-data]');
-            if (modal && modal.__x && modal.__x.$data) {
-                modal.__x.$data.open = false;
-            }
-        });
     });
 </script>
 @endpush
