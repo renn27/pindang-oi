@@ -155,14 +155,28 @@
                                 highlightedIndex: -1,
                                 pegawais: @js($pegawais),
 
+                                init() {
+                                    // ketika modal edit dibuka
+                                    if (this.$root.formData?.nama_anggota) {
+                                        this.search = this.$root.formData.nama_anggota;
+                                        this.selectedId = this.$root.formData.id_anggota;
+                                    }
+                                },
+
                                 filtered() {
-                                    if(this.search.length === 0) return [];
-                                    return this.pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase()));
+                                    if (this.search.length === 0) return [];
+                                    return this.pegawais.filter(p =>
+                                        p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase())
+                                    );
                                 },
 
                                 selectPegawai(p) {
                                     this.search = p.nama_pegawai;
                                     this.selectedId = p.id_pegawai;
+                                    // sinkron ke formData (PENTING)
+                                    this.$root.formData.nama_anggota = p.nama_pegawai;
+                                    this.$root.formData.id_anggota = p.id_pegawai;
+
                                     this.open = false;
                                     this.highlightedIndex = -1;
                                 },
@@ -175,11 +189,17 @@
                                         Nama Anggota
                                     </label>
                                     <!-- Input search -->
-                                    <input type="text" x-model="search" @focus="open = !!search" @input="open = search.length > 0; selectedId = ''"
+                                    <input type="text"
+                                    x-model="search"
+                                    class="h-11 w-full rounded-lg border px-4 py-2 text-sm"
+                                    placeholder="Ketik untuk cari nama"
+                                    {{-- x-model="formData.nama_anggota" --}}
+                                    @focus="open = true"
+                                    @input="open = true; selectedId = ''"
+                                    {{-- @focus="open = !!search" @input="open = search.length > 0; selectedId = ''" --}}
                                     @keydown.arrow-down.prevent="highlightedIndex++"
                                     @keydown.arrow-up.prevent="highlightedIndex--"
-                                    @keydown.enter.prevent="if(highlightedIndex>=0){ search = pegawais[highlightedIndex].nama_pegawai; selectedId = pegawais[highlightedIndex].id_pegawai; open=false; }"
-                                    placeholder="Ketik untuk cari nama" class="h-11 w-full rounded-lg border px-4 py-2 text-sm">
+                                    @keydown.enter.prevent="if(highlightedIndex>=0){ search = pegawais[highlightedIndex].nama_pegawai; selectedId = pegawais[highlightedIndex].id_pegawai; open=false; }">
 
                                 <!-- Hidden input -->
                                 <input type="hidden" name="id_anggota" :value="selectedId" required>
@@ -200,7 +220,7 @@
                                 <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                                     Target
                                 </label>
-                                <input type="number" name="target" placeholder="Masukkan Target"
+                                <input type="number" x-model="formData.target" name="target" placeholder="Masukkan Target"
                                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                             </div>
                             <div>
@@ -209,16 +229,18 @@
                                 </label>
                                 <x-form.date-picker
                                     id="tanggal_mulai"
+                                    x-model="formData.tanggal_mulai"
                                     name="tanggal_mulai"
                                     placeholder="Date Picker"
                                     defaultDate="{{ now()->format('Y-m-d') }}" />
                             </div>
                             <div>
                                 <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Tanggal Akhir
+                                    Tanggal Berakhir (Deadline)
                                 </label>
                                 <x-form.date-picker
-                                    id="tanggal_akhir"
+                                    id="tanggal_selesai"
+                                    x-model="formData.tanggal_selesai"
                                     name="tanggal_selesai"
                                     placeholder="Date Picker"
                                     defaultDate="{{ now()->format('Y-m-d') }}" />
@@ -480,154 +502,154 @@
                 </div>
             </x-ui.smart-modal>
 
-                <!-- Modal Tambah Penerimaan -->
-                <x-ui.smart-modal id="modal-penerimaan-anggota" class="max-w-xl"
-                    @open-smart-modal.window="
-                        if ($event.detail.modalId !== 'modal-penerimaan-anggota') return;
+            <!-- Modal Tambah Penerimaan -->
+            <x-ui.smart-modal id="modal-penerimaan-anggota" class="max-w-xl"
+                @open-smart-modal.window="
+                    if ($event.detail.modalId !== 'modal-penerimaan-anggota') return;
 
-                        mode = $event.detail.mode ?? 'create';
-                        itemKey = $event.detail.key ?? null;
-                        // Ambil data dari dispatch
-                        formData = $event.detail.data ?? {
-                            id_sub_kegiatan: '',
-                            id_penugasan: '',
-                            id_pengiriman: '',
-                            id_penerima: '',
-                            nama_penerima: '',
-                            tanggal_penerimaan: '',
-                            jumlah_diterima: '',
-                            status: '',,
-                            catatan: ''
-                        }">
-                    <div
-                        class="relative flex h-[90vh] w-full max-w-[700px] flex-col overflow-hidden
-                                rounded-3xl bg-white dark:bg-gray-900">
+                    mode = $event.detail.mode ?? 'create';
+                    itemKey = $event.detail.key ?? null;
+                    // Ambil data dari dispatch
+                    formData = $event.detail.data ?? {
+                        id_sub_kegiatan: '',
+                        id_penugasan: '',
+                        id_pengiriman: '',
+                        id_penerima: '',
+                        nama_penerima: '',
+                        tanggal_penerimaan: '',
+                        jumlah_diterima: '',
+                        status: '',,
+                        catatan: ''
+                    }">
+                <div
+                    class="relative flex h-[90vh] w-full max-w-[700px] flex-col overflow-hidden
+                            rounded-3xl bg-white dark:bg-gray-900">
 
-                        <!-- HEADER (FIXED) -->
-                        <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
-                            <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90">
-                                Lakukan Penerimaan
-                            </h4>
-                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                Terima dan Berikan Penilaian Kerja
-                            </p>
-                        </div>
-                        <div class="text-center">
-                            <h6 class="text-sm font-semibold text-gray-600 dark:text-white/90"
-                                x-text="formData.nama_anggota">
-                            </h6>
-                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                ID Penugasan:
-                                <span class="font-medium" x-text="formData.id_penugasan"></span>
-                            </p>
-                        </div>
-
-                        <!-- BODY (SCROLL DI SINI) -->
-                        <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
-                            <form :action="`/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${formData.id_penugasan}/pengirimans/${formData.id_pengiriman}/penerimaan`"
-                                method="POST" class="grid grid-cols-1 gap-y-5">
-                                @csrf
-                                <!-- Id Pengiriman (readonly tampilan) -->
-                                <div>
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                        Id Pengiriman
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        :value="formData.id_pengiriman"
-                                        disabled
-                                        class="w-full h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800
-                                            dark:border-gray-700 dark:bg-gray-800 dark:text-white/70 cursor-not-allowed">
-                                </div>
-
-                                <div>
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                        Tanggal Penerimaan
-                                    </label>
-                                    <x-form.date-picker
-                                        id="tanggal_penerimaan"
-                                        name="tanggal_penerimaan"
-                                        x-model="formData.tanggal_penerimaan"
-                                        placeholder="Date Picker"
-                                        defaultDate="{{ now()->format('Y-m-d') }}"
-                                        readonly="true" />
-                                    </div>
-                                <div>
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                        Jumlah Diterima
-                                    </label>
-                                    <input type="text" name="jumlah_diterima" x-model="formData.jumlah_diterima" placeholder="Masukkan jumlah penerimaan"
-                                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                                </div>
-                                <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                        Status
-                                    </label>
-                                    <select
-                                        name="status"
-                                        x-model="formData.status"
-                                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10
-                                            dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg
-                                            border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm
-                                            placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
-                                            dark:border-gray-700 dark:bg-gray-900 dark:text-white/90
-                                            dark:placeholder:text-white/30"
-                                        :class="isOptionSelected && 'text-gray-800 dark:text-white/90'"
-                                        @change="isOptionSelected = true">
-                                        <!-- Placeholder -->
-                                        <option value="" disabled selected class="text-gray-400 dark:bg-gray-900">
-                                            -- Pilih Status --
-                                        </option>
-
-                                        <option value="Diterima" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                            Diterima
-                                        </option>
-
-                                        <option value="Revisi" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                            Revisi
-                                        </option>
-                                    </select>
-
-                                    <span
-                                        class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2
-                                            text-gray-700 dark:text-gray-400">
-                                        <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                            <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396"
-                                                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                    </span>
-                                </div>
-
-                                <div>
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                        Catatan
-                                    </label>
-                                    <input type="text" name="catatan" placeholder="Masukkan catatan"
-                                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                                </div>
-                                <!-- FOOTER -->
-                                <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-800">
-                                    <div class="flex justify-end gap-3">
-                                        <button type="button"
-                                                @click="open = false"
-                                                class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium
-                                                    text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
-                                            Batal
-                                        </button>
-
-                                        <button type="submit"
-                                            class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600">
-                                            <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-
-
+                    <!-- HEADER (FIXED) -->
+                    <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
+                        <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90">
+                            Lakukan Penerimaan
+                        </h4>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Terima dan Berikan Penilaian Kerja
+                        </p>
                     </div>
-                </x-ui.smart-modal>
+                    <div class="text-center">
+                        <h6 class="text-sm font-semibold text-gray-600 dark:text-white/90"
+                            x-text="formData.nama_anggota">
+                        </h6>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            ID Penugasan:
+                            <span class="font-medium" x-text="formData.id_penugasan"></span>
+                        </p>
+                    </div>
+
+                    <!-- BODY (SCROLL DI SINI) -->
+                    <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
+                        <form :action="`/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${formData.id_penugasan}/pengirimans/${formData.id_pengiriman}/penerimaan`"
+                            method="POST" class="grid grid-cols-1 gap-y-5">
+                            @csrf
+                            <!-- Id Pengiriman (readonly tampilan) -->
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Id Pengiriman
+                                </label>
+
+                                <input
+                                    type="text"
+                                    :value="formData.id_pengiriman"
+                                    disabled
+                                    class="w-full h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800
+                                        dark:border-gray-700 dark:bg-gray-800 dark:text-white/70 cursor-not-allowed">
+                            </div>
+
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Tanggal Penerimaan
+                                </label>
+                                <x-form.date-picker
+                                    id="tanggal_penerimaan"
+                                    name="tanggal_penerimaan"
+                                    x-model="formData.tanggal_penerimaan"
+                                    placeholder="Date Picker"
+                                    defaultDate="{{ now()->format('Y-m-d') }}"
+                                    readonly="true" />
+                                </div>
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Jumlah Diterima
+                                </label>
+                                <input type="text" name="jumlah_diterima" x-model="formData.jumlah_diterima" placeholder="Masukkan jumlah penerimaan"
+                                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                            </div>
+                            <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Status
+                                </label>
+                                <select
+                                    name="status"
+                                    x-model="formData.status"
+                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10
+                                        dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg
+                                        border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm
+                                        placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
+                                        dark:border-gray-700 dark:bg-gray-900 dark:text-white/90
+                                        dark:placeholder:text-white/30"
+                                    :class="isOptionSelected && 'text-gray-800 dark:text-white/90'"
+                                    @change="isOptionSelected = true">
+                                    <!-- Placeholder -->
+                                    <option value="" disabled selected class="text-gray-400 dark:bg-gray-900">
+                                        -- Pilih Status --
+                                    </option>
+
+                                    <option value="Diterima" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                                        Diterima
+                                    </option>
+
+                                    <option value="Revisi" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                                        Revisi
+                                    </option>
+                                </select>
+
+                                <span
+                                    class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2
+                                        text-gray-700 dark:text-gray-400">
+                                    <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396"
+                                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </span>
+                            </div>
+
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Catatan
+                                </label>
+                                <input type="text" name="catatan" placeholder="Masukkan catatan"
+                                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                            </div>
+                            <!-- FOOTER -->
+                            <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-800">
+                                <div class="flex justify-end gap-3">
+                                    <button type="button"
+                                            @click="open = false"
+                                            class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium
+                                                text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                        Batal
+                                    </button>
+
+                                    <button type="submit"
+                                        class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600">
+                                        <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+
+                </div>
+            </x-ui.smart-modal>
 
             <!-- Tabel Detail Pengiriman - VERSI BERSIH -->
             <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
@@ -830,6 +852,29 @@
                                                     :style="`left: ${dropdownPosition.x}px; top: ${dropdownPosition.y}px;`"
                                                     x-on:mouseenter="showDropdown = true"
                                                     x-on:mouseleave="closeDropdown()">
+
+                                                    {{-- Edit Data Penugasan--}}
+                                                    <button class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-300 flex items-center gap-2 whitespace-nowrap border-b border-gray-100 dark:border-gray-700"
+                                                        @click="$dispatch('open-smart-modal', {
+                                                            modalId: 'modal-penugasan-anggota',
+                                                            mode: 'edit',
+                                                            key: '{{ $penugasan->id_penugasan }}',
+                                                            data: {
+                                                                id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
+                                                                nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
+                                                                id_anggota: @js($penugasan->id_anggota),
+                                                                nama_anggota: @js($penugasan->anggota?->nama_pegawai),
+                                                                target: @js($penugasan->target),
+                                                                tanggal_mulai: @js($penugasan->tanggal_mulai),
+                                                                tanggal_selesai: @js($penugasan->tanggal_selesai),
+                                                                status: @js($penugasan->status),
+                                                            }
+
+                                                        })">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                        </svg> Edit Penugasan
+                                                    </button>
 
                                                     <!-- Tombol Buat Pengiriman -->
                                                     <button class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-300 flex items-center gap-2 whitespace-nowrap border-b border-gray-100 dark:border-gray-700"
