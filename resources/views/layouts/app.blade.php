@@ -93,9 +93,6 @@
 
 </head>
 
-
-
-
 <body
     x-data="{ 'loaded': true}"
     x-init="$store.sidebar.isExpanded = window.innerWidth >= 1280;

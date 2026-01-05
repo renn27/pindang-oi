@@ -89,7 +89,7 @@ class MasterKegiatanController extends Controller
 
                     $subKegiatan = $kegiatan->subKegiatans()->create([
                         'nama_sub_kegiatan' => $rkAnggota,
-                        'jenis_kegiatan'    => 'RK Anggota',
+                        'jenis_kegiatan'    => $request->jenis_kegiatan[$index] ?? null,
                         'satuan_target'     => $request->satuan_target[$index] ?? null,
                         'tanggal_mulai'     => $request->tanggal_mulai[$index] ?? null,
                         'tanggal_selesai'   => $request->tanggal_akhir[$index] ?? null,

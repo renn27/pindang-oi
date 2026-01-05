@@ -885,3 +885,17 @@ pre[class*='language-'] {
         fill: none !important;
     }
 }
+
+/* css untuk sweetalert */
+/* === SWEETALERT FIX: selalu di atas header & sidebar === */
+.swal2-container {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 99999 !important;
+}
+
+/* backdrop blur konsisten */
+.swal2-backdrop-show {
+    backdrop-filter: blur(2px);
+}
+

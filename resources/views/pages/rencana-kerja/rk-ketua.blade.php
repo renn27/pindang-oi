@@ -405,7 +405,7 @@
         <div id="${sectionId}" class="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
             <div class="mb-4 flex items-center justify-between">
                 <h5 class="text-sm font-semibold text-gray-800 dark:text-white/90">
-                    RK Anggota ${rkAnggotaCounter}
+                    Sub Kegiatan ${rkAnggotaCounter}
                 </h5>
                 <button type="button" onclick="hapusRKAnggota('${sectionId}')"
                     class="rounded-lg p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
@@ -423,6 +423,13 @@
                         RK Anggota
                     </label>
                     <input name="rk_anggota[]" type="text" placeholder="Masukkan rk anggota"
+                        class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                </div>
+                <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                        Jenis Kegiatan
+                    </label>
+                    <input name="jenis_kegiatan[]" type="text" placeholder="Masukkan jenis kegiatan"
                         class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                 </div>
 
@@ -467,14 +474,6 @@
                             placeholder="Tanggal Akhir"
                             defaultDate="{{ now()->format('Y-m-d') }}" />
                     </div>
-                </div>
-
-                <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
-                        Keterangan
-                    </label>
-                    <input name="keterangan[]" type="text" placeholder="Masukkan keterangan"
-                        class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                 </div>
 
                 <div id="detail-${sectionId}" class="space-y-4"></div>
