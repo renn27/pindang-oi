@@ -15,29 +15,55 @@ use App\Http\Controllers\SubKegiatanController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Pegawai;
 
-// UNTUK SIMULASI ROLE (ADMIN & PIMPINAN)
-Route::get('/login-as/{username}', function ($username) {
-    $pegawai = Pegawai::where('username', $username)->firstOrFail();
-    // dd($pegawai);
-    Auth::login($pegawai);
+Route::middleware('web')->group(function () {
 
-    // langsung dd
-    // dd(Auth::user());
-    return redirect()->route('dashboard');
+    // Simulasi login-as
+    Route::get('/login-as/{username}', function ($username) {
+        $pegawai = Pegawai::where('username', $username)->firstOrFail();
+        Auth::login($pegawai); // login user
+        session()->regenerate(); // regenerasi session supaya aman
+        return redirect()->route('dashboard');
+    })->name('login-as');
+
+    // Dashboard
+    Route::get('/', function () {
+        $user = Auth::user(); // otomatis dari Auth
+        return view('pages.dashboard', [
+            'title' => 'Pindang Dashboard',
+            'user'  => $user,
+        ]);
+    })->name('dashboard');
+
+    // Logout-as / clear session
+    Route::get('/logout-as', function () {
+        Auth::logout();
+        session()->flush(); // hapus semua session
+        session()->regenerate(); // regenerasi session
+        return redirect()->route('dashboard');
+    })->name('logout-as');
+
+    // Session test
+    Route::get('/session-test', function () {
+        session(['test' => 'laravel12']);
+        return session()->all();
+    });
 });
 
-// dashboard pages
-Route::get('/', function () {
-    $user = Auth::user(); // <-- INI KUNCI NYA
-    return view('pages.dashboard', [
-        'title' => 'Pindang Dashboard',
-        'user'  => $user,
-    ]);
-})->name('dashboard');
+// Route fallback login
+Route::get('/login', function () {
+    return response('Belum login. Gunakan /login-as/{username}', 401);
+})->name('login');
+
+// Route::get('/', function () {
+//     return view('pages.dashboard', [
+//         'title' => 'Pindang Dashboard',
+//         'user'  => Auth::user(),
+//     ]);
+// })->middleware('auth')->name('dashboard');
+
 
 // CRUD RK IKI JPT BY PIMPINAN
 Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(function () {
-
     // ROUTE UNTUK RENCANA JPT
     Route::prefix('rencana')->name('rencana.')->group(function () {
         Route::get('/', [RencanaJPTController::class, 'index'])->name('index');
@@ -45,7 +71,6 @@ Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(fu
         Route::put('/{rencanaJpt}', [RencanaJPTController::class, 'update'])->name('update');
         Route::delete('/{rencanaJpt}', [RencanaJPTController::class, 'delete'])->name('delete');
     });
-
 
     // ROUTE UNTUK INDIKATOR JPT
     Route::prefix('{rencanaJpt}/indikator')->name('indikator.')->group(function () {
