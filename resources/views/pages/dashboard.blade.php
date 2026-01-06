@@ -14,7 +14,7 @@
                 🛠 Menu Admin MUNCUL
             @endif
 
-            <a href="{{ route('logout-as') }}" class="text-red-500 underline">Logout</a>
+            <a href="{{ route('simulasi.logout') }}" class="text-red-500 underline">Logout</a>
         @else
             <p>Belum login</p>
             <p>Gunakan <code>/login-as/{username}</code> untuk simulasi login</p>

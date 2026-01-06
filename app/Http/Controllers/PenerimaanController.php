@@ -28,8 +28,8 @@ class PenerimaanController extends Controller
             // Redirect dengan flash message
             return redirect()
                 ->route('sub.kegiatan.show', [
-                    'kegiatan' => $penugasan->subKegiatan->kegiatan->id_kegiatan,
-                    'subKegiatan' => $penugasan->subKegiatan->id_sub_kegiatan
+                        'kegiatan' => $penugasan->subKegiatan->kegiatan->id_kegiatan,
+                        'subKegiatan' => $subKegiatan->id_sub_kegiatan
                 ])
                 ->with('success', 'Penerimaan hasil kerja berhasil dilakukan.');
         } catch (\Exception $e) {

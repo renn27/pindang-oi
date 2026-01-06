@@ -11,6 +11,7 @@ class SubKegiatanController extends Controller
 {
     public function store(Request $request, Kegiatan $kegiatan) {
         // dd($request->all());
+        $this->authorize('createSubKegiatan', $kegiatan);
 
         $validated = $request->validate([
             'nama_sub_kegiatan' => ['required', 'string', 'max:255'],
@@ -56,6 +57,11 @@ class SubKegiatanController extends Controller
     public function update(Request $request, Kegiatan $kegiatan, SubKegiatan $subKegiatan){
         // dd($request->all());
 
+        // 1️⃣ Kegiatan harus milik user
+        $this->authorize('manage', $kegiatan);
+
+        // 2️⃣ Sub kegiatan harus boleh di-update (state)
+        // $this->authorize('update', $subKegiatan); nanti aja kalau kepake
         $validated = $request->validate([
             'nama_sub_kegiatan' => ['required', 'string', 'max:255'],
             'jenis_kegiatan' => ['required', 'string', 'max:255'],
@@ -91,6 +97,8 @@ class SubKegiatanController extends Controller
     }
 
     public function delete(Kegiatan $kegiatan, SubKegiatan $subKegiatan) {
+        $this->authorize('manage', $kegiatan);
+        $this->authorize('delete', $subKegiatan);
         // optional safety check
         if ($subKegiatan->id_kegiatan != $kegiatan->id_kegiatan) {
             abort(403, 'Sub kegiatan tidak sesuai dengan kegiatan');
@@ -100,5 +108,4 @@ class SubKegiatanController extends Controller
 
         return redirect()->back()->with('success', 'Sub kegiatan berhasil dihapus');
     }
-
 }

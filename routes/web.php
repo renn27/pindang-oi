@@ -11,19 +11,16 @@ use App\Http\Controllers\PenerimaanController;
 use App\Http\Controllers\PengirimanController;
 use App\Http\Controllers\PenugasanController;
 use App\Http\Controllers\RencanaJPTController;
+use App\Http\Controllers\SimulasiLoginController;
 use App\Http\Controllers\SubKegiatanController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Pegawai;
 
 Route::middleware('web')->group(function () {
 
-    // Simulasi login-as
-    Route::get('/login-as/{username}', function ($username) {
-        $pegawai = Pegawai::where('username', $username)->firstOrFail();
-        Auth::login($pegawai); // login user
-        session()->regenerate(); // regenerasi session supaya aman
-        return redirect()->route('dashboard');
-    })->name('login-as');
+    // Simulasi Autentikasi dan Autorisasi Untuk Atur Role dan Permission
+    Route::get('/login-as/{username}', [SimulasiLoginController::class, 'loginAs'])->name('simulasi.login');
+    Route::get('/logout-as', [SimulasiLoginController::class, 'logoutAs'])->name('simulasi.logout');
 
     // Dashboard
     Route::get('/', function () {
@@ -33,14 +30,6 @@ Route::middleware('web')->group(function () {
             'user'  => $user,
         ]);
     })->name('dashboard');
-
-    // Logout-as / clear session
-    Route::get('/logout-as', function () {
-        Auth::logout();
-        session()->flush(); // hapus semua session
-        session()->regenerate(); // regenerasi session
-        return redirect()->route('dashboard');
-    })->name('logout-as');
 
     // Session test
     Route::get('/session-test', function () {
@@ -53,13 +42,6 @@ Route::middleware('web')->group(function () {
 Route::get('/login', function () {
     return response('Belum login. Gunakan /login-as/{username}', 401);
 })->name('login');
-
-// Route::get('/', function () {
-//     return view('pages.dashboard', [
-//         'title' => 'Pindang Dashboard',
-//         'user'  => Auth::user(),
-//     ]);
-// })->middleware('auth')->name('dashboard');
 
 
 // CRUD RK IKI JPT BY PIMPINAN
@@ -91,6 +73,86 @@ Route::prefix('bidang-kerja')->group(function () {
     Route::delete('/{bidang:slug}', [BidangController::class, 'delete'])->name('bidang.delete');
 });
 
+
+// OPSI NANTI PAKAI SCOPEBINDINGS
+// Route::scopeBindings()->group(function () {
+
+//     /*
+//     |--------------------------------------------------------------------------
+//     | KEGIATAN (Ketua Tim)
+//     |--------------------------------------------------------------------------
+//     */
+//     Route::prefix('kegiatan')->group(function () {
+
+//         Route::get('bidang/{bidang:slug}', [KegiatanController::class, 'index'])
+//             ->name('kegiatan.index');
+
+//         Route::post('bidang/{bidang:slug}', [KegiatanController::class, 'store'])
+//             ->name('kegiatan.store');
+
+//         /*
+//         |--------------------------------------------------------------------------
+//         | SUB KEGIATAN (Nested Kegiatan)
+//         |--------------------------------------------------------------------------
+//         */
+//         Route::prefix('{kegiatan:id_kegiatan}/sub-kegiatan')
+//             ->group(function () {
+
+//             Route::post('/', [SubKegiatanController::class, 'store'])
+//                 ->name('sub.kegiatan.store');
+
+//             Route::get('{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'show'])
+//                 ->name('sub.kegiatan.show');
+
+//             Route::put('{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'update'])
+//                 ->name('sub.kegiatan.update');
+
+//             Route::delete('{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'delete'])
+//                 ->name('sub.kegiatan.delete');
+
+//             /*
+//             |--------------------------------------------------------------------------
+//             | PENUGASAN (Nested SubKegiatan)
+//             |--------------------------------------------------------------------------
+//             */
+//             Route::prefix('{subKegiatan:id_sub_kegiatan}/penugasan')
+//                 ->group(function () {
+
+//                 Route::post('/', [PenugasanController::class, 'store'])
+//                     ->name('penugasan.store');
+
+//                 Route::put('{penugasan:id_penugasan}', [PenugasanController::class, 'update'])
+//                     ->name('penugasan.update');
+
+//                 Route::delete('{penugasan:id_penugasan}', [PenugasanController::class, 'delete'])
+//                     ->name('penugasan.delete');
+
+//                 /*
+//                 |--------------------------------------------------------------------------
+//                 | PENGIRIMAN (Nested Penugasan)
+//                 |--------------------------------------------------------------------------
+//                 */
+//                 Route::prefix('{penugasan:id_penugasan}/pengirimans')
+//                     ->group(function () {
+
+//                     Route::post('/', [PengirimanController::class, 'store'])
+//                         ->name('pengiriman.store');
+
+//                     /*
+//                     |--------------------------------------------------------------------------
+//                     | PENERIMAAN (Nested Pengiriman)
+//                     |--------------------------------------------------------------------------
+//                     */
+//                     Route::post(
+//                         '{pengiriman:id_pengiriman}/penerimaan',
+//                         [PenerimaanController::class, 'store']
+//                     )->name('penerimaan.store');
+//                 });
+//             });
+//         });
+//     });
+// });
+
 // CRUD KEGIATAN & SUB KEGIATAN BY KETUA TIM
 Route::prefix('kegiatan')->group(function () {
     // Kegiatan
@@ -100,9 +162,9 @@ Route::prefix('kegiatan')->group(function () {
     // Sub Kegiatan
     Route::prefix('{kegiatan:id_kegiatan}/sub-kegiatan')->group(function () {
         Route::post('/', [SubKegiatanController::class, 'store'])->name('sub.kegiatan.store'); // create
-        Route::get('/{subKegiatan}', [SubKegiatanController::class, 'show'])->name('sub.kegiatan.show'); // edit
-        Route::put('/{subKegiatan}', [SubKegiatanController::class, 'update'])->name('sub.kegiatan.update'); // edit
-        Route::delete('/{subKegiatan}', [SubKegiatanController::class, 'delete'])->name('sub.kegiatan.delete'); // delete
+        Route::get('/{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'show'])->name('sub.kegiatan.show'); // edit
+        Route::put('/{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'update'])->name('sub.kegiatan.update'); // edit
+        Route::delete('/{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'delete'])->name('sub.kegiatan.delete'); // delete
     });
 });
 
@@ -111,7 +173,7 @@ Route::prefix('sub-kegiatan/{subKegiatan:id_sub_kegiatan}')->group(function () {
     // CRUD PENUGASAN BY KETUA TIM
     Route::prefix('penugasan')->group(function () {
         Route::post('/', [PenugasanController::class, 'store'])->name('penugasan.store'); // create
-        Route::put('/{penugasan}', [PenugasanController::class, 'update'])->name('penugasan.update'); // edit
+        Route::put('/{penugasan:id_penugasan}', [PenugasanController::class, 'update'])->name('penugasan.update'); // edit
         Route::delete('/{penugasan}', [PenugasanController::class, 'delete'])->name('penugasan.delete'); // delete
 
         // CRUD PENGIRIMAN BY ANGGOTA TIM

@@ -9,12 +9,12 @@ class MenuHelper
     public static function getMainNavItems()
     {
         $user = Auth::user();
+
         $menus = [
             [
                 'icon' => 'dashboard',
                 'name' => 'Dashboard',
                 'path' => '/',
-                'roles' => ['Admin', 'Pimpinan', 'Pegawai'],
             ],
             [
                 'icon' => 'dashboard',
@@ -23,7 +23,6 @@ class MenuHelper
                     ['name' => 'Bidang Kerja', 'path' => '/bidang-kerja'],
                     ['name' => 'Tim Kerja', 'path' => '#'],
                 ],
-                'roles' => ['Admin', 'Pimpinan'],
             ],
             [
                 'icon' => 'dashboard',
@@ -31,13 +30,11 @@ class MenuHelper
                 'subItems' => [
                     ['name' => 'RK & IKI Pimpinan', 'path' => '/rencana-indikator-jpt/rencana'],
                 ],
-                'roles' => ['Admin', 'Pimpinan'],
             ],
             [
                 'icon' => 'dashboard',
                 'name' => 'Tagihan Kerja',
                 'subItems' => Bidang::getNavItems(),
-                'roles' => ['Admin', 'Pimpinan', 'Pegawai'],
             ],
             [
                 'icon' => 'dashboard',
@@ -46,28 +43,62 @@ class MenuHelper
                     ['name' => 'Kegiatan/RK Ketua', 'path' => '/rk-ketua'],
                     ['name' => 'Sub Kegiatan/RK Anggota', 'path' => '/rencana-kerja/sub-kegiatan'],
                 ],
-                'roles' => ['Admin', 'Pimpinan', 'Pegawai'],
             ],
         ];
 
+        // =============================
+        // USER LOGIN
+        // =============================
         if ($user) {
-            if ($user->hasAnyRole(['Admin', 'Pimpinan'])) {
-                // Admin & Pimpinan lihat semua menu
-                return array_map(fn ($menu) => self::normalizeMenuItem($menu), $menus);
-            } else {
-                // Pegawai lain, batasi menu
-                $allowedNames = ['Dashboard', 'Tagihan Kerja', 'Rencana Kinerja'];
-                $filtered = array_filter($menus, fn ($menu) => in_array($menu['name'], $allowedNames));
-                return array_map(fn ($menu) => self::normalizeMenuItem($menu), $filtered);
+
+            // 1️⃣ ADMIN → SEMUA MENU
+            if ($user->hasRole('Admin')) {
+                return array_map(
+                    fn ($menu) => self::normalizeMenuItem($menu),
+                    $menus
+                );
             }
+
+            // 2️⃣ PIMPINAN → SEMUA KECUALI ADMIN
+            if ($user->hasRole('Pimpinan')) {
+                $filtered = array_filter(
+                    $menus,
+                    fn ($menu) => $menu['name'] !== 'Admin'
+                );
+
+                return array_map(
+                    fn ($menu) => self::normalizeMenuItem($menu),
+                    $filtered
+                );
+            }
+
+            // 3️⃣ PEGAWAI / KETUA TIM
+            $allowedNames = ['Dashboard', 'Tagihan Kerja', 'Rencana Kinerja'];
+
+            $filtered = array_filter(
+                $menus,
+                fn ($menu) => in_array($menu['name'], $allowedNames)
+            );
+
+            return array_map(
+                fn ($menu) => self::normalizeMenuItem($menu),
+                $filtered
+            );
         }
 
-        // Guest / tidak login, batasi juga
-        $allowedNames = ['Dashboard', 'Tagihan Kerja', 'Rencana Kinerja'];
-        $filtered = array_filter($menus, fn ($menu) => in_array($menu['name'], $allowedNames));
-        return array_map(fn ($menu) => self::normalizeMenuItem($menu), $filtered);return array_map(fn ($menu) => self::normalizeMenuItem($menu), $menus);
-    }
+        // =============================
+        // GUEST
+        // =============================
+        $filtered = array_filter(
+            $menus,
+            fn ($menu) => $menu['name'] === 'Dashboard'
+        );
 
+        return array_map(
+            fn ($menu) => self::normalizeMenuItem($menu),
+            $filtered
+        );
+    }
 
     public static function getMenuGroups()
     {

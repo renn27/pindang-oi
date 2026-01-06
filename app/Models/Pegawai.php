@@ -30,8 +30,15 @@ class Pegawai extends Authenticatable
         'password',
     ];
 
+    public function isAnggota(): bool
+    {
+        return ! $this->hasAnyRole([
+            'Admin',
+            'Pimpinan',
+            'Ketua Tim',
+        ]);
+    }
 
-    
     // Cek apakah pegawai ini penanggung jawab kegiatan
     public function isKetuaOfKegiatan(Kegiatan $kegiatan): bool {
         return $kegiatan->id_penanggung_jawab === $this->id_pegawai;
