@@ -70,216 +70,221 @@
         <!-- Section Progres -->
         <div class="mb-8 max-w-full overflow-hidden">
             <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Progres</h2>
-            <div class="flex justify-start mb-6">
-                <button class="flex items-center gap-2 rounded-full border border-gray-300
-                        bg-white px-4 py-3 text-sm font-medium text-gray-700
-                        shadow-theme-xs hover:bg-gray-50 hover:text-gray-800
-                        dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400
-                        dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
-                        @click="$dispatch('open-smart-modal', {
-                            modalId: 'modal-penugasan-anggota',
-                            data: {
-                                id_sub_kegiatan: '{{ $subKegiatan->id_sub_kegiatan }}',
-                                nama_sub_kegiatan: '{{ $subKegiatan->nama_sub_kegiatan }}'
-                            }
-                        })">
-                    <!-- icon -->
-                    <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd"
-                        d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z"
-                        fill="" />
-                    </svg>
-                    Tambah Anggota
-                </button>
-            </div>
-
-            <x-ui.smart-modal id="modal-penugasan-anggota" class="max-w-xl"
-                @open-smart-modal.window="
-                    if ($event.detail.modalId !== 'modal-penugasan-anggota') return;
-
-                    mode = $event.detail.mode ?? 'create';
-                    itemKey = $event.detail.key ?? null;
-                    // Ambil data dari dispatch
-                    formData = $event.detail.data ?? {
-                        id_sub_kegiatan: '',
-                        nama_sub_kegiatan: '',
-                        id_anggota: '',
-                        nama_anggota: '',
-                        target: '',
-                        tanggal_mulai: '',
-                        tanggal_selesai: '',
-                        status: ''
-                    }">
-                <div
-                    class="relative flex h-[90vh] w-full max-w-[700px] flex-col overflow-hidden
-                            rounded-3xl bg-white dark:bg-gray-900">
-
-                    <!-- HEADER (FIXED) -->
-                    <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
-                        <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90" x-text="mode === 'create' ? 'Tambah Anggota' : 'Edit Data Anggota'"></h4>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400" x-text="mode === 'create' ? 'Tambahkan penugasan kepada anggota' : 'Edit anggota yang sudah ditugaskan'"></p>
-                    </div>
-
-                    <!-- BODY (SCROLL DI SINI) -->
-                    <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
-                        <form :action="mode === 'edit'
-                                ? `/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${itemKey}`
-                                : `/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan`"
-                            method="POST"
-                            class="grid grid-cols-1 gap-y-5">
-                            @csrf
-                            <template x-if="mode === 'edit'">
-                                @method('PUT')
-                            </template>
-
-                            <!-- Nama Sub Kegiatan (readonly tampilan) -->
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Sub Kegiatan
-                                </label>
-
-                                <input
-                                    type="text"
-                                    :value="formData.nama_sub_kegiatan"
-                                    disabled
-                                    class="w-full h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800
-                                        dark:border-gray-700 dark:bg-gray-800 dark:text-white/70 cursor-not-allowed">
-                            </div>
-
-                            {{-- Nama Ketua / Penanggung Jawab --}}
-                            <div x-data="{
-                                open: false,
-                                search: '',
-                                selectedId: '',
-                                highlightedIndex: -1,
-                                pegawais: @js($pegawais),
-
-                                init() {
-                                    // ketika modal edit dibuka
-                                    if (this.$root.formData?.nama_anggota) {
-                                        this.search = this.$root.formData.nama_anggota;
-                                        this.selectedId = this.$root.formData.id_anggota;
-                                    }
-                                },
-
-                                filtered() {
-                                    if (this.search.length === 0) return [];
-                                    return this.pegawais.filter(p =>
-                                        p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase())
-                                    );
-                                },
-
-                                selectPegawai(p) {
-                                    this.search = p.nama_pegawai;
-                                    this.selectedId = p.id_pegawai;
-                                    // sinkron ke formData (PENTING)
-                                    this.$root.formData.nama_anggota = p.nama_pegawai;
-                                    this.$root.formData.id_anggota = p.id_pegawai;
-
-                                    this.open = false;
-                                    this.highlightedIndex = -1;
-                                },
-
-                                highlightNext() { if(this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++; },
-                                highlightPrev() { if(this.highlightedIndex > 0) this.highlightedIndex--; },
-                                selectHighlighted() { if(this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]); }
-                                }">
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                        Nama Anggota
-                                    </label>
-                                    <!-- Input search -->
-                                    <input type="text"
-                                    x-model="search"
-                                    class="h-11 w-full rounded-lg border px-4 py-2 text-sm"
-                                    placeholder="Ketik untuk cari nama"
-                                    {{-- x-model="formData.nama_anggota" --}}
-                                    @focus="open = true"
-                                    @input="open = true; selectedId = ''"
-                                    {{-- @focus="open = !!search" @input="open = search.length > 0; selectedId = ''" --}}
-                                    @keydown.arrow-down.prevent="highlightedIndex++"
-                                    @keydown.arrow-up.prevent="highlightedIndex--"
-                                    @keydown.enter.prevent="if(highlightedIndex>=0){ search = pegawais[highlightedIndex].nama_pegawai; selectedId = pegawais[highlightedIndex].id_pegawai; open=false; }">
-
-                                <!-- Hidden input -->
-                                <input type="hidden" name="id_anggota" :value="selectedId" required>
-
-                                <!-- Dropdown -->
-                                <div x-show="open" x-transition class="absolute z-50 mt-1 w-full rounded-lg border bg-white max-h-60 overflow-y-auto">
-                                    <template x-for="(pegawai, index) in pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase()))" :key="pegawai.id_pegawai">
-                                        <div @click="search = pegawai.nama_pegawai; selectedId = pegawai.id_pegawai; open = false"
-                                            :class="{'bg-blue-100': highlightedIndex===index, 'hover:bg-gray-100': highlightedIndex!==index}" class="cursor-pointer px-4 py-2 text-sm" x-text="pegawai.nama_pegawai"></div>
-                                    </template>
-                                    <template x-if="pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase())).length === 0">
-                                        <div class="px-4 py-2 text-sm text-gray-500">Data tidak ditemukan</div>
-                                    </template>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Target
-                                </label>
-                                <input type="number" x-model="formData.target" name="target" placeholder="Masukkan Target"
-                                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                            </div>
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Tanggal Mulai
-                                </label>
-                                <x-form.date-picker
-                                    id="tanggal_mulai"
-                                    x-model="formData.tanggal_mulai"
-                                    name="tanggal_mulai"
-                                    placeholder="Date Picker"
-                                    defaultDate="{{ now()->format('Y-m-d') }}" />
-                            </div>
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Tanggal Berakhir (Deadline)
-                                </label>
-                                <x-form.date-picker
-                                    id="tanggal_selesai"
-                                    x-model="formData.tanggal_selesai"
-                                    name="tanggal_selesai"
-                                    placeholder="Date Picker"
-                                    defaultDate="{{ now()->format('Y-m-d') }}" />
-                            </div>
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Status
-                                </label>
-                                <select
-                                    name="status"
-                                    x-model="formData.status"
-                                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">
-                                    <option value="">-- Pilih Status --</option>
-                                    <option value="Belum Dikirim" :selected="formData.status === 'Belum Dikirim'">Belum Dikirim</option>
-                                    <option value="Sudah Dikirim" :selected="formData.status === 'Sudah Dikirim'">Sudah Dikirim</option>
-                                    <option value="Masih Revisi" :selected="formData.status === 'Masih Revisi'">Masih Revisi</option>
-                                    <option value="Sudah Diterima" :selected="formData.status === 'Sudah Diterima'">Sudah Diterima</option>
-                                </select>
-                            </div>
-                            <!-- FOOTER -->
-                            <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-800">
-                                <div class="flex justify-end gap-3">
-                                    <button type="button"
-                                            @click="open = false"
-                                            class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium
-                                                text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
-                                        Batal
-                                    </button>
-
-                                    <button type="submit"
-                                        class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600">
-                                        <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+            @can('manage', $kegiatan)
+                <div class="flex justify-start mb-6">
+                    <button class="flex items-center gap-2 rounded-full border border-gray-300
+                            bg-white px-4 py-3 text-sm font-medium text-gray-700
+                            shadow-theme-xs hover:bg-gray-50 hover:text-gray-800
+                            dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400
+                            dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+                            @click="$dispatch('open-smart-modal', {
+                                modalId: 'modal-penugasan-anggota',
+                                data: {
+                                    id_sub_kegiatan: '{{ $subKegiatan->id_sub_kegiatan }}',
+                                    nama_sub_kegiatan: '{{ $subKegiatan->nama_sub_kegiatan }}'
+                                }
+                            })">
+                        <!-- icon -->
+                        <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                            d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z"
+                            fill="" />
+                        </svg>
+                        Tambah Anggota
+                    </button>
                 </div>
-            </x-ui.smart-modal>
+            @endcan
+
+            @can('manage', $kegiatan)
+                <!-- Modal Histori Penugasan Anggota -->
+                <x-ui.smart-modal id="modal-penugasan-anggota" class="max-w-xl"
+                    @open-smart-modal.window="
+                        if ($event.detail.modalId !== 'modal-penugasan-anggota') return;
+
+                        mode = $event.detail.mode ?? 'create';
+                        itemKey = $event.detail.key ?? null;
+                        // Ambil data dari dispatch
+                        formData = $event.detail.data ?? {
+                            id_sub_kegiatan: '',
+                            nama_sub_kegiatan: '',
+                            id_anggota: '',
+                            nama_anggota: '',
+                            target: '',
+                            tanggal_mulai: '',
+                            tanggal_selesai: '',
+                            status: ''
+                        }">
+                    <div
+                        class="relative flex h-[90vh] w-full max-w-[700px] flex-col overflow-hidden
+                                rounded-3xl bg-white dark:bg-gray-900">
+
+                        <!-- HEADER (FIXED) -->
+                        <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
+                            <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90" x-text="mode === 'create' ? 'Tambah Anggota' : 'Edit Data Anggota'"></h4>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400" x-text="mode === 'create' ? 'Tambahkan penugasan kepada anggota' : 'Edit anggota yang sudah ditugaskan'"></p>
+                        </div>
+
+                        <!-- BODY (SCROLL DI SINI) -->
+                        <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
+                            <form :action="mode === 'edit'
+                                    ? `/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${itemKey}`
+                                    : `/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan`"
+                                method="POST"
+                                class="grid grid-cols-1 gap-y-5">
+                                @csrf
+                                <template x-if="mode === 'edit'">
+                                    @method('PUT')
+                                </template>
+
+                                <!-- Nama Sub Kegiatan (readonly tampilan) -->
+                                <div>
+                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        Sub Kegiatan
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        :value="formData.nama_sub_kegiatan"
+                                        disabled
+                                        class="w-full h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800
+                                            dark:border-gray-700 dark:bg-gray-800 dark:text-white/70 cursor-not-allowed">
+                                </div>
+
+                                {{-- Nama Ketua / Penanggung Jawab --}}
+                                <div x-data="{
+                                    open: false,
+                                    search: '',
+                                    selectedId: '',
+                                    highlightedIndex: -1,
+                                    pegawais: @js($pegawais),
+
+                                    init() {
+                                        // ketika modal edit dibuka
+                                        if (this.$root.formData?.nama_anggota) {
+                                            this.search = this.$root.formData.nama_anggota;
+                                            this.selectedId = this.$root.formData.id_anggota;
+                                        }
+                                    },
+
+                                    filtered() {
+                                        if (this.search.length === 0) return [];
+                                        return this.pegawais.filter(p =>
+                                            p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase())
+                                        );
+                                    },
+
+                                    selectPegawai(p) {
+                                        this.search = p.nama_pegawai;
+                                        this.selectedId = p.id_pegawai;
+                                        // sinkron ke formData (PENTING)
+                                        this.$root.formData.nama_anggota = p.nama_pegawai;
+                                        this.$root.formData.id_anggota = p.id_pegawai;
+
+                                        this.open = false;
+                                        this.highlightedIndex = -1;
+                                    },
+
+                                    highlightNext() { if(this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++; },
+                                    highlightPrev() { if(this.highlightedIndex > 0) this.highlightedIndex--; },
+                                    selectHighlighted() { if(this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]); }
+                                    }">
+                                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                            Nama Anggota
+                                        </label>
+                                        <!-- Input search -->
+                                        <input type="text"
+                                        x-model="search"
+                                        class="h-11 w-full rounded-lg border px-4 py-2 text-sm"
+                                        placeholder="Ketik untuk cari nama"
+                                        {{-- x-model="formData.nama_anggota" --}}
+                                        @focus="open = true"
+                                        @input="open = true; selectedId = ''"
+                                        {{-- @focus="open = !!search" @input="open = search.length > 0; selectedId = ''" --}}
+                                        @keydown.arrow-down.prevent="highlightedIndex++"
+                                        @keydown.arrow-up.prevent="highlightedIndex--"
+                                        @keydown.enter.prevent="if(highlightedIndex>=0){ search = pegawais[highlightedIndex].nama_pegawai; selectedId = pegawais[highlightedIndex].id_pegawai; open=false; }">
+
+                                    <!-- Hidden input -->
+                                    <input type="hidden" name="id_anggota" :value="selectedId" required>
+
+                                    <!-- Dropdown -->
+                                    <div x-show="open" x-transition class="absolute z-50 mt-1 w-full rounded-lg border bg-white max-h-60 overflow-y-auto">
+                                        <template x-for="(pegawai, index) in pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase()))" :key="pegawai.id_pegawai">
+                                            <div @click="search = pegawai.nama_pegawai; selectedId = pegawai.id_pegawai; open = false"
+                                                :class="{'bg-blue-100': highlightedIndex===index, 'hover:bg-gray-100': highlightedIndex!==index}" class="cursor-pointer px-4 py-2 text-sm" x-text="pegawai.nama_pegawai"></div>
+                                        </template>
+                                        <template x-if="pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase())).length === 0">
+                                            <div class="px-4 py-2 text-sm text-gray-500">Data tidak ditemukan</div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        Target
+                                    </label>
+                                    <input type="number" x-model="formData.target" name="target" placeholder="Masukkan Target"
+                                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                </div>
+                                <div>
+                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        Tanggal Mulai
+                                    </label>
+                                    <x-form.date-picker
+                                        id="tanggal_mulai"
+                                        x-model="formData.tanggal_mulai"
+                                        name="tanggal_mulai"
+                                        placeholder="Date Picker"
+                                        defaultDate="{{ now()->format('Y-m-d') }}" />
+                                </div>
+                                <div>
+                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        Tanggal Berakhir (Deadline)
+                                    </label>
+                                    <x-form.date-picker
+                                        id="tanggal_selesai"
+                                        x-model="formData.tanggal_selesai"
+                                        name="tanggal_selesai"
+                                        placeholder="Date Picker"
+                                        defaultDate="{{ now()->format('Y-m-d') }}" />
+                                </div>
+                                <div>
+                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        Status
+                                    </label>
+                                    <select
+                                        name="status"
+                                        x-model="formData.status"
+                                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">
+                                        <option value="">-- Pilih Status --</option>
+                                        <option value="Belum Dikirim" :selected="formData.status === 'Belum Dikirim'">Belum Dikirim</option>
+                                        <option value="Sudah Dikirim" :selected="formData.status === 'Sudah Dikirim'">Sudah Dikirim</option>
+                                        <option value="Masih Revisi" :selected="formData.status === 'Masih Revisi'">Masih Revisi</option>
+                                        <option value="Sudah Diterima" :selected="formData.status === 'Sudah Diterima'">Sudah Diterima</option>
+                                    </select>
+                                </div>
+                                <!-- FOOTER -->
+                                <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-800">
+                                    <div class="flex justify-end gap-3">
+                                        <button type="button"
+                                                @click="open = false"
+                                                class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium
+                                                    text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                            Batal
+                                        </button>
+
+                                        <button type="submit"
+                                            class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600">
+                                            <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </x-ui.smart-modal>
+            @endcan
 
             <!-- Modal Tambah Pengiriman -->
             <x-ui.smart-modal id="modal-pengiriman-anggota" class="max-w-xl"
@@ -502,154 +507,156 @@
                 </div>
             </x-ui.smart-modal>
 
-            <!-- Modal Tambah Penerimaan -->
-            <x-ui.smart-modal id="modal-penerimaan-anggota" class="max-w-xl"
-                @open-smart-modal.window="
-                    if ($event.detail.modalId !== 'modal-penerimaan-anggota') return;
+            @can('manage', $kegiatan)
+                <!-- Modal Tambah Penerimaan -->
+                <x-ui.smart-modal id="modal-penerimaan-anggota" class="max-w-xl"
+                    @open-smart-modal.window="
+                        if ($event.detail.modalId !== 'modal-penerimaan-anggota') return;
 
-                    mode = $event.detail.mode ?? 'create';
-                    itemKey = $event.detail.key ?? null;
-                    // Ambil data dari dispatch
-                    formData = $event.detail.data ?? {
-                        id_sub_kegiatan: '',
-                        id_penugasan: '',
-                        id_pengiriman: '',
-                        id_penerima: '',
-                        nama_penerima: '',
-                        tanggal_penerimaan: '',
-                        jumlah_diterima: '',
-                        status: '',,
-                        catatan: ''
-                    }">
-                <div
-                    class="relative flex h-[90vh] w-full max-w-[700px] flex-col overflow-hidden
-                            rounded-3xl bg-white dark:bg-gray-900">
+                        mode = $event.detail.mode ?? 'create';
+                        itemKey = $event.detail.key ?? null;
+                        // Ambil data dari dispatch
+                        formData = $event.detail.data ?? {
+                            id_sub_kegiatan: '',
+                            id_penugasan: '',
+                            id_pengiriman: '',
+                            id_penerima: '',
+                            nama_penerima: '',
+                            tanggal_penerimaan: '',
+                            jumlah_diterima: '',
+                            status: '',,
+                            catatan: ''
+                        }">
+                    <div
+                        class="relative flex h-[90vh] w-full max-w-[700px] flex-col overflow-hidden
+                                rounded-3xl bg-white dark:bg-gray-900">
 
-                    <!-- HEADER (FIXED) -->
-                    <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
-                        <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90">
-                            Lakukan Penerimaan
-                        </h4>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            Terima dan Berikan Penilaian Kerja
-                        </p>
-                    </div>
-                    <div class="text-center">
-                        <h6 class="text-sm font-semibold text-gray-600 dark:text-white/90"
-                            x-text="formData.nama_anggota">
-                        </h6>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            ID Penugasan:
-                            <span class="font-medium" x-text="formData.id_penugasan"></span>
-                        </p>
-                    </div>
+                        <!-- HEADER (FIXED) -->
+                        <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
+                            <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90">
+                                Lakukan Penerimaan
+                            </h4>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                Terima dan Berikan Penilaian Kerja
+                            </p>
+                        </div>
+                        <div class="text-center">
+                            <h6 class="text-sm font-semibold text-gray-600 dark:text-white/90"
+                                x-text="formData.nama_anggota">
+                            </h6>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                ID Penugasan:
+                                <span class="font-medium" x-text="formData.id_penugasan"></span>
+                            </p>
+                        </div>
 
-                    <!-- BODY (SCROLL DI SINI) -->
-                    <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
-                        <form :action="`/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${formData.id_penugasan}/pengirimans/${formData.id_pengiriman}/penerimaan`"
-                            method="POST" class="grid grid-cols-1 gap-y-5">
-                            @csrf
-                            <!-- Id Pengiriman (readonly tampilan) -->
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Id Pengiriman
-                                </label>
+                        <!-- BODY (SCROLL DI SINI) -->
+                        <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
+                            <form :action="`/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${formData.id_penugasan}/pengirimans/${formData.id_pengiriman}/penerimaan`"
+                                method="POST" class="grid grid-cols-1 gap-y-5">
+                                @csrf
+                                <!-- Id Pengiriman (readonly tampilan) -->
+                                <div>
+                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        Id Pengiriman
+                                    </label>
 
-                                <input
-                                    type="text"
-                                    :value="formData.id_pengiriman"
-                                    disabled
-                                    class="w-full h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800
-                                        dark:border-gray-700 dark:bg-gray-800 dark:text-white/70 cursor-not-allowed">
-                            </div>
-
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Tanggal Penerimaan
-                                </label>
-                                <x-form.date-picker
-                                    id="tanggal_penerimaan"
-                                    name="tanggal_penerimaan"
-                                    x-model="formData.tanggal_penerimaan"
-                                    placeholder="Date Picker"
-                                    defaultDate="{{ now()->format('Y-m-d') }}"
-                                    readonly="true" />
+                                    <input
+                                        type="text"
+                                        :value="formData.id_pengiriman"
+                                        disabled
+                                        class="w-full h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800
+                                            dark:border-gray-700 dark:bg-gray-800 dark:text-white/70 cursor-not-allowed">
                                 </div>
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Jumlah Diterima
-                                </label>
-                                <input type="text" name="jumlah_diterima" x-model="formData.jumlah_diterima" placeholder="Masukkan jumlah penerimaan"
-                                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                            </div>
-                            <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Status
-                                </label>
-                                <select
-                                    name="status"
-                                    x-model="formData.status"
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10
-                                        dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg
-                                        border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm
-                                        placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
-                                        dark:border-gray-700 dark:bg-gray-900 dark:text-white/90
-                                        dark:placeholder:text-white/30"
-                                    :class="isOptionSelected && 'text-gray-800 dark:text-white/90'"
-                                    @change="isOptionSelected = true">
-                                    <!-- Placeholder -->
-                                    <option value="" disabled selected class="text-gray-400 dark:bg-gray-900">
-                                        -- Pilih Status --
-                                    </option>
 
-                                    <option value="Diterima" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                        Diterima
-                                    </option>
-
-                                    <option value="Revisi" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                        Revisi
-                                    </option>
-                                </select>
-
-                                <span
-                                    class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2
-                                        text-gray-700 dark:text-gray-400">
-                                    <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396"
-                                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </span>
-                            </div>
-
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Catatan
-                                </label>
-                                <input type="text" name="catatan" placeholder="Masukkan catatan"
-                                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                            </div>
-                            <!-- FOOTER -->
-                            <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-800">
-                                <div class="flex justify-end gap-3">
-                                    <button type="button"
-                                            @click="open = false"
-                                            class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium
-                                                text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
-                                        Batal
-                                    </button>
-
-                                    <button type="submit"
-                                        class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600">
-                                        <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
-                                    </button>
+                                <div>
+                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        Tanggal Penerimaan
+                                    </label>
+                                    <x-form.date-picker
+                                        id="tanggal_penerimaan"
+                                        name="tanggal_penerimaan"
+                                        x-model="formData.tanggal_penerimaan"
+                                        placeholder="Date Picker"
+                                        defaultDate="{{ now()->format('Y-m-d') }}"
+                                        readonly="true" />
+                                    </div>
+                                <div>
+                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        Jumlah Diterima
+                                    </label>
+                                    <input type="text" name="jumlah_diterima" x-model="formData.jumlah_diterima" placeholder="Masukkan jumlah penerimaan"
+                                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                                 </div>
-                            </div>
-                        </form>
+                                <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
+                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        Status
+                                    </label>
+                                    <select
+                                        name="status"
+                                        x-model="formData.status"
+                                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10
+                                            dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg
+                                            border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm
+                                            placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
+                                            dark:border-gray-700 dark:bg-gray-900 dark:text-white/90
+                                            dark:placeholder:text-white/30"
+                                        :class="isOptionSelected && 'text-gray-800 dark:text-white/90'"
+                                        @change="isOptionSelected = true">
+                                        <!-- Placeholder -->
+                                        <option value="" disabled selected class="text-gray-400 dark:bg-gray-900">
+                                            -- Pilih Status --
+                                        </option>
+
+                                        <option value="Diterima" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                                            Diterima
+                                        </option>
+
+                                        <option value="Revisi" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                                            Revisi
+                                        </option>
+                                    </select>
+
+                                    <span
+                                        class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2
+                                            text-gray-700 dark:text-gray-400">
+                                        <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                            <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396"
+                                                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        Catatan
+                                    </label>
+                                    <input type="text" name="catatan" placeholder="Masukkan catatan"
+                                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                </div>
+                                <!-- FOOTER -->
+                                <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-800">
+                                    <div class="flex justify-end gap-3">
+                                        <button type="button"
+                                                @click="open = false"
+                                                class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium
+                                                    text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                            Batal
+                                        </button>
+
+                                        <button type="submit"
+                                            class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600">
+                                            <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
                     </div>
-
-
-                </div>
-            </x-ui.smart-modal>
+                </x-ui.smart-modal>
+            @endcan
 
             <!-- Tabel Detail Pengiriman - VERSI BERSIH -->
             <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
@@ -676,9 +683,11 @@
                                     <th colspan="4" class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                                     Penerimaan
                                     </th>
-                                    <th rowspan="2" class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                                    Aksi
-                                    </th>
+                                    @can('manage', $kegiatan)
+                                        <th rowspan="2" class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                                        Aksi
+                                        </th>
+                                    @endcan
                                 </tr>
                                 <tr class="bg-gray-50 dark:bg-gray-800/50">
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
@@ -763,7 +772,6 @@
                                             </div>
                                         </td>
 
-
                                         <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-400 text-center">
                                             {{ $penugasan->rr_terima ? $penugasan->rr_terima.'%' : '-' }}
                                         </td>
@@ -787,179 +795,181 @@
                                                 {{ $penugasan->latestPengiriman?->bukti_dukung ? 'Lihat Bukti' : 'Belum Ada' }}
                                             </a>
                                         </td>
-                                        <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-400 text-center border-r border-gray-200 dark:border-gray-800">
-                                            <!-- Container untuk tombol saja -->
-                                            <div class="relative inline-block" x-data="{
-                                                showDropdown: false,
-                                                dropdownPosition: { x: 0, y: 0 },
-                                                calculatePosition(button) {
-                                                    const rect = button.getBoundingClientRect();
-                                                    const dropdownWidth = 192; // w-48 = 192px
-                                                    const dropdownHeight = 132; // perkiraan tinggi 3 tombol
+                                        @can('manage', $kegiatan)
+                                            <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-400 text-center border-r border-gray-200 dark:border-gray-800">
+                                                <!-- Container untuk tombol saja -->
+                                                <div class="relative inline-block" x-data="{
+                                                    showDropdown: false,
+                                                    dropdownPosition: { x: 0, y: 0 },
+                                                    calculatePosition(button) {
+                                                        const rect = button.getBoundingClientRect();
+                                                        const dropdownWidth = 192; // w-48 = 192px
+                                                        const dropdownHeight = 132; // perkiraan tinggi 3 tombol
 
-                                                    // Coba muncul di bawah tombol
-                                                    let left = rect.left + (rect.width / 2) - (dropdownWidth / 2);
-                                                    let top = rect.bottom + 8;
+                                                        // Coba muncul di bawah tombol
+                                                        let left = rect.left + (rect.width / 2) - (dropdownWidth / 2);
+                                                        let top = rect.bottom + 8;
 
-                                                    // Cek jika akan keluar dari viewport kanan
-                                                    if (left + dropdownWidth > window.innerWidth - 10) {
-                                                        left = window.innerWidth - dropdownWidth - 10;
-                                                    }
+                                                        // Cek jika akan keluar dari viewport kanan
+                                                        if (left + dropdownWidth > window.innerWidth - 10) {
+                                                            left = window.innerWidth - dropdownWidth - 10;
+                                                        }
 
-                                                    // Cek jika akan keluar dari viewport kiri
-                                                    if (left < 10) {
-                                                        left = 10;
-                                                    }
+                                                        // Cek jika akan keluar dari viewport kiri
+                                                        if (left < 10) {
+                                                            left = 10;
+                                                        }
 
-                                                    // Cek jika akan keluar dari viewport bawah
-                                                    if (top + dropdownHeight > window.innerHeight - 10) {
-                                                        // Jika tidak muat di bawah, muncul di atas
-                                                        top = rect.top - dropdownHeight - 8;
-                                                    }
+                                                        // Cek jika akan keluar dari viewport bawah
+                                                        if (top + dropdownHeight > window.innerHeight - 10) {
+                                                            // Jika tidak muat di bawah, muncul di atas
+                                                            top = rect.top - dropdownHeight - 8;
+                                                        }
 
-                                                    return { x: left, y: top };
-                                                    },
-                                                    openDropdown(event) {
-                                                        const button = event.currentTarget;
-                                                        this.dropdownPosition = this.calculatePosition(button);
-                                                        this.showDropdown = true;
-                                                    },
-                                                    closeDropdown() {
-                                                        this.showDropdown = false;
-                                                    }
-                                                }" x-on:mouseleave="closeDropdown()">
+                                                        return { x: left, y: top };
+                                                        },
+                                                        openDropdown(event) {
+                                                            const button = event.currentTarget;
+                                                            this.dropdownPosition = this.calculatePosition(button);
+                                                            this.showDropdown = true;
+                                                        },
+                                                        closeDropdown() {
+                                                            this.showDropdown = false;
+                                                        }
+                                                    }" x-on:mouseleave="closeDropdown()">
 
-                                                <!-- Tombol utama dengan hover -->
-                                                <button
-                                                    x-on:mouseenter="openDropdown($event)"
-                                                    class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
-                                                    <svg class="fill-current" width="16" height="16" viewBox="0 0 18 18" fill="none">
-                                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                                        d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z" />
-                                                    </svg>
-                                                    Aksi
-                                                </button>
-
-                                                <!-- Dropdown menu FIXED POSITION -->
-                                                <div x-show="showDropdown"
-                                                    x-transition:enter="transition ease-out duration-150"
-                                                    x-transition:enter-start="opacity-0 scale-95"
-                                                    x-transition:enter-end="opacity-100 scale-100"
-                                                    x-transition:leave="transition ease-in duration-100"
-                                                    x-transition:leave-start="opacity-100 scale-100"
-                                                    x-transition:leave-end="opacity-0 scale-95"
-                                                    class="fixed z-[9999] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 min-w-[192px]"
-                                                    :style="`left: ${dropdownPosition.x}px; top: ${dropdownPosition.y}px;`"
-                                                    x-on:mouseenter="showDropdown = true"
-                                                    x-on:mouseleave="closeDropdown()">
-
-                                                    {{-- Edit Data Penugasan--}}
-                                                    <button class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-300 flex items-center gap-2 whitespace-nowrap border-b border-gray-100 dark:border-gray-700"
-                                                        @click="$dispatch('open-smart-modal', {
-                                                            modalId: 'modal-penugasan-anggota',
-                                                            mode: 'edit',
-                                                            key: '{{ $penugasan->id_penugasan }}',
-                                                            data: {
-                                                                id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
-                                                                nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
-                                                                id_anggota: @js($penugasan->id_anggota),
-                                                                nama_anggota: @js($penugasan->anggota?->nama_pegawai),
-                                                                target: @js($penugasan->target),
-                                                                tanggal_mulai: @js($penugasan->tanggal_mulai),
-                                                                tanggal_selesai: @js($penugasan->tanggal_selesai),
-                                                                status: @js($penugasan->status),
-                                                            }
-
-                                                        })">
-                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                        </svg> Edit Penugasan
+                                                    <!-- Tombol utama dengan hover -->
+                                                    <button
+                                                        x-on:mouseenter="openDropdown($event)"
+                                                        class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
+                                                        <svg class="fill-current" width="16" height="16" viewBox="0 0 18 18" fill="none">
+                                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                            d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z" />
+                                                        </svg>
+                                                        Aksi
                                                     </button>
 
-                                                    <!-- Tombol Buat Pengiriman -->
-                                                    <button class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-300 flex items-center gap-2 whitespace-nowrap border-b border-gray-100 dark:border-gray-700"
+                                                    <!-- Dropdown menu FIXED POSITION -->
+                                                    <div x-show="showDropdown"
+                                                        x-transition:enter="transition ease-out duration-150"
+                                                        x-transition:enter-start="opacity-0 scale-95"
+                                                        x-transition:enter-end="opacity-100 scale-100"
+                                                        x-transition:leave="transition ease-in duration-100"
+                                                        x-transition:leave-start="opacity-100 scale-100"
+                                                        x-transition:leave-end="opacity-0 scale-95"
+                                                        class="fixed z-[9999] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 min-w-[192px]"
+                                                        :style="`left: ${dropdownPosition.x}px; top: ${dropdownPosition.y}px;`"
+                                                        x-on:mouseenter="showDropdown = true"
+                                                        x-on:mouseleave="closeDropdown()">
+
+                                                        {{-- Edit Data Penugasan--}}
+                                                        <button class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-300 flex items-center gap-2 whitespace-nowrap border-b border-gray-100 dark:border-gray-700"
                                                             @click="$dispatch('open-smart-modal', {
-                                                                modalId: 'modal-pengiriman-anggota',
+                                                                modalId: 'modal-penugasan-anggota',
+                                                                mode: 'edit',
+                                                                key: '{{ $penugasan->id_penugasan }}',
                                                                 data: {
-                                                                    id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
+                                                                    id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
+                                                                    nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
+                                                                    id_anggota: @js($penugasan->id_anggota),
+                                                                    nama_anggota: @js($penugasan->anggota?->nama_pegawai),
+                                                                    target: @js($penugasan->target),
+                                                                    tanggal_mulai: @js($penugasan->tanggal_mulai),
+                                                                    tanggal_selesai: @js($penugasan->tanggal_selesai),
+                                                                    status: @js($penugasan->status),
+                                                                }
+
+                                                            })">
+                                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                            </svg> Edit Penugasan
+                                                        </button>
+
+                                                        <!-- Tombol Buat Pengiriman -->
+                                                        <button class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-300 flex items-center gap-2 whitespace-nowrap border-b border-gray-100 dark:border-gray-700"
+                                                                @click="$dispatch('open-smart-modal', {
+                                                                    modalId: 'modal-pengiriman-anggota',
+                                                                    data: {
+                                                                        id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
+                                                                        id_penugasan: '{{ $penugasan->id_penugasan }}',
+                                                                        nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                                    }
+                                                                })">
+                                                            <!-- icon -->
+                                                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                            </svg>
+                                                            Buat Pengiriman
+                                                        </button>
+
+                                                        <!-- Tombol Tampilkan Histori Pengiriman -->
+                                                        <button
+                                                            class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300
+                                                                hover:bg-blue-50 hover:text-blue-600
+                                                                dark:hover:bg-blue-900/20 dark:hover:text-blue-300
+                                                                flex items-center gap-2 whitespace-nowrap
+                                                                border-b border-gray-100 dark:border-gray-700"
+                                                            @click="$dispatch('open-smart-modal', {
+                                                                modalId: 'modal-histori-pengiriman',
+                                                                data: {
                                                                     id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                                     nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
-                                                                }
+                                                                    historiData: @js(
+                                                                        $penugasan->pengirimans
+                                                                            ->sortByDesc(fn($p) => $p->tanggal_pengiriman) // sort sebelum format
+                                                                            ->map(fn($p) => [
+                                                                                'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
+                                                                                'jumlah_dikirim' => $p->jumlah_dikirim,
+                                                                                'media_pengiriman' => $p->media_pengiriman,
+                                                                                'bukti_dukung' => $p->bukti_dukung,
+                                                                                'status' => $p->penerimaan?->status ?? 'Belum Diproses',
+                                                                            ])
+                                                                    )}
                                                             })">
-                                                        <!-- icon -->
-                                                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <!-- Icon -->
+                                                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                    d="M8 7V3m8 4V3M3 11h18M5 19h14a2 2 0 002-2v-6H3v6a2 2 0 002 2z" />
+                                                            </svg>
+
+                                                            Tampilkan Histori Pengiriman
+                                                        </button>
+
+
+                                                        <!-- Tombol Buat Penerimaan -->
+                                                        <button class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-300 flex items-center gap-2 whitespace-nowrap border-b border-gray-100 dark:border-gray-700"
+                                                                @click="$dispatch('open-smart-modal', {
+                                                                    modalId: 'modal-penerimaan-anggota',
+                                                                    data: {
+                                                                        id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
+                                                                        id_penugasan: '{{ $penugasan->id_penugasan }}',
+                                                                        id_pengiriman: '{{ $penugasan->latestPengiriman?->id_pengiriman }}',
+                                                                        nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                                    }
+                                                                })">
+                                                            <!-- icon -->
+                                                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                            </svg>
+                                                            Buat Penerimaan
+                                                        </button>
+
+                                                        <!-- Tombol Jadikan CKP -->
+                                                        <button
+                                                            @click="closeDropdown()"
+                                                            class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-900/20 dark:hover:text-green-300 flex items-center gap-2 whitespace-nowrap">
+                                                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                        Buat Pengiriman
-                                                    </button>
-
-                                                    <!-- Tombol Tampilkan Histori Pengiriman -->
-                                                    <button
-                                                        class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300
-                                                            hover:bg-blue-50 hover:text-blue-600
-                                                            dark:hover:bg-blue-900/20 dark:hover:text-blue-300
-                                                            flex items-center gap-2 whitespace-nowrap
-                                                            border-b border-gray-100 dark:border-gray-700"
-                                                        @click="$dispatch('open-smart-modal', {
-                                                            modalId: 'modal-histori-pengiriman',
-                                                            data: {
-                                                                id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                                nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
-                                                                historiData: @js(
-                                                                    $penugasan->pengirimans
-                                                                        ->sortByDesc(fn($p) => $p->tanggal_pengiriman) // sort sebelum format
-                                                                        ->map(fn($p) => [
-                                                                            'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
-                                                                            'jumlah_dikirim' => $p->jumlah_dikirim,
-                                                                            'media_pengiriman' => $p->media_pengiriman,
-                                                                            'bukti_dukung' => $p->bukti_dukung,
-                                                                            'status' => $p->penerimaan?->status ?? 'Belum Diproses',
-                                                                        ])
-                                                                )}
-                                                        })">
-                                                        <!-- Icon -->
-                                                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                d="M8 7V3m8 4V3M3 11h18M5 19h14a2 2 0 002-2v-6H3v6a2 2 0 002 2z" />
-                                                        </svg>
-
-                                                        Tampilkan Histori Pengiriman
-                                                    </button>
-
-
-                                                    <!-- Tombol Buat Penerimaan -->
-                                                    <button class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-300 flex items-center gap-2 whitespace-nowrap border-b border-gray-100 dark:border-gray-700"
-                                                            @click="$dispatch('open-smart-modal', {
-                                                                modalId: 'modal-penerimaan-anggota',
-                                                                data: {
-                                                                    id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
-                                                                    id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                                    id_pengiriman: '{{ $penugasan->latestPengiriman?->id_pengiriman }}',
-                                                                    nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
-                                                                }
-                                                            })">
-                                                        <!-- icon -->
-                                                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                        Buat Penerimaan
-                                                    </button>
-
-                                                    <!-- Tombol Jadikan CKP -->
-                                                    <button
-                                                        @click="closeDropdown()"
-                                                        class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-900/20 dark:hover:text-green-300 flex items-center gap-2 whitespace-nowrap">
-                                                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M5 13l4 4L19 7" />
-                                                        </svg>
-                                                        <span>Jadikan CKP</span>
-                                                    </button>
+                                                                d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                            <span>Jadikan CKP</span>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
+                                            </td>
+                                        @endcan
                                     </tr>
                                 @empty
                                 <tr>

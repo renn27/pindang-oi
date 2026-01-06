@@ -20,22 +20,25 @@ class KegiatanController extends Controller
         // Data referensi untuk dropdown modal
         $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
         $rkJpts   = RencanaJPT::orderBy('nama_rencana_jpt')->get(['id', 'nama_rencana_jpt']);
+        $ketuaTims = Pegawai::join('pegawai_role', 'pegawais.id_pegawai', '=', 'pegawai_role.pegawai_id')
+                    ->join('roles', 'pegawai_role.role_id', '=', 'roles.id')
+                    ->where('roles.nama_role', 'Ketua Tim')
+                    ->orderBy('pegawais.nama_pegawai')
+                    ->get([
+                        'pegawais.id_pegawai',
+                        'pegawais.nama_pegawai',
+                        'roles.nama_role',
+                    ]);
 
         return view('pages.main.pegawai.tagihan-kerja.index', [
-            'title'     => 'Kegiatan pada' . $bidang->nama_bidang,
+            'title'     => 'Kegiatan pada ' . $bidang->nama_bidang,
             'bidang'    => $bidang,
             'kegiatans' => $kegiatans,
             'pegawais'  => $pegawais,
             'rkJpts'    => $rkJpts,
+            'ketuaTims' => $ketuaTims
         ]);
     }
-
-
-    // public function show($slug)
-    // {
-    //     $bidang = Bidang::where('slug', $slug)->firstOrFail();
-    //     return view('pages.rencana-kerja.show', ['title' => $bidang->nama_bidang, 'bidang' => $bidang]);
-    // }
 
     public function store(Request $request, Bidang $bidang) {
         // dd($request->all());
@@ -64,10 +67,19 @@ class KegiatanController extends Controller
                 ->route('kegiatan.index', $bidang->slug)
                 ->with('success', 'Kegiatan berhasil ditambahkan.');
         } catch (\Exception $e) {
-            // dd($e->getMessage());
+            dd($e->getMessage());
             return redirect()->back()
                 ->with('error', 'Gagal menambahkan Kegiatan. Silakan coba lagi.')
                 ->withInput();
         }
     }
+
+    public function update(Request $request, Kegiatan $kegiatan) {
+        // $this->authorize('update', $kegiatan);
+    }
+
+    public function delete(Kegiatan $kegiatan) {
+        // $this->authorize('delete', $kegiatan);
+    }
+
 }

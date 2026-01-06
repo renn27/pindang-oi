@@ -22,4 +22,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Carbon::setLocale('id');
     }
+
+    protected $policies = [
+        \App\Models\Kegiatan::class => \App\Policies\KegiatanPolicy::class,
+        \App\Models\SubKegiatan::class => \App\Policies\SubKegiatanPolicy::class,
+    ];
 }
