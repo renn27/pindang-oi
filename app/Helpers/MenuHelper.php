@@ -21,7 +21,6 @@ class MenuHelper
                 'name' => 'Admin',
                 'subItems' => [
                     ['name' => 'Bidang Kerja', 'path' => '/bidang-kerja'],
-                    ['name' => 'Tim Kerja', 'path' => '#'],
                 ],
             ],
             [
@@ -40,8 +39,7 @@ class MenuHelper
                 'icon' => 'dashboard',
                 'name' => 'Rencana Kinerja',
                 'subItems' => [
-                    ['name' => 'Kegiatan/RK Ketua', 'path' => '/rk-ketua'],
-                    ['name' => 'Sub Kegiatan/RK Anggota', 'path' => '/rencana-kerja/sub-kegiatan'],
+                    ['name' => 'Master Kegiatan', 'path' => '/master-kegiatan'],
                 ],
             ],
         ];

@@ -26,19 +26,13 @@ class MasterKegiatanController extends Controller
         $bidangs   = Bidang::orderBy('nama_bidang')->get(['id_bidang', 'nama_bidang']);
 
 
-        return view('pages.rencana-kerja.rk-ketua', [
+        return view('pages.main.pegawai.rencana-kerja.master-kegiatan', [
+            'title'     => "Master Kegiatan",
             'pegawais'  => $pegawais,
             'rkJpts'    => $rkJpts,
             'bidangs'    => $bidangs,
         ]);
     }
-
-
-    // public function show($slug)
-    // {
-    //     $bidang = Bidang::where('slug', $slug)->firstOrFail();
-    //     return view('pages.rencana-kerja.show', ['title' => $bidang->nama_bidang, 'bidang' => $bidang]);
-    // }
 
     public function store(Request $request)
     {

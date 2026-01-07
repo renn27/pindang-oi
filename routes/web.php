@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\TimKerjaController;
 use App\Http\Controllers\BidangController;
 use App\Http\Controllers\IndikatorJPTController;
 use App\Http\Controllers\KegiatanController;
@@ -14,7 +12,6 @@ use App\Http\Controllers\RencanaJPTController;
 use App\Http\Controllers\SimulasiLoginController;
 use App\Http\Controllers\SubKegiatanController;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Pegawai;
 
 Route::middleware('web')->group(function () {
 
@@ -26,7 +23,7 @@ Route::middleware('web')->group(function () {
     Route::get('/', function () {
         $user = Auth::user(); // otomatis dari Auth
         return view('pages.dashboard', [
-            'title' => 'Pindang Dashboard',
+            'title' => 'Dashboard',
             'user'  => $user,
         ]);
     })->name('dashboard');
@@ -63,6 +60,7 @@ Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(fu
         Route::delete('/{indikatorJpt}', [IndikatorJPTController::class, 'delete'])->name('delete');
     });
 });
+// END RK IKI JPT BY PIMPINAN
 
 // CRUD BIDANG KERJA BY ADMIN
 Route::prefix('bidang-kerja')->group(function () {
@@ -72,86 +70,7 @@ Route::prefix('bidang-kerja')->group(function () {
     Route::put('/{bidang:slug}', [BidangController::class, 'update'])->name('bidang.update');
     Route::delete('/{bidang:slug}', [BidangController::class, 'delete'])->name('bidang.delete');
 });
-
-
-// OPSI NANTI PAKAI SCOPEBINDINGS
-// Route::scopeBindings()->group(function () {
-
-//     /*
-//     |--------------------------------------------------------------------------
-//     | KEGIATAN (Ketua Tim)
-//     |--------------------------------------------------------------------------
-//     */
-//     Route::prefix('kegiatan')->group(function () {
-
-//         Route::get('bidang/{bidang:slug}', [KegiatanController::class, 'index'])
-//             ->name('kegiatan.index');
-
-//         Route::post('bidang/{bidang:slug}', [KegiatanController::class, 'store'])
-//             ->name('kegiatan.store');
-
-//         /*
-//         |--------------------------------------------------------------------------
-//         | SUB KEGIATAN (Nested Kegiatan)
-//         |--------------------------------------------------------------------------
-//         */
-//         Route::prefix('{kegiatan:id_kegiatan}/sub-kegiatan')
-//             ->group(function () {
-
-//             Route::post('/', [SubKegiatanController::class, 'store'])
-//                 ->name('sub.kegiatan.store');
-
-//             Route::get('{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'show'])
-//                 ->name('sub.kegiatan.show');
-
-//             Route::put('{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'update'])
-//                 ->name('sub.kegiatan.update');
-
-//             Route::delete('{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'delete'])
-//                 ->name('sub.kegiatan.delete');
-
-//             /*
-//             |--------------------------------------------------------------------------
-//             | PENUGASAN (Nested SubKegiatan)
-//             |--------------------------------------------------------------------------
-//             */
-//             Route::prefix('{subKegiatan:id_sub_kegiatan}/penugasan')
-//                 ->group(function () {
-
-//                 Route::post('/', [PenugasanController::class, 'store'])
-//                     ->name('penugasan.store');
-
-//                 Route::put('{penugasan:id_penugasan}', [PenugasanController::class, 'update'])
-//                     ->name('penugasan.update');
-
-//                 Route::delete('{penugasan:id_penugasan}', [PenugasanController::class, 'delete'])
-//                     ->name('penugasan.delete');
-
-//                 /*
-//                 |--------------------------------------------------------------------------
-//                 | PENGIRIMAN (Nested Penugasan)
-//                 |--------------------------------------------------------------------------
-//                 */
-//                 Route::prefix('{penugasan:id_penugasan}/pengirimans')
-//                     ->group(function () {
-
-//                     Route::post('/', [PengirimanController::class, 'store'])
-//                         ->name('pengiriman.store');
-
-//                     /*
-//                     |--------------------------------------------------------------------------
-//                     | PENERIMAAN (Nested Pengiriman)
-//                     |--------------------------------------------------------------------------
-//                     */
-//                     Route::post(
-//                         '{pengiriman:id_pengiriman}/penerimaan',
-//                         [PenerimaanController::class, 'store']
-//                     )->name('penerimaan.store');
-//                 });
-//             });
-//         });
-//     });
-// });
+// END BIDANG KERJA BY ADMIN
 
 // CRUD KEGIATAN & SUB KEGIATAN BY KETUA TIM
 Route::prefix('kegiatan')->group(function () {
@@ -167,6 +86,7 @@ Route::prefix('kegiatan')->group(function () {
         Route::delete('/{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'delete'])->name('sub.kegiatan.delete'); // delete
     });
 });
+// END KEGIATAN & SUB KEGIATAN BY KETUA TIM
 
 // CRUD PENUGASAN  BY KETUA TIM
 Route::prefix('sub-kegiatan/{subKegiatan:id_sub_kegiatan}')->group(function () {
@@ -184,51 +104,66 @@ Route::prefix('sub-kegiatan/{subKegiatan:id_sub_kegiatan}')->group(function () {
                 Route::post('/', [PenerimaanController::class, 'store'])->name('penerimaan.store'); // create
             });
         });
-
     });
 });
+// CRUD PENUGASAN  BY KETUA TIM
 
-
-// CRUD KEGIATAN BY KETUA
-Route::prefix('rencana-kerja')->group(function () {
-    Route::get('/', [KegiatanController::class, 'index'])->name('rencana.index');
-    Route::get('/sub-kegiatan', [KegiatanController::class, 'subKegiatan'])->name('rencana.sub.kegiatan');
-    Route::post('/', [KegiatanController::class, 'store'])->name('rencana.store');
-    Route::put('/{rencanaKerja}', [KegiatanController::class, 'update'])->name('rencana.update');
-    Route::get('/{slug}', [KegiatanController::class, 'show'])->name('rencana.show');
+// ROUTE MASTER KEGIATAN
+Route::prefix('/master-kegiatan')->group(function () {
+    Route::get('/', [MasterKegiatanController::class, 'index'])->name('master-kegiatan.index');
+    Route::post('/', [MasterKegiatanController::class, 'store'])->name('master-kegiatan.store');
 });
+// END ROUTE MASTER KEGIATAN
 
 
 
-// tim kerja
-Route::get('/tim-kerja', function () {
-    return view('pages.rencana-kerja.tim-kerja', ['title' => 'Tim Kerja']);
-})->name('tim-kerja');
-
-// tim kerja
-Route::get('/rk-ketua', function () {
-    return view('pages.rencana-kerja.rk-ketua', ['title' => 'Rencana Kerja Ketua']);
-})->name('rk-ketua');
-
-// ✅ ROUTE BARU UNTUK SIMPAN MASTER KEGIATAN
-Route::post('/master-kegiatan', [MasterKegiatanController::class, 'store'])
-    ->name('master-kegiatan.store');
 
 
 
-Route::prefix('/rk-ketua')->group(function () {
-    Route::get('/', [MasterKegiatanController::class, 'index'])->name('rencana.index');
-    Route::get('/sub-kegiatan', [MasterKegiatanController::class, 'subKegiatan'])->name('rencana.sub.kegiatan');
-    Route::post('/', [MasterKegiatanController::class, 'store'])->name('rencana.store');
-    Route::put('/{rencanaKerja}', [MasterKegiatanController::class, 'update'])->name('rencana.update');
-    Route::get('/{slug}', [MasterKegiatanController::class, 'show'])->name('rencana.show');
-});
 
-// daftar kegiatan
-Route::get('/daftar-kegiatan', function () {
-    return view('pages.rencana-kerja.daftar-kegiatan', ['title' => 'Daftar Kegiatan']);
-})->name('daftar-kegiatan');
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// =====================================================================================================
 
 // dll pages
 Route::get('/dll', function () {
@@ -255,18 +190,7 @@ Route::get('/basic-tables', function () {
     return view('pages.tables.basic-tables', ['title' => 'Basic Tables']);
 })->name('basic-tables');
 
-
-
-
-
-
-
-
-
-
-
 // pages
-
 Route::get('/blank', function () {
     return view('pages.blank', ['title' => 'Blank']);
 })->name('blank');
@@ -320,48 +244,4 @@ Route::get('/videos', function () {
     return view('pages.ui-elements.videos', ['title' => 'Videos']);
 })->name('videos');
 
-
-//crud tabel tim kerja
-
-Route::get('/tim-kerjates', [TimKerjaController::class, 'index']);
-Route::get('/tim-kerja/data', [TimKerjaController::class, 'data'])->name('tim-kerja.data');
-Route::post('/tim-kerja', [TimKerjaController::class, 'store'])->name('tim-kerja.store');
-Route::put('/tim-kerja/{id}', [TimKerjaController::class, 'update'])->name('tim-kerja.update');
-Route::delete('/tim-kerja/{id}', [TimKerjaController::class, 'destroy'])->name('tim-kerja.destroy');
-
-//halaman bidang kerja
-// Route::get('/bidang-kerja', function () {
-//     return view('pages.bidang-kerja', ['title' => 'Bidang Kerja']);
-// })->name('bidang-kerja');
-
-//halaman bidang kerja 2
-Route::get('/bidang-kerja2', function () {
-    return view('pages.bidang-kerja2', ['title' => 'Bidang Kerja 2']);
-})->name('bidang-kerja2');
-
-//halaman detail kegiatan
-Route::get('/detail-kegiatan', function () {
-    return view('pages.detail-kegiatan', ['title' => 'Bidang Kerja']);
-})->name('detail-kegiatan');
-
-// Routes untuk Bidang (Dinamis)
-Route::prefix('bidang')->group(function () {
-    // Halaman utama bidang
-    Route::get('/', [BidangController::class, 'index'])->name('bidang.index');
-
-    // Halaman detail bidang
-    Route::get('/{id}', [BidangController::class, 'show'])->name('bidang.show');
-
-    // Sub-halaman untuk tiap bidang
-    Route::get('/{id}/kegiatan', [BidangController::class, 'kegiatan'])->name('bidang.kegiatan');
-    Route::get('/{id}/laporan', [BidangController::class, 'laporan'])->name('bidang.laporan');
-
-    // Route khusus untuk beberapa bidang (contoh)
-    Route::get('/spbe/kegiatan', function () {
-        $bidang = \App\Models\Bidang::where('nama_bidang', 'like', '%SPBE%')->first();
-        if ($bidang) {
-            return redirect()->route('bidang.kegiatan', $bidang->id_bidang);
-        }
-        return redirect()->route('bidang.index');
-    })->name('bidang.spbe');
-});
+// ====================================================================================================
