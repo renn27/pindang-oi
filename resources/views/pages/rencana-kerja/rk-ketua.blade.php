@@ -425,32 +425,6 @@
                     <input name="rk_anggota[]" type="text" placeholder="Masukkan rk anggota"
                         class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                 </div>
-                <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
-                        Jenis Kegiatan
-                    </label>
-                    <input name="jenis_kegiatan[]" type="text" placeholder="Masukkan jenis kegiatan"
-                        class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                </div>
-
-                <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
-                        Satuan Target
-                    </label>
-                    <input name="satuan_target[]" type="text" placeholder="Masukkan satuan target"
-                        class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                </div>
-                <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
-                        Status
-                    </label>
-                    <select name="status[]"
-                        class="md:w-3/4 dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm">
-                        <option value="Belum Mulai" selected>Belum Mulai</option>
-                        <option value="Berjalan">Berjalan</option>
-                        <option value="Selesai">Selesai</option>
-                    </select>
-                </div>
 
                 <!-- Tanggal Mulai dan Tanggal Akhir untuk Detail Anggota -->
                 <div class="flex flex-col gap-2 md:flex-row md:items-center">
@@ -610,13 +584,13 @@
 
                     <!-- Hidden input untuk menyimpan ID -->
                     <input type="hidden"
-                           name="detail_id_anggota[${sectionId}][]"
-                           x-model="selectedId">
+                            name="detail_id_anggota[${sectionId}][]"
+                            x-model="selectedId">
 
                     <!-- Hidden input untuk menyimpan Nama -->
                     <input type="hidden"
-                           name="detail_nama_anggota[${sectionId}][]"
-                           x-model="search">
+                            name="detail_nama_anggota[${sectionId}][]"
+                            x-model="search">
 
                     <!-- Dropdown -->
                     <div
@@ -653,12 +627,28 @@
                 </div>
             </div>
 
+            <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                    Jenis Kegiatan
+                </label>
+                <input name="jenis_kegiatan[]" type="text" placeholder="Masukkan jenis kegiatan"
+                    class="md:w-3/4 dark:bg-dark-900 h-10 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+            </div>
+
             <!-- Target Input -->
             <div class="flex flex-col gap-2 md:flex-row md:items-center">
                 <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
                     Target
                 </label>
                 <input name="detail_target[${sectionId}][]" type="text" placeholder="Masukkan target"
+                    class="md:w-3/4 dark:bg-dark-900 h-10 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+            </div>
+
+            <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                    Satuan Target
+                </label>
+                <input name="satuan_target[]" type="text" placeholder="Masukkan satuan target"
                     class="md:w-3/4 dark:bg-dark-900 h-10 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
             </div>
 

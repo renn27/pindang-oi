@@ -355,11 +355,11 @@
                 id_kegiatan: '',
                 nama_rk_kegiatan: '',
                 nama_sub_kegiatan: '',
-                jenis_kegiatan: '',
-                satuan_target: '',
+                {{-- jenis_kegiatan: '', --}}
+                {{-- satuan_target: '', --}}
                 tanggal_mulai: '',
                 tanggal_selesai: '',
-                status: ''
+                {{-- status: '' --}}
             }">
     <div
         class="relative flex h-[90vh] w-full max-w-[700px] flex-col overflow-hidden
@@ -409,20 +409,20 @@
                         placeholder="Contoh : Penyiapan Peta"
                         class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                 </div>
-                <div>
+                {{-- <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                         Jenis Kegiatan
                     </label>
                     <input type="text" x-model="formData.jenis_kegiatan" name="jenis_kegiatan"
                         class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                </div>
-                <div>
+                </div> --}}
+                {{-- <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                         Satuan Target
                     </label>
                     <input type="text" x-model="formData.satuan_target" name="satuan_target" placeholder="Misalnya : Dokumen, Kegiatan, dll"
                         class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                </div>
+                </div> --}}
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                         Tanggal Mulai
@@ -446,7 +446,7 @@
                         defaultDate="{{ now()->format('Y-m-d') }}" />
                 </div>
 
-                <div>
+                {{-- <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                         Status
                     </label>
@@ -459,7 +459,7 @@
                         <option value="Berjalan" :selected="formData.status === 'Berjalan'">Berjalan</option>
                         <option value="Selesai" :selected="formData.status === 'Selesai'">Selesai</option>
                     </select>
-                </div>
+                </div> --}}
 
                 <!-- FOOTER -->
                 <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-800">
