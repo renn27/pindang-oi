@@ -13,9 +13,6 @@ use Illuminate\Database\QueryException;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 
-
-
-
 class MasterKegiatanController extends Controller
 {
     public function index()
@@ -163,7 +160,8 @@ class MasterKegiatanController extends Controller
             });
 
             return redirect()
-                ->back();
+                ->back()
+                ->with('success', 'Kegiatan Berhasil Disimpan');
                 // ->with('success', 'RK berhasil disimpan.');
         } catch (QueryException $e) {
             // log error DB
