@@ -58,13 +58,22 @@ class SubKegiatanController extends Controller
     public function show(Kegiatan $kegiatan, SubKegiatan $subKegiatan) {
         // Data referensi untuk dropdown modal
         $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
-        $jenisKegiatans = JenisKegiatan::orderBy('jenis_kegiatan')->get(['id', 'jenis_kegiatan', 'kategori']);
+        $jenisKegiatans = JenisKegiatan::orderBy('jenis_kegiatan')->get();
+        $totalKirim = $subKegiatan->penugasans->sum(fn($p) =>
+            $p->latestPengiriman?->jumlah_dikirim ?? 0
+        );
+
+        $totalTerima = $subKegiatan->penugasans->sum(fn($p) =>
+            $p->latestPenerimaan?->jumlah_diterima ?? 0
+);
 
         return view('pages.main.pegawai.tagihan-kerja.detail-sub-kegiatan', [
             'kegiatan' => $kegiatan,
             'subKegiatan' => $subKegiatan,
             'pegawais' => $pegawais,
-            'jenisKegiatans' => $jenisKegiatans
+            'jenisKegiatans' => $jenisKegiatans,
+            'totalKirim' => $totalKirim,
+            'totalTerima' => $totalTerima
 
         ]);
     }

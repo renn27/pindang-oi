@@ -14,6 +14,10 @@
                         </th>
                         <th rowspan="2"
                             class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                            Jenis Kegiatan
+                        </th>
+                        <th rowspan="2"
+                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                             Target
                         </th>
                         <th rowspan="2"
@@ -61,13 +65,23 @@
                 </thead>
                 <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
                     @forelse ($subKegiatan->penugasans as $index => $penugasan)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30">
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30"
+                            data-target="{{ $penugasan->target }}"
+                            data-deadline="{{ $penugasan->tanggal_selesai }}"
+                            data-kirim-jumlah="{{ $penugasan->latestPengiriman?->jumlah_dikirim ?? 0 }}"
+                            data-kirim-tanggal="{{ $penugasan->latestPengiriman?->tanggal_pengiriman ?? '' }}"
+                            data-terima-jumlah="{{ $penugasan->latestPenerimaan?->jumlah_diterima ?? 0 }}"
+                            data-terima-tanggal="{{ $penugasan->latestPenerimaan?->tanggal_penerimaan ?? '' }}">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-300 text-center">
                                 {{ $index + 1 }}
                             </td>
 
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-400">
                                 {{ $penugasan->anggota->nama_pegawai ?? '-' }}
+                            </td>
+
+                            <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-400">
+                                {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? '-' }}
                             </td>
 
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-400 text-center">
@@ -97,12 +111,7 @@
 
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-400 text-center">
                                 <div class="flex justify-center">
-                                    @for ($i = 0; $i < ($penugasan->rating_kirim ?? 0); $i++)
-                                        <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 20 20">
-                                            <path
-                                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                    @endfor
+                                    <div class="flex justify-center rating-kirim"></div>
                                 </div>
                             </td>
 
@@ -128,12 +137,7 @@
 
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-400 text-center">
                                 <div class="flex justify-center">
-                                    @for ($i = 0; $i < ($penugasan->rating_terima ?? 0); $i++)
-                                        <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 20 20">
-                                            <path
-                                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                    @endfor
+                                    <div class="flex justify-center rating-terima"></div>
                                 </div>
                             </td>
 
@@ -285,18 +289,18 @@
                                                                     id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                                     nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
                                                                     historiData: @js(
-    $penugasan->pengirimans
-        ->sortByDesc(fn($p) => $p->tanggal_pengiriman) // sort sebelum format
-        ->map(
-            fn($p) => [
-                'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
-                'jumlah_dikirim' => $p->jumlah_dikirim,
-                'media_pengiriman' => $p->media_pengiriman,
-                'bukti_dukung' => $p->bukti_dukung,
-                'status' => $p->penerimaan?->status ?? 'Belum Diproses',
-            ],
-        ),
-)}
+                                                                $penugasan->pengirimans
+                                                                    ->sortByDesc(fn($p) => $p->tanggal_pengiriman) // sort sebelum format
+                                                                    ->map(
+                                                                        fn($p) => [
+                                                                            'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
+                                                                            'jumlah_dikirim' => $p->jumlah_dikirim,
+                                                                            'media_pengiriman' => $p->media_pengiriman,
+                                                                            'bukti_dukung' => $p->bukti_dukung,
+                                                                            'status' => $p->penerimaan?->status ?? 'Belum Diproses',
+                                                                        ],
+                                                                    ),
+                                                            )}
                                                             })">
                                                 <!-- Icon -->
                                                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
@@ -353,14 +357,20 @@
                         </tr>
                     @endforelse
                     <tr class="bg-gray-50 dark:bg-gray-800/50">
-                        <td colspan="2" class="px-4 py-6 text-center text-gray-500">
+                        <td colspan="3" class="px-4 py-6 text-center text-gray-500">
                             Total
                         </td>
                         <td class="font-bold px-4 py-3 text-center text-xs text-gray-500 dark:text-gray-400 uppercase">
                             {{ $subKegiatan->penugasans->sum('target') }}
                         </td>
-                        <td colspan="7"
-                            class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                        <td class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+
+                        </td>
+                        <td colspan="3" class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                            {{ $totalKirim}}
+                        </td>
+                        <td colspan="3" class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                            {{ $totalTerima}}
                         </td>
                         <td colspan="2" class="px-4 py-3 text-sm text-gray-700 dark:text-gray-400 text-center">
                             <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer"
@@ -375,3 +385,78 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('tr[data-target]').forEach(row => {
+        const target = Number(row.dataset.target);
+        const deadline = new Date(row.dataset.deadline);
+
+        // =========================
+        // PENGIRIMAN
+        // =========================
+        const jumlahKirim = Number(row.dataset.kirimJumlah);
+        const tanggalKirim = row.dataset.kirimTanggal
+            ? new Date(row.dataset.kirimTanggal)
+            : null;
+
+        const kirimContainer = row.querySelector('.rating-kirim');
+
+        if (!jumlahKirim || !tanggalKirim) {
+            kirimContainer.textContent = '-';
+        } else {
+            let rating = 1;
+            const sesuaiTarget = jumlahKirim === target;
+            const tepatWaktu = tanggalKirim <= deadline;
+
+            if (sesuaiTarget && tepatWaktu) rating = 5;
+            else if (sesuaiTarget) rating = 4;
+            else if (tepatWaktu) rating = 3;
+            else rating = 2;
+
+            renderStars(kirimContainer, rating);
+        }
+
+        // =========================
+        // PENERIMAAN
+        // =========================
+        const jumlahTerima = Number(row.dataset.terimaJumlah);
+        const tanggalTerima = row.dataset.terimaTanggal
+            ? new Date(row.dataset.terimaTanggal)
+            : null;
+
+        const terimaContainer = row.querySelector('.rating-terima');
+
+        if (!jumlahTerima || !tanggalTerima) {
+            terimaContainer.textContent = '-';
+        } else {
+            let rating = 1;
+            const sesuaiJumlah = jumlahTerima === jumlahKirim;
+            const tepatWaktu = tanggalTerima <= deadline;
+
+            if (sesuaiJumlah && tepatWaktu) rating = 5;
+            else if (sesuaiJumlah) rating = 4;
+            else if (tepatWaktu) rating = 3;
+            else rating = 2;
+
+            renderStars(terimaContainer, rating);
+        }
+    });
+});
+
+function renderStars(container, rating) {
+    container.innerHTML = '';
+    for (let i = 0; i < rating; i++) {
+        container.innerHTML += `
+            <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 20 20">
+                <path
+                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+
+        `;
+    }
+}
+</script>
+
+
+

@@ -124,67 +124,6 @@
                     </div>
                 </div>
 
-                {{-- <div x-data="{ isOther: false }">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Jenis Kegiatan
-                    </label>
-
-                    <!-- SELECT UI -->
-                    <select
-                        x-model="formData.id_jenis_kegiatan"
-                        @change="isOther = ($event.target.value === 'LAINNYA')"
-                        required
-                        class="
-                            dark:bg-dark-900
-                            h-11 w-full mb-4
-                            rounded-lg border border-gray-300
-                            bg-white dark:bg-gray-900
-                            px-4 py-2.5 text-sm
-                            focus:ring-2 focus:ring-primary-500 focus:border-primary-500
-                        ">
-                        <option value="">-- Pilih Jenis Kegiatan --</option>
-
-                        @foreach ($jenisKegiatans as $jenis)
-                            <option
-                                value="{{ $jenis->id }}"
-                                class="
-                                    @if($jenis->kategori === 'Utama')
-                                        text-green-700 font-medium
-                                    @elseif($jenis->kategori === 'Tambahan')
-                                        text-orange-700
-                                    @endif
-                                ">
-                                {{ $jenis->jenis_kegiatan }}
-                                @if($jenis->kategori)
-                                    ({{ $jenis->kategori }})
-                                @endif
-                            </option>
-                        @endforeach
-
-
-                        <option value="LAINNYA" class="text-blue-700 font-medium">
-                            ➕ Lainnya
-                        </option>
-                    </select>
-
-                    <!-- 🔥 INI YANG DIKIRIM KE SERVER -->
-                    <input
-                        type="hidden"
-                        name="id_jenis_kegiatan"
-                        :value="formData.id_jenis_kegiatan"
-                    />
-
-                    <!-- INPUT JENIS KEGIATAN BARU -->
-                    <div x-show="isOther" x-transition>
-                        <input
-                            type="text"
-                            name="jenis_kegiatan_baru"
-                            placeholder="Masukkan jenis kegiatan baru"
-                            class="dark:bg-dark-900 h-11 w-full mb-4 rounded-lg border px-4 py-2.5 text-sm"
-                        />
-                    </div>
-                </div> --}}
-
                 <div x-data="{ isOther: false }">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                         Jenis Kegiatan
@@ -227,13 +166,6 @@
                         </option>
                     </select>
 
-                    {{-- <!-- YANG DIKIRIM KE SERVER -->
-                    <input
-                        type="hidden"
-                        name="id_jenis_kegiatan"
-                        :value="formData.id_jenis_kegiatan"
-                    /> --}}
-
                     <!-- INPUT JENIS KEGIATAN BARU -->
                     <div x-show="isOther" x-transition>
                         <input
@@ -244,7 +176,6 @@
                         />
                     </div>
                 </div>
-
 
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">

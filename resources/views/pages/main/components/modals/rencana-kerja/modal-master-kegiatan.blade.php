@@ -61,10 +61,10 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90">
-                            Add Rencana Kinerja Ketua
+                            Tambahkan Kegiatan
                         </h4>
                         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            Tambahkan rencana kinerja ketua baru
+                            Masukkan data kegiatan yang baru
                         </p>
                     </div>
                 </div>
@@ -85,7 +85,7 @@
                     {{-- Rencana JPT --}}
                     <div class="flex flex-col gap-2 md:flex-row md:items-center">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
-                            RK JPT
+                            Rencana JPT
                         </label>
                         <select
                             id="rk_jpt"
@@ -112,20 +112,26 @@
                     {{-- Indikator JPT --}}
                     <div class="flex flex-col gap-2 md:flex-row md:items-center">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
-                            IKI JPT
+                            Indikator JPT
                         </label>
-                        <select
-                            id="iki_jpt"
-                            name="iki_jpt"
-                            x-model="formData.iki_jpt"
+
+                        <select id="iki_jpt" name="iki_jpt" x-model="formData.iki_jpt"
                             class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">
-                            <option value="">-- Harap pilih RK dulu --</option>
+
+                            <!-- OPTION DINAMIS -->
+                            <option value=""
+                                x-text="formData.rk_jpt
+                                        ? '-- Pilih IKI JPT --'
+                                        : '-- Harap pilih RK JPT dulu --'">
+                            </option>
+
                             <template x-for="iki in formData.ikiOptions" :key="iki.id">
-                                <option :value="iki.id" x-text="iki.nama_indikator_jpt" :selected="formData.iki_jpt == iki.id"></option>
+                                <option :value="iki.id" x-text="iki.nama_indikator_jpt" :selected="formData.iki_jpt == iki.id">
+                                </option>
                             </template>
                         </select>
                     </div>
-
+                    
                     <!-- Kolom Bidang -->
                     <div class="flex flex-col gap-2 md:flex-row md:items-center">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
@@ -151,97 +157,97 @@
                     </div>
 
                     {{-- Kolom Ketua --}}
-                    <div class="relative flex flex-col gap-2 md:flex-row md:items-center"
+                    {{-- Nama Ketua / Penanggung Jawab --}}
+                    <div 
                         x-data="{
                         open: false,
                         search: '',
                         selectedId: '',
                         highlightedIndex: -1,
-                        pegawais: @js($pegawais),
-
+                        ketuaTims: @js($ketuaTims),
+                    
                         filtered() {
-                            if(this.search.length === 0) return [];
-                            return this.pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase()));
+                            if (this.search.length === 0) return [];
+                            return this.ketuaTims.filter(p => p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase()));
                         },
-
+                    
                         selectPegawai(p) {
                             this.search = p.nama_pegawai;
                             this.selectedId = p.id_pegawai;
                             this.open = false;
                             this.highlightedIndex = -1;
                         },
-
-                        highlightNext() {
-                            if(this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++;
-                        },
-                        highlightPrev() {
-                            if(this.highlightedIndex > 0) this.highlightedIndex--;
-                        },
-                        selectHighlighted() {
-                            if(this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]);
-                        }
-                    }">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                    
+                        highlightNext() { if (this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++; },
+                        highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
+                        selectHighlighted() { if (this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]); }}"
+                        class="flex flex-col gap-2 md:flex-row md:items-start">
+                        <!-- LABEL -->
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4">
                             Nama Ketua
                         </label>
 
-                        <div class="relative md:w-3/4">
-                            <!-- Input search -->
+                        <!-- INPUT + DROPDOWN WRAPPER -->
+                        <div class="relative md:w-3/4 w-full">
+                            
+                            <!-- INPUT -->
                             <input
                                 type="text"
                                 x-model="search"
+                                placeholder="Ketik untuk cari nama"
+                                class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                                 @focus="open = !!search"
                                 @input="open = search.length > 0; selectedId = ''"
                                 @keydown.arrow-down.prevent="highlightedIndex++"
                                 @keydown.arrow-up.prevent="highlightedIndex--"
-                                @keydown.enter.prevent="if(highlightedIndex>=0){ search = pegawais[highlightedIndex].nama_pegawai; selectedId = pegawais[highlightedIndex].id_pegawai; open=false; }"
-                                placeholder="Ketik untuk cari nama"
-                                class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">
+                                @keydown.enter.prevent="
+                                    if (highlightedIndex >= 0) {
+                                        search = filtered()[highlightedIndex].nama_pegawai;
+                                        selectedId = filtered()[highlightedIndex].id_pegawai;
+                                        open = false;
+                                    }
+                                "
+                            >
 
-                            <!-- Hidden input -->
+                            <!-- HIDDEN INPUT -->
                             <input type="hidden" name="id_penanggung_jawab" :value="selectedId" required>
 
-                            <!-- Dropdown -->
+                            <!-- DROPDOWN -->
                             <div
-                                x-show="open && search.length > 0"
-                                x-transition:enter="transition ease-out duration-100"
-                                x-transition:enter-start="opacity-0 scale-95"
-                                x-transition:enter-end="opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-75"
-                                x-transition:leave-start="opacity-100 scale-100"
-                                x-transition:leave-end="opacity-0 scale-95"
-                                @click.away="open = false"
-                                class="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 max-h-60 overflow-y-auto">
-
-                                <template x-if="filtered().length > 0">
-                                    <template x-for="(pegawai, index) in filtered()" :key="pegawai.id_pegawai">
-                                        <div
-                                            @click="selectPegawai(pegawai)"
-                                            :class="{
-                            'bg-brand-50 dark:bg-brand-900/30': highlightedIndex===index,
-                            'hover:bg-gray-50 dark:hover:bg-gray-700': highlightedIndex!==index
-                        }"
-                                            class="cursor-pointer px-4 py-3 text-sm text-gray-700 dark:text-gray-300"
-                                            x-text="pegawai.nama_pegawai">
-                                        </div>
-                                    </template>
+                                x-show="open"
+                                x-transition
+                                class="absolute left-0 top-full z-50 mt-1 w-full
+                                    rounded-lg border bg-white shadow-lg
+                                    max-h-60 overflow-y-auto"
+                            >
+                                <template x-for="(pegawai, index) in filtered()" :key="pegawai.id_pegawai">
+                                    <div
+                                        @click="selectPegawai(pegawai)"
+                                        class="cursor-pointer px-4 py-2 text-sm"
+                                        :class="{
+                                            'bg-blue-100': highlightedIndex === index,
+                                            'hover:bg-gray-100': highlightedIndex !== index
+                                        }"
+                                        x-text="pegawai.nama_pegawai"
+                                    ></div>
                                 </template>
 
-                                <template x-if="search.length > 0 && filtered().length === 0">
-                                    <div class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                <template x-if="filtered().length === 0 && search.length > 0">
+                                    <div class="px-4 py-2 text-sm text-gray-500">
                                         Data tidak ditemukan
                                     </div>
                                 </template>
                             </div>
+
                         </div>
                     </div>
 
                     <!-- Kolom RK Ketua-->
                     <div class="flex flex-col gap-2 md:flex-row md:items-center">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
-                            Rencana Kinerja Ketua
+                            Nama Kegiatan
                         </label>
-                        <input type="text" placeholder="Tulis rencana kinerja ketua" name="nama_rk_kegiatan" id="rkKetua"
+                        <input type="text" placeholder="Tulis Nama Kegiatan" name="nama_rk_kegiatan" id="rkKetua"
                             class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                     </div>
 

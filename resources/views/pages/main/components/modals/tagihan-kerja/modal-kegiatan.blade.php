@@ -39,7 +39,7 @@
             @method('PUT')
         </template>
         <div class="relative flex h-[90vh] w-full max-w-[800px] flex-col overflow-hidden
-               rounded-3xl bg-white dark:bg-gray-900">
+                rounded-3xl bg-white dark:bg-gray-900">
             <!-- HEADER -->
             <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
                 <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90"
@@ -71,11 +71,11 @@
                     search: '',
                     selectedId: '',
                     highlightedIndex: -1,
-                    pegawais: @js($pegawais),
+                    ketuaTims: @js($ketuaTims),
                 
                     filtered() {
                         if (this.search.length === 0) return [];
-                        return this.pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase()));
+                        return this.ketuaTims.filter(p => p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase()));
                     },
                 
                     selectPegawai(p) {
@@ -96,7 +96,7 @@
                     <input type="text" x-model="search" @focus="open = !!search"
                         @input="open = search.length > 0; selectedId = ''"
                         @keydown.arrow-down.prevent="highlightedIndex++" @keydown.arrow-up.prevent="highlightedIndex--"
-                        @keydown.enter.prevent="if(highlightedIndex>=0){ search = pegawais[highlightedIndex].nama_pegawai; selectedId = pegawais[highlightedIndex].id_pegawai; open=false; }"
+                        @keydown.enter.prevent="if(highlightedIndex>=0){ search = ketuaTims[highlightedIndex].nama_pegawai; selectedId = ketuaTims[highlightedIndex].id_pegawai; open=false; }"
                         placeholder="Ketik untuk cari nama" class="h-11 w-full mb-4 rounded-lg border px-4 py-2 text-sm">
 
                     <!-- Hidden input -->
@@ -106,7 +106,7 @@
                     <div x-show="open" x-transition
                         class="absolute z-50 mt-1 w-full mb-4 rounded-lg border bg-white max-h-60 overflow-y-auto">
                         <template
-                            x-for="(pegawai, index) in pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase()))"
+                            x-for="(pegawai, index) in ketuaTims.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase()))"
                             :key="pegawai.id_pegawai">
                             <div @click="search = pegawai.nama_pegawai; selectedId = pegawai.id_pegawai; open = false"
                                 :class="{
@@ -117,7 +117,7 @@
                                 class="cursor-pointer px-4 py-2 text-sm" x-text="pegawai.nama_pegawai"></div>
                         </template>
                         <template
-                            x-if="pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase())).length === 0">
+                            x-if="ketuaTims.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase())).length === 0">
                             <div class="px-4 py-2 text-sm text-gray-500">Data tidak ditemukan</div>
                         </template>
                     </div>
