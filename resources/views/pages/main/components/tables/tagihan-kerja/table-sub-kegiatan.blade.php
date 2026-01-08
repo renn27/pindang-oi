@@ -14,14 +14,6 @@
                     </th>
                     <th scope="col"
                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32">
-                        Satuan Target
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32">
-                        Jenis
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32">
                         Jumlah Anggota
                     </th>
                     <th scope="col"
@@ -56,12 +48,6 @@
                                                 dark:text-blue-400 dark:hover:text-blue-300">
                                 {{ $subKegiatan->nama_sub_kegiatan }}
                             </a>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-400 text-center">
-                            {{ $subKegiatan->satuan_target }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-400 text-center">
-                            {{ $subKegiatan->jenis_kegiatan }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-400 text-center">
                             {{ $subKegiatan->penugasans->count() }}

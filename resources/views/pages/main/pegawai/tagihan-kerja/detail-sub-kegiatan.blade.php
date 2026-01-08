@@ -26,15 +26,6 @@
                         <tr>
                             <td
                                 class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-800/50">
-                                Jenis Kegiatan
-                            </td>
-                            <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">
-                                {{ $subKegiatan->jenis_kegiatan }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td
-                                class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-800/50">
                                 Tanggal Mulai
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\JenisKegiatan;
 use Illuminate\Http\Request;
 use App\Models\Kegiatan;
 use App\Models\SubKegiatan;
 use App\Models\Pegawai;
+use Carbon\Carbon;
 
 class SubKegiatanController extends Controller
 {
@@ -13,17 +15,27 @@ class SubKegiatanController extends Controller
         // dd($request->all());
         $this->authorize('createSubKegiatan', $kegiatan);
 
+        $today = Carbon::today()->format('Y-m-d');
+
         $validated = $request->validate([
             'nama_sub_kegiatan' => ['required', 'string', 'max:255'],
-            'jenis_kegiatan' => ['required', 'string', 'max:255'],
-            'satuan_target' => ['required', 'string', 'max:255'],
-            'tanggal_mulai' => ['required', 'date', 'date_format:Y-m-d'],
-            'tanggal_selesai' => ['required',
-                                    'date',
-                                    'date_format:Y-m-d',
-                                    'after_or_equal:tanggal_mulai'],
-            'status' => ['required', 'in:Belum Mulai,Berjalan,Selesai'],
+            'target' => ['required', 'integer', 'min:1'],
+            'tanggal_mulai' => [
+                'required',
+                'date',
+                'date_format:Y-m-d',
+                'after_or_equal:' . $today,
+            ],
+            'tanggal_selesai' => [
+                'required',
+                'date',
+                'date_format:Y-m-d',
+                'after_or_equal:tanggal_mulai',
+            ],
         ]);
+
+        // STATUS AWAL (STATE DEFAULT)
+        $validated['status'] = 'Belum Mulai';
 
         try {
             // Simpan
@@ -46,11 +58,14 @@ class SubKegiatanController extends Controller
     public function show(Kegiatan $kegiatan, SubKegiatan $subKegiatan) {
         // Data referensi untuk dropdown modal
         $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
+        $jenisKegiatans = JenisKegiatan::orderBy('jenis_kegiatan')->get(['id', 'jenis_kegiatan', 'kategori']);
 
         return view('pages.main.pegawai.tagihan-kerja.detail-sub-kegiatan', [
             'kegiatan' => $kegiatan,
             'subKegiatan' => $subKegiatan,
-            'pegawais' => $pegawais
+            'pegawais' => $pegawais,
+            'jenisKegiatans' => $jenisKegiatans
+
         ]);
     }
 
@@ -62,15 +77,24 @@ class SubKegiatanController extends Controller
 
         // 2️⃣ Sub kegiatan harus boleh di-update (state)
         // $this->authorize('update', $subKegiatan); nanti aja kalau kepake
+
+        $today = today()->format('Y-m-d');
         $validated = $request->validate([
             'nama_sub_kegiatan' => ['required', 'string', 'max:255'],
             'jenis_kegiatan' => ['required', 'string', 'max:255'],
             'satuan_target' => ['required', 'string', 'max:255'],
-            'tanggal_mulai' => ['required', 'date', 'date_format:Y-m-d'],
-            'tanggal_selesai' => ['required',
-                                    'date',
-                                    'date_format:Y-m-d',
-                                    'after_or_equal:tanggal_mulai'],
+            'tanggal_mulai' => [
+                'required',
+                'date',
+                'date_format:Y-m-d',
+                'after_or_equal:' . $today,
+            ],
+            'tanggal_selesai' => [
+                'required',
+                'date',
+                'date_format:Y-m-d',
+                'after_or_equal:tanggal_mulai',
+            ],
             'status' => ['required', 'in:Belum Mulai,Berjalan,Selesai'],
         ]);
 

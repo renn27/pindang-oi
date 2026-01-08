@@ -9,15 +9,12 @@
                 id_kegiatan: '',
                 nama_rk_kegiatan: '',
                 nama_sub_kegiatan: '',
-                jenis_kegiatan: '',
-                satuan_target: '',
+                target: '',
                 tanggal_mulai: '',
                 tanggal_selesai: '',
-                status: ''
             }">
 
-    <form
-        :action="mode === 'edit'
+    <form :action="mode === 'edit'
             ?
             `/kegiatan/${formData.id_kegiatan}/sub-kegiatan/${itemKey}` :
             `/kegiatan/${formData.id_kegiatan}/sub-kegiatan`"
@@ -29,7 +26,7 @@
         </template>
         <div
             class="relative flex h-[90vh] w-full max-w-[800px] flex-col overflow-hidden
-               rounded-3xl bg-white dark:bg-gray-900">
+                rounded-3xl bg-white dark:bg-gray-900">
 
             <!-- HEADER (FIXED) -->
             <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
@@ -54,9 +51,6 @@
                                 dark:border-gray-700 dark:bg-gray-800 dark:text-white/70 cursor-not-allowed">
                 </div>
 
-                <!-- ID Kegiatan (yang benar-benar dikirim ke backend) -->
-                {{-- <input type="hidden" name="id_kegiatan" :value="formData.id_kegiatan"> --}}
-
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                         Nama Sub Kegiatan
@@ -65,47 +59,30 @@
                         placeholder="Contoh : Penyiapan Peta"
                         class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                 </div>
+
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Jenis Kegiatan
+                        Target Kegiatan
                     </label>
-                    <input type="text" x-model="formData.jenis_kegiatan" name="jenis_kegiatan"
+                    <input type="number" x-model="formData.target" name="target"
+                        placeholder="Misalnya : 200"
                         class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                 </div>
-                <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Satuan Target
-                    </label>
-                    <input type="text" x-model="formData.satuan_target" name="satuan_target"
-                        placeholder="Misalnya : Dokumen, Kegiatan, dll"
-                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                </div>
+
                 <div class="mb-4">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                         Tanggal Mulai
                     </label>
-                    <x-form.date-picker id="tanggal_mulai" x-model="tanggal_mulai" name="tanggal_mulai"
+                    <x-form.date-picker id="tanggal_mulai" x-model="formData.tanggal_mulai" name="tanggal_mulai"
                         placeholder="Pilih Tanggal" defaultDate="{{ now()->format('Y-m-d') }}"/>
                 </div>
+
                 <div class="mb-4">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                         Tanggal Selesai
                     </label>
-                    <x-form.date-picker id="tanggal_selesai" name="tanggal_selesai" x-model="tanggal_selesai"
+                    <x-form.date-picker id="tanggal_selesai" name="tanggal_selesai" x-model="formData.tanggal_selesai"
                         placeholder="Pilih Tanggal" defaultDate="{{ now()->format('Y-m-d') }}" />
-                </div>
-
-                <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Status
-                    </label>
-                    <select name="status" x-model="formData.status"
-                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">
-                        <option value="">-- Pilih Status --</option>
-                        <option value="Belum Mulai" :selected="formData.status === 'Belum Mulai'">Belum Mulai</option>
-                        <option value="Berjalan" :selected="formData.status === 'Berjalan'">Berjalan</option>
-                        <option value="Selesai" :selected="formData.status === 'Selesai'">Selesai</option>
-                    </select>
                 </div>
             </div>
 

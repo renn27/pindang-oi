@@ -19,7 +19,9 @@ class Penugasan extends Model
     protected $fillable = [
         'id_anggota',
         'id_sub_kegiatan',
+        'id_jenis_kegiatan',
         'target',
+        'satuan_target',
         'tanggal_mulai',
         'tanggal_selesai',
         'status',
@@ -36,6 +38,10 @@ class Penugasan extends Model
 
     public function subKegiatan() {
         return $this->belongsTo(SubKegiatan::class, 'id_sub_kegiatan', 'id_sub_kegiatan');
+    }
+
+    public function jenisKegiatan() {
+        return $this->belongsTo(JenisKegiatan::class, 'id_jenis_kegiatan');
     }
 
     public function pengirimans() {

@@ -18,11 +18,9 @@ class SubKegiatan extends Model
 
     protected $fillable = [
         'nama_sub_kegiatan',
-        'jenis_kegiatan',
-        'satuan_target',
+        'target',
         'tanggal_mulai',
         'tanggal_selesai',
-        'status',
     ];
 
     protected $casts = [

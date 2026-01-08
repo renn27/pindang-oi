@@ -54,7 +54,7 @@
         action="{{ route('master-kegiatan.store') }}">
         @csrf
         <div class="relative flex h-[90vh] w-full max-w-[900px] flex-col overflow-hidden
-               rounded-3xl bg-white dark:bg-gray-900">
+                rounded-3xl bg-white dark:bg-gray-900">
 
             <!-- HEADER -->
             <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
