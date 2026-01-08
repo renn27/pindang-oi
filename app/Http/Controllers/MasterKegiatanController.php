@@ -163,7 +163,7 @@ class MasterKegiatanController extends Controller
             });
 
             return redirect()
-                ->back()
+                ->back();
                 // ->with('success', 'RK berhasil disimpan.');
         } catch (QueryException $e) {
             // log error DB
