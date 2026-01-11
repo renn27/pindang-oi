@@ -12,6 +12,7 @@ class PenerimaanController extends Controller
     public function store(Request $request, SubKegiatan $subKegiatan, Penugasan $penugasan, Pengiriman $pengirimans) {
         // dd($request->all());
 
+        $this->authorize('receive', $penugasan);
         $validated = $request->validate([
             'tanggal_penerimaan' => ['required', 'date', 'date_format:Y-m-d'],
             'jumlah_diterima' => ['required', 'integer', 'max:255'],

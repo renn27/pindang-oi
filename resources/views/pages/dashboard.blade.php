@@ -1,20 +1,14 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
 
 @section('content')
-    @php
-        $user = Auth::user();
-    @endphp
-
     <div class="mb-5">
         @auth
-            <p>Login sebagai: <b>{{ $user->nama_pegawai }}</b></p>
-            <p>Role: {{ $user->roles->pluck('nama_role')->implode(', ') }}</p>
+            <p>SELAMAT DATANG <b>{{ Auth::user()->nama_pegawai }}</b></p>
+            <p>
+                Role :
+                {{ Auth::user()->active_role ?? 'Anggota Tim' }}
+            </p>
 
-            @if($user->hasRole('admin'))
-                🛠 Menu Admin MUNCUL
-            @endif
-
-            <a href="{{ route('simulasi.logout') }}" class="text-red-500 underline">Logout</a>
         @else
             <p>Belum login</p>
             <p>Gunakan <code>/login-as/{username}</code> untuk simulasi login</p>
@@ -27,7 +21,7 @@
         </div>
 
         <div class="col-span-12 xl:col-span-6">
-            <div class="mb-5 rounded-2xl space-6 border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
+            <div class="mb-5 rounded-2xl space-6 border border-gray-200 bg-white p-5 lg:p-6">
                 <div class="mb-4">
                     <x-profile.employe-rank-card />
                 </div>

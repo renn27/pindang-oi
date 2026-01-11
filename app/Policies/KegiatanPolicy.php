@@ -38,7 +38,7 @@ class KegiatanPolicy
      */
     public function create(Pegawai $pegawai): bool
     {
-        return $pegawai->hasRole('Ketua Tim');
+        return $pegawai->hasRole('Ketua Tim', 'Pimpinan');
     }
 
     /**
@@ -57,14 +57,6 @@ class KegiatanPolicy
         return $this->isOwner($pegawai, $kegiatan);
     }
 
-    /**
-     * Determine whether the user can manage the Kegiatan and SubKegiatan CRUD Data.
-     */
-    public function manage(Pegawai $pegawai, Kegiatan $kegiatan): bool
-    {
-        return $this->isOwner($pegawai, $kegiatan);
-    }
-    
     /**
      * Determine whether the user can create sub kegiatan data.
      */

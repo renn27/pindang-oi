@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
 
 @section('content')
     <x-common.page-breadcrumb pageTitle="Form Elements" />
@@ -6,7 +6,7 @@
         <div class="space-y-6">
             <x-form.form-elements.default-inputs />
             <x-form.form-elements.default-inputs />
-            
+
             <x-form.form-elements.select-inputs />
             <x-form.form-elements.text-area-inputs />
             <x-form.form-elements.input-states />

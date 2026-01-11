@@ -2,10 +2,10 @@
 
 @section('content')
 
-<div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
+<div class="rounded-2xl border border-gray-200 bg-white p-5 lg:p-6">
     <!-- header -->
     <div class="flex flex-col gap-4 px-2 mb-6 sm:flex-row sm:items-center sm:justify-between">
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+        <h3 class="text-lg font-semibold text-gray-800">
             Data Tim Kerja
         </h3>
 
@@ -15,7 +15,7 @@
                     id="searchTim"
                     type="text"
                     placeholder="Search..."
-                    class="h-10 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-2 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 sm:w-64">
+                    class="h-10 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-2 focus:ring-brand-500/10 sm:w-64">
             </div>
 
             <button
@@ -27,37 +27,37 @@
     </div>
 
     <!-- table -->
-    <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+    <div class="overflow-hidden rounded-lg border border-gray-200">
         <div class="overflow-x-auto">
-            <table id="tim-kerja-table" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <table id="tim-kerja-table" class="min-w-full divide-y divide-gray-200">
                 <thead>
-                    <tr class="bg-gray-50 dark:bg-gray-800/50">
-                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-16 border-r border-gray-200 dark:border-gray-700">
+                    <tr class="bg-gray-50">
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16 border-r border-gray-200">
                             No
                         </th>
-                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700">
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                             Nama Tim
                         </th>
-                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700">
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                             Id Ketua
                         </th>
-                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700">
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                             Dibuat
                         </th>
-                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700">
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200">
                             Status
                         </th>
-                        <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aksi
                         </th>
                     </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
+                <tbody class="bg-white divide-y divide-gray-200">
                     <!-- Data akan diisi oleh DataTables -->
                 </tbody>
             </table>
 
-            <div id="pagination-wrapper" class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+            <div id="pagination-wrapper" class="px-6 py-4 border-t border-gray-200">
                 <!-- Pagination akan diisi oleh JavaScript -->
             </div>
         </div>
@@ -72,14 +72,14 @@
     
     <div
         class="relative flex h-[90vh] max-h-[600px] w-full max-w-[400px] flex-col overflow-hidden
-               rounded-3xl bg-white dark:bg-gray-900">
+               rounded-3xl bg-white">
 
         <!-- HEADER (FIXED) -->
-        <div class="shrink-0 border-b border-gray-200 px-6 py-4 dark:border-gray-800">
+        <div class="shrink-0 border-b border-gray-200 px-6 py-4">
             <h4 x-text="mode === 'add' ? 'Tambah Tim' : 'Edit Tim'" 
-                class="text-xl font-semibold text-gray-800 dark:text-white/90">
+                class="text-xl font-semibold text-gray-800">
             </h4>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p class="mt-1 text-sm text-gray-500">
                 <span x-text="mode === 'add' ? 'Tambahkan' : 'Edit'"></span> data tim kerja
             </p>
         </div>
@@ -92,26 +92,26 @@
                 
                 <!-- Nama Tim -->
                 <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Nama Tim
                     </label>
                     <input
                         id="namaTim"
                         type="text"
                         placeholder="Masukkan nama tim"
-                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                 </div>
 
                 <!-- ID Ketua -->
                 <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         ID Ketua Tim
                     </label>
                     <input
                         id="idKetua"
                         type="text"
                         placeholder="Masukkan ID ketua tim"
-                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                 </div>
             </form>
         </div>
@@ -119,7 +119,7 @@
         <!-- FOOTER (FIXED) -->
         <div
             class="shrink-0 border-t border-gray-200 px-6 py-4
-                   dark:border-gray-800">
+                  ">
             <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                 <button
                     @click="open = false"
@@ -127,8 +127,8 @@
                     class="flex w-full justify-center rounded-lg border
                            border-gray-300 bg-white px-4 py-2.5 text-sm
                            font-medium text-gray-700 hover:bg-gray-50
-                           dark:border-gray-700 dark:bg-gray-800
-                           dark:text-gray-400 dark:hover:bg-white/[0.03]
+                          
+                          
                            sm:w-auto">
                     Batal
                 </button>
@@ -164,27 +164,27 @@
             columns: [{
                     data: 'id_tim_kerja',
                     name: 'id_tim_kerja',
-                    className: 'px-4 py-3 text-sm text-gray-900 dark:text-gray-300 text-center border-r border-gray-200 dark:border-gray-700'
+                    className: 'px-4 py-3 text-sm text-gray-900 text-center border-r border-gray-200'
                 },
                 {
                     data: 'nama_tim',
                     name: 'nama_tim',
-                    className: 'px-4 py-3 text-sm text-gray-700 dark:text-gray-400 border-r border-gray-200 dark:border-gray-700'
+                    className: 'px-4 py-3 text-sm text-gray-700 border-r border-gray-200'
                 },
                 {
                     data: 'id_ketua',
                     name: 'id_ketua',
-                    className: 'px-4 py-3 text-sm text-gray-700 dark:text-gray-400 border-r border-gray-200 dark:border-gray-700'
+                    className: 'px-4 py-3 text-sm text-gray-700 border-r border-gray-200'
                 },
                 {
                     data: 'created_at',
                     name: 'created_at',
-                    className: 'px-4 py-3 text-sm text-gray-700 dark:text-gray-400 border-r border-gray-200 dark:border-gray-700'
+                    className: 'px-4 py-3 text-sm text-gray-700 border-r border-gray-200'
                 },
                 {
                     data: 'status',
                     name: 'status',
-                    className: 'px-4 py-3 text-sm text-gray-700 dark:text-gray-400 border-r border-gray-200 dark:border-gray-700'
+                    className: 'px-4 py-3 text-sm text-gray-700 border-r border-gray-200'
                 },
                 {
                     data: null,
@@ -194,7 +194,7 @@
                     render: function(data, type, row) {
                         return `
                             <div class="flex items-center justify-center gap-1">
-                                <button class="editTim p-2 rounded-lg text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/20 dark:hover:text-blue-300 transition-colors" 
+                                <button class="editTim p-2 rounded-lg text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition-colors" 
                                         data-id="${row.id_tim_kerja}" 
                                         data-nama="${row.nama_tim}" 
                                         data-ketua="${row.id_ketua}">
@@ -203,7 +203,7 @@
                                               d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                     </svg>
                                 </button>
-                                <button class="hapusTim p-2 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300 transition-colors" 
+                                <button class="hapusTim p-2 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors" 
                                         data-id="${row.id_tim_kerja}">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -218,7 +218,7 @@
 
             // Styling untuk row
             createdRow: function(row, data, dataIndex) {
-                $(row).addClass('hover:bg-gray-50 dark:hover:bg-gray-800/30');
+                $(row).addClass('hover:bg-gray-50');
             }
         });
 
@@ -244,7 +244,7 @@
                         class="flex h-9 w-9 items-center justify-center rounded-lg text-sm font-medium
                         ${info.page + 1 === i
                             ? 'bg-brand-500 text-white'
-                            : 'text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'}">
+                            : 'text-gray-700 hover:bg-gray-100'}">
                         ${i}
                     </button>
                 </li>
@@ -254,7 +254,7 @@
             $('#pagination-wrapper').html(`
             <div class="flex items-center justify-between">
                 <button id="prevPage"
-                    class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800
+                    class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50
                     ${info.page === 0 ? 'opacity-50 cursor-not-allowed' : ''}">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -267,7 +267,7 @@
                 </ul>
 
                 <button id="nextPage"
-                    class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800
+                    class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50
                     ${info.page + 1 === info.pages ? 'opacity-50 cursor-not-allowed' : ''}">
                     Next
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

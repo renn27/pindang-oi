@@ -12,19 +12,19 @@
 @php
     $variantClasses = [
         'success' => [
-            'container' => 'border-green-500 bg-green-50 dark:border-green-500/30 dark:bg-green-500/15',
+            'container' => 'border-green-500 bg-green-50',
             'icon' => 'text-green-500',
         ],
         'error' => [
-            'container' => 'border-red-500 bg-red-50 dark:border-red-500/30 dark:bg-red-500/15',
+            'container' => 'border-red-500 bg-red-50',
             'icon' => 'text-red-500',
         ],
         'warning' => [
-            'container' => 'border-yellow-500 bg-yellow-50 dark:border-yellow-500/30 dark:bg-yellow-500/15',
+            'container' => 'border-yellow-500 bg-yellow-50',
             'icon' => 'text-yellow-500',
         ],
         'info' => [
-            'container' => 'border-blue-500 bg-blue-50 dark:border-blue-500/30 dark:bg-blue-500/15',
+            'container' => 'border-blue-500 bg-blue-50',
             'icon' => 'text-blue-500',
         ],
     ];
@@ -57,19 +57,19 @@
 
         <div class="flex-1">
             @if($title)
-                <h4 class="mb-1 text-sm font-semibold text-gray-800 dark:text-white/90">
+                <h4 class="mb-1 text-sm font-semibold text-gray-800">
                     {{ $title }}
                 </h4>
             @endif
 
             @if($message)
-                <p class="text-sm text-gray-500 dark:text-gray-400">{{ $message }}</p>
+                <p class="text-sm text-gray-500">{{ $message }}</p>
             @endif
 
             @if($showLink)
                 <a 
                     href="{{ $linkHref }}" 
-                    class="inline-block mt-3 text-sm font-medium text-gray-500 underline dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                    class="inline-block mt-3 text-sm font-medium text-gray-500 underline hover:text-gray-700"
                 >
                     {{ $linkText }}
                 </a>

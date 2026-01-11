@@ -7,21 +7,21 @@
     :isOpen="false"
     class="max-w-[800px]">
     <div class="relative flex h-[80vh] w-full max-w-[800px] flex-col overflow-hidden
-               rounded-3xl bg-white dark:bg-gray-900">
+               rounded-3xl bg-white">
 
         <!-- HEADER -->
-        <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
+        <div class="shrink-0 border-b border-gray-200 px-6 py-3">
             <div class="flex items-center justify-between">
                 <div>
-                    <h4 class="text-xl font-semibold text-gray-800 dark:text-white/90">
+                    <h4 class="text-xl font-semibold text-gray-800">
                         Konfirmasi Data
                     </h4>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    <p class="mt-1 text-sm text-gray-500">
                         Review data sebelum disimpan
                     </p>
                 </div>
                 <button @click="open = false"
-                    class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800">
+                    class="rounded-lg p-2 text-gray-500 hover:bg-gray-100">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -37,10 +37,10 @@
         </div>
 
         <!-- FOOTER -->
-        <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-800">
+        <div class="shrink-0 border-t border-gray-200 px-6 py-3">
             <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                 <button @click="open = false" type="button"
-                    class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
+                    class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto">
                     Batal
                 </button>
 

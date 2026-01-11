@@ -29,13 +29,13 @@
         </template>
 
         <div class="relative flex h-[90vh] w-full max-w-[800px] flex-col overflow-hidden
-                rounded-3xl bg-white dark:bg-gray-900">
+                rounded-3xl bg-white">
 
             <!-- HEADER (FIXED) -->
-            <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
-                <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90"
+            <div class="shrink-0 border-b border-gray-200 px-6 py-3">
+                <h4 class="text-2xl font-semibold text-gray-800"
                     x-text="mode === 'create' ? 'Tambah Anggota' : 'Edit Data Anggota'"></h4>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+                <p class="mt-1 text-sm text-gray-500"
                     x-text="mode === 'create' ? 'Tambahkan penugasan kepada anggota' : 'Edit anggota yang sudah ditugaskan'">
                 </p>
             </div>
@@ -44,12 +44,12 @@
             <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
                 <!-- Nama Sub Kegiatan (readonly tampilan) -->
                 <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Sub Kegiatan
                     </label>
 
                     <input type="text" :value="formData.nama_sub_kegiatan" disabled
-                        class="w-full mb-4 h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-white/70 cursor-not-allowed">
+                        class="w-full mb-4 h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800 cursor-not-allowed">
                 </div>
 
                 {{-- Nama Ketua / Penanggung Jawab --}}
@@ -90,7 +90,7 @@
                     highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
                     selectHighlighted() { if (this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]); }
                 }">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Nama Anggota
                     </label>
                     <!-- Input search -->
@@ -125,7 +125,7 @@
                 </div>
 
                 <div x-data="{ isOther: false }">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Jenis Kegiatan
                     </label>
 
@@ -139,10 +139,10 @@
                         "
                         required
                         class="
-                            dark:bg-dark-900
+                           
                             h-11 w-full mb-4
                             rounded-lg border border-gray-300
-                            bg-white dark:bg-gray-900
+                            bg-white
                             px-4 py-2.5 text-sm
                             focus:ring-2 focus:ring-primary-500 focus:border-primary-500
                         ">
@@ -178,25 +178,25 @@
                 </div>
 
                 <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Target
                     </label>
                     <input type="number" x-model="formData.target" name="target"
                         placeholder="Misalnya : 200"
-                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                 </div>
 
                 <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Satuan Target
                     </label>
                     <input type="text" x-model="formData.satuan_target" name="satuan_target"
                         placeholder="Misalnya : Dokumen, Kegiatan, dll"
-                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                 </div>
 
                 <div class="mb-4">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Tanggal Mulai
                     </label>
                     <x-form.date-picker id="tanggal_mulai" x-model="formData.tanggal_mulai" name="tanggal_mulai"
@@ -204,7 +204,7 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Tanggal Berakhir (Deadline)
                     </label>
                     <x-form.date-picker id="tanggal_selesai" x-model="formData.tanggal_selesai" name="tanggal_selesai"
@@ -212,10 +212,10 @@
                 </div>
             </div>
             <!-- FOOTER -->
-            <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-800">
+            <div class="shrink-0 border-t border-gray-200 px-6 py-3">
                 <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                     <button @click="open = false" type="button"
-                        class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
+                        class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto">
                         Batal
                     </button>
 

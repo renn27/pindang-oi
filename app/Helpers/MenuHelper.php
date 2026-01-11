@@ -8,7 +8,9 @@ class MenuHelper
 {
     public static function getMainNavItems()
     {
+        /** @var \App\Models\Pegawai|null $user */
         $user = Auth::user();
+        $activeRole = self::getActiveRoleName();
 
         $menus = [
             [
@@ -21,6 +23,7 @@ class MenuHelper
                 'name' => 'Admin',
                 'subItems' => [
                     ['name' => 'Bidang Kerja', 'path' => '/bidang-kerja'],
+                    ['name' => 'Kelola Role', 'path' => '/role-pegawai'],
                 ],
             ],
             [
@@ -44,57 +47,43 @@ class MenuHelper
             ],
         ];
 
-        // =============================
-        // USER LOGIN
-        // =============================
-        if ($user) {
-
-            // 1️⃣ ADMIN → SEMUA MENU
-            if ($user->hasRole('Admin')) {
-                return array_map(
-                    fn ($menu) => self::normalizeMenuItem($menu),
-                    $menus
-                );
-            }
-
-            // 2️⃣ PIMPINAN → SEMUA KECUALI ADMIN
-            if ($user->hasRole('Pimpinan')) {
-                $filtered = array_filter(
-                    $menus,
-                    fn ($menu) => $menu['name'] !== 'Admin'
-                );
-
-                return array_map(
-                    fn ($menu) => self::normalizeMenuItem($menu),
-                    $filtered
-                );
-            }
-
-            // 3️⃣ PEGAWAI / KETUA TIM
-            $allowedNames = ['Dashboard', 'Tagihan Kerja', 'Rencana Kinerja'];
-
-            $filtered = array_filter(
-                $menus,
-                fn ($menu) => in_array($menu['name'], $allowedNames)
-            );
-
+        if (! $user || ! $activeRole) {
             return array_map(
                 fn ($menu) => self::normalizeMenuItem($menu),
-                $filtered
+                array_filter($menus, fn ($m) => $m['name'] === 'Dashboard')
             );
         }
 
-        // =============================
-        // GUEST
-        // =============================
-        $filtered = array_filter(
-            $menus,
-            fn ($menu) => $menu['name'] === 'Dashboard'
-        );
+        // ADMIN → semua menu
+        if ($user->isActiveRole('Admin')) {
+            return array_map(
+                fn ($menu) => self::normalizeMenuItem($menu),
+                $menus
+            );
+        }
+
+        // PIMPINAN → semua kecuali Admin
+        if ($user->isActiveRole('Pimpinan')) {
+            return array_map(
+                fn ($menu) => self::normalizeMenuItem($menu),
+                array_filter($menus, fn ($m) => $m['name'] !== 'Admin')
+            );
+        }
+
+        // KETUA TIM
+        if ($user->isActiveRole('Ketua Tim')) {
+            return array_map(
+                fn ($menu) => self::normalizeMenuItem($menu),
+                array_filter($menus, fn ($m) => in_array($m['name'], ['Dashboard', 'Tagihan Kerja', 'Rencana Kinerja']))
+            );
+        }
+
+        // KETUA TIM / PEGAWAI
+        $allowed = ['Dashboard', 'Tagihan Kerja'];
 
         return array_map(
             fn ($menu) => self::normalizeMenuItem($menu),
-            $filtered
+            array_filter($menus, fn ($m) => in_array($m['name'], $allowed))
         );
     }
 
@@ -108,9 +97,13 @@ class MenuHelper
         ];
     }
 
-    // private static function hasActiveSubItem(array $items): bool {
-    //     return collect($items)->contains('is_active', true);
-    // }
+    private static function getActiveRoleName(): ?string
+    {
+        /** @var \App\Models\Pegawai|null $user */
+        $user = Auth::user();
+        return $user->getActiveRole();
+    }
+
 
     /**
      * ===============================

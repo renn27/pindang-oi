@@ -9,6 +9,15 @@ use Illuminate\Auth\Access\Response;
 class SubKegiatanPolicy
 {
     /**
+     * Hanya ketua tim PEMILIK kegiatan dan Sub Kegiatan di dalamnya
+     */
+    protected function isOwner(Pegawai $pegawai, SubKegiatan $subKegiatan): bool
+    {
+        return
+            $pegawai->hasRole('Ketua Tim') &&
+            $pegawai->id_pegawai === $subKegiatan->kegiatan->id_penanggung_jawab;
+    }
+    /**
      * Determine whether the user can view any models.
      */
     public function viewAny(Pegawai $pegawai): bool
@@ -25,11 +34,19 @@ class SubKegiatanPolicy
     }
 
     /**
+     * Determine whether the user can create the model.
+     */
+    public function create(Pegawai $pegawai, SubKegiatan $subKegiatan): bool
+    {
+        return $this->isOwner($pegawai, $subKegiatan);
+    }
+
+    /**
      * Determine whether the user can update the model.
      */
     public function update(Pegawai $pegawai, SubKegiatan $subKegiatan): bool
     {
-        return true;
+        return $this->isOwner($pegawai, $subKegiatan);
     }
 
     /**
@@ -37,7 +54,7 @@ class SubKegiatanPolicy
      */
     public function delete(Pegawai $pegawai, SubKegiatan $subKegiatan): bool
     {
-        return true;
+        return $this->isOwner($pegawai, $subKegiatan);
     }
 
     /**

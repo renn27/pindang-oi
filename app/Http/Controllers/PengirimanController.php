@@ -10,6 +10,7 @@ class PengirimanController extends Controller
 {
     public function store(Request $request, SubKegiatan $subKegiatan, Penugasan $penugasan) {
         // dd($request->all());
+        $this->authorize('send', $penugasan);
 
         $validated = $request->validate([
             'tanggal_pengiriman' => ['required', 'date', 'date_format:Y-m-d'],

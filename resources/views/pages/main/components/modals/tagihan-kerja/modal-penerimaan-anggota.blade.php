@@ -23,21 +23,21 @@
         @csrf
         <div
             class="relative flex h-[90vh] w-full max-w-[800px] flex-col overflow-hidden
-               rounded-3xl bg-white dark:bg-gray-900">
+               rounded-3xl bg-white">
 
             <!-- HEADER (FIXED) -->
-            <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-800">
-                <h4 class="text-2xl font-semibold text-gray-800 dark:text-white/90">
+            <div class="shrink-0 border-b border-gray-200 px-6 py-3">
+                <h4 class="text-2xl font-semibold text-gray-800">
                     Lakukan Penerimaan
                 </h4>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p class="mt-1 text-sm text-gray-500">
                     Terima dan Berikan Penilaian Kerja
                 </p>
             </div>
             <div class="text-center m-4">
-                <h6 class="text-sm font-semibold text-gray-600 dark:text-white/90" x-text="formData.nama_anggota">
+                <h6 class="text-sm font-semibold text-gray-600" x-text="formData.nama_anggota">
                 </h6>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p class="mt-1 text-sm text-gray-500">
                     ID Penugasan:
                     <span class="font-medium" x-text="formData.id_penugasan"></span>
                 </p>
@@ -48,17 +48,17 @@
 
                 <!-- Id Pengiriman (readonly tampilan) -->
                 <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Id Pengiriman
                     </label>
 
                     <input type="text" :value="formData.id_pengiriman" disabled
                         class="w-full mb-4 h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800
-                                            dark:border-gray-700 dark:bg-gray-800 dark:text-white/70 cursor-not-allowed">
+                                            cursor-not-allowed">
                 </div>
 
                 <div class="mb-4">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Tanggal Penerimaan
                     </label>
                     <x-form.date-picker id="tanggal_penerimaan" name="tanggal_penerimaan"
@@ -66,43 +66,43 @@
                         defaultDate="{{ now()->format('Y-m-d') }}" readonly="true" />
                 </div>
                 <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Jumlah Diterima
                     </label>
                     <input type="text" name="jumlah_diterima" x-model="formData.jumlah_diterima"
                         placeholder="Masukkan jumlah penerimaan"
-                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                 </div>
                 <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Status
                     </label>
                     <select name="status" x-model="formData.status"
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10
-                                            dark:focus:border-brand-800 h-11 w-full mb-4 appearance-none rounded-lg
+                                            h-11 w-full mb-4 appearance-none rounded-lg
                                             border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm
                                             placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
-                                            dark:border-gray-700 dark:bg-gray-900 dark:text-white/90
-                                            dark:placeholder:text-white/30"
-                        :class="isOptionSelected && 'text-gray-800 dark:text-white/90'"
+                                           
+                                           "
+                        :class="isOptionSelected && 'text-gray-800'"
                         @change="isOptionSelected = true">
                         <!-- Placeholder -->
-                        <option value="" disabled selected class="text-gray-400 dark:bg-gray-900">
+                        <option value="" disabled selected class="text-gray-400">
                             -- Pilih Status --
                         </option>
 
-                        <option value="Diterima" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                        <option value="Diterima" class="text-gray-700">
                             Diterima
                         </option>
 
-                        <option value="Revisi" class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
+                        <option value="Revisi" class="text-gray-700">
                             Revisi
                         </option>
                     </select>
 
                     <span
                         class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2
-                                            text-gray-700 dark:text-gray-400">
+                                            text-gray-700">
                         <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5"
                                 stroke-linecap="round" stroke-linejoin="round" />
@@ -111,20 +111,20 @@
                 </div>
 
                 <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Catatan
                     </label>
                     <input type="text" name="catatan" placeholder="Masukkan catatan"
-                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                 </div>
 
             </div>
             <!-- FOOTER -->
             <!-- FOOTER -->
-            <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-800">
+            <div class="shrink-0 border-t border-gray-200 px-6 py-3">
                 <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                     <button @click="open = false" type="button"
-                        class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
+                        class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto">
                         Batal
                     </button>
 

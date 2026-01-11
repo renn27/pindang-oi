@@ -13,6 +13,7 @@ class PenugasanController extends Controller
     public function store(Request $request, SubKegiatan $subKegiatan) {
         // dd($request->all());
 
+        $this->authorize('create', [Penugasan::class, $subKegiatan]);
         $today = Carbon::today()->format('Y-m-d');
 
         $validated = $request->validate([
@@ -83,6 +84,7 @@ class PenugasanController extends Controller
     public function update(Request $request, SubKegiatan $subKegiatan, Penugasan $penugasan) {
         // dd($request->all());
 
+        $this->authorize('update', $penugasan);
         $validated = $request->validate([
             'id_anggota' => ['required', 'exists:pegawais,id_pegawai',],
             'target' => ['required', 'integer', 'min:1'],

@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Pegawai extends Authenticatable
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasUuids;
 
     protected $table = 'pegawais';
     protected $primaryKey = 'id_pegawai';
@@ -24,6 +24,7 @@ class Pegawai extends Authenticatable
         'alamat',
         'jabatan',
         'photo',
+        'active_role',
     ];
 
     protected $hidden = [
@@ -67,13 +68,25 @@ class Pegawai extends Authenticatable
         return $this->belongsToMany(Role::class, 'pegawai_role', 'pegawai_id', 'role_id');
     }
 
-    public function hasRole($roleName)
+    public function hasRole(string $namaRole): bool
     {
-        return $this->roles()->where('nama_role', $roleName)->exists();
+        return $this->roles->contains('nama_role', $namaRole);
     }
 
-    public function hasAnyRole(array $roleNames) {
-        return $this->roles()->whereIn('nama_role', $roleNames)->exists();
+    // ❗ TAMBAHAN (dibutuhkan oleh isAnggota)
+    public function hasAnyRole(array $roles): bool
+    {
+        return $this->roles->pluck('nama_role')->intersect($roles)->isNotEmpty();
+    }
+
+    public function isActiveRole(string $namaRole): bool
+    {
+        return $this->active_role === $namaRole;
+    }
+
+    public function getActiveRole(): ?string
+    {
+        return $this->active_role;
     }
 
     public function getAuthIdentifierName() {

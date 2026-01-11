@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
 
 @section('content')
     <x-common.page-breadcrumb pageTitle="Master Kegiatan" />
@@ -8,24 +8,24 @@
     <div class="space-y-6">
         <x-common.component-card title="Master Kegiatan">
             <div class="flex justify-end">
-                <button
-                    class="flex items-center gap-2 rounded-full border border-gray-300
-                    bg-white px-4 py-3 text-sm font-medium text-gray-700
-                    shadow-theme-xs hover:bg-gray-50 hover:text-gray-800
-                    dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400
-                    dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
-                    @click="$dispatch('open-smart-modal', {
-                        modalId: 'modal-master-kegiatan',
-            })">
-                    <!-- icon -->
-                    <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd"
-                            d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z"
-                            fill="" />
-                    </svg>
-                    Tambah Master Kegiatan
-                </button>
+                @can('create', App\Models\Kegiatan::class)
+                    <button
+                        class="flex items-center gap-2 rounded-full border border-gray-300
+                        bg-white px-4 py-3 text-sm font-medium text-gray-700
+                        shadow-theme-xs hover:bg-gray-50 hover:text-gray-800"
+                        @click="$dispatch('open-smart-modal', {
+                            modalId: 'modal-master-kegiatan',
+                    })">
+                        <!-- icon -->
+                        <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z"
+                                fill="" />
+                        </svg>
+                        Tambah Master Kegiatan
+                    </button>
+                @endcan
             </div>
         </x-common.component-card>
     </div>
@@ -57,13 +57,13 @@
             detailAnggotaCounter[sectionId] = 0;
 
             const sectionHTML = `
-                <div id="${sectionId}" class="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
+                <div id="${sectionId}" class="rounded-lg border border-gray-200 bg-gray-50 p-4">
                     <div class="mb-4 flex items-center justify-between">
-                        <h5 class="text-sm font-semibold text-gray-800 dark:text-white/90">
+                        <h5 class="text-sm font-semibold text-gray-800">
                             Sub Kegiatan ${rkAnggotaCounter}
                         </h5>
                         <button type="button" onclick="hapusRKAnggota('${sectionId}')"
-                            class="rounded-lg p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
+                            class="rounded-lg p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-700">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
@@ -74,25 +74,25 @@
 
                     <div class="space-y-4">
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4">
                                 Nama Sub Kegiatan
                             </label>
                             <input name="rk_anggota[]" type="text" placeholder="Masukkan rk anggota"
-                                class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                         </div>
 
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4">
                                 Target Kegiatan
                             </label>
                             <input type="number" name="target[]"
                                 placeholder="Misalnya : 200"
-                                class="md:w-3/4 dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                         </div>
 
                         <!-- Tanggal Mulai dan Tanggal Selesai untuk Detail Anggota -->
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4">
                                 Tanggal Mulai
                             </label>
                             <div class="md:w-3/4">
@@ -103,7 +103,7 @@
                             </div>
                         </div>
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4">
                                 Tanggal Selesai
                             </label>
                             <div class="md:w-3/4">
@@ -120,7 +120,7 @@
                             <div class="md:w-1/4"></div>
                             <div class="md:w-3/4">
                                 <button type="button" onclick="tambahDetailAnggota('${sectionId}')"
-                                    class="flex items-center gap-2 rounded-lg border border-dashed border-gray-300 bg-transparent px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-white/[0.03]">
+                                    class="flex items-center gap-2 rounded-lg border border-dashed border-gray-300 bg-transparent px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
                                     <svg class="fill-current" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path fill-rule="evenodd" clip-rule="evenodd" d="M8 3.5C8.27614 3.5 8.5 3.72386 8.5 4V7.5H12C12.2761 7.5 12.5 7.72386 12.5 8C12.5 8.27614 12.2761 8.5 12 8.5H8.5V12C8.5 12.2761 8.27614 12.5 8 12.5C7.72386 12.5 7.5 12.2761 7.5 12V8.5H4C3.72386 8.5 3.5 8.27614 3.5 8C3.5 7.72386 3.72386 7.5 4 7.5H7.5V4C7.5 3.72386 7.72386 3.5 8 3.5Z" fill=""/>
                                     </svg>
@@ -182,13 +182,13 @@
             const detailId = sectionId + '-detail-' + detailAnggotaCounter[sectionId];
 
             const detailHTML = `
-                <div id="${detailId}" class="rounded-lg border border-dashed border-gray-300 bg-white p-4 dark:border-gray-600 dark:bg-gray-900/50">
+                <div id="${detailId}" class="rounded-lg border border-dashed border-gray-300 bg-white p-4">
                     <div class="mb-3 flex items-center justify-between">
-                        <h6 class="text-xs font-medium text-gray-700 dark:text-gray-300">
+                        <h6 class="text-xs font-medium text-gray-700">
                             Anggota ${detailAnggotaCounter[sectionId]}
                         </h6>
                         <button type="button" onclick="hapusDetailAnggota('${detailId}')"
-                            class="rounded-lg p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-gray-700">
+                            class="rounded-lg p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
@@ -229,7 +229,7 @@
                                     if(this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]);
                                 }
                             }">
-                            <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            <label class="mb-1.5 block text-xs font-medium text-gray-700 md:w-1/4">
                                 Nama Anggota
                             </label>
 
@@ -244,7 +244,7 @@
                                     @keydown.arrow-up.prevent="highlightPrev()"
                                     @keydown.enter.prevent="selectHighlighted()"
                                     placeholder="Ketik untuk cari nama anggota"
-                                    class="detail-nama-anggota dark:bg-dark-900 h-10 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800">
+                                    class="detail-nama-anggota h-10 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10">
 
                                 <!-- Hidden input untuk menyimpan ID -->
                                 <input type="hidden"
@@ -266,24 +266,24 @@
                                     x-transition:leave-start="opacity-100 scale-100"
                                     x-transition:leave-end="opacity-0 scale-95"
                                     @click.away="open = false"
-                                    class="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 max-h-60 overflow-y-auto">
+                                    class="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-60 overflow-y-auto">
 
                                     <template x-if="filtered().length > 0">
                                         <template x-for="(pegawai, index) in filtered()" :key="pegawai.id_pegawai">
                                             <div
                                                 @click="selectPegawai(pegawai)"
                                                 :class="{
-                                                    'bg-brand-50 dark:bg-brand-900/30': highlightedIndex===index,
-                                                    'hover:bg-gray-50 dark:hover:bg-gray-700': highlightedIndex!==index
+                                                    'bg-brand-50': highlightedIndex===index,
+                                                    'hover:bg-gray-50': highlightedIndex!==index
                                                 }"
-                                                class="cursor-pointer px-3 py-2 text-xs text-gray-700 dark:text-gray-300"
+                                                class="cursor-pointer px-3 py-2 text-xs text-gray-700"
                                                 x-text="pegawai.nama_pegawai">
                                             </div>
                                         </template>
                                     </template>
 
                                     <template x-if="search.length > 0 && filtered().length === 0">
-                                        <div class="px-3 py-2 text-xs text-gray-500 dark:text-gray-400">
+                                        <div class="px-3 py-2 text-xs text-gray-500">
                                             Data tidak ditemukan
                                         </div>
                                     </template>
@@ -330,7 +330,7 @@
                                         type="text"
                                         name="detail_jenis_kegiatan_baru[${sectionId}][]"
                                         placeholder="Masukkan jenis kegiatan baru"
-                                        class="dark:bg-dark-900 h-10 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                                        class="dark:bg-dark-900 h-10 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10"
                                     />
                                 </div>
                             </div>
@@ -338,24 +338,24 @@
 
                         <!-- Target Input -->
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                            <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            <label class="mb-1.5 block text-xs font-medium text-gray-700 md:w-1/4">
                                 Target
                             </label>
                             <input name="detail_target[${sectionId}][]" type="text" placeholder="Masukkan target"
-                                class="md:w-3/4 dark:bg-dark-900 h-10 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                class="md:w-3/4 h-10 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                         </div>
 
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                            <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            <label class="mb-1.5 block text-xs font-medium text-gray-700 md:w-1/4">
                                 Satuan Target
                             </label>
                             <input name="detail_satuan_target[${sectionId}][]" type="text" placeholder="Masukkan satuan target"
-                                class="md:w-3/4 dark:bg-dark-900 h-10 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                class="md:w-3/4 h-10 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                         </div>
 
                         <!-- Tanggal Mulai -->
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                            <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            <label class="mb-1.5 block text-xs font-medium text-gray-700 md:w-1/4">
                                 Tanggal Mulai
                             </label>
                             <div class="md:w-3/4">
@@ -368,7 +368,7 @@
 
                         <!-- Tanggal Selesai -->
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                            <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-400 md:w-1/4">
+                            <label class="mb-1.5 block text-xs font-medium text-gray-700 md:w-1/4">
                                 Tanggal Berakhir (Deadline)
                             </label>
                             <div class="md:w-3/4">
@@ -496,12 +496,12 @@
                     const keterangan = keteranganInput ? keteranganInput.value : '';
 
                     sectionHTML += `
-            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4">
+            <div class="border border-gray-200 rounded-lg p-4 mb-4">
                 <div class="flex items-center justify-between mb-3">
-                    <h5 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <h5 class="text-sm font-semibold text-gray-700">
                         RK Anggota ${sectionIndex + 1}
                     </h5>
-                    <span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:text-blue-300">
+                    <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
                         Bagian ${sectionIndex + 1}
                     </span>
                 </div>
@@ -509,29 +509,29 @@
                 <div class="space-y-3">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">RK Anggota</span>
-                            <span class="block text-sm text-gray-800 dark:text-white/90">${rkAnggota || '-'}</span>
+                            <span class="block text-xs font-medium text-gray-500 mb-1">RK Anggota</span>
+                            <span class="block text-sm text-gray-800">${rkAnggota || '-'}</span>
                         </div>
                         <div>
-                            <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Satuan Target</span>
-                            <span class="block text-sm text-gray-800 dark:text-white/90">${satuanTarget || '-'}</span>
+                            <span class="block text-xs font-medium text-gray-500 mb-1">Satuan Target</span>
+                            <span class="block text-sm text-gray-800">${satuanTarget || '-'}</span>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tanggal Mulai</span>
-                            <span class="block text-sm text-gray-800 dark:text-white/90">${tanggalMulai || '-'}</span>
+                            <span class="block text-xs font-medium text-gray-500 mb-1">Tanggal Mulai</span>
+                            <span class="block text-sm text-gray-800">${tanggalMulai || '-'}</span>
                         </div>
                         <div>
-                            <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tanggal Selesai</span>
-                            <span class="block text-sm text-gray-800 dark:text-white/90">${tanggalAkhir || '-'}</span>
+                            <span class="block text-xs font-medium text-gray-500 mb-1">Tanggal Selesai</span>
+                            <span class="block text-sm text-gray-800">${tanggalAkhir || '-'}</span>
                         </div>
                     </div>
 
                     <div>
-                        <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Keterangan</span>
-                            <span class="block text-sm text-gray-800 dark:text-white/90">${keterangan || '-'}</span>
+                        <span class="block text-xs font-medium text-gray-500 mb-1">Keterangan</span>
+                            <span class="block text-sm text-gray-800">${keterangan || '-'}</span>
                     </div>
             `;
 
@@ -545,8 +545,8 @@
 
                     if (detailAnggotas.length > 0) {
                         sectionHTML += `
-                <div class="mt-3 border-t border-gray-100 dark:border-gray-700 pt-3">
-                    <p class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Anggota:</p>
+                <div class="mt-3 border-t border-gray-100 pt-3">
+                    <p class="text-xs font-medium text-gray-600 mb-2">Anggota:</p>
                     <div class="space-y-2">
                 `;
 
@@ -572,22 +572,22 @@
                                 detailTanggalSelesaiInput.value : '';
 
                             sectionHTML += `
-                    <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-3">
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-3">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Anggota ${detailIndex + 1}</span>
+                            <span class="text-xs font-medium text-gray-700">Anggota ${detailIndex + 1}</span>
                             <div>
-                                <span class="text-xs font-medium text-gray-800 dark:text-white/90">${namaAnggota || '-'}</span>
+                                <span class="text-xs font-medium text-gray-800">${namaAnggota || '-'}</span>
                                 ${idAnggota ? `<span class="ml-2 text-xs text-gray-500">(ID: ${idAnggota})</span>` : ''}
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-2 text-xs">
                             <div>
-                                <span class="block text-gray-500 dark:text-gray-400 mb-1">Target</span>
-                                <span class="block text-gray-700 dark:text-gray-300">${target || '-'}</span>
+                                <span class="block text-gray-500 mb-1">Target</span>
+                                <span class="block text-gray-700">${target || '-'}</span>
                             </div>
                             <div>
-                                <span class="block text-gray-500 dark:text-gray-400 mb-1">Tanggal</span>
-                                <span class="block text-gray-700 dark:text-gray-300">${detailTanggalMulai || '-'} s/d ${detailTanggalSelesai || '-'}</span>
+                                <span class="block text-gray-500 mb-1">Tanggal</span>
+                                <span class="block text-gray-700">${detailTanggalMulai || '-'} s/d ${detailTanggalSelesai || '-'}</span>
                             </div>
                         </div>
                     </div>
@@ -609,58 +609,58 @@
         <div class="space-y-6">
             <!-- Header -->
             <div class="text-center">
-                <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 mb-3">
-                    <svg class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 mb-3">
+                    <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90 mb-1">DATA RENCANA KINERJA KETUA</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Review data sebelum disimpan ke database</p>
+                <h3 class="text-lg font-semibold text-gray-800 mb-1">DATA RENCANA KINERJA KETUA</h3>
+                <p class="text-sm text-gray-500">Review data sebelum disimpan ke database</p>
             </div>
 
             <!-- Data Utama -->
-            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">DATA KETUA</h4>
+            <div class="border border-gray-200 rounded-lg p-4">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">DATA KETUA</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-3">
                         <div>
-                            <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tahun</span>
-                            <span class="block text-sm text-gray-800 dark:text-white/90 font-medium">${tahun || '-'}</span>
+                            <span class="block text-xs font-medium text-gray-500 mb-1">Tahun</span>
+                            <span class="block text-sm text-gray-800 font-medium">${tahun || '-'}</span>
                         </div>
                         <div>
-                            <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">RK JPT</span>
-                            <span class="block text-sm text-gray-800 dark:text-white/90">${rkJpt || '-'}</span>
+                            <span class="block text-xs font-medium text-gray-500 mb-1">RK JPT</span>
+                            <span class="block text-sm text-gray-800">${rkJpt || '-'}</span>
                         </div>
                         <div>
-                            <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">IKI JPT</span>
-                            <span class="block text-sm text-gray-800 dark:text-white/90">${ikiJpt || '-'}</span>
+                            <span class="block text-xs font-medium text-gray-500 mb-1">IKI JPT</span>
+                            <span class="block text-sm text-gray-800">${ikiJpt || '-'}</span>
                         </div>
                     </div>
                     <div class="space-y-3">
                         <div>
-                            <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Bidang</span>
-                            <span class="block text-sm text-gray-800 dark:text-white/90 font-medium">${bidangNama || '-'}</span>
+                            <span class="block text-xs font-medium text-gray-500 mb-1">Bidang</span>
+                            <span class="block text-sm text-gray-800 font-medium">${bidangNama || '-'}</span>
                         </div>
                         <div>
-                            <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Ketua</span>
+                            <span class="block text-xs font-medium text-gray-500 mb-1">Ketua</span>
                             <div>
-                                <span class="block text-sm text-gray-800 dark:text-white/90 font-medium">${namaKetua || '-'}</span>
+                                <span class="block text-sm text-gray-800 font-medium">${namaKetua || '-'}</span>
                                 ${idKetua ? `<span class="block text-xs text-gray-500 mt-1">ID: ${idKetua}</span>` : ''}
                             </div>
                         </div>
                         <div>
-                            <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Rencana Kinerja Ketua</span>
-                            <span class="block text-sm text-gray-800 dark:text-white/90">${rkKetua || '-'}</span>
+                            <span class="block text-xs font-medium text-gray-500 mb-1">Rencana Kinerja Ketua</span>
+                            <span class="block text-sm text-gray-800">${rkKetua || '-'}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Data RK Anggota -->
-            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div class="border border-gray-200 rounded-lg p-4">
                 <div class="flex items-center justify-between mb-3">
-                    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">DATA RK ANGGOTA</h4>
-                    <span class="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-800 px-2.5 py-0.5 text-xs font-medium text-gray-700 dark:text-gray-300">
+                    <h4 class="text-sm font-semibold text-gray-700">DATA RK ANGGOTA</h4>
+                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
                         ${sections.length} bagian
                     </span>
                 </div>
@@ -671,18 +671,18 @@
                         </div>
                     ` : `
                         <div class="text-center py-4">
-                            <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 mb-2">
-                                <svg class="h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 mb-2">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                 </svg>
                             </div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Belum ada RK Anggota yang ditambahkan</p>
+                            <p class="text-sm text-gray-500">Belum ada RK Anggota yang ditambahkan</p>
                         </div>
                     `}
             </div>
 
             <!-- Note -->
-            <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+            <div class="flex items-center text-sm text-gray-500">
                 <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>

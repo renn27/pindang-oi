@@ -48,11 +48,11 @@
         $baseClasses = 'rounded-full px-2 text-theme-xs font-medium';
         switch ($status) {
             case 'Success':
-                return "$baseClasses bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500";
+                return "$baseClasses bg-success-50 text-success-600";
             case 'Pending':
-                return "$baseClasses bg-warning-50 text-warning-600 dark:bg-warning-500/15 dark:text-orange-400";
+                return "$baseClasses bg-warning-50 text-warning-600";
             case 'Failed':
-                return "$baseClasses bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500";
+                return "$baseClasses bg-error-50 text-error-600";
             default:
                 return $baseClasses;
         }
@@ -60,11 +60,11 @@
 @endphp
 
 <div
-    class="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6"
+    class="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pb-3 pt-4 sm:px-6"
 >
     <div class="flex justify-between gap-2 mb-4 sm:items-center">
         <div>
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Featured Campaigns</h3>
+            <h3 class="text-lg font-semibold text-gray-800">Featured Campaigns</h3>
         </div>
 
         <div class="relative"></div>
@@ -74,20 +74,20 @@
         <table class="min-w-full">
             <!-- table header start -->
             <thead>
-                <tr class="border-gray-100 border-y dark:border-gray-800">
+                <tr class="border-gray-100 border-y">
                     <th class="py-3 font-normal">
                         <div class="flex items-center">
-                            <p class="text-gray-500 text-theme-sm dark:text-gray-400">Creator</p>
+                            <p class="text-gray-500 text-theme-sm">Creator</p>
                         </div>
                     </th>
                     <th class="py-3 font-normal">
                         <div class="flex items-center">
-                            <p class="text-gray-500 text-theme-sm dark:text-gray-400">Campaign</p>
+                            <p class="text-gray-500 text-theme-sm">Campaign</p>
                         </div>
                     </th>
                     <th class="py-3 font-normal">
                         <div class="flex items-center">
-                            <p class="text-gray-500 text-theme-sm dark:text-gray-400">Status</p>
+                            <p class="text-gray-500 text-theme-sm">Status</p>
                         </div>
                     </th>
                 </tr>
@@ -95,7 +95,7 @@
             <!-- table header end -->
 
             <!-- table body start -->
-            <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+            <tbody class="divide-y divide-gray-100">
                 @foreach ($campaigns as $campaign)
                     <tr>
                         <td class="py-3">
@@ -104,7 +104,7 @@
                                     <img src="{{ $campaign['creator']['imageUrl'] }}" alt="{{ $campaign['creator']['name'] }}" />
                                 </div>
                                 <div>
-                                    <p class="text-gray-700 text-theme-sm dark:text-gray-400">
+                                    <p class="text-gray-700 text-theme-sm">
                                         {{ $campaign['creator']['name'] }}
                                     </p>
                                 </div>
@@ -117,10 +117,10 @@
                                         <img src="{{ $campaign['brand']['logo'] }}" class="size-8" alt="{{ $campaign['brand']['name'] }}" />
                                     </div>
                                     <div class="truncate">
-                                        <p class="mb-0.5 truncate text-theme-sm font-medium text-gray-700 dark:text-gray-400">
+                                        <p class="mb-0.5 truncate text-theme-sm font-medium text-gray-700">
                                             {{ $campaign['title'] }}
                                         </p>
-                                        <span class="text-gray-500 text-theme-xs dark:text-gray-400">
+                                        <span class="text-gray-500 text-theme-xs">
                                             {{ $campaign['type'] }}
                                         </span>
                                     </div>

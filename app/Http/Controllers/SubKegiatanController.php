@@ -65,7 +65,7 @@ class SubKegiatanController extends Controller
 
         $totalTerima = $subKegiatan->penugasans->sum(fn($p) =>
             $p->latestPenerimaan?->jumlah_diterima ?? 0
-);
+        );
 
         return view('pages.main.pegawai.tagihan-kerja.detail-sub-kegiatan', [
             'kegiatan' => $kegiatan,
@@ -81,11 +81,7 @@ class SubKegiatanController extends Controller
     public function update(Request $request, Kegiatan $kegiatan, SubKegiatan $subKegiatan){
         // dd($request->all());
 
-        // 1️⃣ Kegiatan harus milik user
-        $this->authorize('manage', $kegiatan);
-
-        // 2️⃣ Sub kegiatan harus boleh di-update (state)
-        // $this->authorize('update', $subKegiatan); nanti aja kalau kepake
+        $this->authorize('update', $subKegiatan);
 
         $today = today()->format('Y-m-d');
         $validated = $request->validate([
@@ -130,7 +126,6 @@ class SubKegiatanController extends Controller
     }
 
     public function delete(Kegiatan $kegiatan, SubKegiatan $subKegiatan) {
-        $this->authorize('manage', $kegiatan);
         $this->authorize('delete', $subKegiatan);
         // optional safety check
         if ($subKegiatan->id_kegiatan != $kegiatan->id_kegiatan) {

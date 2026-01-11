@@ -42,6 +42,7 @@ class KegiatanController extends Controller
 
     public function store(Request $request, Bidang $bidang) {
         // dd($request->all());
+        $this->authorize('create', Kegiatan::class);
 
         $validated = $request->validate([
             'nama_rk_kegiatan' => ['required', 'string', 'max:255'],
@@ -75,11 +76,11 @@ class KegiatanController extends Controller
     }
 
     public function update(Request $request, Kegiatan $kegiatan) {
-        // $this->authorize('update', $kegiatan);
+        $this->authorize('update', $kegiatan);
     }
 
     public function delete(Kegiatan $kegiatan) {
-        // $this->authorize('delete', $kegiatan);
+        $this->authorize('delete', $kegiatan);
     }
 
 }
