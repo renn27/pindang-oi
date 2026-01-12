@@ -18,7 +18,7 @@
             // Gunakan data is_open dari PHP
             @foreach ($menuGroups as $groupIndex => $menuGroup)
                 @foreach ($menuGroup['items'] as $itemIndex => $item)
-                    @if (isset($item['subItems']) && $item['is_open'])
+                    @if (isset($item['subItems']) && ($item['is_open'] ?? false))
                         this.openSubmenus['{{ $groupIndex }}-{{ $itemIndex }}'] = true;
                     @endif
                 @endforeach
@@ -121,7 +121,7 @@
                                             <svg x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
                                                 class="ml-auto w-5 h-5 transition-transform duration-200"
                                                 :class="{
-                                                    'rotate-180 text-brand-500': isOpen('{{ $key }}', {{ $item['is_open'] ? 'true' : 'false' }})
+                                                    'rotate-180 text-brand-500': isOpen('{{ $key }}', {{ ($item['is_open'] ?? false) ? 'true' : 'false' }})
                                                 }"
                                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -129,7 +129,7 @@
                                         </button>
 
                                         <!-- Submenu -->
-                                        <div x-show="isOpen('{{ $key }}', {{ $item['is_open'] ? 'true' : 'false' }}) && ($store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen)"
+                                        <div x-show="isOpen('{{ $key }}', {{ ($item['is_open'] ?? false) ? 'true' : 'false' }}) && ($store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen)"
                                             x-transition>
                                             <ul class="mt-2 space-y-1 ml-9">
                                                 @foreach ($item['subItems'] as $subItem)
