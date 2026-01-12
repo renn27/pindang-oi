@@ -48,22 +48,24 @@ class Kegiatan extends Model
         return $this->hasMany(SubKegiatan::class, 'id_kegiatan', 'id_kegiatan');
     }
 
-    public function scopeForUser($query, $user)
+    // Untuk Menampilkan data bidang penugasan sesuai dengan yang di assign ke pegawai (baik sebagai ketua ataupun anggota)
+    public function scopeForKetua($query, $pegawai)
     {
-        if (in_array($user->active_role, ['Admin', 'Pimpinan'])) {
+        if (in_array($pegawai->active_role, ['Admin', 'Pimpinan'])) {
             return $query;
         }
 
-        return $query->where(function ($q) use ($user) {
-
-            // 1. Ketua Tim
-            $q->where('id_penanggung_jawab', $user->id_pegawai)
-
-            // 2. Anggota Tim via SubKegiatan → Penugasan
-            ->orWhereHas('subKegiatans.penugasans.anggota', function ($anggota) use ($user) {
-                $anggota->where('id_anggota', $user->id_pegawai);
-            });
-        });
+        return $query->where('id_penanggung_jawab', $pegawai->id_pegawai);
     }
 
+    public function scopeForAnggota($query, $pegawai)
+    {
+        if (in_array($pegawai->active_role, ['Admin', 'Pimpinan'])) {
+            return $query;
+        }
+
+        return $query->whereHas('subKegiatans.penugasans', function ($q) use ($pegawai) {
+            $q->where('id_anggota', $pegawai->id_pegawai);
+        });
+    }
 }

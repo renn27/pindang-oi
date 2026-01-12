@@ -52,6 +52,13 @@ class Pegawai extends Authenticatable
             ->contains($this->id_pegawai);
     }
 
+    public function modeKerja(): string
+    {
+        return $this->active_role === 'Ketua Tim'
+            ? 'ketua'
+            : 'anggota';
+    }
+
     public function kegiatanYangDipimpin() {
         return $this->hasMany(Kegiatan::class, 'id_penanggung_jawab', 'id_pegawai');
     }

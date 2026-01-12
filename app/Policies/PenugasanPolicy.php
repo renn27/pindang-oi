@@ -19,9 +19,7 @@ class PenugasanPolicy
 
     protected function isAssignedAnggota(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        return
-            $pegawai->isAnggota() &&
-            $pegawai->id_pegawai === $penugasan->id_anggota;
+        return $pegawai->id_pegawai === $penugasan->id_anggota;
     }
 
     /**
@@ -70,11 +68,6 @@ class PenugasanPolicy
 
     // === PENGIRIMAN ===
     public function send(Pegawai $pegawai, Penugasan $penugasan): bool
-    {
-        return $this->isAssignedAnggota($pegawai, $penugasan);
-    }
-
-    public function viewHistory(Pegawai $pegawai, Penugasan $penugasan): bool
     {
         return $this->isAssignedAnggota($pegawai, $penugasan);
     }

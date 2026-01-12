@@ -9,7 +9,7 @@
                 </div>
                 <div class="order-3 xl:order-2">
                     <h4 class="mb-2 text-center text-lg font-semibold text-gray-800 xl:text-left">
-                        {{ Auth::user()->nama_pegawai }}
+                        {{ Auth::user()->nama_pegawai }} ({{ Auth::user()->username }})
                     </h4>
                     <div class="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left">
                         <p class="text-sm text-gray-500">
@@ -86,7 +86,9 @@
                     Lakukan perubahan atau penambahan data yang diperlukan
                 </p>
             </div>
-            <form class="flex flex-col">
+            <form method="post" action="{{ route('profile.update') }}" class="flex flex-col">
+                @csrf
+                @method('PATCH')
                 <div class="custom-scrollbar p-2">
                     {{-- Social Links --}}
                     {{-- <div>
@@ -138,7 +140,15 @@
                                 <label class="mb-1.5 block text-sm font-medium text-gray-700">
                                     Nama Lengkap
                                 </label>
-                                <input type="text" value="{{ Auth::user()->nama_pegawai}}"
+                                <input type="text" name="name" id="name" value="{{ Auth::user()->nama_pegawai}}"
+                                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                            </div>
+
+                            <div class="col-span-2 lg:col-span-1">
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                                    Username
+                                </label>
+                                <input type="text" name="username" id="username" value="{{ Auth::user()->username}}"
                                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                             </div>
 
@@ -146,15 +156,34 @@
                                 <label class="mb-1.5 block text-sm font-medium text-gray-700">
                                     Email
                                 </label>
-                                <input type="text" value="{{ Auth::user()->email }}"
+                                <input type="text" id="email" name="email" value="{{  Auth::user()->email }}"
                                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                                <x-input-error class="mt-2" :messages="$errors->get('email')" />
+
+                                @if ( Auth::user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !  Auth::user()->hasVerifiedEmail())
+                                    <div>
+                                        <p class="text-sm mt-2 text-gray-800">
+                                            {{ __('Your email address is unverified.') }}
+
+                                            <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                                {{ __('Click here to re-send the verification email.') }}
+                                            </button>
+                                        </p>
+
+                                        @if (session('status') === 'verification-link-sent')
+                                            <p class="mt-2 font-medium text-sm text-green-600">
+                                                {{ __('A new verification link has been sent to your email address.') }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
 
-                            <div class="col-span-2">
+                            <div class="col-span-2 lg:col-span-1">
                                 <label class="mb-1.5 block text-sm font-medium text-gray-700">
                                     Jabatan
                                 </label>
-                                <input type="text" value="{{ Auth::user()->jabatan }}"
+                                <input type="text" id="jabatan" name="jabatan" value="{{ Auth::user()->jabatan }}"
                                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                             </div>
 
@@ -162,7 +191,7 @@
                                 <label class="mb-1.5 block text-sm font-medium text-gray-700">
                                     Alamat
                                 </label>
-                                <input type="text" value="{{ Auth::user()->alamat }}" placeholder="{{ Auth::user()->alamat ? '' : 'Alamat belum diisi' }}"
+                                <input type="text" id="alamat" name="alamat" value="{{ Auth::user()->alamat }}" placeholder="{{ Auth::user()->alamat ? '' : 'Alamat belum diisi' }}"
                                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                             </div>
                         </div>
@@ -173,7 +202,7 @@
                         class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto">
                         Close
                     </button>
-                    <button @click="saveProfile" type="button"
+                    <button type="submit"
                         class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
                         Save Changes
                     </button>
