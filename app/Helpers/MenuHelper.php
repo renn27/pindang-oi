@@ -15,7 +15,7 @@ class MenuHelper
         $menus = [
             [
                 'icon' => 'dashboard',
-                'name' => 'Dashboard',
+                'name' => 'Beranda Dashboard',
                 'path' => '/',
             ],
             [
