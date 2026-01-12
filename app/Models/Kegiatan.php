@@ -32,7 +32,7 @@ class Kegiatan extends Model
 
     public function rencanaJpt()
     {
-        return $this->belongsTo(RencanaJpt::class, 'rk_jpt', 'id');
+        return $this->belongsTo(RencanaJPT::class, 'rk_jpt', 'id');
     }
 
     public function indikatorJpt()
