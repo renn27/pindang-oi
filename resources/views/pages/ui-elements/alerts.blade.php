@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
 
 @section('content')
     <x-common.page-breadcrumb pageTitle="Alerts" />
@@ -93,11 +93,11 @@
             <div class="space-y-4">
                 {{-- With Slot Content --}}
                 <x-ui.alert variant="success" title="Custom Content Alert">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                        This alert uses <strong class="text-gray-900 dark:text-white">custom slot content</strong>
+                    <p class="text-sm text-gray-500">
+                        This alert uses <strong class="text-gray-900">custom slot content</strong>
                         instead of the message prop.
                     </p>
-                    <ul class="mt-2 text-sm text-gray-500 dark:text-gray-400 list-disc list-inside">
+                    <ul class="mt-2 text-sm text-gray-500 list-disc list-inside">
                         <li>You can add any HTML content</li>
                         <li>Including lists and formatting</li>
                         <li>Perfect for complex messages</li>
@@ -128,14 +128,14 @@
             <div class="space-y-4">
                 {{-- Payment Success --}}
                 <x-ui.alert variant="success" title="Payment Successful">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                        Your payment of <strong class="text-gray-900 dark:text-white">$99.00</strong> has been processed successfully.
+                    <p class="text-sm text-gray-500 mb-2">
+                        Your payment of <strong class="text-gray-900">$99.00</strong> has been processed successfully.
                     </p>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                    <div class="text-sm text-gray-500">
                         <p><strong>Order ID:</strong> #TAILADMIN-0014</p>
                         <p><strong>Transaction ID:</strong> TXN-1234567890</p>
                     </div>
-                    <a href="/orders" class="inline-block mt-3 text-sm font-medium text-green-600 dark:text-green-400 underline hover:text-green-700">
+                    <a href="/orders" class="inline-block mt-3 text-sm font-medium text-green-600 underline hover:text-green-700">
                         View Order Details
                     </a>
                 </x-alert>
@@ -152,7 +152,7 @@
 
                 {{-- Validation Error --}}
                 <x-ui.alert variant="error" title="Form Validation Failed">
-                    <ul class="text-sm text-gray-500 dark:text-gray-400 list-disc list-inside space-y-1">
+                    <ul class="text-sm text-gray-500 list-disc list-inside space-y-1">
                         <li>Email field is required</li>
                         <li>Password must be at least 8 characters</li>
                         <li>Please accept the terms and conditions</li>

@@ -1,202 +1,121 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\TimKerjaController;
+use App\Models\Role;
+use Illuminate\Http\Request;
 use App\Http\Controllers\BidangController;
 use App\Http\Controllers\IndikatorJPTController;
 use App\Http\Controllers\KegiatanController;
+use App\Http\Controllers\MasterKegiatanController;
+use App\Http\Controllers\PenerimaanController;
+use App\Http\Controllers\PengirimanController;
+use App\Http\Controllers\PenugasanController;
 use App\Http\Controllers\RencanaJPTController;
+use App\Http\Controllers\SubKegiatanController;
+use App\Http\Controllers\PegawaiRoleController;
+use Illuminate\Support\Facades\Auth;
 
-// dashboard pages
 Route::get('/', function () {
-    return view('pages.dashboard', ['title' => 'Pindang Dashboard']);
-})->name('dashboard');
+    return view('pages.dashboard', [
+        'title' => 'Dashboard',
+    ]);
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-// dll pages
-Route::get('/dll', function () {
-    return view('pages.dashboard.ecommerce', ['title' => 'E-commerce Dashboard']);
-})->name('dll');
-
-// calender pages
-Route::get('/calendar', function () {
-    return view('pages.calender', ['title' => 'Calendar']);
-})->name('calendar');
-
-// profile pages
-Route::get('/profile', function () {
-    return view('pages.profile', ['title' => 'Profile']);
-})->name('profile');
-
-// form pages
-Route::get('/form-elements', function () {
-    return view('pages.form.form-elements', ['title' => 'Form Elements']);
-})->name('form-elements');
-
-// tables pages
-Route::get('/basic-tables', function () {
-    return view('pages.tables.basic-tables', ['title' => 'Basic Tables']);
-})->name('basic-tables');
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', function () {
+        return view('pages.profile', ['title' => 'Profile']);
+    })->name('profile');
 
 
-// CRUD BIDANG KERJA BY ADMIN
-Route::prefix('bidang-kerja')->group(function () {
-    Route::get('/', [BidangController::class, 'index'])->name('bidang.index');
-    Route::get('/create', [BidangController::class, 'create'])->name('bidang.create');
-    Route::post('/', [BidangController::class, 'store'])->name('bidang.store');
-    Route::get('/{slug}', [BidangController::class, 'show'])->name('bidang.show');
-});
+    // Switching Role
+    Route::get('/role-pegawai', [PegawaiRoleController::class, 'index'])
+        ->name('pegawai-role.index');
 
-// CRUD RK IKI JPT BY PIMPINAN
-Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(function () {
+    Route::post('/role-pegawai', [PegawaiRoleController::class, 'store'])
+        ->name('pegawai-role.store');
 
-    // ROUTE UNTUK RENCANA JPT
-    Route::prefix('rencana')->name('rencana.')->group(function () {
-        Route::get('/', [RencanaJPTController::class, 'index'])->name('index');
-        Route::post('/', [RencanaJPTController::class, 'store'])->name('store');
-        Route::put('/{rencanaJpt}', [RencanaJPTController::class, 'update'])->name('update');
-        Route::delete('/{rencanaJpt}', [RencanaJPTController::class, 'delete'])->name('delete');
+    Route::post('/switch-role/{role}', [PegawaiRoleController::class, 'switchRolePegawai'])
+        ->name('pegawai-role.switchRolePegawai');
+
+    // CRUD RK IKI JPT BY PIMPINAN
+    Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(function () {
+        // ROUTE UNTUK RENCANA JPT
+        Route::prefix('rencana')->name('rencana.')->group(function () {
+            Route::get('/', [RencanaJPTController::class, 'index'])->name('index');
+            Route::post('/', [RencanaJPTController::class, 'store'])->name('store');
+            Route::put('/{rencanaJpt}', [RencanaJPTController::class, 'update'])->name('update');
+            Route::delete('/{rencanaJpt}', [RencanaJPTController::class, 'delete'])->name('delete');
+        });
+
+        // ROUTE UNTUK INDIKATOR JPT
+        Route::prefix('{rencanaJpt}/indikator')->name('indikator.')->group(function () {
+            // Select data IKI By RK
+            Route::get('/', [RencanaJPTController::class, 'indikator'])->name('rencana-jpt.indikator');
+            Route::post('/', [IndikatorJPTController::class, 'store'])->name('store');
+            Route::put('/{indikatorJpt}', [IndikatorJPTController::class, 'update'])->name('update');
+            Route::delete('/{indikatorJpt}', [IndikatorJPTController::class, 'delete'])->name('delete');
+        });
     });
+    // END RK IKI JPT BY PIMPINAN
 
-    // ROUTE UNTUK INDIKATOR JPT
-    Route::prefix('{rencanaJpt}/indikator')->name('indikator.')->group(function () {
-        Route::post('/', [IndikatorJPTController::class, 'store'])->name('store');
-        Route::put('/{indikatorJPT}', [IndikatorJPTController::class, 'update'])->name('update');
-        Route::delete('/{indikatorJPT}', [IndikatorJPTController::class, 'delete'])->name('delete');
+    // CRUD BIDANG KERJA BY ADMIN
+    Route::prefix('bidang-kerja')->group(function () {
+        Route::get('/', [BidangController::class, 'index'])->name('bidang.index');
+        Route::get('/create', [BidangController::class, 'create'])->name('bidang.create');
+        Route::post('/', [BidangController::class, 'store'])->name('bidang.store');
+        Route::put('/{bidang:slug}', [BidangController::class, 'update'])->name('bidang.update');
+        Route::delete('/{bidang:slug}', [BidangController::class, 'delete'])->name('bidang.delete');
     });
+    // END BIDANG KERJA BY ADMIN
+
+    // CRUD KEGIATAN & SUB KEGIATAN BY KETUA TIM
+    Route::prefix('kegiatan')->group(function () {
+        // Kegiatan
+        Route::get('/bidang/{bidang:slug}', [KegiatanController::class, 'index'])->name('kegiatan.index')->middleware('can:viewAny,App\Models\Kegiatan');
+        Route::post('/bidang/{bidang:slug}', [KegiatanController::class, 'store'])->name('kegiatan.store')->middleware('can:create,App\Models\Kegiatan');
+        Route::put('/{kegiatan:id_kegiatan}', [KegiatanController::class, 'update'])->name('kegiatan.update')->middleware('can:update,kegiatan');
+        Route::delete('/{kegiatan:id_kegiatan}', [KegiatanController::class, 'delete'])->name('kegiatan.delete')->middleware('can:delete,kegiatan');
+
+        // Sub Kegiatan
+        Route::prefix('{kegiatan:id_kegiatan}/sub-kegiatan')->group(function () {
+            Route::post('/', [SubKegiatanController::class, 'store'])->name('sub.kegiatan.store')->middleware('can:create,App\Models\SubKegiatan,kegiatan');; // create
+            Route::get('/{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'show'])->name('sub.kegiatan.show')->middleware('can:view,subKegiatan');; // show detail
+            Route::put('/{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'update'])->name('sub.kegiatan.update')->middleware('can:update,subKegiatan');; // edit
+            Route::delete('/{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'delete'])->name('sub.kegiatan.delete')->middleware('can:delete,subKegiatan');; // delete
+        });
+    });
+    // END KEGIATAN & SUB KEGIATAN BY KETUA TIM
+
+    // CRUD PENUGASAN  BY KETUA TIM
+    Route::prefix('sub-kegiatan/{subKegiatan:id_sub_kegiatan}')->group(function () {
+        // CRUD PENUGASAN BY KETUA TIM
+        Route::prefix('penugasan')->group(function () {
+            Route::post('/', [PenugasanController::class, 'store'])->name('penugasan.store')->middleware('can:create,App\Models\Penugasan,subKegiatan');; // create
+            Route::put('/{penugasan:id_penugasan}', [PenugasanController::class, 'update'])->name('penugasan.update') ->middleware('can:update,penugasan');; // edit
+            Route::delete('/{penugasan}', [PenugasanController::class, 'delete'])->name('penugasan.delete')->middleware('can:delete,penugasan');; // delete
+
+            // CRUD PENGIRIMAN BY ANGGOTA TIM
+            Route::prefix('{penugasan:id_penugasan}/pengirimans')->group(function () {
+                Route::post('/', [PengirimanController::class, 'store'])->name('pengiriman.store')->middleware('can:send,penugasan'); // create pengiriman
+
+                Route::prefix('{pengirimans:id_pengiriman}/penerimaan')->middleware('can:receive,penugasan')->group(function () {
+                    Route::post('/', [PenerimaanController::class, 'store'])->name('penerimaan.store'); // create penerimaan
+                });
+            });
+        });
+    });
+    // CRUD PENUGASAN  BY KETUA TIM
+
+    // ROUTE MASTER KEGIATAN
+    Route::prefix('/master-kegiatan')->middleware('can:create,App\Models\Kegiatan')->group(function () {
+        Route::get('/', [MasterKegiatanController::class, 'index'])->name('master-kegiatan.index');
+        Route::post('/', [MasterKegiatanController::class, 'store'])->name('master-kegiatan.store');
+    });
+    // END ROUTE MASTER KEGIATAN
 });
 
-// CRUD KEGIATAN BY KETUA
-Route::prefix('rencana-kerja')->group(function () {
-    Route::get('/', [KegiatanController::class, 'index'])->name('rencana.index');
-    Route::post('/', [KegiatanController::class, 'store'])->name('rencana.store');
-    Route::put('/{rencanaKerja}', [KegiatanController::class, 'update'])->name('rencana.update');
-    Route::get('/{slug}', [KegiatanController::class, 'show'])->name('rencana.show');
-});
-
-
-
-// tim kerja
-Route::get('/tim-kerja', function () {
-    return view('pages.rencana-kerja.tim-kerja', ['title' => 'Tim Kerja']);
-})->name('tim-kerja');
-
-// tim kerja
-Route::get('/rk-ketua', function () {
-    return view('pages.rencana-kerja.rk-ketua', ['title' => 'Rencana Kerja Ketua']);
-})->name('rk-ketua');
-
-// daftar kegiatan
-Route::get('/daftar-kegiatan', function () {
-    return view('pages.rencana-kerja.daftar-kegiatan', ['title' => 'Daftar Kegiatan']);
-})->name('daftar-kegiatan');
-
-
-
-
-
-
-
-
-
-
-// pages
-
-Route::get('/blank', function () {
-    return view('pages.blank', ['title' => 'Blank']);
-})->name('blank');
-
-// error pages
-Route::get('/error-404', function () {
-    return view('pages.errors.error-404', ['title' => 'Error 404']);
-})->name('error-404');
-
-// chart pages
-Route::get('/line-chart', function () {
-    return view('pages.chart.line-chart', ['title' => 'Line Chart']);
-})->name('line-chart');
-
-Route::get('/bar-chart', function () {
-    return view('pages.chart.bar-chart', ['title' => 'Bar Chart']);
-})->name('bar-chart');
-
-
-// authentication pages
-Route::get('/signin', function () {
-    return view('pages.auth.signin', ['title' => 'Sign In']);
-})->name('signin');
-
-Route::get('/signup', function () {
-    return view('pages.auth.signup', ['title' => 'Sign Up']);
-})->name('signup');
-
-// ui elements pages
-Route::get('/alerts', function () {
-    return view('pages.ui-elements.alerts', ['title' => 'Alerts']);
-})->name('alerts');
-
-Route::get('/avatars', function () {
-    return view('pages.ui-elements.avatars', ['title' => 'Avatars']);
-})->name('avatars');
-
-Route::get('/badge', function () {
-    return view('pages.ui-elements.badges', ['title' => 'Badges']);
-})->name('badges');
-
-Route::get('/buttons', function () {
-    return view('pages.ui-elements.buttons', ['title' => 'Buttons']);
-})->name('buttons');
-
-Route::get('/image', function () {
-    return view('pages.ui-elements.images', ['title' => 'Images']);
-})->name('images');
-
-Route::get('/videos', function () {
-    return view('pages.ui-elements.videos', ['title' => 'Videos']);
-})->name('videos');
-
-
-//crud tabel tim kerja
-
-Route::get('/tim-kerjates', [TimKerjaController::class, 'index']);
-Route::get('/tim-kerja/data', [TimKerjaController::class, 'data'])->name('tim-kerja.data');
-Route::post('/tim-kerja', [TimKerjaController::class, 'store'])->name('tim-kerja.store');
-Route::put('/tim-kerja/{id}', [TimKerjaController::class, 'update'])->name('tim-kerja.update');
-Route::delete('/tim-kerja/{id}', [TimKerjaController::class, 'destroy'])->name('tim-kerja.destroy');
-
-//halaman bidang kerja
-// Route::get('/bidang-kerja', function () {
-//     return view('pages.bidang-kerja', ['title' => 'Bidang Kerja']);
-// })->name('bidang-kerja');
-
-//halaman bidang kerja 2
-Route::get('/bidang-kerja2', function () {
-    return view('pages.bidang-kerja2', ['title' => 'Bidang Kerja 2']);
-})->name('bidang-kerja2');
-
-//halaman detail kegiatan
-Route::get('/detail-kegiatan', function () {
-    return view('pages.detail-kegiatan', ['title' => 'Bidang Kerja']);
-})->name('detail-kegiatan');
-
-// Routes untuk Bidang (Dinamis)
-Route::prefix('bidang')->group(function () {
-    // Halaman utama bidang
-    Route::get('/', [BidangController::class, 'index'])->name('bidang.index');
-
-    // Halaman detail bidang
-    Route::get('/{id}', [BidangController::class, 'show'])->name('bidang.show');
-
-    // Sub-halaman untuk tiap bidang
-    Route::get('/{id}/kegiatan', [BidangController::class, 'kegiatan'])->name('bidang.kegiatan');
-    Route::get('/{id}/laporan', [BidangController::class, 'laporan'])->name('bidang.laporan');
-
-    // Route khusus untuk beberapa bidang (contoh)
-    Route::get('/spbe/kegiatan', function () {
-        $bidang = \App\Models\Bidang::where('nama_bidang', 'like', '%SPBE%')->first();
-        if ($bidang) {
-            return redirect()->route('bidang.kegiatan', $bidang->id_bidang);
-        }
-        return redirect()->route('bidang.index');
-    })->name('bidang.spbe');
-});
+require __DIR__.'/auth.php';

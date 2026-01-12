@@ -1,5 +1,5 @@
 
-@extends('layouts.app')
+@extends('layouts.dashboard')
 
 @section('content')
     {{-- Page Breadcrumb --}}

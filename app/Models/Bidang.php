@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class Bidang extends Model
 {
@@ -22,26 +23,66 @@ class Bidang extends Model
         'detail_bidang',
     ];
 
-    protected $dates = [
-        'deleted_at' // Tambahkan ini untuk soft delete
-    ];
+    // public static function getNavItems() {
+    //     $currentBidang = request()->route('bidang');
 
-    // Method untuk mendapatkan data bidang dalam format array navbar
-    public static function getNavItems()
+    //     return self::whereNull('deleted_at')
+    //         ->orderBy('nama_bidang')
+    //         ->get()
+    //         ->map(function ($bidang) use ($currentBidang) {
+    //             $isActive = $currentBidang
+    //                 && $currentBidang->slug === $bidang->slug;
+
+    //             return [
+    //                 'name'      => $bidang->nama_bidang,
+    //                 'path'      => route('kegiatan.index', $bidang->slug),
+    //                 'icon'      => 'dashboard',
+    //                 'is_active' => $isActive, 
+    //             ];
+    //         })
+    //         ->toArray();
+    // }
+
+    public static function getNavItems(): array
     {
-        $bidangs = self::whereNull('deleted_at')->orderBy('nama_bidang')->get();
+        $user = Auth::user();
+        $currentBidang = request()->route('bidang');
 
-        $navItems = [];
-        foreach ($bidangs as $bidang) {
-            $navItems[] = [
-                'name' => $bidang->nama_bidang,
-                'path' => '/bidang-kerja/' . $bidang->slug, // atau slug jika ada
-                'icon' => 'dashboard', // default icon
-            ];
+        $query = self::query()->whereNull('deleted_at');
+
+        if ($user && ! in_array($user->active_role, ['Admin', 'Pimpinan'])) {
+
+            $query->whereHas('kegiatans', function ($kegiatan) use ($user) {
+
+                $kegiatan->where(function ($q) use ($user) {
+
+                    // ✅ 1. Ketua Tim
+                    $q->where('id_penanggung_jawab', $user->id_pegawai)
+
+                    // ✅ 2. Anggota Tim → lewat SubKegiatan → Penugasan
+                    ->orWhereHas('subKegiatans.penugasans.anggota', function ($anggota) use ($user) {
+                        $anggota->where('id_anggota', $user->id_pegawai);
+                    });
+                });
+            });
         }
 
-        return $navItems;
+        return $query
+            ->orderBy('nama_bidang')
+            ->get()
+            ->map(function ($bidang) use ($currentBidang) {
+                return [
+                    'name'      => $bidang->nama_bidang,
+                    'path'      => route('kegiatan.index', $bidang->slug),
+                    'icon'      => 'dashboard',
+                    'is_active' => $currentBidang && $currentBidang->slug === $bidang->slug,
+                ];
+            })
+            ->toArray();
     }
+
+
+
 
     // Generate slug from nama_bidang
     protected static function sluggable()
@@ -55,7 +96,7 @@ class Bidang extends Model
 
     // Relationships
     public function kegiatans() {
-        return $this->hasMany(Kegiatan::class, 'id_bidang', 'id_bidang')->whereNull('deleted_at');
+        return $this->hasMany(Kegiatan::class, 'id_bidang', 'id_bidang');
     }
 }
 

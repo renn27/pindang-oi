@@ -30,7 +30,7 @@
                 this.files.splice(index, 1);
             }
         }"
-        class="transition border border-gray-300 border-dashed cursor-pointer dark:hover:border-brand-500 dark:border-gray-700 rounded-xl hover:border-brand-500"
+        class="transition border border-gray-300 border-dashed cursor-pointer rounded-xl hover:border-brand-500"
     >
         <div 
             @drop.prevent="handleDrop($event)"
@@ -38,8 +38,8 @@
             @dragleave.prevent="isDragging = false"
             @click="$refs.fileInput.click()"
             :class="isDragging 
-                ? 'border-brand-500 bg-gray-100 dark:bg-gray-800' 
-                : 'border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-900'"
+                ? 'border-brand-500 bg-gray-100' 
+                : 'border-gray-300 bg-gray-50'"
             class="dropzone rounded-xl border-dashed border-gray-300 p-7 lg:p-10 transition-colors cursor-pointer"
             id="demo-upload"
         >
@@ -57,7 +57,7 @@
             <div class="flex flex-col items-center m-0">
                 <!-- Icon Container -->
                 <div class="mb-[22px] flex justify-center">
-                    <div class="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                    <div class="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-gray-200 text-gray-700">
                         <svg
                             class="fill-current"
                             width="29"
@@ -75,12 +75,12 @@
                 </div>
 
                 <!-- Text Content -->
-                <h4 class="mb-3 font-semibold text-gray-800 text-theme-xl dark:text-white/90">
+                <h4 class="mb-3 font-semibold text-gray-800 text-theme-xl">
                     <span x-show="!isDragging">Drag & Drop Files Here</span>
                     <span x-show="isDragging" x-cloak>Drop Files Here</span>
                 </h4>
 
-                <span class="text-center mb-5 block w-full max-w-[290px] text-sm text-gray-700 dark:text-gray-400">
+                <span class="text-center mb-5 block w-full max-w-[290px] text-sm text-gray-700">
                     Drag and drop your PNG, JPG, WebP, SVG images here or browse
                 </span>
 
@@ -91,21 +91,21 @@
         </div>
 
         <!-- File Preview List (Optional) -->
-        <div x-show="files.length > 0" class="mt-4 p-4 border-t border-gray-200 dark:border-gray-700" x-cloak>
-            <h5 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Uploaded Files:</h5>
+        <div x-show="files.length > 0" class="mt-4 p-4 border-t border-gray-200" x-cloak>
+            <h5 class="text-sm font-semibold text-gray-700 mb-3">Uploaded Files:</h5>
             <ul class="space-y-2">
                 <template x-for="(file, index) in files" :key="index">
-                    <li class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <li class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <span class="text-sm text-gray-700 dark:text-gray-300" x-text="file.name"></span>
+                            <span class="text-sm text-gray-700" x-text="file.name"></span>
                         </div>
                         <button 
                             @click.stop="removeFile(index)"
                             type="button"
-                            class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                            class="text-red-500 hover:text-red-700"
                         >
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

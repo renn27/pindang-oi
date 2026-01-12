@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Carbon::setLocale('id');
     }
+
+    protected $policies = [
+        \App\Models\Kegiatan::class => \App\Policies\KegiatanPolicy::class,
+        \App\Models\SubKegiatan::class => \App\Policies\SubKegiatanPolicy::class,
+    ];
 }

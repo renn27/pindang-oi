@@ -8,13 +8,6 @@ use App\Models\RencanaJPT;
 
 class IndikatorJPTController extends Controller
 {
-    public function index()
-    {
-        $rencanaJpts = IndikatorJPT::with(['indikatorjpts'])->get();
-
-        return view('pages.admin.rk-iki-jpt.index', ['title' => 'Rencana Kerja dan IKI Pimpinan', 'rencanaJpts' => $rencanaJpts]);
-    }
-
     public function store(Request $request, RencanaJPT $rencanaJpt)
     {
         $validatedData = $request->validate([
@@ -35,42 +28,41 @@ class IndikatorJPTController extends Controller
         }
     }
 
-    public function update(Request $request, IndikatorJPT $indikatorJpt)
+    public function update(Request $request, RencanaJPT $rencanaJpt, IndikatorJPT $indikatorJpt)
     {
         $validatedData = $request->validate([
             'nama_indikator_jpt' => 'required|string|max:255',
         ]);
 
-        try {
-            $indikatorJpt = IndikatorJPT::update($validatedData);
+        // pastikan indikator milik rencana tsb
+        if ($indikatorJpt->id_rencana_jpt !== $rencanaJpt->id) {
+            abort(403);
+        }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Indikator JPT berhasil diubah',
-                'data' => $indikatorJpt
-            ]);
+        try {
+            $indikatorJpt->update($validatedData);
+
+            return back()->with('success', 'Indikator JPT berhasil diperbarui!');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal mengubah Indikator JPT: ' . $e->getMessage()
-            ], 500);
+            return back()
+                ->with('error', 'Gagal memperbarui Indikator JPT.')
+                ->withInput();
         }
     }
 
-    public function delete(IndikatorJPT $indikatorJpt)
+    public function delete(RencanaJPT $rencanaJpt, IndikatorJPT $indikatorJpt)
     {
+        // safety check
+        if ($indikatorJpt->id_rencana_jpt !== $rencanaJpt->id) {
+            abort(403);
+        }
+
         try {
             $indikatorJpt->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Indikator JPT berhasil dihapus'
-            ]);
+            return back()->with('success', 'Indikator JPT berhasil dihapus');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menghapus Indikator JPT: ' . $e->getMessage()
-            ], 500);
+            return back()->with('error', 'Gagal menghapus Indikator JPT');
         }
     }
 }

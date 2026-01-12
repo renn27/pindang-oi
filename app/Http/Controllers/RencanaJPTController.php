@@ -12,8 +12,16 @@ class RencanaJPTController extends Controller
     {
         $rencanaJpts = RencanaJPT::with(['indikatorjpts'])->get();
 
-        return view('pages.admin.rk-iki-jpt.index', ['title' => 'Rencana Kerja dan IKI Pimpinan', 'rencanaJpts' => $rencanaJpts]);
+        return view('pages.main.admin.rk-iki-jpt.index', ['title' => 'Rencana Kerja dan IKI Pimpinan', 'rencanaJpts' => $rencanaJpts]);
     }
+
+    public function indikator(RencanaJPT $rencanaJpt)
+    {
+        return $rencanaJpt->indikatorJpts()
+            ->orderBy('nama_indikator_jpt')
+            ->get(['id', 'nama_indikator_jpt']);
+    }
+
 
     public function store(Request $request)
     {
@@ -92,5 +100,4 @@ class RencanaJPTController extends Controller
                 ->with('error', 'Gagal menghapus Rencana JPT');
         }
     }
-
 }
