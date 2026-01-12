@@ -164,7 +164,7 @@
                                             nama_rk_kegiatan: '{{ $kegiatan->nama_rk_kegiatan }}'
                                         }
                                     })"
-                                                    class="flex items-center gap-2 rounded-full border border-gray-300
+                                class="flex items-center gap-2 rounded-full border border-gray-300
                                 bg-white px-4 py-3 text-sm font-medium text-gray-700
                                 shadow-theme-xs hover:bg-green-50 hover:text-green-700
                                 hover:border-green-300 transition-all duration-200">
