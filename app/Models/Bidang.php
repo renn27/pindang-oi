@@ -30,21 +30,21 @@ class Bidang extends Model
 
         $query = self::query()->whereNull('deleted_at');
 
-        if ($user && ! in_array($user->active_role, ['Admin', 'Pimpinan'])) {
+        if ($user) {
 
-            $query->whereHas('kegiatans', function ($kegiatan) use ($user) {
-
-                $kegiatan->where(function ($q) use ($user) {
-
-                    // ✅ 1. Ketua Tim
-                    $q->where('id_penanggung_jawab', $user->id_pegawai)
-
-                    // ✅ 2. Anggota Tim → lewat SubKegiatan → Penugasan
-                    ->orWhereHas('subKegiatans.penugasans.anggota', function ($anggota) use ($user) {
-                        $anggota->where('id_anggota', $user->id_pegawai);
-                    });
+            // MODE KETUA TIM
+            if ($user->active_role === 'Ketua Tim') {
+                $query->whereHas('kegiatans', function ($q) use ($user) {
+                    $q->where('id_penanggung_jawab', $user->id_pegawai);
                 });
-            });
+            }
+
+            // MODE ANGGOTA TIM
+            if ($user->active_role === 'Anggota Tim') {
+                $query->whereHas('kegiatans.subKegiatans.penugasans', function ($q) use ($user) {
+                    $q->where('id_anggota', $user->id_pegawai);
+                });
+            }
         }
 
         return $query
@@ -60,7 +60,6 @@ class Bidang extends Model
             })
             ->toArray();
     }
-
 
 
 

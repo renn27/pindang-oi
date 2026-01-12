@@ -13,17 +13,35 @@ use Illuminate\Support\Facades\Auth;
 class KegiatanController extends Controller
 {
     public function index(Bidang $bidang) {
-        $user = Auth::user();
+        $pegawai = Auth::user();
         // Data utama
         $this->authorize('viewAny', Kegiatan::class);
-        $kegiatans = $bidang->kegiatans()
-            ->forUser($user)
-            ->with([
-                'subKegiatans' => fn ($q) => $q->forUser($user),
-                'rencanaJpt',
-                'indikatorJpt'
-            ])
-            ->get();
+        $kegiatanQuery = $bidang->kegiatans()
+                ->with([
+                    'subKegiatans' => function ($q) use ($pegawai) {
+
+                        // MODE ANGGOTA → subkegiatan harus ada penugasan dia
+                        if ($pegawai->active_role === 'Anggota Tim') {
+                            $q->whereHas('penugasans', function ($p) use ($pegawai) {
+                                $p->where('id_anggota', $pegawai->id_pegawai);
+                            });
+                        }
+
+                        // MODE KETUA → tidak difilter
+                    },
+                    'rencanaJpt',
+                    'indikatorJpt'
+            ]);
+
+        if ($pegawai->active_role === 'Anggota Tim') {
+            $kegiatanQuery->forAnggota($pegawai);
+        }
+
+        if ($pegawai->active_role === 'Ketua Tim') {
+            $kegiatanQuery->forKetua($pegawai);
+        }
+
+        $kegiatans = $kegiatanQuery->get();
 
         // Data referensi untuk dropdown modal
         $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
@@ -50,7 +68,7 @@ class KegiatanController extends Controller
 
     public function store(Request $request, Bidang $bidang) {
         // dd($request->all());
-        
+
         $this->authorize('create', Kegiatan::class);
 
         $validated = $request->validate([
@@ -114,7 +132,7 @@ class KegiatanController extends Controller
                 ->route('kegiatan.index', $kegiatan->bidang->slug)
                 ->with('success', 'Kegiatan berhasil diperbarui.');
         } catch (\Exception $e) {
-            dd($e->getMessage()); 
+            dd($e->getMessage());
 
             return redirect()->back()
                 ->with('error', 'Gagal memperbarui Kegiatan. Silakan coba lagi.')

@@ -28,11 +28,18 @@ class ProfileController extends Controller
 
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        // dd($request->all());
         $user = $request->user();
+        $data = $request->validated();
+        // mapping name → nama_pegawai
+        if (isset($data['name'])) {
+            $data['nama_pegawai'] = $data['name'];
+            unset($data['name']);
+        }
 
         // Update field selain password
         $user->fill(
-            collect($request->validated())
+            collect($data)
                 ->except('password')
                 ->toArray()
         );
@@ -49,10 +56,9 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return Redirect::route('profile.edit')
-            ->with('status', 'profile-updated');
+        return Redirect::route('profile')
+            ->with('success', 'Profil berhasil diubah');
     }
-
 
     /**
      * Delete the user's account.

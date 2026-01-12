@@ -216,6 +216,17 @@
                                         Aksi
                                     </button>
 
+                                    @php
+                                        $latestPengiriman = $penugasan->latestPengiriman;
+                                        $latestPenerimaan = $penugasan->latestPenerimaan;
+
+                                        $statusPenerimaan = $latestPenerimaan?->status;
+
+                                        // boleh melakukan aksi
+                                        $bolehAksi =
+                                            is_null($latestPengiriman) ||        // belum ada pengiriman
+                                            $statusPenerimaan === 'Direvisi';    // sudah ada tapi direvisi
+                                    @endphp
                                     <!-- Dropdown menu FIXED POSITION -->
                                     <div x-show="showDropdown" x-transition:enter="transition ease-out duration-150"
                                         x-transition:enter-start="opacity-0 scale-95"
@@ -228,110 +239,114 @@
                                         x-on:mouseenter="showDropdown = true" x-on:mouseleave="closeDropdown()">
 
                                         @can('update', $penugasan)
-                                            {{-- Edit Data Penugasan --}}
-                                            <button
-                                                class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
-                                                @click="$dispatch('open-smart-modal', {
-                                                modalId: 'modal-penugasan-anggota',
-                                                mode: 'edit',
-                                                key: '{{ $penugasan->id_penugasan }}',
-                                                data: {
-                                                    id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
-                                                    nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
-                                                    id_anggota: @js($penugasan->id_anggota),
-                                                    nama_anggota: @js($penugasan->anggota?->nama_pegawai),
-                                                    target: @js($penugasan->target),
-                                                    tanggal_mulai: @js($penugasan->tanggal_mulai),
-                                                    tanggal_selesai: @js($penugasan->tanggal_selesai),
-                                                    status: @js($penugasan->status),
-                                                }
+                                            @if($bolehAksi)
+                                                {{-- Edit Data Penugasan --}}
+                                                <button
+                                                    class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
+                                                    @click="$dispatch('open-smart-modal', {
+                                                    modalId: 'modal-penugasan-anggota',
+                                                    mode: 'edit',
+                                                    key: '{{ $penugasan->id_penugasan }}',
+                                                    data: {
+                                                        id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
+                                                        nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
+                                                        id_anggota: @js($penugasan->id_anggota),
+                                                        nama_anggota: @js($penugasan->anggota?->nama_pegawai),
+                                                        target: @js($penugasan->target),
+                                                        tanggal_mulai: @js($penugasan->tanggal_mulai),
+                                                        tanggal_selesai: @js($penugasan->tanggal_selesai),
+                                                        status: @js($penugasan->status),
+                                                    }
 
-                                            })">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                </svg> Edit Penugasan
-                                            </button>
+                                                })">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                    </svg> Edit Penugasan
+                                                </button>
+                                            @endif
                                         @endcan
 
                                         @can('send', $penugasan)
-                                            <!-- Tombol Buat Pengiriman -->
-                                            <button
-                                                class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
-                                                @click="$dispatch('open-smart-modal', {
-                                                    modalId: 'modal-pengiriman-anggota',
-                                                    data: {
-                                                        id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
-                                                        id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                        nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
-                                                    }
-                                                })">
-                                                <!-- icon -->
-                                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                Buat Pengiriman
-                                            </button>
+                                            @if($bolehAksi)
+                                                <!-- Tombol Buat Pengiriman -->
+                                                <button
+                                                    class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
+                                                    @click="$dispatch('open-smart-modal', {
+                                                        modalId: 'modal-pengiriman-anggota',
+                                                        data: {
+                                                            id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
+                                                            id_penugasan: '{{ $penugasan->id_penugasan }}',
+                                                            nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                        }
+                                                    })">
+                                                    <!-- icon -->
+                                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    Buat Pengiriman
+                                                </button>
+                                            @endif
                                         @endcan
 
-                                        @can('viewHistory', $penugasan)
-                                            <!-- Tombol Tampilkan Histori Pengiriman -->
-                                            <button
-                                                class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700
-                                                hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
-                                                @click="$dispatch('open-smart-modal', {
-                                                    modalId: 'modal-histori-pengiriman',
-                                                    data: {
-                                                        id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                        nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
-                                                        historiData: @js($penugasan->pengirimans
-                                                        ->sortByDesc(fn($p) => $p->tanggal_pengiriman) // sort sebelum format
-                                                        ->map(
-                                                            fn($p) => [
-                                                                'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
-                                                                'jumlah_dikirim' => $p->jumlah_dikirim,
-                                                                'media_pengiriman' => $p->media_pengiriman,
-                                                                'bukti_dukung' => $p->bukti_dukung,
-                                                                'status' => $p->penerimaan?->status ?? 'Belum Diproses',
-                                                                'catatan' => $p->penerimaan?->catatan ?? '--',
-                                                            ],
-                                                        ),
-                                                    )}
-                                                })">
-                                                <!-- Icon -->
-                                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M8 7V3m8 4V3M3 11h18M5 19h14a2 2 0 002-2v-6H3v6a2 2 0 002 2z" />
-                                                </svg>
-                                                Tampilkan Histori Pengiriman
-                                            </button>
-                                        @endcan
+                                        <!-- Tombol Tampilkan Histori Pengiriman -->
+                                        <button
+                                            class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700
+                                            hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
+                                            @click="$dispatch('open-smart-modal', {
+                                                modalId: 'modal-histori-pengiriman',
+                                                data: {
+                                                    id_penugasan: '{{ $penugasan->id_penugasan }}',
+                                                    nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                    historiData: @js($penugasan->pengirimans
+                                                    ->sortByDesc(fn($p) => $p->tanggal_pengiriman) // sort sebelum format
+                                                    ->map(
+                                                        fn($p) => [
+                                                            'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
+                                                            'jumlah_dikirim' => $p->jumlah_dikirim,
+                                                            'media_pengiriman' => $p->media_pengiriman,
+                                                            'bukti_dukung' => $p->bukti_dukung,
+                                                            'status' => $p->penerimaan?->status ?? 'Belum Diproses',
+                                                            'catatan' => $p->penerimaan?->catatan,
+                                                        ],
+                                                    ),
+                                                )}
+                                            })">
+                                            <!-- Icon -->
+                                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M8 7V3m8 4V3M3 11h18M5 19h14a2 2 0 002-2v-6H3v6a2 2 0 002 2z" />
+                                            </svg>
+                                            Tampilkan Histori Pengiriman
+                                        </button>
 
                                         @can('receive', $penugasan)
-                                            <!-- Tombol Buat Penerimaan -->
-                                            <button
-                                                class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
-                                                @click="$dispatch('open-smart-modal', {
-                                                    modalId: 'modal-penerimaan-anggota',
-                                                    data: {
-                                                        id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
-                                                        id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                        id_pengiriman: '{{ $penugasan->latestPengiriman?->id_pengiriman }}',
-                                                        nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
-                                                    }
-                                                })">
-                                                <!-- icon -->
-                                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                Buat Penerimaan
-                                            </button>
+                                            @if($bolehAksi)
+                                                <!-- Tombol Buat Penerimaan -->
+                                                <button
+                                                    class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
+                                                    @click="$dispatch('open-smart-modal', {
+                                                        modalId: 'modal-penerimaan-anggota',
+                                                        data: {
+                                                            id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
+                                                            id_penugasan: '{{ $penugasan->id_penugasan }}',
+                                                            id_pengiriman: '{{ $penugasan->latestPengiriman?->id_pengiriman }}',
+                                                            nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                        }
+                                                    })">
+                                                    <!-- icon -->
+                                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    Buat Penerimaan
+                                                </button>
+                                            @endif
                                         @endcan
 
                                         <!-- Tombol Jadikan CKP -->

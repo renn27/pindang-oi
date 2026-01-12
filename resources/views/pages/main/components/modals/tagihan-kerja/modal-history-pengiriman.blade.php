@@ -81,9 +81,17 @@
 
                         <div>
                             <p class="text-gray-500">Catatan Ketua</p>
-                            <p class="font-medium text-gray-800" x-text="item.catatan">
+                            <p
+                                class="font-medium"
+                                :class="item.catatan && item.catatan.trim() !== ''
+                                    ? 'text-gray-800'
+                                    : 'text-gray-400 italic'"
+                                x-text="item.catatan && item.catatan.trim() !== ''
+                                    ? item.catatan
+                                    : 'Belum ada catatan'">
                             </p>
                         </div>
+
                     </div>
                 </div>
             </template>
@@ -93,8 +101,7 @@
         <div class="shrink-0 border-t border-gray-200 px-6 py-3">
             <div class="flex justify-end">
                 <button type="button" @click="open = false"
-                    class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium
-                                        text-gray-700 hover:bg-gray-50">
+                    class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
                     Tutup
                 </button>
             </div>
