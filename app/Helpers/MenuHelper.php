@@ -15,7 +15,7 @@ class MenuHelper
         $menus = [
             [
                 'icon' => 'dashboard',
-                'name' => 'Beranda Dashboard',
+                'name' => 'Dashboard',
                 'path' => '/',
             ],
             [
@@ -23,7 +23,7 @@ class MenuHelper
                 'name' => 'Admin',
                 'subItems' => [
                     ['name' => 'Bidang Kerja', 'path' => '/bidang-kerja'],
-                    ['name' => 'Kelola Role', 'path' => '/role-pegawai'],
+                    ['name' => 'Kelola Role Pegawai', 'path' => '/role-pegawai'],
                 ],
             ],
             [
