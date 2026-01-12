@@ -35,4 +35,25 @@ class SubKegiatan extends Model
     public function penugasans() {
         return $this->hasMany(Penugasan::class, 'id_sub_kegiatan', 'id_sub_kegiatan');
     }
+
+    public function scopeForUser($query, $user)
+    {
+        if (in_array($user->active_role, ['Admin', 'Pimpinan'])) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($user) {
+
+            // Ketua Tim lewat parent Kegiatan
+            $q->whereHas('kegiatan', function ($k) use ($user) {
+                $k->where('id_penanggung_jawab', $user->id_pegawai);
+            })
+
+            // Anggota tim langsung di penugasan
+            ->orWhereHas('penugasans.anggota', function ($anggota) use ($user) {
+                $anggota->where('id_anggota', $user->id_pegawai);
+            });
+        });
+    }
+
 }

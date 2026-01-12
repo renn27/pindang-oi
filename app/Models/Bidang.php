@@ -23,26 +23,6 @@ class Bidang extends Model
         'detail_bidang',
     ];
 
-    // public static function getNavItems() {
-    //     $currentBidang = request()->route('bidang');
-
-    //     return self::whereNull('deleted_at')
-    //         ->orderBy('nama_bidang')
-    //         ->get()
-    //         ->map(function ($bidang) use ($currentBidang) {
-    //             $isActive = $currentBidang
-    //                 && $currentBidang->slug === $bidang->slug;
-
-    //             return [
-    //                 'name'      => $bidang->nama_bidang,
-    //                 'path'      => route('kegiatan.index', $bidang->slug),
-    //                 'icon'      => 'dashboard',
-    //                 'is_active' => $isActive, 
-    //             ];
-    //         })
-    //         ->toArray();
-    // }
-
     public static function getNavItems(): array
     {
         $user = Auth::user();

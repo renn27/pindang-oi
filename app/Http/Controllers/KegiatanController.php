@@ -8,14 +8,21 @@ use App\Models\Kegiatan;
 use App\Models\RencanaJPT;
 use App\Models\Pegawai;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class KegiatanController extends Controller
 {
     public function index(Bidang $bidang) {
+        $user = Auth::user();
         // Data utama
         $this->authorize('viewAny', Kegiatan::class);
         $kegiatans = $bidang->kegiatans()
-            ->with(['subKegiatans', 'rencanaJpt', 'indikatorJpt'])
+            ->forUser($user)
+            ->with([
+                'subKegiatans' => fn ($q) => $q->forUser($user),
+                'rencanaJpt',
+                'indikatorJpt'
+            ])
             ->get();
 
         // Data referensi untuk dropdown modal

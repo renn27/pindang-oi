@@ -62,28 +62,50 @@
         @php
             $user = Auth::user();
 
-            // Ambil role struktural (dari tabel roles)
+            // 1. Ambil role struktural (dari tabel roles)
             $roles = $user->roles
                 ->pluck('nama_role')
                 ->toArray();
 
-            // Tambahkan role kontekstual
-            $roles[] = 'Anggota Tim';
+            // 2. Cek apakah user terlibat penugasan (punya role Anggota Tim)
+            // asumsi relasi: $user->penugasans
+            $isAnggotaTim = $user->penugasanSebagaiAnggota()->exists();
 
-            // Hilangkan duplikat
-            $roles = array_unique($roles);
+            if ($isAnggotaTim) {
+                $roles[] = 'Anggota Tim';
+            }
 
-            // Role aktif
-            $activeRole = $user->active_role ?? 'Anggota Tim';
+            // 3. Hilangkan duplikat
+            $roles = array_values(array_unique($roles));
+
+            // 4. Role aktif
+            $activeRole = $user->active_role ?? null;
+
+            // 5. Flag
+            $hasRole = !empty($roles);
         @endphp
+
 
         <!-- Switch Role -->
         <div class="mt-3 border-t border-gray-200 pt-3">
             <span class="block mb-2 text-xs font-semibold text-gray-500">
-                {{ count($roles) > 1 ? 'Switch Role' : 'Role Aktif' }}
+                @if(!$hasRole)
+                    Belum Ada Role Aktif
+                @elseif(count($roles) > 1)
+                    Switch Role
+                @else
+                    Role Aktif
+                @endif
             </span>
 
-            @if(count($roles) > 1)
+            @if(!$hasRole)
+                <!-- 1. BELUM ADA ROLE SAMA SEKALI -->
+                <div class="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-500 italic">
+                    Belum Ada Role Aktif
+                </div>
+
+            @elseif(count($roles) > 1)
+                <!-- 2. MULTI ROLE (Admin / Ketua Tim / Anggota Tim, dll) -->
                 <ul class="space-y-1">
                     @foreach($roles as $role)
                         <li>
@@ -106,12 +128,15 @@
                         </li>
                     @endforeach
                 </ul>
+
             @else
+                <!-- 3. SINGLE ROLE -->
                 <div class="px-3 py-2 rounded-lg text-sm font-medium bg-green-100 text-green-700">
-                    {{ $activeRole }}
+                    {{ $roles[0] }}
                     <span class="ml-2 text-xs">(active)</span>
                 </div>
             @endif
+
         </div>
 
         <!-- Menu -->

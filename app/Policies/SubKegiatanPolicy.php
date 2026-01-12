@@ -30,7 +30,18 @@ class SubKegiatanPolicy
      */
     public function view(Pegawai $pegawai, SubKegiatan $SubKegiatan): bool
     {
-        return true;
+        if (in_array($pegawai->active_role, ['Admin', 'Pimpinan'])) {
+            return true;
+        }
+
+        if ($SubKegiatan->kegiatan->id_penanggung_jawab == $pegawai->id_pegawai) {
+            return true;
+        }
+
+        return $SubKegiatan->penugasans()
+            ->whereHas('anggota', function ($q) use ($pegawai) {
+                $q->where('id_anggota', $pegawai->id_pegawai);
+            })->exists();
     }
 
     /**

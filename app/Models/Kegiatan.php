@@ -47,4 +47,23 @@ class Kegiatan extends Model
     public function subKegiatans() {
         return $this->hasMany(SubKegiatan::class, 'id_kegiatan', 'id_kegiatan');
     }
+
+    public function scopeForUser($query, $user)
+    {
+        if (in_array($user->active_role, ['Admin', 'Pimpinan'])) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($user) {
+
+            // 1. Ketua Tim
+            $q->where('id_penanggung_jawab', $user->id_pegawai)
+
+            // 2. Anggota Tim via SubKegiatan → Penugasan
+            ->orWhereHas('subKegiatans.penugasans.anggota', function ($anggota) use ($user) {
+                $anggota->where('id_anggota', $user->id_pegawai);
+            });
+        });
+    }
+
 }
