@@ -74,7 +74,8 @@ class PegawaiRoleController extends Controller
             'active_role' => $role
         ]);
 
-        return back();
+        return redirect()->route('dashboard')
+        ->with('success', 'Berhasil switching role');
     }
 
 }

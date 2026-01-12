@@ -28,24 +28,27 @@ class KegiatanPolicy
         }
 
         $bidang = request()->route('bidang');
-
         if (! $bidang) {
             return false;
         }
+        
+        // KETUA TIM
+        if ($pegawai->active_role === 'Ketua Tim') {
+            return Kegiatan::where('id_bidang', $bidang->id_bidang)
+                ->where('id_penanggung_jawab', $pegawai->id_pegawai)
+                ->exists();
+        }
 
-        // Ketua Tim / Anggota Tim
-        return Kegiatan::where('id_bidang', $bidang->id_bidang)
-            ->where(function ($q) use ($pegawai) {
+        // ANGGOTA TIM
+        if ($pegawai->active_role === 'Anggota Tim') {
+            return Kegiatan::where('id_bidang', $bidang->id_bidang)
+                ->whereHas('subKegiatans.penugasans.anggota', function ($q) use ($pegawai) {
+                    $q->where('id_anggota', $pegawai->id_pegawai);
+                })
+                ->exists();
+        }
 
-                // Ketua Tim
-                $q->where('id_penanggung_jawab', $pegawai->id_pegawai)
-
-                // Anggota Tim
-                ->orWhereHas('subKegiatans.penugasans.anggota', function ($a) use ($pegawai) {
-                    $a->where('id_anggota', $pegawai->id_pegawai);
-                });
-
-            })->exists();
+        return false;
     }
 
     /**
@@ -57,15 +60,19 @@ class KegiatanPolicy
             return true;
         }
 
-        if ($kegiatan->id_penanggung_jawab === $pegawai->id_pegawai) {
-            return true;
+        if ($pegawai->active_role === 'Ketua Tim') {
+            return $kegiatan->id_penanggung_jawab === $pegawai->id_pegawai;
         }
 
-        return $kegiatan->subKegiatans()
-            ->whereHas('penugasans.anggota', function ($q) use ($pegawai) {
-                $q->where('id_anggota', $pegawai->id_pegawai);
-            })
-            ->exists();
+        if ($pegawai->active_role === 'Anggota Tim') {
+            return $kegiatan->subKegiatans()
+                ->whereHas('penugasans.anggota', function ($q) use ($pegawai) {
+                    $q->where('id_anggota', $pegawai->id_pegawai);
+                })
+                ->exists();
+        }
+
+        return false;
     }
 
     /**
@@ -73,29 +80,20 @@ class KegiatanPolicy
      */
     public function create(Pegawai $pegawai): bool
     {
-        return $pegawai->hasRole('Ketua Tim', 'Pimpinan');
+        return in_array($pegawai->active_role, [
+            'Ketua Tim',
+            'Pimpinan',
+        ]);
     }
+
 
     /**
      * Determine whether the user can update the model.
      */
     public function update(Pegawai $pegawai, Kegiatan $kegiatan): bool
     {
-        if (in_array($pegawai->active_role, ['Admin', 'Pimpinan'])) {
-            return true;
-        }
-
-        // Ketua Tim
-        if ($kegiatan->id_penanggung_jawab === $pegawai->id_pegawai) {
-            return true;
-        }
-
-        // Anggota Tim
-        return $kegiatan->subKegiatans()
-            ->whereHas('penugasans.anggota', function ($q) use ($pegawai) {
-                $q->where('id_anggota', $pegawai->id_pegawai);
-            })
-            ->exists();
+        return in_array($pegawai->active_role, ['Admin', 'Pimpinan'])
+        || $kegiatan->id_penanggung_jawab === $pegawai->id_pegawai;
     }
 
     /**
@@ -103,7 +101,6 @@ class KegiatanPolicy
      */
     public function delete(Pegawai $pegawai, Kegiatan $kegiatan): bool
     {
-        // Biasanya delete lebih ketat
         return in_array($pegawai->active_role, ['Admin', 'Pimpinan'])
         || $kegiatan->id_penanggung_jawab === $pegawai->id_pegawai;
     }

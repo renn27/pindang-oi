@@ -85,7 +85,6 @@
             $hasRole = !empty($roles);
         @endphp
 
-
         <!-- Switch Role -->
         <div class="mt-3 border-t border-gray-200 pt-3">
             <span class="block mb-2 text-xs font-semibold text-gray-500">
