@@ -32,12 +32,10 @@
                             class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                             Penerimaan
                         </th>
-                        @can('manage', $kegiatan)
-                            <th rowspan="2"
-                                class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                                Aksi
-                            </th>
-                        @endcan
+                        <th rowspan="2"
+                            class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                            Aksi
+                        </th>
                     </tr>
                     <tr class="bg-gray-50">
                         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
@@ -309,7 +307,6 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M8 7V3m8 4V3M3 11h18M5 19h14a2 2 0 002-2v-6H3v6a2 2 0 002 2z" />
                                                 </svg>
-
                                                 Tampilkan Histori Pengiriman
                                             </button>
                                         @endcan

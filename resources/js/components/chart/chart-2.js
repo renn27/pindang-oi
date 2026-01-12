@@ -52,12 +52,7 @@ export const initChartTwo = () => {
         };
 
         const chart = new ApexCharts(chartElement, chartTwoOptions);
-        window.addEventListener("load", () => {
-            setTimeout(() => {
-                chart.render();
-            }, 400);
-        });
-        return chart;
+        chart.render();
     }
 };
 

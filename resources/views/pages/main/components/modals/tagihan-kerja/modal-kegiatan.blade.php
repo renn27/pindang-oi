@@ -31,8 +31,9 @@
             });
         ">
     <form
-        :action="mode === 'edit' ? `{{ url('kegiatan') }}/${itemKey}` :
-            `{{ route('kegiatan.store', $bidang->slug) }}`"
+        :action="mode === 'edit'
+            ? `/kegiatan/${itemKey}`
+            : '{{ route('kegiatan.store', $bidang->slug) }}'"
         method="POST" class="grid grid-cols-1 gap-y-5">
         @csrf
         <template x-if="mode === 'edit'">

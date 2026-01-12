@@ -54,4 +54,27 @@ class PegawaiRoleController extends Controller
         return back()->with('success', 'Role baru berhasil ditambahkan');
     }
 
+    public function switchRolePegawai(Request $request, string $role) {
+        $user = $request->user();
+
+        abort_if(! $user, 401);
+
+        // daftar role kontekstual yang diperbolehkan
+        $contextualRoles = [
+            'Anggota Tim',
+        ];
+
+        // jika BUKAN role kontekstual, wajib role struktural
+        if (! in_array($role, $contextualRoles)) {
+            abort_if(! $user->hasRole($role), 403);
+        }
+
+        // simpan role aktif
+        $user->update([
+            'active_role' => $role
+        ]);
+
+        return back();
+    }
+
 }

@@ -66,13 +66,8 @@ export const initChartResumeKegiatan = () => {
         ],
     })
 
-    window.addEventListener("load", () => {
-        setTimeout(() => {
-            chart.render()
-        }, 400)
-    })
+    chart.render()
 
-    return chart
 }
 
 export default initChartResumeKegiatan

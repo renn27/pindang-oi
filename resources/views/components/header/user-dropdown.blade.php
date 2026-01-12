@@ -7,6 +7,7 @@
         this.dropdownOpen = false;
     }
 }" @click.away="closeDropdown()">
+
     <!-- User Button -->
     <button
         class="flex items-center text-gray-700"
@@ -17,9 +18,11 @@
             <img src="/images/user/owner.png" alt="User" />
         </span>
 
-       <span class="block mr-1 font-medium text-theme-sm">{{ Auth::user()->username }}</span>
+        <span class="block mr-1 font-medium text-theme-sm">
+            {{ Auth::user()->username }}
+        </span>
 
-        <!-- Chevron Icon -->
+        <!-- Chevron -->
         <svg
             class="w-5 h-5 transition-transform duration-200"
             :class="{ 'rotate-180': dropdownOpen }"
@@ -27,11 +30,13 @@
             stroke="currentColor"
             viewBox="0 0 24 24"
         >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 9l-7 7-7-7">
+            </path>
         </svg>
     </button>
 
-    <!-- Dropdown Start -->
+    <!-- Dropdown -->
     <div
         x-show="dropdownOpen"
         x-transition:enter="transition ease-out duration-100"
@@ -43,37 +48,57 @@
         class="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg z-50"
         style="display: none;"
     >
+
         <!-- User Info -->
         <div>
-            <span class="block font-medium text-gray-700 text-theme-sm">{{ Auth::user()->nama_pegawai }}</span>
-            <span class="mt-0.5 block text-theme-xs text-gray-500">{{ Auth::user()->email }}</span>
+            <span class="block font-medium text-gray-700 text-theme-sm">
+                {{ Auth::user()->nama_pegawai }}
+            </span>
+            <span class="mt-0.5 block text-theme-xs text-gray-500">
+                {{ Auth::user()->email }}
+            </span>
         </div>
 
         @php
-            $roles = Auth::user()->roles;
-            $activeRole = Auth::user()->active_role ?? 'Anggota Tim';
+            $user = Auth::user();
+
+            // Ambil role struktural (dari tabel roles)
+            $roles = $user->roles
+                ->pluck('nama_role')
+                ->toArray();
+
+            // Tambahkan role kontekstual
+            $roles[] = 'Anggota Tim';
+
+            // Hilangkan duplikat
+            $roles = array_unique($roles);
+
+            // Role aktif
+            $activeRole = $user->active_role ?? 'Anggota Tim';
         @endphp
 
+        <!-- Switch Role -->
         <div class="mt-3 border-t border-gray-200 pt-3">
             <span class="block mb-2 text-xs font-semibold text-gray-500">
-                {{ $roles->count() > 1 ? 'Switch Role' : 'Role Aktif' }}
+                {{ count($roles) > 1 ? 'Switch Role' : 'Role Aktif' }}
             </span>
 
-            @if($roles->count() > 1)
+            @if(count($roles) > 1)
                 <ul class="space-y-1">
                     @foreach($roles as $role)
                         <li>
-                            <form method="POST" action="{{ route('switch.role', $role->nama_role) }}">
+                            <form method="POST" action="{{ route('pegawai-role.switchRolePegawai', $role) }}">
                                 @csrf
                                 <button
                                     type="submit"
                                     class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium
-                                        {{ $activeRole === $role->nama_role
+                                        {{ $activeRole === $role
                                             ? 'bg-green-100 text-green-700'
                                             : 'hover:bg-gray-100 text-gray-700'
-                                        }}">
-                                    {{ $role->nama_role }}
-                                    @if($activeRole === $role->nama_role)
+                                        }}"
+                                >
+                                    {{ $role }}
+                                    @if($activeRole === $role)
                                         <span class="ml-2 text-xs">(active)</span>
                                     @endif
                                 </button>
@@ -89,56 +114,37 @@
             @endif
         </div>
 
-
-
-
-
-        <!-- Menu Items -->
+        <!-- Menu -->
         <ul class="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200">
-            @php
-                $menuItems = [
-                    [
-                        'text' => 'Edit profile',
-                        'icon' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                fill-rule="evenodd"
-                                clip-rule="evenodd"
-                                d="M12 3.5C7.30558 3.5 3.5 7.30558 3.5 12C3.5 14.1526 4.3002 16.1184 5.61936 17.616C6.17279 15.3096 8.24852 13.5955 10.7246 13.5955H13.2746C15.7509 13.5955 17.8268 15.31 18.38 17.6167C19.6996 16.119 20.5 14.153 20.5 12C20.5 7.30558 16.6944 3.5 12 3.5ZM17.0246 18.8566V18.8455C17.0246 16.7744 15.3457 15.0955 13.2746 15.0955H10.7246C8.65354 15.0955 6.97461 16.7744 6.97461 18.8455V18.856C8.38223 19.8895 10.1198 20.5 12 20.5C13.8798 20.5 15.6171 19.8898 17.0246 18.8566ZM2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12ZM11.9991 7.25C10.8847 7.25 9.98126 8.15342 9.98126 9.26784C9.98126 10.3823 10.8847 11.2857 11.9991 11.2857C13.1135 11.2857 14.0169 10.3823 14.0169 9.26784C14.0169 8.15342 13.1135 7.25 11.9991 7.25ZM8.48126 9.26784C8.48126 7.32499 10.0563 5.75 11.9991 5.75C13.9419 5.75 15.5169 7.32499 15.5169 9.26784C15.5169 11.2107 13.9419 12.7857 11.9991 12.7857C10.0563 12.7857 8.48126 11.2107 8.48126 9.26784Z"
-                                fill="currentColor"
-                            />
-                        </svg>',
-                        'path' => 'profile',
-                    ],
-                ];
-            @endphp
-
-            @foreach ($menuItems as $item)
-                <li>
-                    <a
-                        href="{{ $item['path'] }}"
-                        class="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700"
-                    >
-                        <span class="text-gray-500 group-hover:text-gray-700">
-                            {!! $item['icon'] !!}
-                        </span>
-                        {{ $item['text'] }}
-                    </a>
-                </li>
-            @endforeach
+            <li>
+                <a
+                    href="{{ route('profile') }}"
+                    class="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100"
+                >
+                    <span class="text-gray-500 group-hover:text-gray-700">
+                        <!-- icon -->
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                d="M12 3.5C7.30558 3.5 3.5 7.30558 3.5 12C3.5 17.5228 6.47715 20.5 12 20.5C17.5228 20.5 20.5 17.5228 20.5 12C20.5 7.30558 16.6944 3.5 12 3.5Z"
+                                fill="currentColor"/>
+                        </svg>
+                    </span>
+                    Edit Profile
+                </a>
+            </li>
         </ul>
 
-        <!-- Sign Out -->
-            <div class="flex items-center w-full gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <x-dropdown-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-dropdown-link>
-                </form>
-            </div>
+        <!-- Logout -->
+        <div class="flex items-center w-full gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg hover:bg-gray-100">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button
+                    type="submit"
+                    class="text-theme-sm font-medium"
+                >
+                    Log Out
+                </button>
+            </form>
+        </div>
     </div>
-    <!-- Dropdown End -->
 </div>

@@ -5,7 +5,7 @@
         <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div>
                 <h4 class="text-lg font-semibold text-gray-800 lg:mb-6">
-                     Informasi Pribadi
+                    Informasi Pribadi
                 </h4>
 
                 <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
@@ -26,8 +26,12 @@
 
                     <div>
                         <p class="mb-2 text-xs leading-normal text-gray-500">Alamat</p>
-                        <p class="text-sm font-medium text-gray-800">{{ Auth::user()->alamat }}</p>
+                        {!! Auth::user()->alamat
+                            ? '<p class="text-sm font-medium text-gray-800">'.e(Auth::user()->alamat).'</p>'
+                            : '<p class="text-sm text-gray-400 italic">-- Alamat belum diisi --</p>'
+                        !!}
                     </div>
+
                 </div>
             </div>
         </div>

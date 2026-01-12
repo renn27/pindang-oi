@@ -38,18 +38,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/role-pegawai', [PegawaiRoleController::class, 'store'])
         ->name('pegawai-role.store');
 
-    Route::post('/switch-role/{role}', function (Request $request, string $role) {
-        $user = $request->user();
-
-        abort_if(! $user, 401);
-        abort_if(! $user->hasRole($role), 403);
-
-        $user->update([
-            'active_role' => $role
-        ]);
-
-        return back();
-    })->middleware('auth')->name('switch.role');
+    Route::post('/switch-role/{role}', [PegawaiRoleController::class, 'switchRolePegawai'])
+        ->name('pegawai-role.switchRolePegawai');
 
     // CRUD RK IKI JPT BY PIMPINAN
     Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(function () {
@@ -87,6 +77,8 @@ Route::middleware('auth')->group(function () {
         // Kegiatan
         Route::get('/bidang/{bidang:slug}', [KegiatanController::class, 'index'])->name('kegiatan.index')->middleware('can:viewAny,App\Models\Kegiatan');
         Route::post('/bidang/{bidang:slug}', [KegiatanController::class, 'store'])->name('kegiatan.store')->middleware('can:create,App\Models\Kegiatan');
+        Route::put('/{kegiatan:id_kegiatan}', [KegiatanController::class, 'update'])->name('kegiatan.update')->middleware('can:update,kegiatan');
+        Route::delete('/{kegiatan:id_kegiatan}', [KegiatanController::class, 'delete'])->name('kegiatan.delete')->middleware('can:delete,kegiatan');
 
         // Sub Kegiatan
         Route::prefix('{kegiatan:id_kegiatan}/sub-kegiatan')->group(function () {

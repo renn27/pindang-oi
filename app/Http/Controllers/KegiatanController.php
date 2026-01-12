@@ -13,6 +13,7 @@ class KegiatanController extends Controller
 {
     public function index(Bidang $bidang) {
         // Data utama
+        $this->authorize('viewAny', Kegiatan::class);
         $kegiatans = $bidang->kegiatans()
             ->with(['subKegiatans', 'rencanaJpt', 'indikatorJpt'])
             ->get();
@@ -42,6 +43,7 @@ class KegiatanController extends Controller
 
     public function store(Request $request, Bidang $bidang) {
         // dd($request->all());
+        
         $this->authorize('create', Kegiatan::class);
 
         $validated = $request->validate([
@@ -75,12 +77,61 @@ class KegiatanController extends Controller
         }
     }
 
-    public function update(Request $request, Kegiatan $kegiatan) {
+    public function update(Request $request, Kegiatan $kegiatan)
+    {
+        // dd($request->all());
+        // 🔐 Authorization
         $this->authorize('update', $kegiatan);
+
+        // ✅ Validasi
+        $validated = $request->validate([
+            'nama_rk_kegiatan' => ['required', 'string', 'max:255'],
+            'rk_jpt' => ['required', 'exists:rencana_jpts,id'],
+            'iki_jpt' => [
+                'required',
+                Rule::exists('indikator_jpts', 'id')
+                    ->where('id_rencana_jpt', $request->rk_jpt),
+            ],
+            'id_penanggung_jawab' => ['required', 'exists:pegawais,id_pegawai'],
+            'tahun_kegiatan' => ['required'],
+        ]);
+
+        // 🔐 PERTAHANKAN id_bidang (tidak boleh diubah lewat form)
+        $validated['id_bidang'] = $kegiatan->id_bidang;
+
+        try {
+            // 🔄 Update data
+            $kegiatan->update($validated);
+
+            return redirect()
+                ->route('kegiatan.index', $kegiatan->bidang->slug)
+                ->with('success', 'Kegiatan berhasil diperbarui.');
+        } catch (\Exception $e) {
+            dd($e->getMessage()); 
+
+            return redirect()->back()
+                ->with('error', 'Gagal memperbarui Kegiatan. Silakan coba lagi.')
+                ->withInput();
+        }
     }
 
-    public function delete(Kegiatan $kegiatan) {
+    public function delete(Kegiatan $kegiatan)
+    {
+        // 🔐 Authorization
         $this->authorize('delete', $kegiatan);
-    }
 
+        try {
+            // 🗑️ Hapus kegiatan
+            $kegiatan->delete();
+
+            return redirect()
+                ->route('kegiatan.index', $kegiatan->bidang->slug)
+                ->with('success', 'Kegiatan berhasil dihapus.');
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+
+            return redirect()->back()
+                ->with('error', 'Gagal menghapus Kegiatan. Silakan coba lagi.');
+        }
+    }
 }
