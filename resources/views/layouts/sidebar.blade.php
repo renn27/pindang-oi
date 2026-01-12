@@ -90,14 +90,14 @@
                                         <button @click="toggle('{{ $key }}')"
                                             class="menu-item group w-full"
                                             :class="[
-                                                {{ $item['is_active'] ? 'true' : 'false' }} ?
+                                                {{ ($item['is_active'] ?? false) ? 'true' : 'false' }} ?
                                                 'menu-item-active' : 'menu-item-inactive',
                                                 !$store.sidebar.isExpanded && !$store.sidebar.isHovered ?
                                                 'xl:justify-center' : 'xl:justify-start'
                                             ]">
 
                                             <!-- Icon -->
-                                            <span :class="{{ $item['is_active'] ? 'true' : 'false' }} ?
+                                            <span :class="{{ ($item['is_active'] ?? false) ? 'true' : 'false' }} ?
                                                     'menu-item-icon-active' : 'menu-item-icon-inactive'">
                                                 {!! MenuHelper::getIconSvg($item['icon']) !!}
                                             </span>
@@ -109,7 +109,7 @@
                                                 {{ $item['name'] }}
                                                 @if (!empty($item['new']))
                                                     <span class="absolute right-10"
-                                                        :class="{{ $item['is_active'] ? 'true' : 'false' }} ?
+                                                        :class="{{ ($item['is_active'] ?? false) ? 'true' : 'false' }} ?
                                                             'menu-dropdown-badge menu-dropdown-badge-active' :
                                                             'menu-dropdown-badge menu-dropdown-badge-inactive'">
                                                         new
@@ -135,7 +135,7 @@
                                                 @foreach ($item['subItems'] as $subItem)
                                                     <li>
                                                         <a href="{{ $subItem['path'] }}" class="menu-dropdown-item"
-                                                            :class="{{ $subItem['is_active'] ? 'true' : 'false' }} ?
+                                                            :class="{{ ($subItem['is_active'] ?? false) ? 'true' : 'false' }} ?
                                                                 'menu-dropdown-item-active' :
                                                                 'menu-dropdown-item-inactive'">
                                                             {{ $subItem['name'] }}
@@ -150,7 +150,7 @@
                                                                 @endif
                                                                 @if (!empty($subItem['pro']))
                                                                     <span
-                                                                        :class="{{ $subItem['is_active'] ? 'true' : 'false' }} ?
+                                                                        :class="{{ ($subItem['is_active'] ?? false) ? 'true' : 'false' }} ?
                                                                             'menu-dropdown-badge-pro menu-dropdown-badge-pro-active' :
                                                                             'menu-dropdown-badge-pro menu-dropdown-badge-pro-inactive'">
                                                                         pro
@@ -165,8 +165,7 @@
                                     @else
                                         <!-- Simple Menu Item -->
                                         <a href="{{ $item['path'] }}" class="menu-item group"
-                                            :class="[
-                                                {{ $item['is_active'] ? 'true' : 'false' }} ? 'menu-item-active' :
+                                                :class="{{ ($item['is_active'] ?? false) ? 'true' : 'false' }} ? 'menu-item-active' :
                                                 'menu-item-inactive',
                                                 (!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ?
                                                 'xl:justify-center' :
@@ -175,8 +174,7 @@
 
                                             <!-- Icon -->
                                             <span
-                                                :class="{{ $item['is_active'] ? 'true' : 'false' }} ? 'menu-item-icon-active' :
-                                                    'menu-item-icon-inactive'">
+                                                :class="{{ ($item['is_active'] ?? false) ? 'true' : 'false' }} ? 'menu-item-active' : 'menu-item-inactive'">
                                                 {!! MenuHelper::getIconSvg($item['icon']) !!}
                                             </span>
 
