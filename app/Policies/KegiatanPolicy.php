@@ -83,6 +83,7 @@ class KegiatanPolicy
         return in_array($pegawai->active_role, [
             'Ketua Tim',
             'Pimpinan',
+            'Admin'
         ]);
     }
 
