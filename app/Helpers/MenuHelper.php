@@ -66,7 +66,7 @@ class MenuHelper
         if ($user->isActiveRole('Pimpinan')) {
             return array_map(
                 fn ($menu) => self::normalizeMenuItem($menu),
-                array_filter($menus, fn ($m) => in_array($m['name'], haystack: ['Dashboard', 'Tagihan Kerja']))
+                array_filter($menus, fn ($m) => in_array($m['name'], haystack: ['Dashboard', 'Tagihan Kerja', 'Rencana Kerja']))
             );
         }
 

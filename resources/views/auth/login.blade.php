@@ -8,7 +8,7 @@
                     <div class="w-full">
                         <img src="/images/logo/logo-dark.svg" alt="Logo"
                             class="mx-auto w-auto max-w-[150px] h-[40px] mb-2" />
-                        <p class="text-xs text-white mt-1 font-semibold">Portal Integrasi Data dan Informasi</p>
+                        <p class="text-xs text-white mt-1 font-semibold">Portal Integrasi Data Kinerja dan Data Penunjang</p>
                         <h2 class="text-base font-semibold text-white/90">Badan Pusat Statistik - Ogan Ilir</h2>
                     </div>
                 </div>

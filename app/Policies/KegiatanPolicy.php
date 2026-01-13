@@ -31,7 +31,7 @@ class KegiatanPolicy
         if (! $bidang) {
             return false;
         }
-        
+
         // KETUA TIM
         if ($pegawai->active_role === 'Ketua Tim') {
             return Kegiatan::where('id_bidang', $bidang->id_bidang)
@@ -86,7 +86,6 @@ class KegiatanPolicy
         ]);
     }
 
-
     /**
      * Determine whether the user can update the model.
      */
@@ -110,7 +109,10 @@ class KegiatanPolicy
      */
     public function createSubKegiatan(Pegawai $pegawai, Kegiatan $kegiatan): bool
     {
-        return $this->isOwner($pegawai, $kegiatan);
+        // return $this->isOwner($pegawai, $kegiatan);
+
+        return in_array($pegawai->active_role, ['Admin', 'Pimpinan'])
+        || $kegiatan->id_penanggung_jawab === $pegawai->id_pegawai;
     }
 
     /**

@@ -152,7 +152,7 @@
                                         <span class="text-xs font-medium">Hapus</span>
                                     </button>
                                 </form>
-                        @endcan
+                            @endcan
 
                             @can('createSubKegiatan', $kegiatan)
                                 {{-- Tambah Sub --}}
