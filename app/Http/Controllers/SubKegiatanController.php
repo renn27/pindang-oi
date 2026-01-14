@@ -13,7 +13,7 @@ class SubKegiatanController extends Controller
 {
     public function store(Request $request, Kegiatan $kegiatan) {
         // dd($request->all());
-        $this->authorize('createSubKegiatan', $kegiatan);
+        // $this->authorize('createSubKegiatan', $kegiatan);
 
         $validated = $request->validate([
             'nama_sub_kegiatan' => ['required', 'string', 'max:255'],
