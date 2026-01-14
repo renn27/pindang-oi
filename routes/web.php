@@ -83,7 +83,7 @@ Route::middleware('auth')->group(function () {
 
         // Sub Kegiatan
         Route::prefix('{kegiatan:id_kegiatan}/sub-kegiatan')->group(function () {
-            Route::post('/', [SubKegiatanController::class, 'store'])->name('sub.kegiatan.store')->middleware('can:create,App\Models\SubKegiatan,kegiatan');; // create
+            Route::post('/', [SubKegiatanController::class, 'store'])->name('sub.kegiatan.store');// create
             Route::get('/{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'show'])->name('sub.kegiatan.show')->middleware('can:view,subKegiatan');; // show detail
             Route::put('/{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'update'])->name('sub.kegiatan.update')->middleware('can:update,subKegiatan');; // edit
             Route::delete('/{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'delete'])->name('sub.kegiatan.delete')->middleware('can:delete,subKegiatan');; // delete
