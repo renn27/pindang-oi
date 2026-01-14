@@ -55,7 +55,9 @@ class PenugasanPolicy
      */
     public function update(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        return $this->isKetuaOwner($pegawai, $penugasan);
+        return
+            $pegawai->hasRole('Ketua Tim') &&
+            $pegawai->id_pegawai === $penugasan->subKegiatan->kegiatan->id_penanggung_jawab;
     }
 
     /**

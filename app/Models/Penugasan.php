@@ -64,4 +64,17 @@ class Penugasan extends Model
         )->latestOfMany('tanggal_penerimaan');
     }
 
+    public function isDinasLuar()
+    {
+        $specialTypes = [
+            'Pengawasan',
+            'Pendataan',
+            'Supervisi',
+            'Perjalanan Dinas',
+        ];
+
+        return in_array($this->jenis_kegiatan, $specialTypes);
+    }
+
+
 }

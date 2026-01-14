@@ -74,7 +74,7 @@
                         Tanggal Mulai
                     </label>
                     <x-form.date-picker id="tanggal_mulai" x-model="formData.tanggal_mulai" name="tanggal_mulai"
-                        placeholder="Pilih Tanggal" defaultDate="{{ now()->format('Y-m-d') }}"/>
+                        placeholder="Pilih Tanggal"/>
                 </div>
 
                 <div class="mb-4">

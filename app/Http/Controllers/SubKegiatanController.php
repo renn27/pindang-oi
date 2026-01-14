@@ -15,8 +15,6 @@ class SubKegiatanController extends Controller
         // dd($request->all());
         $this->authorize('createSubKegiatan', $kegiatan);
 
-        $today = Carbon::today()->format('Y-m-d');
-
         $validated = $request->validate([
             'nama_sub_kegiatan' => ['required', 'string', 'max:255'],
             'target' => ['required', 'integer', 'min:1'],
@@ -24,7 +22,7 @@ class SubKegiatanController extends Controller
                 'required',
                 'date',
                 'date_format:Y-m-d',
-                'after_or_equal:' . $today,
+                'after_or_equal:today',
             ],
             'tanggal_selesai' => [
                 'required',
@@ -58,7 +56,17 @@ class SubKegiatanController extends Controller
     public function show(Kegiatan $kegiatan, SubKegiatan $subKegiatan) {
         // Data referensi untuk dropdown modal
         $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
-        $jenisKegiatans = JenisKegiatan::orderBy('jenis_kegiatan')->get();
+        $jenisKegiatans = JenisKegiatan::query()
+            ->orderByRaw("
+                CASE 
+                    WHEN kategori = 'Utama' THEN 1
+                    WHEN kategori = 'Tambahan' THEN 2
+                    ELSE 3
+                END
+            ")
+            ->orderBy('jenis_kegiatan', 'asc')
+            ->get();
+
         $totalKirim = $subKegiatan->penugasans->sum(fn($p) =>
             $p->latestPengiriman?->jumlah_dikirim ?? 0
         );
@@ -83,7 +91,6 @@ class SubKegiatanController extends Controller
 
         $this->authorize('update', $subKegiatan);
 
-        $today = today()->format('Y-m-d');
         $validated = $request->validate([
             'nama_sub_kegiatan' => ['required', 'string', 'max:255'],
             'jenis_kegiatan' => ['required', 'string', 'max:255'],
@@ -92,7 +99,7 @@ class SubKegiatanController extends Controller
                 'required',
                 'date',
                 'date_format:Y-m-d',
-                'after_or_equal:' . $today,
+                'after_or_equal:today',
             ],
             'tanggal_selesai' => [
                 'required',

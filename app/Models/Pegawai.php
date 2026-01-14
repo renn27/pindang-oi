@@ -71,6 +71,10 @@ class Pegawai extends Authenticatable
         return $this->hasMany(Penerimaan::class, 'id_penerima', 'id_pegawai');
     }
 
+    public function kalenderDls() {
+        return $this->hasMany(KalenderDL::class, 'id_pegawai', 'id_pegawai');
+    }
+
     public function roles() {
         return $this->belongsToMany(Role::class, 'pegawai_role', 'pegawai_id', 'role_id');
     }

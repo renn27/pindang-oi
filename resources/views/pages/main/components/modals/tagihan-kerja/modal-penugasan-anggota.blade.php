@@ -131,15 +131,15 @@
 
                     <!-- SELECT UI -->
                     <select
+                        id="jenis_kegiatan_select"
                         name="id_jenis_kegiatan"
                         x-model="formData.id_jenis_kegiatan"
                         @change="
-                            formData.id_jenis_kegiatan = $event.target.value;
                             isOther = ($event.target.value === 'LAINNYA')
                         "
+                        
                         required
                         class="
-                           
                             h-11 w-full mb-4
                             rounded-lg border border-gray-300
                             bg-white
@@ -149,17 +149,19 @@
                         <option value="">-- Pilih Jenis Kegiatan --</option>
 
                         @foreach ($jenisKegiatans as $jenis)
-                            <option value="{{ $jenis->id }}"
+                            <option 
+                                value="{{ $jenis->id }}"
+                                data-text="{{ $jenis->jenis_kegiatan }}"
                                 class="
                                     @if($jenis->kategori === 'Utama')
                                         text-green-700 font-medium
                                     @elseif($jenis->kategori === 'Tambahan')
                                         text-orange-700
                                     @endif">
-                                {{ $jenis->jenis_kegiatan }}
-                                ({{ $jenis->kategori }})
+                                {{ $jenis->jenis_kegiatan }} ({{ $jenis->kategori }})
                             </option>
                         @endforeach
+
 
                         <option value="LAINNYA" class="text-blue-700 font-medium">
                             ➕ Lainnya
@@ -195,21 +197,42 @@
                         class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                 </div>
 
-                <div class="mb-4">
+                <div id="wrap-tanggal-pelaksanaan" class="mb-4 hidden">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                        Tanggal Pelaksanaan
+                    </label>
+                    <x-form.date-picker 
+                        x-model="formData.tanggal_selesai"
+                        id="tanggal_pelaksanaan" 
+                        name="tanggal_pelaksanaan"
+                        placeholder="Tanggal Pelaksanaan" 
+                    />
+                </div>
+
+                <div id="wrap-tanggal-mulai" class="mb-4 hidden">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Tanggal Mulai
                     </label>
-                    <x-form.date-picker id="tanggal_mulai" x-model="formData.tanggal_mulai" name="tanggal_mulai"
-                        placeholder="Date Picker" defaultDate="{{ now()->format('Y-m-d') }}" />
+                    <x-form.date-picker 
+                        x-model="formData.tanggal_mulai"
+                        id="tanggal_mulai" 
+                        name="tanggal_mulai"
+                        placeholder="Tanggal Mulai" 
+                    />
                 </div>
 
-                <div class="mb-4">
+                <div id="wrap-tanggal-selesai" class="mb-4 hidden">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Tanggal Berakhir (Deadline)
                     </label>
-                    <x-form.date-picker id="tanggal_selesai" x-model="formData.tanggal_selesai" name="tanggal_selesai"
-                        placeholder="Date Picker" defaultDate="{{ now()->format('Y-m-d') }}" />
+                    <x-form.date-picker 
+                        x-model="formData.tanggal_selesai"
+                        id="tanggal_selesai" 
+                        name="tanggal_selesai"
+                        placeholder="Tanggal Selesai" 
+                    />
                 </div>
+
             </div>
             <!-- FOOTER -->
             <div class="shrink-0 border-t border-gray-200 px-6 py-3">
@@ -227,4 +250,77 @@
             </div>
         </div>
     </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const jenisSelect = document.getElementById('jenis_kegiatan_select');
+
+            const wrapPelaksanaan = document.getElementById('wrap-tanggal-pelaksanaan');
+            const wrapMulai = document.getElementById('wrap-tanggal-mulai');
+            const wrapSelesai = document.getElementById('wrap-tanggal-selesai');
+
+            const inputPelaksanaan = document.getElementById('tanggal_pelaksanaan');
+            const inputMulai = document.getElementById('tanggal_mulai');
+            const inputSelesai = document.getElementById('tanggal_selesai');
+
+            const specialTypes = ['Pengawasan', 'Pendataan', 'Supervisi', 'Perjalanan Dinas'];
+
+            function isSpecialJenis() {
+                const selectedOption = jenisSelect.options[jenisSelect.selectedIndex];
+                if (!selectedOption) return false;
+
+                const text = selectedOption.text.toLowerCase();
+
+                return specialTypes.some(type => text.includes(type.toLowerCase()));
+            }
+
+            function handleTanggalField() {
+                if (!jenisSelect.value) {
+                    hideAll();
+                    return;
+                }
+
+                if (isSpecialJenis()) {
+                    // === MODE SPECIAL ===
+                    wrapPelaksanaan.classList.remove('hidden');
+                    wrapMulai.classList.add('hidden');
+                    wrapSelesai.classList.add('hidden');
+
+                    // sinkron value (kalau edit)
+                    if (inputMulai.value) {
+                        inputPelaksanaan.value = inputMulai.value;
+                    }
+
+                } else {
+                    // === MODE NORMAL ===
+                    wrapPelaksanaan.classList.add('hidden');
+                    wrapMulai.classList.remove('hidden');
+                    wrapSelesai.classList.remove('hidden');
+                }
+            }
+
+            function hideAll() {
+                wrapPelaksanaan.classList.add('hidden');
+                wrapMulai.classList.add('hidden');
+                wrapSelesai.classList.add('hidden');
+            }
+
+            // event change
+            jenisSelect.addEventListener('change', handleTanggalField);
+
+            // ====== PENTING: trigger saat modal dibuka (edit) ======
+            window.addEventListener('open-smart-modal', function (e) {
+                if (e.detail.modalId !== 'modal-penugasan-anggota') return;
+
+                // delay sedikit biar DOM & Alpine siap
+                setTimeout(() => {
+                    handleTanggalField();
+                }, 50);
+            });
+
+        });
+    </script>
+
+
 </x-ui.smart-modal>

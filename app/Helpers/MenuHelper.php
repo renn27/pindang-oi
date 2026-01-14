@@ -40,6 +40,13 @@ class MenuHelper
             ],
             [
                 'icon' => 'dashboard',
+                'name' => 'Kalender',
+                'subItems' => [
+                    ['name' => 'Kalender DL', 'path' => '/kalender-dl'],
+                ],
+            ],
+            [
+                'icon' => 'dashboard',
                 'name' => 'Rencana Kinerja',
                 'subItems' => [
                     ['name' => 'Master Kegiatan', 'path' => '/master-kegiatan'],
@@ -66,7 +73,7 @@ class MenuHelper
         if ($user->isActiveRole('Pimpinan')) {
             return array_map(
                 fn ($menu) => self::normalizeMenuItem($menu),
-                array_filter($menus, fn ($m) => in_array($m['name'], haystack: ['Dashboard', 'Tagihan Kerja']))
+                $menus
             );
         }
 
@@ -74,12 +81,12 @@ class MenuHelper
         if ($user->isActiveRole('Ketua Tim')) {
             return array_map(
                 fn ($menu) => self::normalizeMenuItem($menu),
-                array_filter($menus, fn ($m) => in_array($m['name'], ['Dashboard', 'Tagihan Kerja', 'Rencana Kinerja']))
+                array_filter($menus, fn ($m) => in_array($m['name'], ['Dashboard', 'Tagihan Kerja', 'Rencana Kinerja', 'Kalender']))
             );
         }
 
         // KETUA TIM / PEGAWAI
-        $allowed = ['Dashboard', 'Tagihan Kerja'];
+        $allowed = ['Dashboard', 'Tagihan Kerja', 'Kalender'];
 
         return array_map(
             fn ($menu) => self::normalizeMenuItem($menu),

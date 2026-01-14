@@ -22,7 +22,7 @@
                         </th>
                         <th rowspan="2"
                             class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Deadline
+                            Waktu Pelaksanaan
                         </th>
                         <th colspan="3"
                             class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
@@ -83,10 +83,18 @@
                             </td>
 
                             <td class="px-4 py-3 text-sm text-gray-700 text-center">
-                                {{ $penugasan->target ?? '-' }}
+                                {{ $penugasan->target ?? '-' }} <span class="block text-xs text-orange-800">{{ $penugasan->satuan_target ?? '-' }}</span>
                             </td>
-                            <td class="px-4 py-3 text-sm text-gray-700 text-center">
-                                {{ $penugasan->tanggal_selesai->translatedFormat('D, d M Y') ?? '-' }}
+                            <td class="px-4 py-3 text-xs text-gray-700 text-center">
+                                {{ 
+                                    ($penugasan->tanggal_mulai && $penugasan->tanggal_selesai)
+                                        ? (
+                                            $penugasan->tanggal_mulai->equalTo($penugasan->tanggal_selesai)
+                                                ? $penugasan->tanggal_mulai->translatedFormat('D, d M Y')
+                                                : $penugasan->tanggal_mulai->translatedFormat('D, d M Y') . ' - ' . $penugasan->tanggal_selesai->translatedFormat('D, d M Y')
+                                        )
+                                        : '-'
+                                }}
                             </td>
 
                             {{-- PENGIRIMAN --}}
@@ -239,37 +247,47 @@
                                         x-on:mouseenter="showDropdown = true" x-on:mouseleave="closeDropdown()">
 
                                         @can('update', $penugasan)
-                                            @if($bolehAksi)
+                                            {{-- @if($bolehAksi) --}}
                                                 {{-- Edit Data Penugasan --}}
                                                 <button
                                                     class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
-                                                    @click="$dispatch('open-smart-modal', {
-                                                    modalId: 'modal-penugasan-anggota',
-                                                    mode: 'edit',
-                                                    key: '{{ $penugasan->id_penugasan }}',
-                                                    data: {
-                                                        id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
-                                                        nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
-                                                        id_anggota: @js($penugasan->id_anggota),
-                                                        nama_anggota: @js($penugasan->anggota?->nama_pegawai),
-                                                        target: @js($penugasan->target),
-                                                        tanggal_mulai: @js($penugasan->tanggal_mulai),
-                                                        tanggal_selesai: @js($penugasan->tanggal_selesai),
-                                                        status: @js($penugasan->status),
-                                                    }
+                                                    @click="
+                                                        const payload = {
+                                                            modalId: 'modal-penugasan-anggota',
+                                                            mode: 'edit',
+                                                            key: '{{ $penugasan->id_penugasan }}',
+                                                            data: {
+                                                                id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
+                                                                nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
+                                                                id_anggota: @js($penugasan->id_anggota),
+                                                                nama_anggota: @js($penugasan->anggota?->nama_pegawai),
+                                                                id_jenis_kegiatan: @js($penugasan->jenisKegiatan->id),
+                                                                target: @js($penugasan->target),
+                                                                satuan_target: @js($penugasan->satuan_target),
+                                                                tanggal_mulai: @js(optional($penugasan->tanggal_mulai)->format('Y-m-d')),
+                                                                tanggal_selesai: @js(optional($penugasan->tanggal_selesai)->format('Y-m-d')),
 
-                                                })">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                                {{-- tanggal_mulai: @js($penugasan->tanggal_mulai),
+                                                                tanggal_selesai: @js($penugasan->tanggal_selesai), --}}
+                                                                status: @js($penugasan->status),
+                                                            }
+                                                        };
+
+                                                        console.log('PAYLOAD KE MODAL:', payload);
+
+                                                        $dispatch('open-smart-modal', payload);
+                                                    ">
+                                                                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                     </svg> Edit Penugasan
                                                 </button>
-                                            @endif
+                                            {{-- @endif --}}
                                         @endcan
 
                                         @can('send', $penugasan)
-                                            @if($bolehAksi)
+                                            {{-- @if($bolehAksi) --}}
                                                 <!-- Tombol Buat Pengiriman -->
                                                 <button
                                                     class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
@@ -289,7 +307,7 @@
                                                     </svg>
                                                     Buat Pengiriman
                                                 </button>
-                                            @endif
+                                            {{-- @endif --}}
                                         @endcan
 
                                         <!-- Tombol Tampilkan Histori Pengiriman -->
@@ -325,7 +343,7 @@
                                         </button>
 
                                         @can('receive', $penugasan)
-                                            @if($bolehAksi)
+                                            {{-- @if($bolehAksi) --}}
                                                 <!-- Tombol Buat Penerimaan -->
                                                 <button
                                                     class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
@@ -346,9 +364,29 @@
                                                     </svg>
                                                     Buat Penerimaan
                                                 </button>
-                                            @endif
+                                            {{-- @endif --}}
                                         @endcan
 
+                                        {{-- @if($penugasan->isDinasLuar()) --}}
+                                        @can('send', $penugasan)
+                                            <form action="{{ route('kalenderDL.store')}}"
+                                                method="POST" class="flex flex-col items-center">
+                                                @csrf
+                                                
+                                                <input type="hidden" name="id_pegawai" value="{{ Auth::user()->id_pegawai }}">
+                                                <input type="hidden" name="tanggal_dl" value="{{ $penugasan->tanggal_selesai }}">
+                                                
+                                                <button type="submit" class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                    Masukkan Kalender DL
+                                                </button>
+                                            </form>
+                                        @endcan
+                                        {{-- @endif --}}
+                                        
                                         <!-- Tombol Jadikan CKP -->
                                         <button @click="closeDropdown()"
                                             class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 flex items-center gap-2 whitespace-nowrap">
