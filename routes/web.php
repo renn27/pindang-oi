@@ -96,7 +96,7 @@ Route::middleware('auth')->group(function () {
         // CRUD PENUGASAN BY KETUA TIM
         Route::prefix('penugasan')->group(function () {
             Route::post('/', [PenugasanController::class, 'store'])->name('penugasan.store')->middleware('can:create,App\Models\Penugasan,subKegiatan');// create
-            Route::put('/{penugasan:id_penugasan}', [PenugasanController::class, 'update'])->name('penugasan.update') ->middleware('can:update,penugasan'); // edit
+            Route::put('/{penugasan:id_penugasan}', [PenugasanController::class, 'update'])->name('penugasan.update')->middleware('can:update,penugasan'); // edit
             Route::delete('/{penugasan}', [PenugasanController::class, 'delete'])->name('penugasan.delete')->middleware('can:delete,penugasan'); // delete
 
             // CRUD PENGIRIMAN BY ANGGOTA TIM

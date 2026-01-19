@@ -17,10 +17,19 @@
                         <tr>
                             <td
                                 class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 w-32">
-                                Sub Kegiatan
+                                Sumber Kegiatan
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-800">
-                                {{ $subKegiatan->nama_sub_kegiatan }}
+                                {{ $subKegiatan->kegiatan->nama_rk_kegiatan }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td
+                                class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 w-32">
+                                Nama Ketua
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-800">
+                                {{ $subKegiatan->kegiatan->penanggungJawab->nama_pegawai }}
                             </td>
                         </tr>
                         <tr>
@@ -47,7 +56,8 @@
                                 Target
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-800">
-                                200
+                                {{ $subKegiatan->target }} {{ $subKegiatan->satuan_target }} 
+                            </td>
                             </td>
                         </tr>
                         <tr>
@@ -92,7 +102,8 @@
                 </div>
             @endcan
             <!-- Tabel Penugasan Anggota-->
-            @include('pages.main.components.tables.tagihan-kerja.table-penugasan-anggota')
+            @include('pages.main.components.tables.tagihan-kerja.table-penugasan-anggota_old')
+            {{-- @include('pages.main.components.tables.tagihan-kerja.table-penugasan-anggota') --}}
         </div>
     </div>
 
