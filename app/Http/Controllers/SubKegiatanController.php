@@ -13,7 +13,7 @@ class SubKegiatanController extends Controller
 {
     public function store(Request $request, Kegiatan $kegiatan) {
         // dd($request->all());
-        // $this->authorize('createSubKegiatan', $kegiatan);
+        $this->authorize('createSubKegiatan', $kegiatan);
 
         $validated = $request->validate([
             'nama_sub_kegiatan' => ['required', 'string', 'max:255'],
@@ -58,7 +58,7 @@ class SubKegiatanController extends Controller
         $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
         $jenisKegiatans = JenisKegiatan::query()
             ->orderByRaw("
-                CASE 
+                CASE
                     WHEN kategori = 'Utama' THEN 1
                     WHEN kategori = 'Tambahan' THEN 2
                     ELSE 3

@@ -137,7 +137,7 @@
                         @change="
                             isOther = ($event.target.value === 'LAINNYA')
                         "
-                        
+
                         required
                         class="
                             h-11 w-full mb-4
@@ -149,7 +149,7 @@
                         <option value="">-- Pilih Jenis Kegiatan --</option>
 
                         @foreach ($jenisKegiatans as $jenis)
-                            <option 
+                            <option
                                 value="{{ $jenis->id }}"
                                 data-text="{{ $jenis->jenis_kegiatan }}"
                                 class="
@@ -201,11 +201,11 @@
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Tanggal Pelaksanaan
                     </label>
-                    <x-form.date-picker 
+                    <x-form.date-picker
                         x-model="formData.tanggal_selesai"
-                        id="tanggal_pelaksanaan" 
+                        id="tanggal_pelaksanaan"
                         name="tanggal_pelaksanaan"
-                        placeholder="Tanggal Pelaksanaan" 
+                        placeholder="Tanggal Pelaksanaan"
                     />
                 </div>
 
@@ -213,11 +213,11 @@
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Tanggal Mulai
                     </label>
-                    <x-form.date-picker 
+                    <x-form.date-picker
                         x-model="formData.tanggal_mulai"
-                        id="tanggal_mulai" 
+                        id="tanggal_mulai"
                         name="tanggal_mulai"
-                        placeholder="Tanggal Mulai" 
+                        placeholder="Tanggal Mulai"
                     />
                 </div>
 
@@ -225,11 +225,11 @@
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Tanggal Berakhir (Deadline)
                     </label>
-                    <x-form.date-picker 
+                    <x-form.date-picker
                         x-model="formData.tanggal_selesai"
-                        id="tanggal_selesai" 
+                        id="tanggal_selesai"
                         name="tanggal_selesai"
-                        placeholder="Tanggal Selesai" 
+                        placeholder="Tanggal Selesai"
                     />
                 </div>
 
@@ -318,9 +318,6 @@
                     handleTanggalField();
                 }, 50);
             });
-
         });
     </script>
-
-
 </x-ui.smart-modal>

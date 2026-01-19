@@ -86,7 +86,7 @@
                                 {{ $penugasan->target ?? '-' }} <span class="block text-xs text-orange-800">{{ $penugasan->satuan_target ?? '-' }}</span>
                             </td>
                             <td class="px-4 py-3 text-xs text-gray-700 text-center">
-                                {{ 
+                                {{
                                     ($penugasan->tanggal_mulai && $penugasan->tanggal_selesai)
                                         ? (
                                             $penugasan->tanggal_mulai->equalTo($penugasan->tanggal_selesai)
@@ -368,14 +368,14 @@
                                         @endcan
 
                                         {{-- @if($penugasan->isDinasLuar()) --}}
-                                        @can('send', $penugasan)
+                                        @can('acceptDL', $penugasan)
                                             <form action="{{ route('kalenderDL.store')}}"
                                                 method="POST" class="flex flex-col items-center">
                                                 @csrf
-                                                
-                                                <input type="hidden" name="id_pegawai" value="{{ Auth::user()->id_pegawai }}">
+
+                                                <input type="hidden" name="id_pegawai" value="{{ $penugasan->id_anggota }}">
                                                 <input type="hidden" name="tanggal_dl" value="{{ $penugasan->tanggal_selesai }}">
-                                                
+
                                                 <button type="submit" class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -386,7 +386,7 @@
                                             </form>
                                         @endcan
                                         {{-- @endif --}}
-                                        
+
                                         <!-- Tombol Jadikan CKP -->
                                         <button @click="closeDropdown()"
                                             class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 flex items-center gap-2 whitespace-nowrap">

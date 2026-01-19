@@ -15,8 +15,8 @@
         </div>
 
         {{-- Filter --}}
-        <form method="GET" action="{{ route('kalenderDL.index') }}" 
-              class="flex items-end gap-3 bg-white p-3 rounded-lg border shadow-sm">
+        <form method="GET" action="{{ route('kalenderDL.index') }}"
+            class="flex items-end gap-3 bg-white p-3 rounded-lg border shadow-sm">
 
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1">Bulan</label>

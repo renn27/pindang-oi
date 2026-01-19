@@ -65,7 +65,7 @@ class KegiatanController extends Controller
             'ketuaTims' => $ketuaTims
         ]);
     }
-
+    
     public function store(Request $request, Bidang $bidang) {
         // dd($request->all());
 

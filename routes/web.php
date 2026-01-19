@@ -83,10 +83,10 @@ Route::middleware('auth')->group(function () {
 
         // Sub Kegiatan
         Route::prefix('{kegiatan:id_kegiatan}/sub-kegiatan')->group(function () {
-            Route::post('/', [SubKegiatanController::class, 'store'])->name('sub.kegiatan.store');// create
-            Route::get('/{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'show'])->name('sub.kegiatan.show')->middleware('can:view,subKegiatan');; // show detail
-            Route::put('/{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'update'])->name('sub.kegiatan.update')->middleware('can:update,subKegiatan');; // edit
-            Route::delete('/{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'delete'])->name('sub.kegiatan.delete')->middleware('can:delete,subKegiatan');; // delete
+            Route::post('/', [SubKegiatanController::class, 'store'])->name('sub.kegiatan.store')->middleware('can:create,kegiatan');// create
+            Route::get('/{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'show'])->name('sub.kegiatan.show')->middleware('can:view,subKegiatan');// show detail
+            Route::put('/{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'update'])->name('sub.kegiatan.update')->middleware('can:update,subKegiatan');// edit
+            Route::delete('/{subKegiatan:id_sub_kegiatan}', [SubKegiatanController::class, 'delete'])->name('sub.kegiatan.delete')->middleware('can:delete,subKegiatan');// delete
         });
     });
     // END KEGIATAN & SUB KEGIATAN BY KETUA TIM
@@ -95,9 +95,9 @@ Route::middleware('auth')->group(function () {
     Route::prefix('sub-kegiatan/{subKegiatan:id_sub_kegiatan}')->group(function () {
         // CRUD PENUGASAN BY KETUA TIM
         Route::prefix('penugasan')->group(function () {
-            Route::post('/', [PenugasanController::class, 'store'])->name('penugasan.store')->middleware('can:create,App\Models\Penugasan,subKegiatan');; // create
-            Route::put('/{penugasan:id_penugasan}', [PenugasanController::class, 'update'])->name('penugasan.update') ->middleware('can:update,penugasan');; // edit
-            Route::delete('/{penugasan}', [PenugasanController::class, 'delete'])->name('penugasan.delete')->middleware('can:delete,penugasan');; // delete
+            Route::post('/', [PenugasanController::class, 'store'])->name('penugasan.store')->middleware('can:create,App\Models\Penugasan,subKegiatan');// create
+            Route::put('/{penugasan:id_penugasan}', [PenugasanController::class, 'update'])->name('penugasan.update') ->middleware('can:update,penugasan'); // edit
+            Route::delete('/{penugasan}', [PenugasanController::class, 'delete'])->name('penugasan.delete')->middleware('can:delete,penugasan'); // delete
 
             // CRUD PENGIRIMAN BY ANGGOTA TIM
             Route::prefix('{penugasan:id_penugasan}/pengirimans')->group(function () {

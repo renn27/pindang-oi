@@ -13,7 +13,7 @@ class PenugasanPolicy
     protected function isKetuaOwner(Pegawai $pegawai, Penugasan $penugasan): bool
     {
         return
-            $pegawai->hasRole('Ketua Tim') &&
+            in_array($pegawai->active_role, ['Admin', 'Pimpinan'], true) &&
             $pegawai->id_pegawai === $penugasan->subKegiatan->kegiatan->id_penanggung_jawab;
     }
 
@@ -72,6 +72,24 @@ class PenugasanPolicy
     public function send(Pegawai $pegawai, Penugasan $penugasan): bool
     {
         return $this->isAssignedAnggota($pegawai, $penugasan);
+    }
+
+    public function acceptDL(Pegawai $pegawai, Penugasan $penugasan): bool
+    {
+       // 1️⃣ Jenis kegiatan yang dianggap Dinas Luar
+        $jenisDL = [
+            'Pengawasan',
+            'Pendataan',
+            'Supervisi',
+            'Perjalanan Dinas',
+        ];
+
+        // 2️⃣ Pastikan jenis kegiatan masuk DL
+        if (! in_array($penugasan->jenisKegiatan->jenis_kegiatan, $jenisDL, true)) {
+            return false;
+        }
+
+        return $pegawai->active_role == "Pimpinan";
     }
 
     // === PENERIMAAN ===
