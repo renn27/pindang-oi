@@ -21,6 +21,7 @@ class Bidang extends Model
         'nama_bidang',
         'slug',
         'detail_bidang',
+        'urutan',
     ];
 
     public static function getNavItems(): array
@@ -48,7 +49,7 @@ class Bidang extends Model
         }
 
         return $query
-            ->orderBy('nama_bidang')
+            ->orderBy('urutan')
             ->get()
             ->map(function ($bidang) use ($currentBidang) {
                 return [
