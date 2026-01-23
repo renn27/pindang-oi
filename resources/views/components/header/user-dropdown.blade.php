@@ -15,8 +15,8 @@
         type="button"
     >
         <span class="mr-3 overflow-hidden rounded-full h-11 w-11">
-            <img src="{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('images/user/owner.png') }}"
-                        alt="user" class="h-full w-full object-cover" />
+            <img src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/user/owner.png') }}"
+                class="h-full w-full object-cover"/>
         </span>
 
         <span class="block mr-1 font-medium text-theme-sm">

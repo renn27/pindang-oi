@@ -16,10 +16,9 @@
         <div class="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
             <div class="flex w-full flex-col items-center gap-6 xl:flex-row">
                 <div class="h-20 w-20 overflow-hidden rounded-full border border-gray-200">
-                    {{-- <img src="./images/user/owner.jpg" alt="user" /> --}}
-                    <img src="{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('images/user/owner.png') }}"
-                        class="h-full w-full object-cover">
-
+                    <img src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/user/owner.png') }}"
+                        class="h-full w-full object-cover"
+                    />
 
                 </div>
                 <div class="order-3 xl:order-2">

@@ -59,20 +59,27 @@ class ProfileController extends Controller
         //foto
         if ($request->hasFile('photo')) {
 
-            // hapus foto lama
-            if ($user->photo && Storage::disk('public')->exists('profile/' . $user->photo)) {
-                Storage::disk('public')->delete('profile/' . $user->photo);
+            // hapus foto lama (pakai full path dari DB)
+            if ($user->photo && Storage::disk('public')->exists($user->photo)) {
+                Storage::disk('public')->delete($user->photo);
             }
 
-            // buat nama file unik
+            // folder tujuan
+            $folder = 'foto-profil';
+
+            // nama file unik
             $filename = uniqid() . '.' . $request->photo->extension();
 
-            // simpan foto
-            $request->photo->storeAs('profile', $filename, 'public');
+            // full path yang akan disimpan ke DB
+            $path = $folder . '/' . $filename;
 
-            // simpan ke DB
-            $user->photo = $filename;
+            // simpan file
+            $request->photo->storeAs($folder, $filename, 'public');
+
+            // simpan path ke DB
+            $user->photo = $path;
         }
+
 
         $user->save();
 
