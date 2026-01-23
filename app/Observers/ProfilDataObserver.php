@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\File;
 
 class ProfilDataObserver
 {
-    public function saved(Pegawai $pegawai)
+    public function updated(Pegawai $pegawai)
     {
         if (!$pegawai->photo) return;
 

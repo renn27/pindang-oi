@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Carbon\Carbon;
+use App\Models\Pegawai;
+use App\Observers\ProfilDataObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Pegawai::observe(ProfilDataObserver::class);
         Carbon::setLocale('id');
     }
 
