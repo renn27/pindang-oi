@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Helpers;
+
 use App\Models\Bidang;
 use Illuminate\Support\Facades\Auth;
 
@@ -56,15 +57,15 @@ class MenuHelper
 
         if (! $user || ! $activeRole) {
             return array_map(
-                fn ($menu) => self::normalizeMenuItem($menu),
-                array_filter($menus, fn ($m) => $m['name'] === 'Dashboard')
+                fn($menu) => self::normalizeMenuItem($menu),
+                array_filter($menus, fn($m) => $m['name'] === 'Dashboard')
             );
         }
 
         // ADMIN → semua menu
         if ($user->isActiveRole('Admin')) {
             return array_map(
-                fn ($menu) => self::normalizeMenuItem($menu),
+                fn($menu) => self::normalizeMenuItem($menu),
                 $menus
             );
         }
@@ -72,7 +73,7 @@ class MenuHelper
         // PIMPINAN → semua kecuali Admin
         if ($user->isActiveRole('Pimpinan')) {
             return array_map(
-                fn ($menu) => self::normalizeMenuItem($menu),
+                fn($menu) => self::normalizeMenuItem($menu),
                 $menus
             );
         }
@@ -80,8 +81,8 @@ class MenuHelper
         // KETUA TIM
         if ($user->isActiveRole('Ketua Tim')) {
             return array_map(
-                fn ($menu) => self::normalizeMenuItem($menu),
-                array_filter($menus, fn ($m) => in_array($m['name'], ['Dashboard', 'Tagihan Kerja', 'Rencana Kinerja', 'Kalender']))
+                fn($menu) => self::normalizeMenuItem($menu),
+                array_filter($menus, fn($m) => in_array($m['name'], ['Dashboard', 'Tagihan Kerja', 'Rencana Kinerja', 'Kalender']))
             );
         }
 
@@ -89,9 +90,21 @@ class MenuHelper
         $allowed = ['Dashboard', 'Tagihan Kerja', 'Kalender'];
 
         return array_map(
-            fn ($menu) => self::normalizeMenuItem($menu),
-            array_filter($menus, fn ($m) => in_array($m['name'], $allowed))
+            fn($menu) => self::normalizeMenuItem($menu),
+            array_filter($menus, fn($m) => in_array($m['name'], $allowed))
         );
+    }
+
+    public static function getOthersItems()
+    {
+        return [
+            [
+                'icon' => 'dashboard',
+                'name' => 'MANGCEK SE2026',
+                'path' => 'https://mangcek.bpsoganilir.com/admin',
+                'is_external' => true,
+            ]
+        ];
     }
 
     public static function getMenuGroups()
@@ -101,6 +114,10 @@ class MenuHelper
                 'title' => 'Menu',
                 'items' => self::getMainNavItems()
             ],
+            [
+                'title' => 'Informasi',
+                'items' => self::getOthersItems()
+            ]
         ];
     }
 
@@ -117,7 +134,14 @@ class MenuHelper
      * NORMALIZE MENU (FINAL VERSION)
      * ===============================
      */
-    private static function normalizeMenuItem(array $item): array {
+    private static function normalizeMenuItem(array $item): array
+    {
+
+        if (!empty($item['is_external'])) {
+            $item['is_active'] = false;
+            return $item;
+        }
+
         $currentPath = trim(request()->path(), '/');
 
         // ===============================
@@ -144,13 +168,13 @@ class MenuHelper
         if (!empty($item['subItems'])) {
 
             $item['subItems'] = array_map(
-                fn ($sub) => self::normalizeMenuItem($sub),
+                fn($sub) => self::normalizeMenuItem($sub),
                 $item['subItems']
             );
 
             // 🔥 PARENT ACTIVE JIKA ADA CHILD ACTIVE
             $hasActiveChild = collect($item['subItems'])
-                ->contains(fn ($sub) => $sub['is_active'] === true);
+                ->contains(fn($sub) => $sub['is_active'] === true);
 
             $item['is_active'] = $hasActiveChild;
             $item['is_open']   = $hasActiveChild;

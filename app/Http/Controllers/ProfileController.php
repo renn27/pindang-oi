@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+
 
 class ProfileController extends Controller
 {
@@ -52,6 +54,24 @@ class ProfileController extends Controller
         // Jika email berubah, reset verifikasi
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
+        }
+
+        //foto
+        if ($request->hasFile('photo')) {
+
+            // hapus foto lama
+            if ($user->photo && Storage::disk('public')->exists('profile/' . $user->photo)) {
+                Storage::disk('public')->delete('profile/' . $user->photo);
+            }
+
+            // buat nama file unik
+            $filename = uniqid() . '.' . $request->photo->extension();
+
+            // simpan foto
+            $request->photo->storeAs('profile', $filename, 'public');
+
+            // simpan ke DB
+            $user->photo = $filename;
         }
 
         $user->save();

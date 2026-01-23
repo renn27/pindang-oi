@@ -4,72 +4,80 @@
     <x-common.page-breadcrumb pageTitle="{{ $title }}" />
 
     <!-- Bagian Tahun -->
-    <div
-        class="flex flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 mb-6">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <!-- Label -->
-            <div class="flex items-center h-10">
-                <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
-                    Tampilkan Data Tahun
-                </label>
-            </div>
-
-            <!-- Dropdown -->
-            <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent w-full sm:w-auto">
-                <select
-                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden"
-                    :class="isOptionSelected && 'text-gray-800'" @change="isOptionSelected = true">
-                    <option value="" class="text-gray-700">
-                        2025
-                    </option>
-                    <option value="" class="text-gray-700">
-                        2024
-                    </option>
-                    <option value="" class="text-gray-700">
-                        2023
-                    </option>
-                    <option value="" class="text-gray-700">
-                        2022
-                    </option>
-                </select>
-                <span
-                    class="pointer-events-none absolute top-1/2 right-3.5 z-30 -translate-y-1/2 text-gray-500">
-                    <svg class="stroke-current" width="16" height="16" viewBox="0 0 20 20" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </span>
-            </div>
-
-            <!-- Tombol -->
-            <button type="button"
-                class="flex justify-center items-center rounded-lg bg-brand-500 px-5 py-2 text-sm font-medium text-white hover:bg-brand-600 w-full sm:w-auto h-10 whitespace-nowrap">
-                Tampilkan
-            </button>
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 mb-6 gap-4 sm:gap-0">
+    <!-- Bagian Kiri: Filter Tahun -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+        <!-- Label -->
+        <div class="flex items-center h-10">
+            <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                Tampilkan Data Tahun
+            </label>
         </div>
 
+        <!-- Dropdown -->
+        <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent w-full sm:w-auto">
+            <select
+                class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden"
+                :class="isOptionSelected && 'text-gray-800'" @change="isOptionSelected = true">
+                <option value="" class="text-gray-700">
+                    2026
+                </option>
+            </select>
+            <span
+                class="pointer-events-none absolute top-1/2 right-3.5 z-30 -translate-y-1/2 text-gray-500">
+                <svg class="stroke-current" width="16" height="16" viewBox="0 0 20 20" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </span>
+        </div>
+    </div>
+
+    <!-- Bagian Kanan: Tombol Aksi -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
         @can('create', App\Models\Kegiatan::class)
-            <div class="flex justify-start mt-5">
-                <button
-                    class="flex items-center gap-2 rounded-full border border-gray-300
-                            bg-white px-4 py-3 text-sm font-medium text-gray-700
-                            shadow-theme-xs hover:bg-gray-50 hover:text-gray-800"
-                    @click="$dispatch('open-smart-modal', {
-                                modalId: 'modal-kegiatan',
-                    })">
-                    <!-- icon -->
-                    <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd"
-                            d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z"
-                            fill="" />
-                    </svg>
-                    Tambah Kegiatan
-                </button>
-            </div>
+            <!-- Tombol Liat MPH -->
+            <button
+    class="flex items-center justify-center gap-2 rounded-full border border-gray-300
+                        bg-white px-4 py-3 text-sm font-medium text-gray-700
+                        shadow-theme-xs hover:bg-gray-50 hover:text-gray-800
+                        transition-colors duration-200 w-full sm:w-auto"
+    @click="$dispatch('open-smart-modal', {
+                modalId: 'modal-mph',
+    })">
+    <!-- icon mata -->
+    <svg class="fill-current" width="18" height="18" viewBox="0 0 24 24" fill="none"
+        xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"
+            fill="currentColor"/>
+        <path d="M12 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"
+            fill="currentColor"/>
+    </svg>
+    Lihat MPH
+</button>
+            
+            <!-- Tombol Tambah Kegiatan -->
+            <button
+                class="flex items-center justify-center gap-2 rounded-full border border-gray-300
+                        bg-white px-4 py-3 text-sm font-medium text-gray-700
+                        shadow-theme-xs hover:bg-gray-50 hover:text-gray-800
+                        transition-colors duration-200 w-full sm:w-auto"
+                @click="$dispatch('open-smart-modal', {
+                            modalId: 'modal-kegiatan',
+                })">
+                <!-- icon -->
+                <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z"
+                        fill="" />
+                </svg>
+                Tambah Kegiatan
+            </button>
         @endcan
     </div>
+</div>
 
     <!-- Container untuk Card Kegiatan -->
     <div class="space-y-6">
@@ -186,6 +194,9 @@
 
     {{-- MODAL KEGIATAN --}}
     @include('pages.main.components.modals.tagihan-kerja.modal-kegiatan')
+
+    {{-- MODAL MPH --}}
+    @include('pages.main.components.modals.tagihan-kerja.modal-mph')
 
     {{-- MODAL SUB KEGIATAN --}}
     @include('pages.main.components.modals.tagihan-kerja.modal-sub-kegiatan')
