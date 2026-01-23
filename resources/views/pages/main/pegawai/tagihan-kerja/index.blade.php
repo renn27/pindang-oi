@@ -135,7 +135,6 @@
 
                             @can('delete', $kegiatan)
                                 {{-- Hapus --}}
-                                {{-- Delete --}}
                                     <form id="delete-kegiatan-{{ $kegiatan->id_kegiatan }}"
                                     action="{{ route('kegiatan.delete', [
                                         'kegiatan' => $kegiatan->id_kegiatan,
