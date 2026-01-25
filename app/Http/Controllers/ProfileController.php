@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+
 
 class ProfileController extends Controller
 {
@@ -53,6 +55,31 @@ class ProfileController extends Controller
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
+
+        //foto
+        if ($request->hasFile('photo')) {
+
+            // hapus foto lama (pakai full path dari DB)
+            if ($user->photo && Storage::disk('public')->exists($user->photo)) {
+                Storage::disk('public')->delete($user->photo);
+            }
+
+            // folder tujuan
+            $folder = 'foto-profil';
+
+            // nama file unik
+            $filename = uniqid() . '.' . $request->photo->extension();
+
+            // full path yang akan disimpan ke DB
+            $path = $folder . '/' . $filename;
+
+            // simpan file
+            $request->photo->storeAs($folder, $filename, 'public');
+
+            // simpan path ke DB
+            $user->photo = $path;
+        }
+
 
         $user->save();
 

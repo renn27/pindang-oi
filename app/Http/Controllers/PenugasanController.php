@@ -6,6 +6,7 @@ use App\Models\Penugasan;
 use App\Models\SubKegiatan;
 use App\Models\JenisKegiatan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class PenugasanController extends Controller
@@ -104,20 +105,20 @@ class PenugasanController extends Controller
 
     public function update(Request $request, SubKegiatan $subKegiatan, Penugasan $penugasan)
     {
-        dd($request->all());
+        // dd($request->all());
         $this->authorize('update', $penugasan);
 
         $validated = $request->validate([
             'id_anggota' => ['required', 'exists:pegawais,id_pegawai'],
             'id_jenis_kegiatan' => ['required'],
+            'jenis_kegiatan_baru' => ['nullable', 'string', 'max:100'],
             'target' => ['required', 'integer', 'min:1'],
+            'satuan_target' => ['required', 'string', 'max:50'],
 
             'tanggal_pelaksanaan' => ['nullable', 'date', 'after_or_equal:today'],
 
             'tanggal_mulai' => ['nullable', 'date', 'after_or_equal:today'],
             'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
-
-            'status' => ['required', 'in:Belum Dikirim,Sudah Dikirim,Masih Revisi,Sudah Diterima'],
         ]);
 
         /**
@@ -158,12 +159,25 @@ class PenugasanController extends Controller
                     'subKegiatan' => $subKegiatan->id_sub_kegiatan
                 ])
                 ->with('success', 'Data Penugasan kepada anggota berhasil diperbarui.');
-        } catch (\Exception $e) {
-            dd($e->getMessage());
-            return redirect()->back()
-                ->with('error', 'Gagal memperbarui data penugasan kepada anggota. Silakan coba lagi.')
+        } catch (\Throwable $e) {
+            Log::error('Update penugasan gagal', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'trace'   => $e->getTraceAsString(),
+            ]);
+
+            return back()
+                ->with('error', 'Terjadi kesalahan sistem.')
                 ->withInput();
         }
+        // } catch (\Exception $e) {
+        //     dd($e->getMessage());
+            
+        //     return redirect()->back()
+        //         ->with('error', 'Gagal memperbarui data penugasan kepada anggota. Silakan coba lagi.')
+        //         ->withInput();
+        // }
     }
 
     /**

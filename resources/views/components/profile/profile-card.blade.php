@@ -1,11 +1,25 @@
-<div x-data="{saveProfile(){
-    console.log('Saving profile...');
-}}">
+<div x-data="{
+    photoPreview: '{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('images/user/owner.png') }}',
+
+    previewPhoto(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        this.photoPreview = URL.createObjectURL(file);
+    },
+
+    saveProfile() {
+        console.log('Saving profile...');
+    }
+}">
     <div class="mb-6 rounded-2xl border border-gray-200 p-5 lg:p-6">
         <div class="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
             <div class="flex w-full flex-col items-center gap-6 xl:flex-row">
                 <div class="h-20 w-20 overflow-hidden rounded-full border border-gray-200">
-                    <img src="./images/user/owner.jpg" alt="user" />
+                    <img src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/user/owner.png') }}"
+                        class="h-full w-full object-cover"
+                    />
+
                 </div>
                 <div class="order-3 xl:order-2">
                     <h4 class="mb-2 text-center text-lg font-semibold text-gray-800 xl:text-left">
@@ -76,61 +90,81 @@
 
     <!-- Profile Info Modal -->
     <x-ui.smart-modal @open-profile-info-modal.window="open = true" :isOpen="false" class="max-w-[700px]">
-        <div
-            class="w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 lg:p-11">
-            <div class="px-2 pr-14">
-                <h4 class="mb-2 text-2xl font-semibold text-gray-800">
-                    Ubah Data
-                </h4>
-                <p class="mb-6 text-sm text-gray-500 lg:mb-7">
-                    Lakukan perubahan atau penambahan data yang diperlukan
-                </p>
+        <div class="w-full max-w-[700px] overflow-hidden rounded-3xl bg-white flex flex-col max-h-[90vh]">
+            <!-- Header Modal (Compact) -->
+            <div class="flex-shrink-0 border-b border-gray-200 px-6 py-4">
+                <div class="px-2">
+                    <h4 class="text-xl font-semibold text-gray-800">
+                        Ubah Data
+                    </h4>
+                    <p class="text-sm text-gray-500 mt-1">
+                        Lakukan perubahan atau penambahan data yang diperlukan
+                    </p>
+                </div>
             </div>
-            <form method="post" action="{{ route('profile.update') }}" class="flex flex-col">
-                @csrf
-                @method('PATCH')
-                <div class="custom-scrollbar p-2">
-                    {{-- Social Links --}}
-                    {{-- <div>
-                        <h5 class="mb-5 text-lg font-medium text-gray-800 lg:mb-6">
-                            Social Links
+
+            <!-- Body Area dengan Scroll -->
+            <div class="flex-1 overflow-y-auto p-6 lg:p-8">
+                <form method="post" action="{{ route('profile.update') }}" class="flex flex-col h-full"
+                    enctype="multipart/form-data">
+                    @csrf
+                    @method('PATCH')
+
+                    <!-- Ganti photo profile di modal -->
+                    <div class="col-span-2 mb-8">
+                        <h5 class="mb-4 text-lg font-medium text-gray-800">
+                            Foto Profil
                         </h5>
 
-                        <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">
-                                    Facebook
+                        <div class="flex flex-col items-center gap-4">
+                            <!-- Preview Foto dengan Upload Button -->
+                            <div class="relative">
+                                <div class="h-32 w-32 overflow-hidden rounded-full border-2 border-gray-200">
+                                    <img src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/user/owner.png') }}"
+                class="h-full w-full object-cover"/>
+                                </div>
+
+                                <!-- Upload Button Floating -->
+                                <label for="photo-upload"
+                                    class="absolute bottom-0 right-0 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white border-2 border-gray-300 text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:border-brand-400">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+                                    </svg>
+                                    <input type="file" name="photo" id="photo-upload" accept="image/*"
+                                        class="hidden" @change="previewPhoto">
                                 </label>
-                                <input type="text" value="https://www.facebook.com/PimjoHQ"
-                                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                             </div>
 
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">
-                                    X.com
-                                </label>
-                                <input type="text" value="https://x.com/PimjoHQ"
-                                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                            <!-- Petunjuk Singkat -->
+                            <div class="text-center">
+                                <p class="text-sm text-gray-600">
+                                    Klik icon kamera untuk mengganti foto
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Format: PNG, JPG, JPEG • Maks. 2MB
+                                </p>
+
+                                <!-- Reset Button Minimal -->
+                                <div x-show="photoPreview.includes('blob:')" x-transition class="mt-3">
+                                    <button type="button"
+                                        @click="photoPreview = '{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('images/user/owner.png') }}'; document.getElementById('photo-upload').value = ''"
+                                        class="text-sm text-gray-500 hover:text-gray-700 underline">
+                                        Reset ke foto sebelumnya
+                                    </button>
+                                </div>
                             </div>
 
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">
-                                    Linkedin
-                                </label>
-                                <input type="text" value="https://www.linkedin.com/company/pimjo/posts/?feedView=all"
-                                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
-                            </div>
-
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">
-                                    Instagram
-                                </label>
-                                <input type="text" value="https://instagram.com/emirhan55"
-                                    class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
-                            </div>
+                            <!-- Error Messages -->
+                            <x-input-error :messages="$errors->get('photo')" class="text-center" />
                         </div>
-                    </div> --}}
-                    <div class="mt-2">
+                    </div>
+
+                    {{-- Bagian Informasi Pribadi --}}
+                    <div>
                         <h5 class="mb-5 text-lg font-medium text-gray-800 lg:mb-6">
                             Informasi Pribadi
                         </h5>
@@ -140,7 +174,8 @@
                                 <label class="mb-1.5 block text-sm font-medium text-gray-700">
                                     Nama Lengkap
                                 </label>
-                                <input type="text" name="name" id="name" value="{{ Auth::user()->nama_pegawai}}"
+                                <input type="text" name="name" id="name"
+                                    value="{{ Auth::user()->nama_pegawai }}"
                                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                             </div>
 
@@ -148,7 +183,8 @@
                                 <label class="mb-1.5 block text-sm font-medium text-gray-700">
                                     Username
                                 </label>
-                                <input type="text" name="username" id="username" value="{{ Auth::user()->username}}"
+                                <input type="text" name="username" id="username"
+                                    value="{{ Auth::user()->username }}"
                                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                             </div>
 
@@ -156,16 +192,17 @@
                                 <label class="mb-1.5 block text-sm font-medium text-gray-700">
                                     Email
                                 </label>
-                                <input type="text" id="email" name="email" value="{{  Auth::user()->email }}"
+                                <input type="text" id="email" name="email" value="{{ Auth::user()->email }}"
                                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                                 <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
-                                @if ( Auth::user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !  Auth::user()->hasVerifiedEmail())
-                                    <div>
-                                        <p class="text-sm mt-2 text-gray-800">
+                                @if (Auth::user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !Auth::user()->hasVerifiedEmail())
+                                    <div class="mt-2">
+                                        <p class="text-sm text-gray-800">
                                             {{ __('Your email address is unverified.') }}
 
-                                            <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                            <button form="send-verification"
+                                                class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                                 {{ __('Click here to re-send the verification email.') }}
                                             </button>
                                         </p>
@@ -183,7 +220,8 @@
                                 <label class="mb-1.5 block text-sm font-medium text-gray-700">
                                     Jabatan
                                 </label>
-                                <input type="text" id="jabatan" name="jabatan" value="{{ Auth::user()->jabatan }}"
+                                <input type="text" id="jabatan" name="jabatan"
+                                    value="{{ Auth::user()->jabatan }}"
                                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                             </div>
 
@@ -191,14 +229,23 @@
                                 <label class="mb-1.5 block text-sm font-medium text-gray-700">
                                     Alamat
                                 </label>
-                                <input type="text" id="alamat" name="alamat" value="{{ Auth::user()->alamat }}" placeholder="{{ Auth::user()->alamat ? '' : 'Alamat belum diisi' }}"
+                                <input type="text" id="alamat" name="alamat"
+                                    value="{{ Auth::user()->alamat }}"
+                                    placeholder="{{ Auth::user()->alamat ? '' : 'Alamat belum diisi' }}"
                                     class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-                    <button @click="open = false" type="button"
+
+                    <!-- Spacer untuk footer -->
+                    <div class="flex-1"></div>
+            </div>
+
+            <!-- Footer Modal (Sticky) -->
+            <div class="flex-shrink-0 border-t border-gray-200 bg-gray-50 px-6 py-4">
+                <div class="flex items-center gap-3 lg:justify-end">
+                    <button type="button"
+                        @click=" open = false; photoPreview = '{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('images/user/owner.png') }}';"
                         class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto">
                         Close
                     </button>
@@ -207,6 +254,7 @@
                         Save Changes
                     </button>
                 </div>
+            </div>
             </form>
         </div>
     </x-ui.smart-modal>

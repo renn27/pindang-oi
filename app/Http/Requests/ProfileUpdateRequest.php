@@ -26,6 +26,7 @@ class ProfileUpdateRequest extends FormRequest
                     ->ignore($this->user()->id_pegawai, 'id_pegawai'),
             ],
             'jabatan' => ['required', 'string', 'max:255'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             'alamat' => ['nullable', 'string'],
             'email' => [
                 'required',

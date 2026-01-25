@@ -172,6 +172,7 @@
                                     @else
                                         <!-- Simple Menu Item -->
                                         <a href="{{ $item['path'] }}"
+                                            @if (!empty($item['is_external'])) target="_blank" rel="noopener noreferrer" @endif
                                             class="menu-item group w-full
                                             {{ $item['is_active'] ?? false ? 'menu-item-active' : 'menu-item-inactive' }}"
                                             :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar

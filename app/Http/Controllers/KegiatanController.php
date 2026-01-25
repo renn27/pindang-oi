@@ -57,7 +57,7 @@ class KegiatanController extends Controller
                     ]);
 
         return view('pages.main.pegawai.tagihan-kerja.index', [
-            'title'     => $bidang->nama_bidang,
+            'title'     => $bidang->detail_bidang,
             'bidang'    => $bidang,
             'kegiatans' => $kegiatans,
             'pegawais'  => $pegawais,
