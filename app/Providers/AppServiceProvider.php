@@ -26,5 +26,6 @@ class AppServiceProvider extends ServiceProvider
     protected $policies = [
         \App\Models\Kegiatan::class => \App\Policies\KegiatanPolicy::class,
         \App\Models\SubKegiatan::class => \App\Policies\SubKegiatanPolicy::class,
+        \App\Models\Penugasan::class => \App\Policies\PenugasanPolicy::class,
     ];
 }
