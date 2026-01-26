@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\BidangController;
 use App\Http\Controllers\IndikatorJPTController;
 use App\Http\Controllers\KalenderDLController;
+use App\Http\Controllers\KalenderKegiatanController;
 use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\MasterKegiatanController;
 use App\Http\Controllers\PenerimaanController;
@@ -122,6 +123,12 @@ Route::middleware('auth')->group(function () {
     Route::prefix('/kalender-dl')->group(function () {
         Route::get('/', [KalenderDLController::class, 'index'])->name('kalenderDL.index');
         Route::post('/', [KalenderDLController::class, 'store'])->name('kalenderDL.store');
+    });
+
+    // ROUTE KALENDER DL
+    Route::prefix('/kalender-kegiatan')->group(function () {
+        Route::get('/', [KalenderKegiatanController::class, 'index'])->name('kalenderDL.index');
+        // Route::post('/', [KalenderDLController::class, 'store'])->name('kalenderDL.store');
     });
     // END ROUTE MASTER KEGIATAN
 });

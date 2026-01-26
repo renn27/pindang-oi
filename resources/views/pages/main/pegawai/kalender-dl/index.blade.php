@@ -52,29 +52,34 @@
     {{-- Kalender --}}
     <div class="bg-white border rounded-xl shadow-sm overflow-hidden">
 
-        <div class="w-full overflow-hidden">
-            <table class="w-full text-[11px] border-collapse table-fixed">
+        {{--
+            Mobile & Tablet  : boleh scroll horizontal
+            Desktop (lg+)    : NO horizontal scroll
+        --}}
+        <div class="w-full overflow-x-auto lg:overflow-x-hidden">
+            <table class="w-full border-collapse table-fixed text-[11px] lg:text-[12px]">
 
                 {{-- HEADER --}}
                 <thead class="bg-gray-50 sticky top-0 z-20">
                     <tr>
                         {{-- Pegawai --}}
-                        <th class="border-b px-3 py-2 text-left font-semibold text-gray-700 max-w-1">
+                        <th class="border-b px-3 py-2 text-left font-semibold text-gray-700 w-[180px]">
                             Pegawai
                         </th>
 
                         {{-- Total --}}
-                        <th class="border-b px-2 py-2 text-center font-semibold text-gray-700 w-[70px]">
+                        <th class="border-b px-2 py-2 text-center font-semibold text-gray-700 w-[60px]">
                             Total
                         </th>
 
                         {{-- Tanggal --}}
                         @foreach($dates as $date)
-                            <th class="border-b px-0.5 py-2 text-center w-[32px]">
-                                <div class="text-[11px] font-semibold text-gray-800 leading-tight">
+                            <th class="border-b px-0.5 py-2 text-center
+                                w-[34px] lg:w-[26px]">
+                                <div class="font-semibold text-gray-800 leading-tight text-[11px] lg:text-[10px]">
                                     {{ $date->format('d') }}
                                 </div>
-                                <div class="text-[9px] text-gray-500 uppercase leading-tight">
+                                <div class="text-gray-500 uppercase leading-tight text-[9px] lg:text-[8px]">
                                     {{ $date->translatedFormat('D') }}
                                 </div>
                             </th>
@@ -86,10 +91,10 @@
                 <tbody>
                     @foreach($pegawais as $pegawai)
 
-                        <tr class="hover:bg-blue-50 transition h-[36px]">
+                        <tr class="hover:bg-blue-50 transition h-[34px]">
 
                             {{-- Nama --}}
-                            <td class="border-b px-3 py-1 font-medium text-gray-800">
+                            <td class="border-b px-3 py-1 font-medium text-gray-800 truncate">
                                 {{ $pegawai->nama_pegawai }}
                             </td>
 
@@ -116,9 +121,9 @@
 
                                 <td class="border-b p-0.5 text-center">
                                     @if($hasDL)
-                                        <div class="mx-auto h-5 w-5 rounded bg-blue-700"></div>
+                                        <div class="mx-auto h-4 w-4 lg:h-3.5 lg:w-3.5 rounded bg-blue-700"></div>
                                     @else
-                                        <div class="mx-auto h-5 w-5 rounded bg-gray-100"></div>
+                                        <div class="mx-auto h-4 w-4 lg:h-3.5 lg:w-3.5 rounded bg-gray-100"></div>
                                     @endif
                                 </td>
                             @endforeach

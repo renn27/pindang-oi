@@ -44,6 +44,7 @@ class MenuHelper
                 'name' => 'Kalender',
                 'subItems' => [
                     ['name' => 'Kalender DL', 'path' => '/kalender-dl'],
+                    ['name' => 'Kalender Kegiatan', 'path' => '/kalender-kegiatan'],
                 ],
             ],
             [
