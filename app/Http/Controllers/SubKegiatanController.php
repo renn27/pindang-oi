@@ -93,13 +93,12 @@ class SubKegiatanController extends Controller
 
         $validated = $request->validate([
             'nama_sub_kegiatan' => ['required', 'string', 'max:255'],
-            'jenis_kegiatan' => ['required', 'string', 'max:255'],
-            'satuan_target' => ['required', 'string', 'max:255'],
+            'target' => ['required', 'integer', 'min:1'],
             'tanggal_mulai' => [
                 'required',
                 'date',
                 'date_format:Y-m-d',
-                'after_or_equal:today',
+                // 'after_or_equal:today',
             ],
             'tanggal_selesai' => [
                 'required',
@@ -107,7 +106,7 @@ class SubKegiatanController extends Controller
                 'date_format:Y-m-d',
                 'after_or_equal:tanggal_mulai',
             ],
-            'status' => ['required', 'in:Belum Mulai,Berjalan,Selesai'],
+            // 'status' => ['required', 'in:Belum Mulai,Berjalan,Selesai'],
         ]);
 
         // 🔒 VALIDASI KEPEMILIKAN (PENTING!)

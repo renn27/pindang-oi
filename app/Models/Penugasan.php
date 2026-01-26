@@ -81,16 +81,24 @@ class Penugasan extends Model
 
     public function bolehKirim(): bool
     {
-        if (!$this->latestPenerimaan) {
-            return false; // belum diperiksa
-        }
-        
         $today   = Carbon::today();
         $mulai   = Carbon::parse($this->tanggal_mulai);
         $selesai = Carbon::parse($this->tanggal_selesai);
 
-        return $today->between($mulai, $selesai);
+        // belum masuk waktu
+        if (!$today->between($mulai, $selesai)) {
+            return false;
+        }
+
+        // SUDAH KIRIM tapi BELUM DIPERIKSA → tidak boleh kirim lagi
+        if ($this->latestPengiriman && !$this->latestPenerimaan) {
+            return false;
+        }
+
+        // BELUM PERNAH KIRIM → boleh kirim
+        return true;
     }
+
 
     public function tooltipPengiriman(): ?string
     {
@@ -98,28 +106,32 @@ class Penugasan extends Model
         $mulai   = Carbon::parse($this->tanggal_mulai);
         $selesai = Carbon::parse($this->tanggal_selesai);
 
-        // ⚠️ BELUM DIPERIKSA KETUA TIM
-        if (!$this->latestPenerimaan) {
-            return 'warning|Pengiriman sedang diperiksa oleh ketua tim';
-        }   
-
-        // ❌ TELAT
-        if ($today->gt($selesai)) {
-            return 'danger|Penugasan telah berakhir · Anda terlambat / tidak mengirimkan penugasan';
-        }
-
         // ⏳ BELUM MULAI
         if ($today->lt($mulai)) {
             $hari = $today->diffInDays($mulai);
 
-            $text = $hari === 1
-                ? 'Belum dimulai · Aktif 1 hari lagi'
-                : 'Belum dimulai · Aktif '.$hari.' hari lagi';
-
-            return 'info|'.$text;
+            return 'info|' . (
+                $hari === 1
+                    ? 'Belum dimulai · Aktif 1 hari lagi'
+                    : 'Belum dimulai · Aktif ' . $hari . ' hari lagi'
+            );
         }
 
-        return null; // aktif
+        // ⚠️ SUDAH KIRIM, BELUM DIPERIKSA (masih dalam waktu)
+        if (
+            $this->latestPengiriman &&
+            !$this->latestPenerimaan &&
+            $today->between($mulai, $selesai)
+        ) {
+            return 'warning|Pengiriman sedang diperiksa oleh ketua tim';
+        }
+
+        // ❌ TELAT (belum pernah kirim)
+        if (!$this->latestPengiriman && $today->gt($selesai)) {
+            return 'danger|Penugasan telah berakhir · Anda tidak mengirimkan penugasan';
+        }
+
+        return null; // aktif, tanpa tooltip
     }
 
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Penugasan;
 use App\Models\SubKegiatan;
+use Illuminate\Support\Facades\DB;
 
 class PengirimanController extends Controller
 {
@@ -20,8 +21,16 @@ class PengirimanController extends Controller
         ]);
 
         try {
+            DB::transaction(function () use ($penugasan, $validated) {
+
+                // 1️⃣ Simpan pengiriman
+                $penugasan->pengirimans()->create($validated);
+
+                // 2️⃣ Update status penugasan
+                $penugasan->status = 'Sudah Dikirim';
+                $penugasan->save();
+            });
             // Simpan
-            $penugasan->pengirimans()->create($validated);
 
             // Redirect dengan flash message
             return redirect()
