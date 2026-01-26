@@ -24,6 +24,10 @@
                             class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                             Waktu Pelaksanaan
                         </th>
+                        <th rowspan="2"
+                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                            Status Penerimaan
+                        </th>
                         <th colspan="3"
                             class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                             Pengiriman
@@ -96,6 +100,18 @@
                                         : '-'
                                 }}
                             </td>
+                            <td class="px-4 py-3 text-xs text-center">
+                                <span
+                                    class="inline-flex items-center px-2 py-1 rounded-full font-medium
+                                    {{ $penugasan->latestPenerimaan?->status === 'Diterima'
+                                        ? 'bg-green-100 text-green-700/80'
+                                        : ($penugasan->latestPenerimaan?->status === 'Revisi'
+                                            ? 'bg-orange-100 text-orange-500/80'
+                                            : 'bg-yellow-100/80 text-yellow-500') }}">
+                                    {{ $penugasan->latestPenerimaan?->status ?? 'Sedang Diperiksa' }}
+                                </span>
+                            </td>
+
 
                             {{-- PENGIRIMAN --}}
                             <td class="px-4 py-3 text-sm text-gray-700">
@@ -287,27 +303,53 @@
                                         @endcan
 
                                         @can('send', $penugasan)
-                                            {{-- @if($bolehAksi) --}}
-                                                <!-- Tombol Buat Pengiriman -->
+                                            <div class="relative group">
                                                 <button
-                                                    class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
-                                                    @click="$dispatch('open-smart-modal', {
+                                                    class="w-full rounded-lg text-left px-4 py-3 text-sm flex items-center gap-2 border-b
+                                                        {{ $penugasan->bolehKirim()
+                                                            ? 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                                                            : 'text-gray-400 bg-gray-50 cursor-not-allowed' }}"
+                                                    {{ $penugasan->bolehKirim() ? '' : 'disabled' }}
+
+                                                    @if($penugasan->bolehKirim())
+                                                        @click="$dispatch('open-smart-modal', {
                                                         modalId: 'modal-pengiriman-anggota',
                                                         data: {
                                                             id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
                                                             id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                             nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
                                                         }
-                                                    })">
-                                                    <!-- icon -->
+                                                    })"
+                                                    @endif>
                                                     <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
-                                                    Buat Pengiriman
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Buat Pengiriman
                                                 </button>
-                                            {{-- @endif --}}
+
+                                                @if(!$penugasan->bolehKirim() && $penugasan->tooltipPengiriman())
+                                                    @php
+                                                        [$type, $text] = explode('|', $penugasan->tooltipPengiriman(), 2);
+                                                    @endphp
+
+                                                    <div
+                                                        class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2
+                                                            hidden group-hover:block
+                                                            text-white text-xs rounded px-3 py-1 shadow
+                                                            {{
+                                                                $type === 'danger'
+                                                                    ? 'bg-red-500/80'
+                                                                    : ($type === 'warning'
+                                                                        ? 'bg-orange-500/80'
+                                                                        : 'bg-blue-500/80')
+                                                            }}">
+                                                        {{ $text }}
+                                                    </div>
+
+                                                @endif
+                                            </div>
                                         @endcan
 
                                         <!-- Tombol Tampilkan Histori Pengiriman -->
@@ -327,7 +369,7 @@
                                                             'jumlah_dikirim' => $p->jumlah_dikirim,
                                                             'media_pengiriman' => $p->media_pengiriman,
                                                             'bukti_dukung' => $p->bukti_dukung,
-                                                            'status' => $p->penerimaan?->status ?? 'Belum Diproses',
+                                                            'status' => $p->penerimaan?->status ?? 'Belum Diperiksa',
                                                             'catatan' => $p->penerimaan?->catatan,
                                                         ],
                                                     ),

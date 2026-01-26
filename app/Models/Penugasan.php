@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class Penugasan extends Model
 {
@@ -76,5 +77,49 @@ class Penugasan extends Model
         return in_array($this->jenis_kegiatan, $specialTypes);
     }
 
+
+
+    public function bolehKirim(): bool
+    {
+        if (!$this->latestPenerimaan) {
+            return false; // belum diperiksa
+        }
+        
+        $today   = Carbon::today();
+        $mulai   = Carbon::parse($this->tanggal_mulai);
+        $selesai = Carbon::parse($this->tanggal_selesai);
+
+        return $today->between($mulai, $selesai);
+    }
+
+    public function tooltipPengiriman(): ?string
+    {
+        $today   = Carbon::today();
+        $mulai   = Carbon::parse($this->tanggal_mulai);
+        $selesai = Carbon::parse($this->tanggal_selesai);
+
+        // ⚠️ BELUM DIPERIKSA KETUA TIM
+        if (!$this->latestPenerimaan) {
+            return 'warning|Pengiriman sedang diperiksa oleh ketua tim';
+        }   
+
+        // ❌ TELAT
+        if ($today->gt($selesai)) {
+            return 'danger|Penugasan telah berakhir · Anda terlambat / tidak mengirimkan penugasan';
+        }
+
+        // ⏳ BELUM MULAI
+        if ($today->lt($mulai)) {
+            $hari = $today->diffInDays($mulai);
+
+            $text = $hari === 1
+                ? 'Belum dimulai · Aktif 1 hari lagi'
+                : 'Belum dimulai · Aktif '.$hari.' hari lagi';
+
+            return 'info|'.$text;
+        }
+
+        return null; // aktif
+    }
 
 }

@@ -14,7 +14,7 @@
                             nama_penerima: '',
                             tanggal_penerimaan: '',
                             jumlah_diterima: '',
-                            status: '',,
+                            status: '',
                             catatan: ''
                         }">
     <form
@@ -23,7 +23,7 @@
         @csrf
         <div
             class="relative flex h-[90vh] w-full max-w-[800px] flex-col overflow-hidden
-               rounded-3xl bg-white">
+                rounded-3xl bg-white">
 
             <!-- HEADER (FIXED) -->
             <div class="shrink-0 border-b border-gray-200 px-6 py-3">

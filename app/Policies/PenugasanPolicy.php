@@ -13,7 +13,7 @@ class PenugasanPolicy
     protected function isKetuaOwner(Pegawai $pegawai, Penugasan $penugasan): bool
     {
         return
-            in_array($pegawai->active_role, ['Admin', 'Pimpinan'], true) &&
+            in_array($pegawai->active_role, ['Ketua Tim', 'Admin', 'Pimpinan'], true) &&
             $pegawai->id_pegawai === $penugasan->subKegiatan->kegiatan->id_penanggung_jawab;
     }
 
@@ -71,7 +71,16 @@ class PenugasanPolicy
     // === PENGIRIMAN ===
     public function send(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        return $this->isAssignedAnggota($pegawai, $penugasan);
+        if(!$this->isAssignedAnggota($pegawai, $penugasan)) {
+            return false;
+        }
+
+        if($penugasan->latestPenerimaan?->status === 'Diterima') {
+            return false;
+        }
+
+        // ✅ masih revisi / menunggu → boleh muncul
+        return true;
     }
 
     public function acceptDL(Pegawai $pegawai, Penugasan $penugasan): bool
