@@ -30,502 +30,180 @@
         </x-common.component-card>
 
         <!-- Tampilan Card Fungsi dengan Accordion -->
-        <x-common.component-card title="Daftar Fungsi">
+        <x-common.component-card title="Matriks Peran Hasil">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-800"></h2>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.location='{{ route('kegiatan.export-mph-all') }}'"
+                        class="flex items-center gap-2 rounded-lg border border-green-500
+       bg-green-50 px-4 py-2 text-sm font-medium text-green-700
+       hover:bg-green-100 hover:text-green-800 transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 384 512">
+                            <path
+                                d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c8.1-10.5 6.3-25.5-4.2-33.7s-25.5-6.3-33.7 4.2L192 280.9l-37.1-47.6z" />
+                        </svg>
+                        Export Excel
+                    </button>
+                </div>
+            </div>
             <div class="space-y-4">
-                <!-- Fungsi 1: Pengembangan Sistem Informasi -->
-                <div x-data="{ open: false }" class="rounded-lg border border-gray-200 bg-white">
-                    <!-- Header Fungsi -->
-                    <button
-                        @click="open = !open"
-                        class="flex w-full items-center justify-between p-4 text-left hover:bg-gray-50">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
-                                <span class="text-sm font-semibold text-blue-600">F1</span>
+                @foreach ($bidangs as $index => $bidang)
+                    <div x-data="{ open: false }" class="rounded-lg border border-gray-200 bg-white">
+                        <!-- Header Fungsi -->
+                        <button @click="open = !open"
+                            class="flex w-full items-center justify-between p-4 text-left hover:bg-gray-50">
+                            <div class="flex items-center gap-3">
+                                <div>
+                                    <h3 class="text-sm font-semibold text-gray-800">{{ $bidang->nama_bidang }}</h3>
+                                    <p class="text-xs text-gray-500">
+                                        Total {{ $bidang->kegiatans->count() }} kegiatan
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 class="text-sm font-semibold text-gray-800">Pengembangan Sistem Informasi</h3>
-                                <p class="text-xs text-gray-500">Bidang: Teknologi Informasi</p>
-                            </div>
-                        </div>
-                        <svg :class="{ 'rotate-180': open }" class="h-5 w-5 text-gray-500 transition-transform"
-                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
+                            <svg :class="{ 'rotate-180': open }" class="h-5 w-5 text-gray-500 transition-transform"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
 
-                    <!-- Accordion Content -->
-                    <div x-show="open" x-collapse class="border-t border-gray-100">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                                            Kegiatan
-                                        </th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                                            Sub Kegiatan
-                                        </th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                                            Nama Pegawai
-                                        </th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                                            Jenis Kegiatan
-                                        </th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                                            Target
-                                        </th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                                            Satuan
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Survei Harga Produsen -->
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm font-medium text-gray-800 align-top" rowspan="10">
-                                            Survei Harga Produsen
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top" rowspan="2">
-                                            Survei Harga Produsen Bulan Januari
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Ishlahul Kamal
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                                                Pendata
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            20
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Dokumen
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Ade Ulfa Wahyuni
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                                                Pendata
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            23
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Kegiatan
-                                        </td>
-                                    </tr>
-                                    
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top" rowspan="2">
-                                            Survei Harga Produsen Bulan Februari
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Ade Ulfa Wahyuni
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                                                Pencacah
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            20
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Dokumen
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Ishlahul Kamal
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800">
-                                                Pendokumentasian
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            25
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Peta
-                                        </td>
-                                    </tr>
-                                    
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top" rowspan="6">
-                                            Survei Harga Produsen Bulan Maret
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Ade Ulfa Wahyuni
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                                                Pencacah
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            50
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Dokumen
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Indra Gunawan
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
-                                                Makan Instansi
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            30
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Peta
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Ishlahul Kamal
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                                                Pencacah
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            10
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Dokumen
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Salsa Yurinka
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
-                                                Pengawasan
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            15
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Dokumen
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Ifone Arma
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
-                                                Perjalanan Dinas
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            20
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Dokumen
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            M. Gusti Arya Priandana
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800">
-                                                Supervisi
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            1
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            OH
-                                        </td>
-                                    </tr>
-                                    
-                                    <!-- Survei Barang Hasil Produksi -->
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm font-medium text-gray-800 align-top" rowspan="9">
-                                            Survei Barang Hasil Produksi
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top" rowspan="3">
-                                            Survei Barang Hasil Produksi Bulanan
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Ade Ulfa Wahyuni
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                                                Pendata
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            50
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Dokumen
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            M. Gusti Arya Priandana
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
-                                                Pengawasan
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            1
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            OH
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Ishlahul Kamal
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
-                                                Perjalanan Dinas
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            1
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Kegiatan
-                                        </td>
-                                    </tr>
-                                    
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top" rowspan="6">
-                                            Survei Barang Hasil Produksi Triwulan
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Ishlahul Kamal
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800">
-                                                Supervisi
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            1
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            OH
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Ishlahul Kamal
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                                                Pendata
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            12
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Dokumen
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Ishlahul Kamal
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800">
-                                                Pengolahan Data
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            2
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Dokumen
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Ade Ulfa Wahyuni
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800">
-                                                Pendokumentasian
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            4
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Peta
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Rendy Alamsyah
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800">
-                                                Pendokumentasian
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            5
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Peta
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            M. Gusti Arya Priandana
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                                                Pencacah
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            8
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Dokumen
-                                        </td>
-                                    </tr>
-                                    
-                                    <tr>
-                                        <td class="px-4 py-3 text-sm font-medium text-gray-800 align-top">
-                                            Survei Barang Hasil Produksi
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Survei Barang Hasil Produksi Triwulan
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Rendy Alamsyah
-                                        </td>
-                                        <td class="px-4 py-3 align-top">
-                                            <span class="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800">
-                                                Pengolahan Data
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            11
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-800 align-top">
-                                            Dokumen
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <!-- Accordion Content -->
+                        <div x-show="open" x-collapse class="border-t border-gray-100">
+                            @if ($bidang->kegiatans->count() > 0)
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full border border-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">
+                                                    Kegiatan
+                                                </th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">
+                                                    Sub Kegiatan
+                                                </th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">
+                                                    Nama Pegawai
+                                                </th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">
+                                                    Jenis Kegiatan
+                                                </th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">
+                                                    Target
+                                                </th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">
+                                                    Satuan
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @php
+                                                $rowCounter = 0;
+                                            @endphp
+
+                                            @foreach ($bidang->kegiatans as $kegiatan)
+                                                @php
+                                                    $kegiatanRowCount = 0;
+                                                    // Hitung total baris untuk kegiatan ini
+                                                    foreach ($kegiatan->subKegiatans as $subKegiatan) {
+                                                        $kegiatanRowCount += $subKegiatan->penugasans->count();
+                                                    }
+                                                @endphp
+
+                                                @foreach ($kegiatan->subKegiatans as $subIndex => $subKegiatan)
+                                                    @php
+                                                        $subRowCount = $subKegiatan->penugasans->count();
+                                                    @endphp
+
+                                                    @foreach ($subKegiatan->penugasans as $penugasanIndex => $penugasan)
+                                                        <tr
+                                                            class="{{ !($loop->parent->last && $loop->last) ? 'border-b border-gray-200' : '' }}">
+                                                            <!-- Kolom Kegiatan (rowspan hanya untuk baris pertama tiap kegiatan) -->
+                                                            @if ($subIndex === 0 && $penugasanIndex === 0)
+                                                                <td class="px-4 py-3 align-top border border-gray-200"
+                                                                    rowspan="{{ $kegiatanRowCount }}">
+                                                                    <div class="flex flex-col">
+                                                                        <span class="text-sm font-medium text-gray-800">
+                                                                            {{ $kegiatan->nama_rk_kegiatan }}
+                                                                        </span>
+                                                                        <span class="text-xs text-gray-500 mt-1">
+                                                                            Ketua:
+                                                                            {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
+                                                                        </span>
+                                                                    </div>
+                                                                </td>
+                                                            @endif
+
+                                                            <!-- Kolom Sub Kegiatan (rowspan hanya untuk baris pertama tiap sub kegiatan) -->
+                                                            @if ($penugasanIndex === 0)
+                                                                <td class="px-4 py-3 text-sm text-gray-800 align-top border border-gray-200"
+                                                                    rowspan="{{ $subRowCount }}">
+                                                                    {{ $subKegiatan->nama_sub_kegiatan }}
+                                                                </td>
+                                                            @endif
+
+                                                            <!-- Kolom Nama Pegawai -->
+                                                            <td
+                                                                class="px-4 py-3 text-sm text-gray-800 align-top border border-gray-200">
+                                                                {{ $penugasan->anggota->nama_pegawai ?? '-' }}
+                                                            </td>
+
+                                                            <!-- Kolom Jenis Kegiatan dengan Badge -->
+                                                            <td
+                                                                class="px-4 py-3 text-sm text-gray-800 align-top border border-gray-200">
+                                                                {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? '-' }}
+                                                            </td>
+
+                                                            <!-- Kolom Target -->
+                                                            <td
+                                                                class="px-4 py-3 text-sm text-gray-800 align-top border border-gray-200">
+                                                                {{ $penugasan->target ?? '-' }}
+                                                            </td>
+
+                                                            <!-- Kolom Satuan -->
+                                                            <td
+                                                                class="px-4 py-3 text-sm text-gray-800 align-top border border-gray-200">
+                                                                {{ $penugasan->satuan_target ?? '-' }}
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                @endforeach
+                                            @endforeach
+
+                                            @if ($bidang->kegiatans->count() === 0)
+                                                <tr>
+                                                    <td colspan="6"
+                                                        class="px-4 py-6 text-center text-sm text-gray-500 border border-gray-200">
+                                                        Belum ada kegiatan untuk bidang ini
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <div class="p-4 text-center border border-gray-200 border-t-0">
+                                    <p class="text-sm text-gray-500 italic">Belum ada kegiatan untuk fungsi ini</p>
+                                </div>
+                            @endif
                         </div>
                     </div>
-                </div>
+                @endforeach
 
-                <!-- Fungsi 2: Pengelolaan Keuangan -->
-                <div x-data="{ open: false }" class="rounded-lg border border-gray-200 bg-white">
-                    <!-- Header Fungsi -->
-                    <button
-                        @click="open = !open"
-                        class="flex w-full items-center justify-between p-4 text-left hover:bg-gray-50">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100">
-                                <span class="text-sm font-semibold text-green-600">F2</span>
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-semibold text-gray-800">Pengelolaan Keuangan</h3>
-                                <p class="text-xs text-gray-500">Bidang: Keuangan dan Akuntansi</p>
-                            </div>
+                @if ($bidangs->count() === 0)
+                    <div class="text-center py-8 border border-gray-200 rounded-lg">
+                        <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 mb-3">
+                            <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                            </svg>
                         </div>
-                        <svg :class="{ 'rotate-180': open }" class="h-5 w-5 text-gray-500 transition-transform"
-                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-
-                    <!-- Accordion Content -->
-                    <div x-show="open" x-collapse class="border-t border-gray-100">
-                        <div class="p-4">
-                            <p class="text-sm text-gray-500 italic">Belum ada kegiatan untuk fungsi ini</p>
-                        </div>
+                        <p class="text-sm text-gray-500">Belum ada fungsi/bidang yang dibuat</p>
                     </div>
-                </div>
-
-                <!-- Fungsi 3: Pelatihan dan Pengembangan SDM -->
-                <div x-data="{ open: false }" class="rounded-lg border border-gray-200 bg-white">
-                    <!-- Header Fungsi -->
-                    <button
-                        @click="open = !open"
-                        class="flex w-full items-center justify-between p-4 text-left hover:bg-gray-50">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100">
-                                <span class="text-sm font-semibold text-purple-600">F3</span>
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-semibold text-gray-800">Pelatihan dan Pengembangan SDM</h3>
-                                <p class="text-xs text-gray-500">Bidang: Sumber Daya Manusia</p>
-                            </div>
-                        </div>
-                        <svg :class="{ 'rotate-180': open }" class="h-5 w-5 text-gray-500 transition-transform"
-                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-
-                    <!-- Accordion Content -->
-                    <div x-show="open" x-collapse class="border-t border-gray-100">
-                        <div class="p-4">
-                            <p class="text-sm text-gray-500 italic">Belum ada kegiatan untuk fungsi ini</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Fungsi 4: Pengawasan dan Evaluasi -->
-                <div x-data="{ open: false }" class="rounded-lg border border-gray-200 bg-white">
-                    <!-- Header Fungsi -->
-                    <button
-                        @click="open = !open"
-                        class="flex w-full items-center justify-between p-4 text-left hover:bg-gray-50">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-100">
-                                <span class="text-sm font-semibold text-yellow-600">F4</span>
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-semibold text-gray-800">Pengawasan dan Evaluasi</h3>
-                                <p class="text-xs text-gray-500">Bidang: Pengendalian Mutu</p>
-                            </div>
-                        </div>
-                        <svg :class="{ 'rotate-180': open }" class="h-5 w-5 text-gray-500 transition-transform"
-                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-
-                    <!-- Accordion Content -->
-                    <div x-show="open" x-collapse class="border-t border-gray-100">
-                        <div class="p-4">
-                            <p class="text-sm text-gray-500 italic">Belum ada kegiatan untuk fungsi ini</p>
-                        </div>
-                    </div>
-                </div>
+                @endif
             </div>
         </x-common.component-card>
     </div>
@@ -536,7 +214,6 @@
     <!-- Modal Konfirmasi Master Kegiatan -->
     @include('pages.main.components.modals.rencana-kerja.modal-konfirmasi-master-kegiatan')
 @endsection
-
 
 @push('scripts')
     <script>
@@ -812,11 +489,9 @@
                                     @foreach ($jenisKegiatans as $jenis)
                                         <option value="{{ $jenis->id }}"
                                             class="
-                                                @if($jenis->kategori === 'Utama')
-                                                    text-green-700 font-medium
+                                                @if ($jenis->kategori === 'Utama') text-green-700 font-medium
                                                 @elseif($jenis->kategori === 'Tambahan')
-                                                    text-orange-700
-                                                @endif">
+                                                    text-orange-700 @endif">
                                             {{ $jenis->jenis_kegiatan }}
                                             ({{ $jenis->kategori }})
                                         </option>
@@ -1167,19 +842,19 @@
                 </div>
 
                 ${sections.length > 0 ? `
-                        <div class="space-y-4">
-                            ${detailHTML}
-                        </div>
-                    ` : `
-                        <div class="text-center py-4">
-                            <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 mb-2">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                                </svg>
-                            </div>
-                            <p class="text-sm text-gray-500">Belum ada RK Anggota yang ditambahkan</p>
-                        </div>
-                    `}
+                                        <div class="space-y-4">
+                                            ${detailHTML}
+                                        </div>
+                                    ` : `
+                                        <div class="text-center py-4">
+                                            <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 mb-2">
+                                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                                </svg>
+                                            </div>
+                                            <p class="text-sm text-gray-500">Belum ada RK Anggota yang ditambahkan</p>
+                                        </div>
+                                    `}
             </div>
 
             <!-- Note -->

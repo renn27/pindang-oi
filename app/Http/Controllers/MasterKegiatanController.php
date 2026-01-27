@@ -12,36 +12,57 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
+use App\Exports\MphAllExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class MasterKegiatanController extends Controller
 {
     public function index()
     {
-
         // Data referensi untuk dropdown modal
         $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
         $rkJpts   = RencanaJPT::orderBy('nama_rencana_jpt')->get(['id', 'nama_rencana_jpt']);
-        $bidangs   = Bidang::orderBy('nama_bidang')->get(['id_bidang', 'nama_bidang']);
+        $bidangs  = Bidang::orderBy('nama_bidang')->get(); // ambil semua bidang
         $jenisKegiatans = JenisKegiatan::orderBy('jenis_kegiatan')->get();
         $ketuaTims = Pegawai::join('pegawai_role', 'pegawais.id_pegawai', '=', 'pegawai_role.pegawai_id')
-                    ->join('roles', 'pegawai_role.role_id', '=', 'roles.id')
-                    ->where('roles.nama_role', 'Ketua Tim')
-                    ->orderBy('pegawais.nama_pegawai')
-                    ->get([
-                        'pegawais.id_pegawai',
-                        'pegawais.nama_pegawai',
-                        'roles.nama_role',
-                    ]);
+            ->join('roles', 'pegawai_role.role_id', '=', 'roles.id')
+            ->where('roles.nama_role', 'Ketua Tim')
+            ->orderBy('pegawais.nama_pegawai')
+            ->get([
+                'pegawais.id_pegawai',
+                'pegawais.nama_pegawai',
+                'roles.nama_role',
+            ]);
+
+        // Ambil semua kegiatan beserta relasinya untuk setiap bidang tanpa filter role
+        $bidangs = Bidang::with([
+            'kegiatans' => function ($query) {
+                $query->with([
+                    'subKegiatans' => function ($subQuery) {
+                        $subQuery->with([
+                            'penugasans' => function ($penugasanQuery) {
+                                $penugasanQuery->with(['anggota', 'jenisKegiatan']);
+                            }
+                        ]);
+                    },
+                    'rencanaJpt',
+                    'indikatorJpt',
+                    'penanggungJawab' // asumsi ada relasi
+                ]);
+            }
+        ])->orderBy('nama_bidang')->get();
 
         return view('pages.main.pegawai.rencana-kerja.master-kegiatan', [
-            'title'     => "Master Kegiatan",
-            'pegawais'  => $pegawais,
-            'rkJpts'    => $rkJpts,
-            'bidangs'    => $bidangs,
+            'title'         => "Master Kegiatan",
+            'bidangs'       => $bidangs,
+            'pegawais'      => $pegawais,
+            'rkJpts'        => $rkJpts,
             'jenisKegiatans' => $jenisKegiatans,
-            'ketuaTims' => $ketuaTims
+            'ketuaTims'     => $ketuaTims
         ]);
     }
+
 
     public function store(Request $request)
     {
@@ -138,13 +159,11 @@ class MasterKegiatanController extends Controller
                             ]);
 
                             $idJenisKegiatan = $jenis->id;
-
                         } else {
                             // validasi FK existing
                             if (!$idJenisKegiatan || !JenisKegiatan::where('id', $idJenisKegiatan)->exists()) {
                                 throw new \Exception('Jenis kegiatan tidak valid');
                             }
-
                         }
 
                         $subKegiatan->penugasans()->create([
@@ -163,7 +182,7 @@ class MasterKegiatanController extends Controller
             return redirect()
                 ->back()
                 ->with('success', 'Kegiatan Berhasil Disimpan');
-                // ->with('success', 'RK berhasil disimpan.');
+            // ->with('success', 'RK berhasil disimpan.');
         } catch (QueryException $e) {
             // log error DB
             Log::error('Gagal simpan RK', [
@@ -185,5 +204,12 @@ class MasterKegiatanController extends Controller
                 ->with('error', 'Gagal menyimpan data. Silakan coba lagi.')
                 ->withInput();
         }
+    }
+
+    public function exportMphAll()
+    {
+        $bidangs = Bidang::orderBy('nama_bidang')->get(); // semua bidang
+
+        return Excel::download(new MphAllExport($bidangs), 'matriks_peran_hasil.xlsx');
     }
 }

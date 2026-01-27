@@ -136,6 +136,9 @@ Route::middleware('auth')->group(function () {
         '/bidang/{bidang:slug}/kegiatan/export-mph',
         [KegiatanController::class, 'exportMph']
     )->name('kegiatan.export-mph');
+
+    Route::get('/kegiatan/export-mph-all', [MasterKegiatanController::class, 'exportMphAll'])
+        ->name('kegiatan.export-mph-all');
 });
 
 
