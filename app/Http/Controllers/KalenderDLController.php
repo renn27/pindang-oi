@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Pegawai;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class KalenderDLController extends Controller
 {
@@ -51,40 +52,45 @@ class KalenderDLController extends Controller
         ]);
     }
 
-
     public function store(Request $request)
     {
+
         $validated = $request->validate([
-            'id_pegawai' => ['required', 'exists:pegawais,id_pegawai'],
-            'tanggal_dl' => ['required', 'date'],
-        ]);
+            'id_pegawai'      => ['required', 'exists:pegawais,id_pegawai'],
+            'tanggal_mulai'   => ['required', 'date'],
+            'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
+            ]);
 
         try {
-            // 🔒 CEK DUPLIKAT
-            $exists = KalenderDL::where('id_pegawai', $validated['id_pegawai'])
-                ->where('tanggal_dl', $validated['tanggal_dl'])
-                ->exists();
+            $period = CarbonPeriod::create(
+                $validated['tanggal_mulai'],
+                $validated['tanggal_selesai']
+            );
 
-            if ($exists) {
-                return redirect()->back()
-                    ->with('error', 'Pegawai ini sudah tercatat Dinas Luar pada tanggal tersebut.')
-                    ->withInput();
+            foreach ($period as $date) {
+                // 🔒 Cek duplikat per tanggal
+                $exists = KalenderDL::where('id_pegawai', $validated['id_pegawai'])
+                    ->where('tanggal_dl', $date)
+                    ->exists();
+
+                if (!$exists) {
+                    KalenderDL::create([
+                        'id_pegawai' => $validated['id_pegawai'],
+                        'tanggal_dl' => $date,
+                    ]);
+                }
             }
-
-            // Simpan
-            KalenderDL::create($validated);
 
             return redirect()
                 ->route('kalenderDL.index')
-                ->with('success', 'Berhasil Memasukkan ke dalam Kalender DL.');
+                ->with('success', 'Berhasil memasukkan DL sesuai range tanggal.');
 
         } catch (\Exception $e) {
             Log::error('Gagal simpan Kalender DL: ' . $e->getMessage());
 
             return redirect()->back()
-                ->with('error', 'Gagal memasukkan ke dalam Kalender DL. Silakan coba lagi.')
+                ->with('error', 'Gagal memasukkan ke Kalender DL.')
                 ->withInput();
         }
     }
-
 }

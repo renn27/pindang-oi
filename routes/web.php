@@ -127,8 +127,8 @@ Route::middleware('auth')->group(function () {
 
     // ROUTE KALENDER DL
     Route::prefix('/kalender-kegiatan')->group(function () {
-        Route::get('/', [KalenderKegiatanController::class, 'index'])->name('kalenderDL.index');
-        // Route::post('/', [KalenderDLController::class, 'store'])->name('kalenderDL.store');
+        Route::get('/', [KalenderKegiatanController::class, 'index'])->name('kalenderKegiatan.index');
+        // Route::post('/', [KalenderKegiatanController::class, 'store'])->name('kalenderKegiatan.store');
     });
     // END ROUTE MASTER KEGIATAN
 });

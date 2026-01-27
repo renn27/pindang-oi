@@ -6,7 +6,7 @@
         </div>
         <div class="flex items-center space-x-4">
             <!-- Toggle untuk Pengiriman -->
-            <button id="toggle-pengiriman" 
+            <button id="toggle-pengiriman"
                     class="toggle-section-btn flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
                     data-section="pengiriman">
                 <svg class="w-4 h-4 mr-2 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -14,9 +14,9 @@
                 </svg>
                 <span>Pengiriman</span>
             </button>
-            
+
             <!-- Toggle untuk Penerimaan -->
-            <button id="toggle-penerimaan" 
+            <button id="toggle-penerimaan"
                     class="toggle-section-btn flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
                     data-section="penerimaan">
                 <svg class="w-4 h-4 mr-2 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -24,7 +24,7 @@
                 </svg>
                 <span>Penerimaan</span>
             </button>
-            
+
             <!-- Toggle Semua -->
             <button id="toggle-semua"
                     class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-lg hover:bg-blue-700">
@@ -52,21 +52,21 @@
                     <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                         Waktu Pelaksanaan
                     </th>
-                    
+
                     <!-- Kolom PENGIRIMAN (bisa di-toggle) -->
-                    <th colspan="3" 
+                    <th colspan="3"
                         class="section-pengiriman px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase border-l-2 border-blue-200"
                         data-section="pengiriman">
                         Pengiriman
                     </th>
-                    
+
                     <!-- Kolom PENERIMAAN (bisa di-toggle) -->
-                    <th colspan="4" 
+                    <th colspan="4"
                         class="section-penerimaan px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase border-l-2 border-green-200"
                         data-section="penerimaan">
                         Penerimaan
                     </th>
-                    
+
                     <th rowspan="2" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase sticky right-0 bg-gray-50 z-10">
                         Aksi
                     </th>
@@ -85,7 +85,7 @@
                         data-section="pengiriman">
                         Ketepatan Waktu
                     </th>
-                    
+
                     <!-- Sub-kolom PENERIMAAN -->
                     <th class="section-penerimaan px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase border-l-2 border-green-200"
                         data-section="penerimaan">
@@ -114,7 +114,7 @@
                         data-kirim-tanggal="{{ $penugasan->latestPengiriman?->tanggal_pengiriman ?? '' }}"
                         data-terima-jumlah="{{ $penugasan->latestPenerimaan?->jumlah_diterima ?? 0 }}"
                         data-terima-tanggal="{{ $penugasan->latestPenerimaan?->tanggal_penerimaan ?? '' }}">
-                        
+
                         <!-- Kolom tetap (tidak bisa di-toggle) -->
                         <td class="px-4 py-3 text-sm font-medium text-gray-900 text-center sticky left-0 bg-white z-10">
                             {{ $index + 1 }}
@@ -126,7 +126,7 @@
                             {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? '-' }}
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-700 text-center">
-                            {{ $penugasan->target ?? '-' }} 
+                            {{ $penugasan->target ?? '-' }}
                             <span class="block text-xs text-orange-800">{{ $penugasan->satuan_target ?? '-' }}</span>
                         </td>
                         <td class="px-4 py-3 text-xs text-gray-700 text-center">
@@ -140,7 +140,7 @@
                                         : '-'
                                 }}
                         </td>
-                        
+
                         <!-- Kolom PENGIRIMAN (bisa di-toggle) -->
                         <td class="section-pengiriman px-4 py-3 text-sm text-gray-700 border-l-2 border-blue-50">
                             <div>
@@ -162,7 +162,7 @@
                                 <div class="flex justify-center rating-kirim"></div>
                             </div>
                         </td>
-                        
+
                         <!-- Kolom PENERIMAAN (bisa di-toggle) -->
                         <td class="section-penerimaan px-4 py-3 text-sm text-gray-700 border-l-2 border-green-50">
                             <div>
@@ -194,7 +194,7 @@
                                 {{ $penugasan->latestPengiriman?->bukti_dukung ? 'Lihat Bukti' : 'Belum Ada' }}
                             </a>
                         </td>
-                        
+
                         <td class="px-4 py-3 text-sm text-gray-700 text-center border-r border-gray-200">
                             <!-- Container untuk tombol saja -->
                             <div class="relative inline-block" x-data="{
@@ -413,7 +413,8 @@
                                             @csrf
 
                                             <input type="hidden" name="id_pegawai" value="{{ $penugasan->id_anggota }}">
-                                            <input type="hidden" name="tanggal_dl" value="{{ $penugasan->tanggal_selesai }}">
+                                            <input type="hidden" name="tanggal_mulai" value="{{ $penugasan->tanggal_mulai }}">
+                                            <input type="hidden" name="tanggal_selesai" value="{{ $penugasan->tanggal_selesai }}">
 
                                             <button type="submit" class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -561,21 +562,21 @@ document.addEventListener('DOMContentLoaded', function() {
         pengiriman: true,
         penerimaan: true
     };
-    
+
     // Elemen tombol toggle
     const togglePengirimanBtn = document.getElementById('toggle-pengiriman');
     const togglePenerimaanBtn = document.getElementById('toggle-penerimaan');
     const toggleSemuaBtn = document.getElementById('toggle-semua');
-    
+
     // Fungsi untuk toggle section
     function toggleSection(section, show = null) {
         const shouldShow = show !== null ? show : !visibilityState[section];
         visibilityState[section] = shouldShow;
-        
+
         // Toggle semua elemen dengan class section-[nama]
         const elements = document.querySelectorAll(`.section-${section}`);
         const button = document.querySelector(`[data-section="${section}"]`);
-        
+
         elements.forEach(el => {
             if (shouldShow) {
                 el.classList.remove('hidden');
@@ -583,7 +584,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 el.classList.add('hidden');
             }
         });
-        
+
         // Update icon tombol
         if (button) {
             const icon = button.querySelector('svg');
@@ -597,10 +598,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
-        
+
         updateToggleButtons();
     }
-    
+
     // Fungsi untuk update tampilan tombol
     function updateToggleButtons() {
         // Update teks tombol
@@ -615,29 +616,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Event listener untuk toggle pengiriman
     togglePengirimanBtn.addEventListener('click', () => {
         toggleSection('pengiriman');
     });
-    
+
     // Event listener untuk toggle penerimaan
     togglePenerimaanBtn.addEventListener('click', () => {
         toggleSection('penerimaan');
     });
-    
+
     // Event listener untuk toggle semua
     toggleSemuaBtn.addEventListener('click', () => {
         const allVisible = Object.values(visibilityState).every(v => v);
-        
+
         // Jika semua visible, sembunyikan semua
         // Jika ada yang hidden, tampilkan semua
         const shouldShow = !allVisible;
-        
+
         toggleSection('pengiriman', shouldShow);
         toggleSection('penerimaan', shouldShow);
     });
-    
+
     // Fungsi rating stars (tetap sama)
     function renderStars(container, rating) {
         container.innerHTML = '';
@@ -650,12 +651,12 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
     }
-    
+
     // Inisialisasi rating stars
     document.querySelectorAll('tr[data-target]').forEach(row => {
         // ... (kode rating stars tetap sama) ...
     });
-    
+
     // Inisialisasi state awal
     updateToggleButtons();
 });

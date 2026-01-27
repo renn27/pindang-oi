@@ -197,7 +197,19 @@
                         class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                 </div>
 
-                <div class="mb-4">
+                <div id="wrap-tanggal-pelaksanaan" class="mb-4 hidden">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                        Tanggal Pelaksanaan
+                    </label>
+                    <x-form.date-picker
+                        x-model="formData.tanggal_selesai"
+                        id="tanggal_pelaksanaan"
+                        name="tanggal_pelaksanaan"
+                        placeholder="Tanggal Pelaksanaan"
+                    />
+                </div>
+
+                <div id="wrap-tanggal-mulai" class="mb-4 hidden">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Tanggal Mulai
                     </label>
@@ -209,7 +221,7 @@
                     />
                 </div>
 
-                <div>
+                <div id="wrap-tanggal-selesai" class="mb-4 hidden">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Tanggal Berakhir (Deadline)
                     </label>
@@ -238,4 +250,74 @@
             </div>
         </div>
     </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const jenisSelect = document.getElementById('jenis_kegiatan_select');
+
+            const wrapPelaksanaan = document.getElementById('wrap-tanggal-pelaksanaan');
+            const wrapMulai = document.getElementById('wrap-tanggal-mulai');
+            const wrapSelesai = document.getElementById('wrap-tanggal-selesai');
+
+            const inputPelaksanaan = document.getElementById('tanggal_pelaksanaan');
+            const inputMulai = document.getElementById('tanggal_mulai');
+            const inputSelesai = document.getElementById('tanggal_selesai');
+
+            const specialTypes = ['Pengawasan', 'Pendataan', 'Supervisi', 'Perjalanan Dinas'];
+
+            function isSpecialJenis() {
+                const selectedOption = jenisSelect.options[jenisSelect.selectedIndex];
+                if (!selectedOption) return false;
+
+                const text = selectedOption.text.toLowerCase();
+
+                return specialTypes.some(type => text.includes(type.toLowerCase()));
+            }
+
+            function handleTanggalField() {
+                if (!jenisSelect.value) {
+                    hideAll();
+                    return;
+                }
+
+                if (isSpecialJenis()) {
+                    // === MODE SPECIAL ===
+                    wrapPelaksanaan.classList.remove('hidden');
+                    wrapMulai.classList.add('hidden');
+                    wrapSelesai.classList.add('hidden');
+
+                    // sinkron value (kalau edit)
+                    if (inputMulai.value) {
+                        inputPelaksanaan.value = inputMulai.value;
+                    }
+
+                } else {
+                    // === MODE NORMAL ===
+                    wrapPelaksanaan.classList.add('hidden');
+                    wrapMulai.classList.remove('hidden');
+                    wrapSelesai.classList.remove('hidden');
+                }
+            }
+
+            function hideAll() {
+                wrapPelaksanaan.classList.add('hidden');
+                wrapMulai.classList.add('hidden');
+                wrapSelesai.classList.add('hidden');
+            }
+
+            // event change
+            jenisSelect.addEventListener('change', handleTanggalField);
+
+            // ====== PENTING: trigger saat modal dibuka (edit) ======
+            window.addEventListener('open-smart-modal', function (e) {
+                if (e.detail.modalId !== 'modal-penugasan-anggota') return;
+
+                // delay sedikit biar DOM & Alpine siap
+                setTimeout(() => {
+                    handleTanggalField();
+                }, 50);
+            });
+        });
+    </script>
 </x-ui.smart-modal>
