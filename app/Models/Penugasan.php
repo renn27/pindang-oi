@@ -33,6 +33,7 @@ class Penugasan extends Model
         'tanggal_selesai' => 'date',
     ];
 
+    // RELATIONS
     public function anggota() { // pegawai diganti sebagai anggota supaya lebih jelas
         return $this->belongsTo(Pegawai::class, 'id_anggota', 'id_pegawai');
     }
@@ -48,6 +49,7 @@ class Penugasan extends Model
     public function pengirimans() {
         return $this->hasMany(Pengiriman::class, 'id_penugasan', 'id_penugasan');
     }
+    // END RELATIONS
 
     public function latestPengiriman() {
         return $this->hasOne(Pengiriman::class, 'id_penugasan', 'id_penugasan')
@@ -77,30 +79,126 @@ class Penugasan extends Model
         return in_array($this->jenis_kegiatan, $specialTypes);
     }
 
-
-
-    public function bolehKirim(): bool
+    public function isWithinSchedule(): bool
     {
         $today   = Carbon::today();
         $mulai   = Carbon::parse($this->tanggal_mulai);
         $selesai = Carbon::parse($this->tanggal_selesai);
 
-        // belum masuk waktu
-        if (!$today->between($mulai, $selesai)) {
+        return $today->between($mulai, $selesai);
+    }
+
+    public function bolehTerimaPenugasan(): bool
+    {
+        // 1️⃣ Belum masuk waktu
+        if (! $this->isWithinSchedule()) {
             return false;
         }
 
-        // SUDAH KIRIM tapi BELUM DIPERIKSA → tidak boleh kirim lagi
-        if ($this->latestPengiriman && !$this->latestPenerimaan) {
+        $latestPengiriman = $this->latestPengiriman;
+        $latestPenerimaan = $this->latestPenerimaan;
+
+        // 2️⃣ Belum ada pengiriman sama sekali
+        if (! $latestPengiriman) {
             return false;
         }
 
-        // BELUM PERNAH KIRIM → boleh kirim
+        // // 3️⃣ Sudah ada penerimaan revisi, tapi BELUM ada pengiriman baru
+        // if (
+        //     $latestPenerimaan &&
+        //     $latestPenerimaan->status === 'Revisi' &&
+        //     $latestPenerimaan->id_pengiriman === $latestPengiriman->id_pengiriman
+        // ) {
+        //     return false; // tunggu anggota kirim ulang
+        // }
+
+        // // 4️⃣ Pengiriman terbaru BELUM pernah diterima → boleh terima
+        // if (
+        //     ! $latestPenerimaan ||
+        //     $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman
+        // ) {
+        //     return true;
+        // }
+        // Belum ada penerimaan untuk pengiriman TERBARU
+        return
+            ! $latestPenerimaan ||
+            $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman;
+
+        // return false;
+    }
+
+    public function tooltipPenerimaanPenugasan(): ?string
+    {
+        $today   = Carbon::today();
+        $mulai   = Carbon::parse($this->tanggal_mulai);
+        $selesai = Carbon::parse($this->tanggal_selesai);
+
+        // ⏳ BELUM MULAI
+        if ($today->lt($mulai)) {
+            $hari = $today->diffInDays($mulai);
+
+            return 'info|' . (
+                $hari === 1
+                    ? 'Penugasan belum dimulai · Aktif 1 hari lagi'
+                    : 'Penugasan belum dimulai · Aktif ' . $hari . ' hari lagi'
+            );
+        }
+
+        $latestPengiriman = $this->latestPengiriman;
+        $latestPenerimaan = $this->latestPenerimaan;
+
+        // ❌ BELUM ADA PENGIRIMAN
+        if (! $latestPengiriman && $this->isWithinSchedule()) {
+            return 'info|Belum ada pengiriman dari anggota tim';
+        }
+
+        // ⚠️ SUDAH REVISI, TAPI BELUM ADA PENGIRIMAN ULANG
+        if (
+            $latestPengiriman &&
+            $latestPenerimaan &&
+            $latestPenerimaan->status === 'Revisi' &&
+            $latestPenerimaan->id_pengiriman === $latestPengiriman->id_pengiriman
+        ) {
+            return 'warning|Tunggu anggota tim mengirimkan perbaikan';
+        }
+
+        // ⚠️ DEADLINE LEWAT, SUDAH ADA PENGIRIMAN, BELUM DIPERIKSA
+        if (
+            $latestPengiriman &&
+            $today->gt($selesai) &&
+            ( ! $latestPenerimaan || $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman)
+        ) {
+            return 'danger|Pengiriman sudah masuk, namun tidak anda periksa';
+        }
+
+         // ❌ PENUGASAN BERAKHIR & BELUM ADA PENGIRIMAN
+        if (! $latestPengiriman && $today->gt($selesai)) {
+            return 'danger|Penugasan telah berakhir dan anggota tidak mengirimkan';
+        }
+
+        return null; // aktif, tanpa tooltip
+    }
+
+    public function bolehKirimPenugasan(): bool
+    {
+        // 1️⃣ Belum masuk waktu
+        if (! $this->isWithinSchedule()) {
+            return false;
+        }
+
+        $latestPengiriman = $this->latestPengiriman;
+        $latestPenerimaan = $this->latestPenerimaan;
+
+        // 2️⃣ Ada pengiriman terbaru tapi BELUM ada penerimaan utk pengiriman tsb
+        if ($latestPengiriman && (!$latestPenerimaan || $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman)) {
+            return false; // sedang diperiksa
+        }
+
+        // 3️⃣ Selain itu → boleh kirim
         return true;
     }
 
-
-    public function tooltipPengiriman(): ?string
+    public function tooltipPengirimanPenugasan(): ?string
     {
         $today   = Carbon::today();
         $mulai   = Carbon::parse($this->tanggal_mulai);
@@ -117,21 +215,138 @@ class Penugasan extends Model
             );
         }
 
-        // ⚠️ SUDAH KIRIM, BELUM DIPERIKSA (masih dalam waktu)
-        if (
-            $this->latestPengiriman &&
-            !$this->latestPenerimaan &&
-            $today->between($mulai, $selesai)
-        ) {
+        $latestPengiriman = $this->latestPengiriman;
+        $latestPenerimaan = $this->latestPenerimaan;
+
+        // ⚠️ Sedang diperiksa
+        if ($latestPengiriman && ( !$latestPenerimaan || $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman) 
+            & $today->between($mulai, $selesai)) {
             return 'warning|Pengiriman sedang diperiksa oleh ketua tim';
         }
 
-        // ❌ TELAT (belum pernah kirim)
-        if (!$this->latestPengiriman && $today->gt($selesai)) {
+        if (
+            $latestPengiriman &&
+            $today->gt($selesai) &&
+            ( ! $latestPenerimaan || $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman)
+        ) {
+            return 'danger|Pengiriman sudah masuk, namun tidak diperiksa ketua tim';
+        }
+
+        // ❌ TELAT
+        if (!$latestPengiriman && $today->gt($selesai)) {
             return 'danger|Penugasan telah berakhir · Anda tidak mengirimkan penugasan';
         }
 
         return null; // aktif, tanpa tooltip
     }
 
+    public function statusPenugasan(): array
+    {
+        $today            = Carbon::today();
+        $deadline         = Carbon::parse($this->tanggal_selesai);
+        $latestPengiriman = $this->latestPengiriman;
+        $latestPenerimaan = $this->latestPenerimaan;
+
+        // 1️⃣ TUGAS SELESAI
+        if (
+            $latestPengiriman &&
+            $latestPenerimaan &&
+            $latestPenerimaan->status === 'Diterima'
+        ) {
+            return [
+                'label' => 'Tugas Selesai',
+                'class' => 'bg-green-200 text-green-800',
+            ];
+        }
+
+        // 2️⃣ DEADLINE LEWAT & TIDAK ADA PENGIRIMAN
+        if ($today->gt($deadline) && ! $latestPengiriman) {
+            return [
+                'label' => 'Tidak Mengumpulkan',
+                'class' => 'bg-red-100 text-red-700',
+            ];
+        }
+
+        // 3️⃣ DEADLINE LEWAT, SUDAH KIRIM TAPI BELUM DITERIMA
+        if (
+            $today->gt($deadline) &&
+            $latestPengiriman &&
+            (
+                ! $latestPenerimaan ||
+                $latestPenerimaan->status !== 'Diterima'
+            )
+        ) {
+            return [
+                'label' => 'Belum Diterima Ketua Tim',
+                'class' => 'bg-red-100 text-red-600',
+            ];
+        }
+
+        // 4️⃣ SUDAH KIRIM, BELUM DITERIMA, MASIH DALAM WAKTU
+        if (
+            $latestPengiriman &&
+            (
+                ! $latestPenerimaan ||
+                $latestPenerimaan->status !== 'Diterima'
+            )
+        ) {
+            return [
+                'label' => 'Menunggu Pemeriksaan',
+                'class' => 'bg-yellow-100 text-yellow-700',
+            ];
+        }
+
+        // 5️⃣ DEFAULT (belum deadline & belum kirim)
+        return [
+            'label' => 'Menunggu Pengumpulan',
+            'class' => 'bg-gray-100 text-gray-700',
+        ];
+    }
+
+
+    public function statusPengiriman(): array
+    {
+        return [
+            'label' => $this->status,
+            'class' => match ($this->status) {
+                'Sudah Dikirim' => 'bg-blue-100 text-blue-600',
+                default => 'bg-gray-100 text-gray-500',
+            },
+        ];
+    }
+
+    public function statusPenerimaan(): array
+    {
+        $latestPengiriman = $this->latestPengiriman;
+        $latestPenerimaan = $this->latestPenerimaan;
+
+        // 1️⃣ Ada pengiriman terbaru tapi belum ada penerimaan utk pengiriman tsb
+        if ($latestPengiriman && (
+            !$latestPenerimaan ||
+            $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman
+        )) {
+            return [
+                'label' => 'Menunggu Diperiksa',
+                'class' => 'bg-yellow-100 text-yellow-600',
+            ];
+        }
+
+        // 2️⃣ Penerimaan cocok dengan pengiriman terakhir
+        if ($latestPenerimaan) {
+            return [
+                'label' => $latestPenerimaan->status,
+                'class' => match ($latestPenerimaan->status) {
+                    'Diterima' => 'bg-green-100 text-green-700',
+                    'Revisi'   => 'bg-red-100 text-red-500',
+                    default    => 'bg-gray-100 text-gray-500',
+                },
+            ];
+        }
+
+        // 3️⃣ Belum ada apa-apa
+        return [
+            'label' => 'Belum Ada',
+            'class' => 'bg-gray-100 text-gray-500',
+        ];
+    }
 }

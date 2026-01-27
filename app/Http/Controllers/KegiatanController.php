@@ -9,28 +9,31 @@ use App\Models\RencanaJPT;
 use App\Models\Pegawai;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\MphExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class KegiatanController extends Controller
 {
-    public function index(Bidang $bidang) {
+    public function index(Bidang $bidang)
+    {
         $pegawai = Auth::user();
         // Data utama
         $this->authorize('viewAny', Kegiatan::class);
         $kegiatanQuery = $bidang->kegiatans()
-                ->with([
-                    'subKegiatans' => function ($q) use ($pegawai) {
+            ->with([
+                'subKegiatans' => function ($q) use ($pegawai) {
 
-                        // MODE ANGGOTA → subkegiatan harus ada penugasan dia
-                        if ($pegawai->active_role === 'Anggota Tim') {
-                            $q->whereHas('penugasans', function ($p) use ($pegawai) {
-                                $p->where('id_anggota', $pegawai->id_pegawai);
-                            });
-                        }
+                    // MODE ANGGOTA → subkegiatan harus ada penugasan dia
+                    if ($pegawai->active_role === 'Anggota Tim') {
+                        $q->whereHas('penugasans', function ($p) use ($pegawai) {
+                            $p->where('id_anggota', $pegawai->id_pegawai);
+                        });
+                    }
 
-                        // MODE KETUA → tidak difilter
-                    },
-                    'rencanaJpt',
-                    'indikatorJpt'
+                    // MODE KETUA → tidak difilter
+                },
+                'rencanaJpt',
+                'indikatorJpt'
             ]);
 
         if ($pegawai->active_role === 'Anggota Tim') {
@@ -47,14 +50,14 @@ class KegiatanController extends Controller
         $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
         $rkJpts   = RencanaJPT::orderBy('nama_rencana_jpt')->get(['id', 'nama_rencana_jpt']);
         $ketuaTims = Pegawai::join('pegawai_role', 'pegawais.id_pegawai', '=', 'pegawai_role.pegawai_id')
-                    ->join('roles', 'pegawai_role.role_id', '=', 'roles.id')
-                    ->where('roles.nama_role', 'Ketua Tim')
-                    ->orderBy('pegawais.nama_pegawai')
-                    ->get([
-                        'pegawais.id_pegawai',
-                        'pegawais.nama_pegawai',
-                        'roles.nama_role',
-                    ]);
+            ->join('roles', 'pegawai_role.role_id', '=', 'roles.id')
+            ->where('roles.nama_role', 'Ketua Tim')
+            ->orderBy('pegawais.nama_pegawai')
+            ->get([
+                'pegawais.id_pegawai',
+                'pegawais.nama_pegawai',
+                'roles.nama_role',
+            ]);
 
         return view('pages.main.pegawai.tagihan-kerja.index', [
             'title'     => $bidang->detail_bidang,
@@ -65,15 +68,16 @@ class KegiatanController extends Controller
             'ketuaTims' => $ketuaTims
         ]);
     }
-    
-    public function store(Request $request, Bidang $bidang) {
+
+    public function store(Request $request, Bidang $bidang)
+    {
         // dd($request->all());
 
         $this->authorize('create', Kegiatan::class);
 
         $validated = $request->validate([
             'nama_rk_kegiatan' => ['required', 'string', 'max:255'],
-            'rk_jpt' => ['required','exists:rencana_jpts,id'],
+            'rk_jpt' => ['required', 'exists:rencana_jpts,id'],
             'iki_jpt' => [
                 'required',
                 Rule::exists('indikator_jpts', 'id')
@@ -158,5 +162,19 @@ class KegiatanController extends Controller
             return redirect()->back()
                 ->with('error', 'Gagal menghapus Kegiatan. Silakan coba lagi.');
         }
+    }
+
+    
+
+    public function exportMph(Bidang $bidang)
+    {
+        $pegawai = Auth::user();
+
+        $this->authorize('viewAny', Kegiatan::class);
+
+        return Excel::download(
+            new MphExport($bidang, $pegawai),
+            'MPH_' . $bidang->detail_bidang . '_2026.xlsx'
+        );
     }
 }

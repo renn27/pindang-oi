@@ -26,6 +26,10 @@
                         </th>
                         <th rowspan="2"
                             class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                            Status Penugasan
+                        </th>
+                        <th rowspan="2"
+                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                             Status Pengiriman
                         </th>
                         <th rowspan="2"
@@ -105,27 +109,25 @@
                                 }}
                             </td>
                             <td class="px-4 py-3 text-[10px] text-center">
-                                <span
-                                    class="inline-flex items-center px-2 py-1 rounded-full font-medium
-                                    {{ $penugasan->latestPengiriman?->status === 'Sudah Diterima'
-                                        ? 'bg-green-100 text-green-700/80'
-                                        : ($penugasan->latestPengiriman?->status === 'Masih Revisi'
-                                            ? 'bg-orange-100 text-orange-500/80'
-                                            : 'bg-yellow-100/80 text-yellow-500') }}">
-                                    {{ $penugasan->latestPengiriman?->status ?? 'Belum Dikirim' }}
+                                <span class="inline-flex items-center px-2 py-1 rounded-full font-medium
+                                    {{ $penugasan->statusPenugasan()['class'] }}">
+                                    {{ $penugasan->statusPenugasan()['label'] }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 text-[10px] text-center">
-                                <span
-                                    class="inline-flex items-center px-2 py-1 rounded-full font-medium
-                                    {{ $penugasan->latestPenerimaan?->status === 'Diterima'
-                                        ? 'bg-green-100 text-green-700/80'
-                                        : ($penugasan->latestPenerimaan?->status === 'Revisi'
-                                            ? 'bg-orange-100 text-orange-500/80'
-                                            : 'bg-yellow-100/80 text-yellow-500') }}">
-                                    {{ $penugasan->latestPenerimaan?->status ?? 'Belum Diterima' }}
+                                <span class="inline-flex items-center px-2 py-1 rounded-full font-medium
+                                    {{ $penugasan->statusPengiriman()['class'] }}">
+                                    {{ $penugasan->statusPengiriman()['label'] }}
                                 </span>
                             </td>
+
+                            <td class="px-4 py-3 text-[10px] text-center">
+                                <span class="inline-flex items-center px-2 py-1 rounded-full font-medium
+                                    {{ $penugasan->statusPenerimaan()['class'] }}">
+                                    {{ $penugasan->statusPenerimaan()['label'] }}
+                                </span>
+                            </td>
+
 
                             {{-- PENGIRIMAN --}}
                             <td class="px-4 py-3 text-sm text-gray-700">
@@ -254,17 +256,6 @@
                                         Aksi
                                     </button>
 
-                                    @php
-                                        $latestPengiriman = $penugasan->latestPengiriman;
-                                        $latestPenerimaan = $penugasan->latestPenerimaan;
-
-                                        $statusPenerimaan = $latestPenerimaan?->status;
-
-                                        // boleh melakukan aksi
-                                        $bolehAksi =
-                                            is_null($latestPengiriman) ||        // belum ada pengiriman
-                                            $statusPenerimaan === 'Direvisi';    // sudah ada tapi direvisi
-                                    @endphp
                                     <!-- Dropdown menu FIXED POSITION -->
                                     <div x-show="showDropdown" x-transition:enter="transition ease-out duration-150"
                                         x-transition:enter-start="opacity-0 scale-95"
@@ -276,64 +267,58 @@
                                         :style="`left: ${dropdownPosition.x}px; top: ${dropdownPosition.y}px;`"
                                         x-on:mouseenter="showDropdown = true" x-on:mouseleave="closeDropdown()">
 
+                                        <!-- Tombol Edit Penugasan -->
                                         @can('update', $penugasan)
-                                            {{-- @if($bolehAksi) --}}
-                                                {{-- Edit Data Penugasan --}}
-                                                <button
-                                                    class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
-                                                    @click="
-                                                        const payload = {
-                                                            modalId: 'modal-penugasan-anggota',
-                                                            mode: 'edit',
-                                                            key: '{{ $penugasan->id_penugasan }}',
-                                                            data: {
-                                                                id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
-                                                                nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
-                                                                id_anggota: @js($penugasan->id_anggota),
-                                                                nama_anggota: @js($penugasan->anggota?->nama_pegawai),
-                                                                id_jenis_kegiatan: @js($penugasan->jenisKegiatan->id),
-                                                                target: @js($penugasan->target),
-                                                                satuan_target: @js($penugasan->satuan_target),
-                                                                tanggal_mulai: @js(optional($penugasan->tanggal_mulai)->format('Y-m-d')),
-                                                                tanggal_selesai: @js(optional($penugasan->tanggal_selesai)->format('Y-m-d')),
+                                            <button
+                                                class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
+                                                @click="$dispatch('open-smart-modal', {
+                                                    modalId: 'modal-penugasan-anggota',
+                                                    mode: 'edit',
+                                                    key: '{{ $penugasan->id_penugasan }}',
+                                                    data: {
+                                                        id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
+                                                        nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
 
-                                                                {{-- tanggal_mulai: @js($penugasan->tanggal_mulai),
-                                                                tanggal_selesai: @js($penugasan->tanggal_selesai), --}}
-                                                                status: @js($penugasan->status),
-                                                            }
-                                                        };
+                                                        id_anggota: @js($penugasan->id_anggota),
+                                                        nama_anggota: @js($penugasan->anggota?->nama_pegawai),
 
-                                                        console.log('PAYLOAD KE MODAL:', payload);
+                                                        id_jenis_kegiatan: @js($penugasan->jenisKegiatan->id),
+                                                        target: @js($penugasan->target),
+                                                        satuan_target: @js($penugasan->satuan_target),
 
-                                                        $dispatch('open-smart-modal', payload);
-                                                    ">
-                                                                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                    </svg> Edit Penugasan
-                                                </button>
-                                            {{-- @endif --}}
+                                                        tanggal_mulai: @js(optional($penugasan->tanggal_mulai)->format('Y-m-d')),
+                                                        tanggal_selesai: @js(optional($penugasan->tanggal_selesai)->format('Y-m-d')),
+
+                                                        status: @js($penugasan->status),
+                                                    }
+                                                })">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg> Edit Penugasan
+                                            </button>
                                         @endcan
 
+                                        <!-- Tombol Buat Pengiriman -->
                                         @can('send', $penugasan)
                                             <div class="relative group">
                                                 <button
                                                     class="w-full rounded-lg text-left px-4 py-3 text-sm flex items-center gap-2 border-b
-                                                        {{ $penugasan->bolehKirim()
+                                                        {{ $penugasan->bolehKirimPenugasan()
                                                             ? 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
                                                             : 'text-gray-400 bg-gray-50 cursor-not-allowed' }}"
-                                                    {{ $penugasan->bolehKirim() ? '' : 'disabled' }}
+                                                    {{ $penugasan->bolehKirimPenugasan() ? '' : 'disabled' }}
 
-                                                    @if($penugasan->bolehKirim())
+                                                    @if($penugasan->bolehKirimPenugasan())
                                                         @click="$dispatch('open-smart-modal', {
-                                                        modalId: 'modal-pengiriman-anggota',
-                                                        data: {
-                                                            id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
-                                                            id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                            nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
-                                                        }
-                                                    })"
+                                                            modalId: 'modal-pengiriman-anggota',
+                                                            data: {
+                                                                id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
+                                                                id_penugasan: '{{ $penugasan->id_penugasan }}',
+                                                                nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                            }
+                                                        })"
                                                     @endif>
                                                     <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
@@ -343,11 +328,10 @@
                                                     Buat Pengiriman
                                                 </button>
 
-                                                @if(!$penugasan->bolehKirim() && $penugasan->tooltipPengiriman())
+                                                @if(!$penugasan->bolehKirimPenugasan() && $penugasan->tooltipPengirimanPenugasan())
                                                     @php
-                                                        [$type, $text] = explode('|', $penugasan->tooltipPengiriman(), 2);
+                                                        [$type, $text] = explode('|', $penugasan->tooltipPengirimanPenugasan(), 2);
                                                     @endphp
-
                                                     <div
                                                         class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2
                                                             hidden group-hover:block
@@ -361,7 +345,6 @@
                                                             }}">
                                                         {{ $text }}
                                                     </div>
-
                                                 @endif
                                             </div>
                                         @endcan
@@ -383,7 +366,7 @@
                                                             'jumlah_dikirim' => $p->jumlah_dikirim,
                                                             'media_pengiriman' => $p->media_pengiriman,
                                                             'bukti_dukung' => $p->bukti_dukung,
-                                                            'status' => $p->penerimaan?->status ?? 'Belum Diperiksa',
+                                                            'status' => $p->penerimaan?->status ?? 'Menunggu Diperiksa',
                                                             'catatan' => $p->penerimaan?->catatan,
                                                         ],
                                                     ),
@@ -398,21 +381,27 @@
                                             Tampilkan Histori Pengiriman
                                         </button>
 
+                                        <!-- Tombol Buat Penerimaan -->
                                         @can('receive', $penugasan)
-                                            {{-- @if($bolehAksi) --}}
-                                                <!-- Tombol Buat Penerimaan -->
+                                            <div class="relative group">
                                                 <button
-                                                    class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
-                                                    @click="$dispatch('open-smart-modal', {
-                                                        modalId: 'modal-penerimaan-anggota',
-                                                        data: {
-                                                            id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
-                                                            id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                            id_pengiriman: '{{ $penugasan->latestPengiriman?->id_pengiriman }}',
-                                                            nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
-                                                        }
-                                                    })">
-                                                    <!-- icon -->
+                                                    class="w-full rounded-lg text-left px-4 py-3 text-sm flex items-center gap-2 border-b
+                                                        {{ $penugasan->bolehTerimaPenugasan()
+                                                            ? 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                                                            : 'text-gray-400 bg-gray-50 cursor-not-allowed' }}"
+                                                    {{ $penugasan->bolehTerimaPenugasan() ? '' : 'disabled' }}
+    
+                                                    @if($penugasan->bolehTerimaPenugasan())
+                                                        @click="$dispatch('open-smart-modal', {
+                                                            modalId: 'modal-penerimaan-anggota',
+                                                            data: {
+                                                                id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
+                                                                id_penugasan: '{{ $penugasan->id_penugasan }}',
+                                                                id_pengiriman: '{{ $penugasan->latestPengiriman?->id_pengiriman }}',
+                                                                nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                            }
+                                                        })"
+                                                    @endif>
                                                     <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -420,10 +409,27 @@
                                                     </svg>
                                                     Buat Penerimaan
                                                 </button>
-                                            {{-- @endif --}}
+                                                @if(!$penugasan->bolehTerimaPenugasan() && $penugasan->tooltipPenerimaanPenugasan())
+                                                    @php
+                                                        [$type, $text] = explode('|', $penugasan->tooltipPenerimaanPenugasan(), 2);
+                                                    @endphp
+                                                    <div
+                                                        class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2
+                                                            hidden group-hover:block
+                                                            text-white text-xs rounded px-3 py-1 shadow
+                                                            {{
+                                                                $type === 'danger'
+                                                                    ? 'bg-red-500/80'
+                                                                    : ($type === 'warning'
+                                                                        ? 'bg-orange-500/80'
+                                                                        : 'bg-blue-500/80')
+                                                            }}">
+                                                        {{ $text }}
+                                                    </div>
+                                                @endif   
+                                            </div>
                                         @endcan
 
-                                        {{-- @if($penugasan->isDinasLuar()) --}}
                                         @can('acceptDL', $penugasan)
                                             <form action="{{ route('kalenderDL.store')}}"
                                                 method="POST" class="flex flex-col items-center">
@@ -442,7 +448,6 @@
                                                 </button>
                                             </form>
                                         @endcan
-                                        {{-- @endif --}}
 
                                         <!-- Tombol Jadikan CKP -->
                                         <button @click="closeDropdown()"
@@ -486,6 +491,13 @@
                                 title="Kirim Ke Simket"
                                 class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800">
                                 Kirim ke Simket
+                            </a>
+                        </td>
+                        <td colspan="2" class="px-4 py-3 text-sm text-gray-700 text-center">
+                            <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer"
+                                title="Jadikan CKP ketua tim"
+                                class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800">
+                                Jadikan CKP
                             </a>
                         </td>
                     </tr>

@@ -11,11 +11,14 @@ class SubKegiatanPolicy
     /**
      * Hanya ketua tim PEMILIK kegiatan dan Sub Kegiatan di dalamnya
      */
-    protected function isOwner(Pegawai $pegawai, SubKegiatan $subKegiatan): bool
+    protected function canManageSubKegiatan(Pegawai $pegawai, SubKegiatan $subKegiatan): bool
     {
         return
-            $pegawai->hasRole('Ketua Tim') &&
-            $pegawai->id_pegawai === $subKegiatan->kegiatan->id_penanggung_jawab;
+            in_array($pegawai->active_role, ['Admin', 'Pimpinan'], true)
+            || (
+                $pegawai->active_role === 'Ketua Tim'
+                && $pegawai->id_pegawai === $subKegiatan->kegiatan->id_penanggung_jawab
+        );
     }
     /**
      * Determine whether the user can view any models.
@@ -49,7 +52,7 @@ class SubKegiatanPolicy
      */
     public function create(Pegawai $pegawai, SubKegiatan $subKegiatan): bool
     {
-        return $this->isOwner($pegawai, $subKegiatan);
+        return $this->canManageSubKegiatan($pegawai, $subKegiatan);
     }
 
     /**
@@ -57,7 +60,7 @@ class SubKegiatanPolicy
      */
     public function update(Pegawai $pegawai, SubKegiatan $subKegiatan): bool
     {
-        return $this->isOwner($pegawai, $subKegiatan);
+        return $this->canManageSubKegiatan($pegawai, $subKegiatan);
     }
 
     /**
@@ -65,7 +68,7 @@ class SubKegiatanPolicy
      */
     public function delete(Pegawai $pegawai, SubKegiatan $subKegiatan): bool
     {
-        return $this->isOwner($pegawai, $subKegiatan);
+        return $this->canManageSubKegiatan($pegawai, $subKegiatan);
     }
 
     /**

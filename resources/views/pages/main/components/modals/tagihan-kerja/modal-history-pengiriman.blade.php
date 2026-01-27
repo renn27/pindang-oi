@@ -48,12 +48,18 @@
                         </div>
 
                         <!-- Status -->
-                        <span class="rounded-full px-3 py-1 text-xs font-medium"
-                            :class="item.status === 'Diterima' ?
-                                'bg-green-100 text-green-700' :
-                                'bg-yellow-100 text-yellow-700'"
-                            x-text="item.status">
-                        </span>
+                        <span
+                            class="rounded-full px-3 py-1 text-xs font-medium"
+                            :class="
+                                item.status === 'Diterima'
+                                    ? 'bg-green-100 text-green-700'
+                                    : item.status === 'Revisi'
+                                        ? 'bg-red-100 text-red-600'
+                                        : 'bg-yellow-100 text-yellow-600'
+                            "
+                            x-text="item.status"
+                        ></span>
+
                     </div>
 
                     <div class="mt-4 grid grid-cols-2 gap-4 text-sm">

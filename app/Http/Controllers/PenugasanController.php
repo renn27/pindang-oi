@@ -22,7 +22,7 @@ class PenugasanController extends Controller
             'target' => ['required', 'integer', 'min:1'],
             'satuan_target' => ['required', 'string', 'max:50'],
 
-            'tanggal_mulai' => ['nullable', 'date', 'after_or_equal:today'],
+            'tanggal_mulai' => ['nullable', 'date'],
             'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
         ]);
 
@@ -82,7 +82,7 @@ class PenugasanController extends Controller
             'target' => ['required', 'integer', 'min:1'],
             'satuan_target' => ['required', 'string', 'max:50'],
 
-            'tanggal_mulai' => ['nullable', 'date', 'after_or_equal:today'],
+            'tanggal_mulai' => ['nullable', 'date'],
             'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
         ]);
 

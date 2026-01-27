@@ -10,20 +10,25 @@ use Illuminate\Auth\Access\Response;
 class PenugasanPolicy
 {
 
-    protected function isKetuaOwner(Pegawai $pegawai, Penugasan $penugasan): bool
+    protected function canManagePenugasan(Pegawai $pegawai, Penugasan $penugasan): bool
     {
         return
-            in_array($pegawai->active_role, ['Ketua Tim', 'Admin', 'Pimpinan'], true) &&
-            $pegawai->id_pegawai === $penugasan->subKegiatan->kegiatan->id_penanggung_jawab;
+            in_array($pegawai->active_role, ['Admin', 'Pimpinan'], true)
+            || (
+                $pegawai->active_role === 'Ketua Tim'
+                && $pegawai->id_pegawai === $penugasan->subKegiatan->kegiatan->id_penanggung_jawab
+        );
     }
 
     protected function isAssignedAnggota(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        return $pegawai->id_pegawai === $penugasan->id_anggota;
+        return
+            $pegawai->active_role === 'Anggota Tim'
+            && $pegawai->id_pegawai === $penugasan->id_anggota;
     }
 
     /**
-     * Determine whether the user can view any models.
+ * Determine whether the user can view any models.
      */
     public function viewAny(Pegawai $pegawai): bool
     {
@@ -36,7 +41,7 @@ class PenugasanPolicy
     public function view(Pegawai $pegawai, Penugasan $penugasan): bool
     {
         return
-            $this->isKetuaOwner($pegawai, $penugasan) ||
+            $this->canManagePenugasan($pegawai, $penugasan) ||
             $this->isAssignedAnggota($pegawai, $penugasan);
     }
 
@@ -46,8 +51,11 @@ class PenugasanPolicy
     public function create(Pegawai $pegawai, SubKegiatan $subKegiatan): bool
     {
         return
-            $pegawai->hasRole('Ketua Tim') &&
-            $pegawai->id_pegawai === $subKegiatan->kegiatan->id_penanggung_jawab;
+            in_array($pegawai->active_role, ['Admin', 'Pimpinan'], true)
+            || (
+                $pegawai->active_role === 'Ketua Tim'
+                && $pegawai->id_pegawai === $subKegiatan->kegiatan->id_penanggung_jawab
+        );
     }
 
     /**
@@ -55,9 +63,12 @@ class PenugasanPolicy
      */
     public function update(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        return
-            $pegawai->hasRole('Ketua Tim') &&
-            $pegawai->id_pegawai === $penugasan->subKegiatan->kegiatan->id_penanggung_jawab;
+        if (! $this->canManagePenugasan($pegawai, $penugasan) || ! $penugasan->isWithinSchedule() ||
+            $penugasan->latestPenerimaan?->status === 'Diterima') {
+            return false;
+        }
+        
+        return true;
     }
 
     /**
@@ -65,7 +76,7 @@ class PenugasanPolicy
      */
     public function delete(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        return $this->isKetuaOwner($pegawai, $penugasan);
+        return $this->canManagePenugasan($pegawai, $penugasan);
     }
 
     // === PENGIRIMAN ===
@@ -104,7 +115,15 @@ class PenugasanPolicy
     // === PENERIMAAN ===
     public function receive(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        return $this->isKetuaOwner($pegawai, $penugasan);
+        if(!$this->canManagePenugasan($pegawai, $penugasan)) {
+            return false;
+        }
+
+        if($penugasan->latestPenerimaan?->status === 'Diterima') {
+            return false;
+        }
+
+        return true;
     }
 
     /**

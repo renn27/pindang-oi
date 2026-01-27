@@ -11,10 +11,14 @@ class KegiatanPolicy
     /**
      * Hanya ketua tim PEMILIK kegiatan
      */
-    protected function isOwner(Pegawai $pegawai, Kegiatan $kegiatan): bool
+    protected function canManageKegiatan(Pegawai $pegawai, Kegiatan $kegiatan): bool
     {
-        return $pegawai->hasRole('Ketua Tim')
-            && $pegawai->id_pegawai === $kegiatan->id_penanggung_jawab;
+        return
+            in_array($pegawai->active_role, ['Admin', 'Pimpinan'], true)
+            || (
+                $pegawai->active_role === 'Ketua Tim'
+                && $pegawai->id_pegawai === $kegiatan->id_penanggung_jawab
+        );
     }
 
     /**
@@ -111,7 +115,7 @@ class KegiatanPolicy
      */
     public function createSubKegiatan(Pegawai $pegawai, Kegiatan $kegiatan): bool
     {
-        return $this->isOwner($pegawai, $kegiatan);
+        return $this->canManageKegiatan($pegawai, $kegiatan);
     }
 
     /**

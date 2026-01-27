@@ -13,20 +13,26 @@ return new class extends Migration
     public function up(): void
     {
         DB::statement("
-            ALTER TABLE penerimaans 
-            MODIFY status ENUM('Sedang Diperiksa', 'Diterima', 'Revisi')
-            DEFAULT 'Sedang Diperiksa'
+            ALTER TABLE penugasans 
+            MODIFY status ENUM('Belum Dikirim', 'Sudah Dikirim')
+            NOT NULL DEFAULT 'Belum Dikirim'
         ");
-}
-
+    }
+    
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
         DB::statement("
-            ALTER TABLE penerimaans 
-            MODIFY status ENUM('Diterima', 'Revisi')
+            ALTER TABLE penugasans 
+            MODIFY status ENUM(
+                'Belum Dikirim',
+                'Sudah Dikirim',
+                'Masih Revisi',
+                'Sudah Diterima'
+            )
+            NOT NULL DEFAULT 'Belum Dikirim'
         ");
     }
 };
