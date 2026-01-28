@@ -168,7 +168,7 @@ class Penugasan extends Model
             $today->gt($selesai) &&
             ( ! $latestPenerimaan || $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman)
         ) {
-            return 'danger|Pengiriman sudah masuk, namun tidak anda periksa';
+            return 'danger|Pengiriman sudah masuk, namun tidak diperiksa oleh ketua tim';
         }
 
          // ❌ PENUGASAN BERAKHIR & BELUM ADA PENGIRIMAN
@@ -219,7 +219,7 @@ class Penugasan extends Model
         $latestPenerimaan = $this->latestPenerimaan;
 
         // ⚠️ Sedang diperiksa
-        if ($latestPengiriman && ( !$latestPenerimaan || $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman) 
+        if ($latestPengiriman && ( !$latestPenerimaan || $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman)
             & $today->between($mulai, $selesai)) {
             return 'warning|Pengiriman sedang diperiksa oleh ketua tim';
         }

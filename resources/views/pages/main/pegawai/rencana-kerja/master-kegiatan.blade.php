@@ -672,44 +672,44 @@
                     const keterangan = keteranganInput ? keteranganInput.value : '';
 
                     sectionHTML += `
-            <div class="border border-gray-200 rounded-lg p-4 mb-4">
-                <div class="flex items-center justify-between mb-3">
-                    <h5 class="text-sm font-semibold text-gray-700">
-                        RK Anggota ${sectionIndex + 1}
-                    </h5>
-                    <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                        Bagian ${sectionIndex + 1}
-                    </span>
-                </div>
+                    <div class="border border-gray-200 rounded-lg p-4 mb-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h5 class="text-sm font-semibold text-gray-700">
+                                RK Anggota ${sectionIndex + 1}
+                            </h5>
+                            <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                                Bagian ${sectionIndex + 1}
+                            </span>
+                        </div>
 
-                <div class="space-y-3">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <span class="block text-xs font-medium text-gray-500 mb-1">RK Anggota</span>
-                            <span class="block text-sm text-gray-800">${rkAnggota || '-'}</span>
-                        </div>
-                        <div>
-                            <span class="block text-xs font-medium text-gray-500 mb-1">Satuan Target</span>
-                            <span class="block text-sm text-gray-800">${satuanTarget || '-'}</span>
-                        </div>
-                    </div>
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <span class="block text-xs font-medium text-gray-500 mb-1">RK Anggota</span>
+                                    <span class="block text-sm text-gray-800">${rkAnggota || '-'}</span>
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-medium text-gray-500 mb-1">Satuan Target</span>
+                                    <span class="block text-sm text-gray-800">${satuanTarget || '-'}</span>
+                                </div>
+                            </div>
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <span class="block text-xs font-medium text-gray-500 mb-1">Tanggal Mulai</span>
-                            <span class="block text-sm text-gray-800">${tanggalMulai || '-'}</span>
-                        </div>
-                        <div>
-                            <span class="block text-xs font-medium text-gray-500 mb-1">Tanggal Selesai</span>
-                            <span class="block text-sm text-gray-800">${tanggalAkhir || '-'}</span>
-                        </div>
-                    </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <span class="block text-xs font-medium text-gray-500 mb-1">Tanggal Mulai</span>
+                                    <span class="block text-sm text-gray-800">${tanggalMulai || '-'}</span>
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-medium text-gray-500 mb-1">Tanggal Selesai</span>
+                                    <span class="block text-sm text-gray-800">${tanggalAkhir || '-'}</span>
+                                </div>
+                            </div>
 
-                    <div>
-                        <span class="block text-xs font-medium text-gray-500 mb-1">Keterangan</span>
-                            <span class="block text-sm text-gray-800">${keterangan || '-'}</span>
-                    </div>
-            `;
+                            <div>
+                                <span class="block text-xs font-medium text-gray-500 mb-1">Keterangan</span>
+                                    <span class="block text-sm text-gray-800">${keterangan || '-'}</span>
+                            </div>
+                    `;
 
                     // Data Detail Anggota
                     const detailContainer = document.getElementById(`detail-${sectionId}`);
@@ -721,10 +721,10 @@
 
                     if (detailAnggotas.length > 0) {
                         sectionHTML += `
-                <div class="mt-3 border-t border-gray-100 pt-3">
-                    <p class="text-xs font-medium text-gray-600 mb-2">Anggota:</p>
-                    <div class="space-y-2">
-                `;
+                            <div class="mt-3 border-t border-gray-100 pt-3">
+                                <p class="text-xs font-medium text-gray-600 mb-2">Anggota:</p>
+                                <div class="space-y-2">
+                            `;
 
                         detailAnggotas.forEach((detail, detailIndex) => {
                             // Ambil data dari Alpine component di detail anggota
@@ -748,37 +748,37 @@
                                 detailTanggalSelesaiInput.value : '';
 
                             sectionHTML += `
-                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-3">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-medium text-gray-700">Anggota ${detailIndex + 1}</span>
-                            <div>
-                                <span class="text-xs font-medium text-gray-800">${namaAnggota || '-'}</span>
-                                ${idAnggota ? `<span class="ml-2 text-xs text-gray-500">(ID: ${idAnggota})</span>` : ''}
+                            <div class="rounded-lg border border-gray-200 bg-gray-50 p-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-medium text-gray-700">Anggota ${detailIndex + 1}</span>
+                                    <div>
+                                        <span class="text-xs font-medium text-gray-800">${namaAnggota || '-'}</span>
+                                        ${idAnggota ? `<span class="ml-2 text-xs text-gray-500">(ID: ${idAnggota})</span>` : ''}
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <div>
+                                        <span class="block text-gray-500 mb-1">Target</span>
+                                        <span class="block text-gray-700">${target || '-'}</span>
+                                    </div>
+                                    <div>
+                                        <span class="block text-gray-500 mb-1">Tanggal</span>
+                                        <span class="block text-gray-700">${detailTanggalMulai || '-'} s/d ${detailTanggalSelesai || '-'}</span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2 text-xs">
-                            <div>
-                                <span class="block text-gray-500 mb-1">Target</span>
-                                <span class="block text-gray-700">${target || '-'}</span>
-                            </div>
-                            <div>
-                                <span class="block text-gray-500 mb-1">Tanggal</span>
-                                <span class="block text-gray-700">${detailTanggalMulai || '-'} s/d ${detailTanggalSelesai || '-'}</span>
-                            </div>
-                        </div>
-                    </div>
-                    `;
+                            `;
                         });
 
                         sectionHTML += `
-                    </div>
-                </div>
-                `;
-                    }
+                                </div>
+                            </div>
+                            `;
+                                }
 
-                    sectionHTML += `</div></div>`;
-                    detailHTML += sectionHTML;
-                });
+                                sectionHTML += `</div></div>`;
+                                detailHTML += sectionHTML;
+                            });
 
                 // Buat HTML untuk modal
                 const confirmationHTML = `
