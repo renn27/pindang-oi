@@ -21,7 +21,7 @@
         </div>
 
         <div class="col-span-12 xl:col-span-6">
-            <div class="mb-5 rounded-2xl space-6 border border-gray-200 bg-white p-5 lg:p-6">
+            <div class="mb-5 rounded-2xl space-6 border border-gray-200 bg-white p-5 lg:p-6 dark:border-gray-800 dark:bg-gray-900">
                 <div class="mb-4">
                     <x-profile.employe-rank-card />
                 </div>

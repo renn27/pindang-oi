@@ -4,48 +4,37 @@
             <table class="max-w-[1400px] w-full divide-y divide-gray-200">
                 <thead>
                     <tr class="bg-gray-50">
-                        <th rowspan="2"
-                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                             No.
                         </th>
-                        <th rowspan="2"
-                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                             Nama
                         </th>
-                        <th rowspan="2"
-                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                             Jenis Kegiatan
                         </th>
-                        <th rowspan="2"
-                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                             Target
                         </th>
-                        <th rowspan="2"
-                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                             Waktu Pelaksanaan
                         </th>
-                        <th rowspan="2"
-                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                             Status Penugasan
                         </th>
-                        <th rowspan="2"
-                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                             Status Pengiriman
                         </th>
-                        <th rowspan="2"
-                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                             Status Penerimaan
                         </th>
-                        <th colspan="3"
-                            class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                        <th colspan="3" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                             Pengiriman
                         </th>
-                        <th colspan="4"
-                            class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                        <th colspan="4" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                             Penerimaan
                         </th>
-                        <th rowspan="2"
-                            class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                        <th rowspan="2" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                             Aksi
                         </th>
                     </tr>
@@ -75,8 +64,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse ($subKegiatan->penugasans as $index => $penugasan)
-                        <tr class="hover:bg-gray-50"
-                            data-target="{{ $penugasan->target }}"
+                        <tr class="hover:bg-gray-50" data-target="{{ $penugasan->target }}"
                             data-deadline="{{ $penugasan->tanggal_selesai }}"
                             data-kirim-jumlah="{{ $penugasan->latestPengiriman?->jumlah_dikirim ?? 0 }}"
                             data-kirim-tanggal="{{ $penugasan->latestPengiriman?->tanggal_pengiriman ?? '' }}"
@@ -95,34 +83,36 @@
                             </td>
 
                             <td class="px-4 py-3 text-sm text-gray-700 text-center">
-                                {{ $penugasan->target ?? '-' }} <span class="block text-xs text-orange-800">{{ $penugasan->satuan_target ?? '-' }}</span>
+                                {{ $penugasan->target ?? '-' }} <span
+                                    class="block text-xs text-orange-800">{{ $penugasan->satuan_target ?? '-' }}</span>
                             </td>
                             <td class="px-4 py-3 text-xs text-gray-700 text-center">
-                                {{
-                                    ($penugasan->tanggal_mulai && $penugasan->tanggal_selesai)
-                                        ? (
-                                            $penugasan->tanggal_mulai->equalTo($penugasan->tanggal_selesai)
-                                                ? $penugasan->tanggal_mulai->translatedFormat('D, d M Y')
-                                                : $penugasan->tanggal_mulai->translatedFormat('D, d M Y') . ' - ' . $penugasan->tanggal_selesai->translatedFormat('D, d M Y')
-                                        )
-                                        : '-'
-                                }}
+                                {{ $penugasan->tanggal_mulai && $penugasan->tanggal_selesai
+                                    ? ($penugasan->tanggal_mulai->equalTo($penugasan->tanggal_selesai)
+                                        ? $penugasan->tanggal_mulai->translatedFormat('D, d M Y')
+                                        : $penugasan->tanggal_mulai->translatedFormat('D, d M Y') .
+                                            ' - ' .
+                                            $penugasan->tanggal_selesai->translatedFormat('D, d M Y'))
+                                    : '-' }}
                             </td>
                             <td class="px-4 py-3 text-[10px] text-center">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full font-medium
+                                <span
+                                    class="inline-flex items-center px-2 py-1 rounded-full font-medium
                                     {{ $penugasan->statusPenugasan()['class'] }}">
                                     {{ $penugasan->statusPenugasan()['label'] }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 text-[10px] text-center">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full font-medium
+                                <span
+                                    class="inline-flex items-center px-2 py-1 rounded-full font-medium
                                     {{ $penugasan->statusPengiriman()['class'] }}">
                                     {{ $penugasan->statusPengiriman()['label'] }}
                                 </span>
                             </td>
 
                             <td class="px-4 py-3 text-[10px] text-center">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full font-medium
+                                <span
+                                    class="inline-flex items-center px-2 py-1 rounded-full font-medium
                                     {{ $penugasan->statusPenerimaan()['class'] }}">
                                     {{ $penugasan->statusPenerimaan()['label'] }}
                                 </span>
@@ -187,56 +177,22 @@
                                     {{ $penugasan->latestPengiriman?->bukti_dukung ? 'Lihat Bukti' : 'Belum Ada' }}
                                 </a>
                             </td>
-                            <td
-                                class="px-4 py-3 text-sm text-gray-700 text-center border-r border-gray-200">
+                            <td class="px-4 py-3 text-sm text-gray-700 text-center border-r border-gray-200">
                                 <!-- Container untuk tombol saja -->
                                 <div class="relative inline-block" x-data="{
                                     showDropdown: false,
                                     dropdownPosition: { x: 0, y: 0 },
-                                    calculatePosition(button) {
-                                        const rect = button.getBoundingClientRect();
-                                        const dropdownWidth = 192;
-                                        // Tinggi untuk 5 tombol: (5 * 44px) ≈ 220px, plus padding
-                                        const dropdownHeight = 236;
-
-                                        // Start dengan posisi di bawah tombol, rata kiri dengan tombol
-                                        let left = rect.left;
-                                        let top = rect.bottom + 8;
-
-                                        // Cek jika dropdown akan keluar dari viewport KANAN
-                                        // Gunakan window.innerWidth - 20 (margin) bukan -50
-                                        if (left + dropdownWidth > window.innerWidth - 20) {
-                                            // Posisikan di KIRI tombol
-                                            left = rect.left - dropdownWidth;
-
-                                            // Jika masih di luar kiri viewport
-                                            if (left < 10) {
-                                                // Posisikan di dalam viewport dengan sedikit margin
-                                                left = 10;
-                                            }
-                                        }
-
-                                        // Cek jika dropdown akan keluar dari viewport KIRI
-                                        if (left < 10) {
-                                            left = 10;
-                                        }
-
-                                        // Cek jika dropdown akan keluar dari viewport BAWAH
-                                        if (top + dropdownHeight > window.innerHeight - 20) {
-                                            // Pindah ke ATAS tombol
-                                            top = rect.top - dropdownHeight - 8;
-
-                                            // Jika juga tidak muat di atas
-                                            if (top < 10) {
-                                                top = 10;
-                                            }
-                                        }
-
-                                        return { x: left, y: top };
-                                    },
                                     openDropdown(event) {
                                         const button = event.currentTarget;
-                                        this.dropdownPosition = this.calculatePosition(button);
+                                        const rect = button.getBoundingClientRect();
+                                        const dropdownWidth = 192; // Lebar dropdown (sesuai min-w-[192px])
+                                
+                                        // Posisikan dropdown di sebelah kiri tombol
+                                        // dengan ujung kanan dropdown = ujung kiri tombol
+                                        this.dropdownPosition = {
+                                            x: rect.left - dropdownWidth + 10, // +10 agar sedikit overlap/rapat
+                                            y: rect.top - 10 // 10px di atas tombol
+                                        };
                                         this.showDropdown = true;
                                     },
                                     closeDropdown() {
@@ -272,26 +228,26 @@
                                             <button
                                                 class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
                                                 @click="$dispatch('open-smart-modal', {
-                                                    modalId: 'modal-penugasan-anggota',
-                                                    mode: 'edit',
-                                                    key: '{{ $penugasan->id_penugasan }}',
-                                                    data: {
-                                                        id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
-                                                        nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
+                        modalId: 'modal-penugasan-anggota',
+                        mode: 'edit',
+                        key: '{{ $penugasan->id_penugasan }}',
+                        data: {
+                            id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
+                            nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
 
-                                                        id_anggota: @js($penugasan->id_anggota),
-                                                        nama_anggota: @js($penugasan->anggota?->nama_pegawai),
+                            id_anggota: @js($penugasan->id_anggota),
+                            nama_anggota: @js($penugasan->anggota?->nama_pegawai),
 
-                                                        id_jenis_kegiatan: @js($penugasan->jenisKegiatan->id),
-                                                        target: @js($penugasan->target),
-                                                        satuan_target: @js($penugasan->satuan_target),
+                            id_jenis_kegiatan: @js($penugasan->jenisKegiatan->id),
+                            target: @js($penugasan->target),
+                            satuan_target: @js($penugasan->satuan_target),
 
-                                                        tanggal_mulai: @js(optional($penugasan->tanggal_mulai)->format('Y-m-d')),
-                                                        tanggal_selesai: @js(optional($penugasan->tanggal_selesai)->format('Y-m-d')),
+                            tanggal_mulai: @js(optional($penugasan->tanggal_mulai)->format('Y-m-d')),
+                            tanggal_selesai: @js(optional($penugasan->tanggal_selesai)->format('Y-m-d')),
 
-                                                        status: @js($penugasan->status),
-                                                    }
-                                                })">
+                            status: @js($penugasan->status),
+                        }
+                    })">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -305,44 +261,40 @@
                                             <div class="relative group">
                                                 <button
                                                     class="w-full rounded-lg text-left px-4 py-3 text-sm flex items-center gap-2 border-b
-                                                        {{ $penugasan->bolehKirimPenugasan()
-                                                            ? 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
-                                                            : 'text-gray-400 bg-gray-50 cursor-not-allowed' }}"
+                            {{ $penugasan->bolehKirimPenugasan()
+                                ? 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                                : 'text-gray-400 bg-gray-50 cursor-not-allowed' }}"
                                                     {{ $penugasan->bolehKirimPenugasan() ? '' : 'disabled' }}
-
-                                                    @if($penugasan->bolehKirimPenugasan())
-                                                        @click="$dispatch('open-smart-modal', {
-                                                            modalId: 'modal-pengiriman-anggota',
-                                                            data: {
-                                                                id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
-                                                                id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                                nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
-                                                            }
-                                                        })"
-                                                    @endif>
-                                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    @if ($penugasan->bolehKirimPenugasan()) @click="$dispatch('open-smart-modal', {
+                                modalId: 'modal-pengiriman-anggota',
+                                data: {
+                                    id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
+                                    id_penugasan: '{{ $penugasan->id_penugasan }}',
+                                    nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                }
+                            })" @endif>
+                                                    <svg class="w-4 h-4 flex-shrink-0" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
                                                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
                                                     Buat Pengiriman
                                                 </button>
 
-                                                @if(!$penugasan->bolehKirimPenugasan() && $penugasan->tooltipPengirimanPenugasan())
+                                                @if (!$penugasan->bolehKirimPenugasan() && $penugasan->tooltipPengirimanPenugasan())
                                                     @php
-                                                        [$type, $text] = explode('|', $penugasan->tooltipPengirimanPenugasan(), 2);
+                                                        [$type, $text] = explode(
+                                                            '|',
+                                                            $penugasan->tooltipPengirimanPenugasan(),
+                                                            2,
+                                                        );
                                                     @endphp
                                                     <div
                                                         class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2
-                                                            hidden group-hover:block
-                                                            text-white text-xs rounded px-3 py-1 shadow
-                                                            {{
-                                                                $type === 'danger'
-                                                                    ? 'bg-red-500/80'
-                                                                    : ($type === 'warning'
-                                                                        ? 'bg-orange-500/80'
-                                                                        : 'bg-blue-500/80')
-                                                            }}">
+                                hidden group-hover:block
+                                text-white text-xs rounded px-3 py-1 shadow
+                                {{ $type === 'danger' ? 'bg-red-500/80' : ($type === 'warning' ? 'bg-orange-500/80' : 'bg-blue-500/80') }}">
                                                         {{ $text }}
                                                     </div>
                                                 @endif
@@ -352,26 +304,27 @@
                                         <!-- Tombol Tampilkan Histori Pengiriman -->
                                         <button
                                             class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700
-                                            hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
+                hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
                                             @click="$dispatch('open-smart-modal', {
-                                                modalId: 'modal-histori-pengiriman',
-                                                data: {
-                                                    id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                    nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
-                                                    historiData: @js($penugasan->pengirimans
-                                                    ->sortByDesc(fn($p) => $p->tanggal_pengiriman) // sort sebelum format
-                                                    ->map(
-                                                        fn($p) => [
-                                                            'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
-                                                            'jumlah_dikirim' => $p->jumlah_dikirim,
-                                                            'media_pengiriman' => $p->media_pengiriman,
-                                                            'bukti_dukung' => $p->bukti_dukung,
-                                                            'status' => $p->penerimaan?->status ?? 'Menunggu Diperiksa',
-                                                            'catatan' => $p->penerimaan?->catatan,
-                                                        ],
-                                                    ),
-                                                )}
-                                            })">
+                    modalId: 'modal-histori-pengiriman',
+                    data: {
+                        id_penugasan: '{{ $penugasan->id_penugasan }}',
+                        nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                        historiData: @js(
+    $penugasan->pengirimans
+        ->sortByDesc(fn($p) => $p->tanggal_pengiriman) // sort sebelum format
+        ->map(
+            fn($p) => [
+                'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
+                'jumlah_dikirim' => $p->jumlah_dikirim,
+                'media_pengiriman' => $p->media_pengiriman,
+                'bukti_dukung' => $p->bukti_dukung,
+                'status' => $p->penerimaan?->status ?? 'Menunggu Diperiksa',
+                'catatan' => $p->penerimaan?->catatan,
+            ],
+        ),
+)}
+                })">
                                             <!-- Icon -->
                                             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
@@ -386,62 +339,64 @@
                                             <div class="relative group">
                                                 <button
                                                     class="w-full rounded-lg text-left px-4 py-3 text-sm flex items-center gap-2 border-b
-                                                        {{ $penugasan->bolehTerimaPenugasan()
-                                                            ? 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
-                                                            : 'text-gray-400 bg-gray-50 cursor-not-allowed' }}"
+                            {{ $penugasan->bolehTerimaPenugasan()
+                                ? 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                                : 'text-gray-400 bg-gray-50 cursor-not-allowed' }}"
                                                     {{ $penugasan->bolehTerimaPenugasan() ? '' : 'disabled' }}
-    
-                                                    @if($penugasan->bolehTerimaPenugasan())
-                                                        @click="$dispatch('open-smart-modal', {
-                                                            modalId: 'modal-penerimaan-anggota',
-                                                            data: {
-                                                                id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
-                                                                id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                                id_pengiriman: '{{ $penugasan->latestPengiriman?->id_pengiriman }}',
-                                                                nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
-                                                            }
-                                                        })"
-                                                    @endif>
-                                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    @if ($penugasan->bolehTerimaPenugasan()) @click="$dispatch('open-smart-modal', {
+                                modalId: 'modal-penerimaan-anggota',
+                                data: {
+                                    id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
+                                    id_penugasan: '{{ $penugasan->id_penugasan }}',
+                                    id_pengiriman: '{{ $penugasan->latestPengiriman?->id_pengiriman }}',
+                                    nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                }
+                            })" @endif>
+                                                    <svg class="w-4 h-4 flex-shrink-0" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
                                                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
                                                     Buat Penerimaan
                                                 </button>
-                                                @if(!$penugasan->bolehTerimaPenugasan() && $penugasan->tooltipPenerimaanPenugasan())
+                                                @if (!$penugasan->bolehTerimaPenugasan() && $penugasan->tooltipPenerimaanPenugasan())
                                                     @php
-                                                        [$type, $text] = explode('|', $penugasan->tooltipPenerimaanPenugasan(), 2);
+                                                        [$type, $text] = explode(
+                                                            '|',
+                                                            $penugasan->tooltipPenerimaanPenugasan(),
+                                                            2,
+                                                        );
                                                     @endphp
                                                     <div
                                                         class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2
-                                                            hidden group-hover:block
-                                                            text-white text-xs rounded px-3 py-1 shadow
-                                                            {{
-                                                                $type === 'danger'
-                                                                    ? 'bg-red-500/80'
-                                                                    : ($type === 'warning'
-                                                                        ? 'bg-orange-500/80'
-                                                                        : 'bg-blue-500/80')
-                                                            }}">
+                                hidden group-hover:block
+                                text-white text-xs rounded px-3 py-1 shadow
+                                {{ $type === 'danger' ? 'bg-red-500/80' : ($type === 'warning' ? 'bg-orange-500/80' : 'bg-blue-500/80') }}">
                                                         {{ $text }}
                                                     </div>
-                                                @endif   
+                                                @endif
                                             </div>
                                         @endcan
 
                                         @can('acceptDL', $penugasan)
-                                            <form action="{{ route('kalenderDL.store')}}"
-                                                method="POST" class="flex flex-col items-center">
+                                            <form action="{{ route('kalenderDL.store') }}" method="POST"
+                                                class="flex flex-col items-center">
                                                 @csrf
 
-                                                <input type="hidden" name="id_pegawai" value="{{ $penugasan->id_anggota }}">
-                                                <input type="hidden" name="tanggal_mulai" value="{{ $penugasan->tanggal_mulai }}">
-                                                <input type="hidden" name="tanggal_selesai" value="{{ $penugasan->tanggal_selesai }}">
+                                                <input type="hidden" name="id_pegawai"
+                                                    value="{{ $penugasan->id_anggota }}">
+                                                <input type="hidden" name="tanggal_mulai"
+                                                    value="{{ $penugasan->tanggal_mulai }}">
+                                                <input type="hidden" name="tanggal_selesai"
+                                                    value="{{ $penugasan->tanggal_selesai }}">
 
-                                                <button type="submit" class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                <button type="submit"
+                                                    class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
                                                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                     </svg>
                                                     Masukkan Kalender DL
@@ -481,10 +436,10 @@
 
                         </td>
                         <td colspan="3" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                            {{ $totalKirim}}
+                            {{ $totalKirim }}
                         </td>
                         <td colspan="3" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                            {{ $totalTerima}}
+                            {{ $totalTerima }}
                         </td>
                         <td colspan="2" class="px-4 py-3 text-sm text-gray-700 text-center">
                             <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer"
@@ -508,73 +463,73 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('tr[data-target]').forEach(row => {
-        const target = Number(row.dataset.target);
-        const deadline = new Date(row.dataset.deadline);
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('tr[data-target]').forEach(row => {
+            const target = Number(row.dataset.target);
+            const deadline = new Date(row.dataset.deadline);
 
-        // =========================
-        // PENGIRIMAN
-        // =========================
-        const jumlahKirim = Number(row.dataset.kirimJumlah);
-        const tanggalKirim = row.dataset.kirimTanggal
-            ? new Date(row.dataset.kirimTanggal)
-            : null;
+            // =========================
+            // PENGIRIMAN
+            // =========================
+            const jumlahKirim = Number(row.dataset.kirimJumlah);
+            const tanggalKirim = row.dataset.kirimTanggal ?
+                new Date(row.dataset.kirimTanggal) :
+                null;
 
-        const kirimContainer = row.querySelector('.rating-kirim');
+            const kirimContainer = row.querySelector('.rating-kirim');
 
-        if (!jumlahKirim || !tanggalKirim) {
-            kirimContainer.textContent = '-';
-        } else {
-            let rating = 1;
-            const sesuaiTarget = jumlahKirim === target;
-            const tepatWaktu = tanggalKirim <= deadline;
+            if (!jumlahKirim || !tanggalKirim) {
+                kirimContainer.textContent = '-';
+            } else {
+                let rating = 1;
+                const sesuaiTarget = jumlahKirim === target;
+                const tepatWaktu = tanggalKirim <= deadline;
 
-            if (sesuaiTarget && tepatWaktu) rating = 5;
-            else if (sesuaiTarget) rating = 4;
-            else if (tepatWaktu) rating = 3;
-            else rating = 2;
+                if (sesuaiTarget && tepatWaktu) rating = 5;
+                else if (sesuaiTarget) rating = 4;
+                else if (tepatWaktu) rating = 3;
+                else rating = 2;
 
-            renderStars(kirimContainer, rating);
-        }
+                renderStars(kirimContainer, rating);
+            }
 
-        // =========================
-        // PENERIMAAN
-        // =========================
-        const jumlahTerima = Number(row.dataset.terimaJumlah);
-        const tanggalTerima = row.dataset.terimaTanggal
-            ? new Date(row.dataset.terimaTanggal)
-            : null;
+            // =========================
+            // PENERIMAAN
+            // =========================
+            const jumlahTerima = Number(row.dataset.terimaJumlah);
+            const tanggalTerima = row.dataset.terimaTanggal ?
+                new Date(row.dataset.terimaTanggal) :
+                null;
 
-        const terimaContainer = row.querySelector('.rating-terima');
+            const terimaContainer = row.querySelector('.rating-terima');
 
-        if (!jumlahTerima || !tanggalTerima) {
-            terimaContainer.textContent = '-';
-        } else {
-            let rating = 1;
-            const sesuaiJumlah = jumlahTerima === jumlahKirim;
-            const tepatWaktu = tanggalTerima <= deadline;
+            if (!jumlahTerima || !tanggalTerima) {
+                terimaContainer.textContent = '-';
+            } else {
+                let rating = 1;
+                const sesuaiJumlah = jumlahTerima === jumlahKirim;
+                const tepatWaktu = tanggalTerima <= deadline;
 
-            if (sesuaiJumlah && tepatWaktu) rating = 5;
-            else if (sesuaiJumlah) rating = 4;
-            else if (tepatWaktu) rating = 3;
-            else rating = 2;
+                if (sesuaiJumlah && tepatWaktu) rating = 5;
+                else if (sesuaiJumlah) rating = 4;
+                else if (tepatWaktu) rating = 3;
+                else rating = 2;
 
-            renderStars(terimaContainer, rating);
-        }
+                renderStars(terimaContainer, rating);
+            }
+        });
     });
-});
 
-function renderStars(container, rating) {
-    container.innerHTML = '';
-    for (let i = 0; i < rating; i++) {
-        container.innerHTML += `
+    function renderStars(container, rating) {
+        container.innerHTML = '';
+        for (let i = 0; i < rating; i++) {
+            container.innerHTML += `
             <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 20 20">
                 <path
                     d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
             </svg>
 
         `;
+        }
     }
-}
 </script>

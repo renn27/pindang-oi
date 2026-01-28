@@ -1,5 +1,5 @@
 <div x-data="{
-    photoPreview: '{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('images/user/owner.png') }}',
+    photoPreview: '{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/user/owner.png') }}',
 
     previewPhoto(event) {
         const file = event.target.files[0];
@@ -120,8 +120,7 @@
                             <!-- Preview Foto dengan Upload Button -->
                             <div class="relative">
                                 <div class="h-32 w-32 overflow-hidden rounded-full border-2 border-gray-200">
-                                    <img src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/user/owner.png') }}"
-                class="h-full w-full object-cover"/>
+                                    <img :src="photoPreview" class="h-full w-full object-cover"/>
                                 </div>
 
                                 <!-- Upload Button Floating -->
@@ -151,7 +150,7 @@
                                 <!-- Reset Button Minimal -->
                                 <div x-show="photoPreview.includes('blob:')" x-transition class="mt-3">
                                     <button type="button"
-                                        @click="photoPreview = '{{ Auth::user()->photo ? asset('storage/profile/' . Auth::user()->photo) : asset('images/user/owner.png') }}'; document.getElementById('photo-upload').value = ''"
+                                        @click="photoPreview = '{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/user/owner.png') }}'; document.getElementById('photo-upload').value = ''"
                                         class="text-sm text-gray-500 hover:text-gray-700 underline">
                                         Reset ke foto sebelumnya
                                     </button>

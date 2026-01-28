@@ -2,7 +2,6 @@
 
 namespace App\Exports;
 
-use App\Models\Bidang;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\{
     FromCollection,
@@ -12,6 +11,8 @@ use Maatwebsite\Excel\Concerns\{
     WithEvents
 };
 use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 class MphAllExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithEvents
 {
@@ -30,10 +31,11 @@ class MphAllExport implements FromCollection, WithHeadings, WithMapping, ShouldA
             $bidang->load([
                 'kegiatans.subKegiatans.penugasans.anggota',
                 'kegiatans.subKegiatans.penugasans.jenisKegiatan',
-                'kegiatans.penanggungJawab' // pastikan relasi ketua
+                'kegiatans.penanggungJawab'
             ]);
 
             foreach ($bidang->kegiatans as $kegiatan) {
+                // 1 kegiatan = 1 ketua
                 $namaKetua = $kegiatan->penanggungJawab->nama_pegawai ?? '-';
 
                 foreach ($kegiatan->subKegiatans as $sub) {
@@ -87,31 +89,32 @@ class MphAllExport implements FromCollection, WithHeadings, WithMapping, ShouldA
     public function registerEvents(): array
     {
         return [
-            AfterSheet::class => function(AfterSheet $event) {
+            AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
                 $highestRow = $sheet->getHighestRow();
                 $highestColumn = $sheet->getHighestColumn();
 
-                // Merge kolom Bidang (A)
+                // Merge Bidang
                 $this->mergeColumn($sheet, 'A', 2, $highestRow);
 
-                // Merge kolom Kegiatan (B)
-                $this->mergeColumn($sheet, 'B', 2, $highestRow);
+                // 🔥 Merge Kegiatan + Ketua (IKUT KEGIATAN)
+                $this->mergeKegiatanDanKetua($sheet, 2, $highestRow);
 
-                // Merge kolom Nama Ketua (C)
-                $this->mergeColumn($sheet, 'C', 2, $highestRow);
-
-                // Merge kolom Sub Kegiatan (D)
+                // Merge Sub Kegiatan
                 $this->mergeColumn($sheet, 'D', 2, $highestRow);
 
-                // Set border all
+                // Border semua cell
                 $sheet->getStyle("A1:{$highestColumn}{$highestRow}")
-                    ->getBorders()->getAllBorders()
-                    ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
-            },
+                    ->getBorders()
+                    ->getAllBorders()
+                    ->setBorderStyle(Border::BORDER_THIN);
+            }
         ];
     }
 
+    /**
+     * Merge kolom standar (berdasarkan nilai sel)
+     */
     private function mergeColumn($sheet, $col, $startRow, $endRow)
     {
         $lastValue = null;
@@ -124,18 +127,67 @@ class MphAllExport implements FromCollection, WithHeadings, WithMapping, ShouldA
                 if ($row - 1 > $mergeStart) {
                     $sheet->mergeCells("{$col}{$mergeStart}:{$col}" . ($row - 1));
                     $sheet->getStyle("{$col}{$mergeStart}")
-                        ->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                        ->getAlignment()
+                        ->setVertical(Alignment::VERTICAL_CENTER);
                 }
+
                 $lastValue = $value;
                 $mergeStart = $row;
             }
         }
 
-        // Merge terakhir
         if ($endRow > $mergeStart) {
             $sheet->mergeCells("{$col}{$mergeStart}:{$col}{$endRow}");
             $sheet->getStyle("{$col}{$mergeStart}")
-                ->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                ->getAlignment()
+                ->setVertical(Alignment::VERTICAL_CENTER);
         }
     }
-}  
+
+    /**
+     * 🔥 LOGIKA FINAL
+     * Nama Ketua (C) SELALU ikut merge Kegiatan (B)
+     * Karena: 1 kegiatan = 1 ketua
+     */
+    private function mergeKegiatanDanKetua($sheet, $startRow, $endRow)
+    {
+        $lastKegiatan = null;
+        $mergeStart = $startRow;
+
+        for ($row = $startRow; $row <= $endRow; $row++) {
+            $kegiatan = $sheet->getCell("B{$row}")->getValue();
+
+            if ($kegiatan !== $lastKegiatan) {
+                if ($row - 1 > $mergeStart) {
+                    // Merge Kegiatan
+                    $sheet->mergeCells("B{$mergeStart}:B" . ($row - 1));
+                    $sheet->getStyle("B{$mergeStart}")
+                        ->getAlignment()
+                        ->setVertical(Alignment::VERTICAL_CENTER);
+
+                    // Merge Ketua IKUT kegiatan
+                    $sheet->mergeCells("C{$mergeStart}:C" . ($row - 1));
+                    $sheet->getStyle("C{$mergeStart}")
+                        ->getAlignment()
+                        ->setVertical(Alignment::VERTICAL_CENTER);
+                }
+
+                $mergeStart = $row;
+                $lastKegiatan = $kegiatan;
+            }
+        }
+
+        // Merge terakhir
+        if ($endRow > $mergeStart) {
+            $sheet->mergeCells("B{$mergeStart}:B{$endRow}");
+            $sheet->getStyle("B{$mergeStart}")
+                ->getAlignment()
+                ->setVertical(Alignment::VERTICAL_CENTER);
+
+            $sheet->mergeCells("C{$mergeStart}:C{$endRow}");
+            $sheet->getStyle("C{$mergeStart}")
+                ->getAlignment()
+                ->setVertical(Alignment::VERTICAL_CENTER);
+        }
+    }
+}
