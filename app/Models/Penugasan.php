@@ -51,6 +51,11 @@ class Penugasan extends Model
     public function pengirimans() {
         return $this->hasMany(Pengiriman::class, 'id_penugasan', 'id_penugasan');
     }
+
+    public function kalenderDLs()
+    {
+        return $this->hasMany(KalenderDL::class, 'id_penugasan');
+    }
     // END RELATIONS
 
     public function latestPengiriman() {
@@ -80,6 +85,21 @@ class Penugasan extends Model
 
         return in_array($this->jenis_kegiatan, $specialTypes);
     }
+
+    public function sudahMasukKalenderDL()
+    {
+        return $this->kalenderDLs()->exists();
+        // return KalenderDL::where('id_penugasan', $this->id)->exists();
+        // return KalenderDL::where('id_pegawai', $this->id_anggota)
+        //     ->where(function ($q) {
+        //         $q->whereBetween('tanggal_dl', [
+        //             $this->tanggal_mulai,
+        //             $this->tanggal_selesai
+        //         ]);
+        //     })
+        //     ->exists();
+    }
+
 
     public function isWithinSchedule(): bool
     {

@@ -133,4 +133,38 @@ class PenugasanController extends Controller
     }
 
     public function delete() {}
+
+    public function update_rk_dl(Request $request, Penugasan $penugasan)
+    {
+        // dd($request->all());
+        $validated = $request->validate([
+            'status_dl' => ['required', 'in:Menunggu,ACC,Ditolak'],
+        ]);
+
+        // Cek role aktif
+        $role = $request->user()->active_role;
+
+        if ($role === 'Pimpinan' && !in_array($request->status_dl, ['ACC', 'Ditolak'])) {
+            return redirect()->back()->with('error', 'Pimpinan hanya boleh menyetujui atau menolak.');
+        }
+
+        if ($role === 'Ketua Tim' && $request->status_dl !== 'Menunggu') {
+            return redirect()->back()->with('error', 'Ketua Tim hanya boleh mengajukan kembali.');
+        }
+
+        try {
+            $penugasan->update([
+                'status_dl' => $validated['status_dl'],
+            ]);
+
+            return redirect()->back()
+            ->with('success', 'Status Dinas Luar berhasil diperbarui.');
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+
+            return redirect()->back()
+                ->with('error', 'Gagal memperbarui data status Dinas Luar. Silakan coba lagi.')
+                ->withInput();
+        }
+    }
 }

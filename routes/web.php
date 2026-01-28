@@ -118,10 +118,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [MasterKegiatanController::class, 'store'])->name('master-kegiatan.store');
     });
 
-    Route::prefix('/rencana-kerja-dl')->group(function () {
-        Route::get('/', [MasterKegiatanController::class, 'index_rk_dl'])->name('master-kegiatan.index_rk_dl');
-        // Route::post('/', [MasterKegiatanController::class, 'store_rk_dl'])->name('master-kegiatan.store_rk_dl');
-    });
+    Route::get('/rencana-kerja-dl', [MasterKegiatanController::class, 'index_rk_dl'])->name('master-kegiatan.index_rk_dl');
+    Route::put('/penugasan/{penugasan:id_penugasan}/rencana-kerja-dl', [PenugasanController::class, 'update_rk_dl'])->name('penugasan.update_rk_dl');
     // END ROUTE MASTER KEGIATAN
 
     // ROUTE KALENDER DL

@@ -82,7 +82,7 @@
                         Tanggal Selesai
                     </label>
                     <x-form.date-picker id="tanggal_selesai" name="tanggal_selesai" x-model="formData.tanggal_selesai"
-                        placeholder="Pilih Tanggal" defaultDate="{{ now()->format('Y-m-d') }}" />
+                        placeholder="Pilih Tanggal" />
                 </div>
             </div>
 

@@ -54,9 +54,10 @@ class KalenderDLController extends Controller
 
     public function store(Request $request)
     {
-
+        // dd($request->all());
         $validated = $request->validate([
             'id_pegawai'      => ['required', 'exists:pegawais,id_pegawai'],
+            'id_penugasan'    => ['required', 'exists:penugasans,id_penugasan'],
             'tanggal_mulai'   => ['required', 'date'],
             'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
             ]);
@@ -76,6 +77,7 @@ class KalenderDLController extends Controller
                 if (!$exists) {
                     KalenderDL::create([
                         'id_pegawai' => $validated['id_pegawai'],
+                        'id_penugasan' => $validated['id_penugasan'],
                         'tanggal_dl' => $date,
                     ]);
                 }

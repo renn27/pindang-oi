@@ -13,6 +13,8 @@ use Illuminate\Database\QueryException;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 use App\Exports\MphAllExport;
+use App\Models\Penugasan;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
 
@@ -23,7 +25,6 @@ class MasterKegiatanController extends Controller
         // Data referensi untuk dropdown modal
         $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
         $rkJpts   = RencanaJPT::orderBy('nama_rencana_jpt')->get(['id', 'nama_rencana_jpt']);
-        // $bidangs  = Bidang::orderBy('nama_bidang')->get(); // ambil semua bidang
         $jenisKegiatans = JenisKegiatan::orderBy('jenis_kegiatan')->get();
         $ketuaTims = Pegawai::join('pegawai_role', 'pegawais.id_pegawai', '=', 'pegawai_role.pegawai_id')
             ->join('roles', 'pegawai_role.role_id', '=', 'roles.id')
@@ -212,15 +213,12 @@ class MasterKegiatanController extends Controller
         return Excel::download(new MphAllExport($bidangs), 'matriks_peran_hasil.xlsx');
     }
 
-
-    // RENCANA KERJA DENGAN DL
     public function index_rk_dl()
     {
-        // Data referensi untuk dropdown modal
+        $pegawai = Auth::user();
+        $activeRole = $pegawai->active_role;
+
         $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
-        $rkJpts   = RencanaJPT::orderBy('nama_rencana_jpt')->get(['id', 'nama_rencana_jpt']);
-        // $bidangs  = Bidang::orderBy('nama_bidang')->get(); // ambil semua bidang
-        $jenisKegiatans = JenisKegiatan::orderBy('jenis_kegiatan')->get();
         $ketuaTims = Pegawai::join('pegawai_role', 'pegawais.id_pegawai', '=', 'pegawai_role.pegawai_id')
             ->join('roles', 'pegawai_role.role_id', '=', 'roles.id')
             ->where('roles.nama_role', 'Ketua Tim')
@@ -231,47 +229,76 @@ class MasterKegiatanController extends Controller
                 'roles.nama_role',
             ]);
 
-        $bidangs = Bidang::whereHas('kegiatans.subKegiatans.penugasans', function ($q) {
-            $q->where('butuh_dl', true);
+        $bidangs = Bidang::whereHas('kegiatans', function ($kegiatanQuery) use ($pegawai, $activeRole) {
+
+            // 🔥 FILTER ROLE DI KEGIATAN
+            $kegiatanQuery
+                ->when($activeRole === 'Ketua Tim', function ($q) use ($pegawai) {
+                    $q->where('id_penanggung_jawab', $pegawai->id_pegawai);
+                })
+                ->whereHas('subKegiatans.penugasans', function ($q) {
+                    $q->where('butuh_dl', true);
+                });
         })
         ->with([
-            'kegiatans' => function ($query) {
-                $query->whereHas('subKegiatans.penugasans', function ($q) {
-                    $q->where('butuh_dl', true);
-                })
-                ->with([
-                    'subKegiatans' => function ($subQuery) {
-                        $subQuery->whereHas('penugasans', function ($q) {
-                            $q->where('butuh_dl', true);
-                        })
-                        ->with([
-                            'penugasans' => function ($penugasanQuery) {
-                                $penugasanQuery
-                                    ->where('butuh_dl', true)
-                                    // ❗ status_dl TIDAK difilter
-                                    ->with([
-                                        'anggota',
-                                        'jenisKegiatan'
-                                    ]);
-                            }
-                        ]);
-                    },
-                    'rencanaJpt',
-                    'indikatorJpt',
-                    'penanggungJawab'
-                ]);
+            'kegiatans' => function ($kegiatanQuery) use ($pegawai, $activeRole) {
+
+                $kegiatanQuery
+                    ->when($activeRole === 'Ketua Tim', function ($q) use ($pegawai) {
+                        $q->where('id_penanggung_jawab', $pegawai->id_pegawai);
+                    })
+                    ->whereHas('subKegiatans.penugasans', function ($q) {
+                        $q->where('butuh_dl', true);
+                    })
+                    ->with([
+                        'subKegiatans' => function ($subQuery) {
+
+                            $subQuery->whereHas('penugasans', function ($q) {
+                                $q->where('butuh_dl', true);
+                            })
+                            ->with([
+                                'penugasans' => function ($penugasanQuery) {
+                                    $penugasanQuery
+                                        ->where('butuh_dl', true)
+                                        ->with(['anggota', 'jenisKegiatan']);
+                                }
+                            ]);
+                        },
+                        'rencanaJpt',
+                        'indikatorJpt',
+                        'penanggungJawab'
+                    ]);
             }
         ])
         ->orderBy('nama_bidang')
         ->get();
 
+        // 🔹 Hitung jumlah "Menunggu" dan "Ditolak" untuk tiap bidang
+        $bidangs->each(function($bidang) {
+            $bidang->menungguCount = $bidang->kegiatans->sum(function($kegiatan) {
+                return $kegiatan->subKegiatans->sum(function($sub) {
+                    return $sub->penugasans->where('status_dl', 'Menunggu')->count();
+                });
+            });
+
+            $bidang->ditolakCount = $bidang->kegiatans->sum(function($kegiatan) {
+                return $kegiatan->subKegiatans->sum(function($sub) {
+                    return $sub->penugasans->where('status_dl', 'Ditolak')->count();
+                });
+            });
+        });
+
+        $allPenugasans = $bidangs
+            ->flatMap(fn ($bidang) => $bidang->kegiatans)
+            ->flatMap(fn ($kegiatan) => $kegiatan->subKegiatans)
+            ->flatMap(fn ($sub) => $sub->penugasans);
+
         return view('pages.main.pegawai.rencana-kerja.rencana-kerja-dl', [
             'title'         => "Rencana Kerja Butuh DL",
             'bidangs'       => $bidangs,
             'pegawais'      => $pegawais,
-            'rkJpts'        => $rkJpts,
-            'jenisKegiatans' => $jenisKegiatans,
-            'ketuaTims'     => $ketuaTims
+            'ketuaTims'     => $ketuaTims,
+            'allPenugasans' => $allPenugasans,
         ]);
     }
 }
