@@ -13,6 +13,7 @@ class PenugasanController extends Controller
 {
     public function store(Request $request, SubKegiatan $subKegiatan)
     {
+        // dd($request->all());
         $this->authorize('create', [Penugasan::class, $subKegiatan]);
 
         $validated = $request->validate([
@@ -24,6 +25,7 @@ class PenugasanController extends Controller
 
             'tanggal_mulai' => ['nullable', 'date'],
             'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
+            'butuh_dl' => ['nullable', 'boolean'],
         ]);
 
         /**
@@ -49,6 +51,27 @@ class PenugasanController extends Controller
         }
 
         unset($validated['jenis_kegiatan_baru']);
+
+        /**
+         * 🔐 SERVER-SIDE DL VALIDATION
+         * (jangan percaya UI sepenuhnya)
+         */
+        $jenisKegiatan = JenisKegiatan::find($validated['id_jenis_kegiatan']);
+
+        $wajibDl = in_array($jenisKegiatan->jenis_kegiatan, [
+            'Perjalanan Dinas',
+            'Supervisi',
+            'Pengawasan',
+            'Pendataan',
+        ]);
+
+        // Tentukan butuh_dl (paksa true jika wajib DL)
+        $butuhDl = $wajibDl ? true : (bool) ($validated['butuh_dl'] ?? false);
+
+        $validated['butuh_dl'] = $butuhDl;
+
+        // Tentukan status_dl
+        $validated['status_dl'] = $butuhDl ? 'Menunggu' : null;
 
         // STATUS AWAL
         $validated['status'] = 'Belum Dikirim';

@@ -131,7 +131,7 @@
                             </template>
                         </select>
                     </div>
-                    
+
                     <!-- Kolom Bidang -->
                     <div class="flex flex-col gap-2 md:flex-row md:items-center">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4">
@@ -158,26 +158,26 @@
 
                     {{-- Kolom Ketua --}}
                     {{-- Nama Ketua / Penanggung Jawab --}}
-                    <div 
+                    <div
                         x-data="{
                         open: false,
                         search: '',
                         selectedId: '',
                         highlightedIndex: -1,
                         ketuaTims: @js($ketuaTims),
-                    
+
                         filtered() {
                             if (this.search.length === 0) return [];
                             return this.ketuaTims.filter(p => p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase()));
                         },
-                    
+
                         selectPegawai(p) {
                             this.search = p.nama_pegawai;
                             this.selectedId = p.id_pegawai;
                             this.open = false;
                             this.highlightedIndex = -1;
                         },
-                    
+
                         highlightNext() { if (this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++; },
                         highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
                         selectHighlighted() { if (this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]); }}"
@@ -189,7 +189,7 @@
 
                         <!-- INPUT + DROPDOWN WRAPPER -->
                         <div class="relative md:w-3/4 w-full">
-                            
+
                             <!-- INPUT -->
                             <input
                                 type="text"

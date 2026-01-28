@@ -23,7 +23,7 @@ class MasterKegiatanController extends Controller
         // Data referensi untuk dropdown modal
         $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
         $rkJpts   = RencanaJPT::orderBy('nama_rencana_jpt')->get(['id', 'nama_rencana_jpt']);
-        $bidangs  = Bidang::orderBy('nama_bidang')->get(); // ambil semua bidang
+        // $bidangs  = Bidang::orderBy('nama_bidang')->get(); // ambil semua bidang
         $jenisKegiatans = JenisKegiatan::orderBy('jenis_kegiatan')->get();
         $ketuaTims = Pegawai::join('pegawai_role', 'pegawais.id_pegawai', '=', 'pegawai_role.pegawai_id')
             ->join('roles', 'pegawai_role.role_id', '=', 'roles.id')
@@ -62,7 +62,6 @@ class MasterKegiatanController extends Controller
             'ketuaTims'     => $ketuaTims
         ]);
     }
-
 
     public function store(Request $request)
     {
@@ -211,5 +210,68 @@ class MasterKegiatanController extends Controller
         $bidangs = Bidang::orderBy('nama_bidang')->get(); // semua bidang
 
         return Excel::download(new MphAllExport($bidangs), 'matriks_peran_hasil.xlsx');
+    }
+
+
+    // RENCANA KERJA DENGAN DL
+    public function index_rk_dl()
+    {
+        // Data referensi untuk dropdown modal
+        $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
+        $rkJpts   = RencanaJPT::orderBy('nama_rencana_jpt')->get(['id', 'nama_rencana_jpt']);
+        // $bidangs  = Bidang::orderBy('nama_bidang')->get(); // ambil semua bidang
+        $jenisKegiatans = JenisKegiatan::orderBy('jenis_kegiatan')->get();
+        $ketuaTims = Pegawai::join('pegawai_role', 'pegawais.id_pegawai', '=', 'pegawai_role.pegawai_id')
+            ->join('roles', 'pegawai_role.role_id', '=', 'roles.id')
+            ->where('roles.nama_role', 'Ketua Tim')
+            ->orderBy('pegawais.nama_pegawai')
+            ->get([
+                'pegawais.id_pegawai',
+                'pegawais.nama_pegawai',
+                'roles.nama_role',
+            ]);
+
+        $bidangs = Bidang::whereHas('kegiatans.subKegiatans.penugasans', function ($q) {
+            $q->where('butuh_dl', true);
+        })
+        ->with([
+            'kegiatans' => function ($query) {
+                $query->whereHas('subKegiatans.penugasans', function ($q) {
+                    $q->where('butuh_dl', true);
+                })
+                ->with([
+                    'subKegiatans' => function ($subQuery) {
+                        $subQuery->whereHas('penugasans', function ($q) {
+                            $q->where('butuh_dl', true);
+                        })
+                        ->with([
+                            'penugasans' => function ($penugasanQuery) {
+                                $penugasanQuery
+                                    ->where('butuh_dl', true)
+                                    // ❗ status_dl TIDAK difilter
+                                    ->with([
+                                        'anggota',
+                                        'jenisKegiatan'
+                                    ]);
+                            }
+                        ]);
+                    },
+                    'rencanaJpt',
+                    'indikatorJpt',
+                    'penanggungJawab'
+                ]);
+            }
+        ])
+        ->orderBy('nama_bidang')
+        ->get();
+
+        return view('pages.main.pegawai.rencana-kerja.rencana-kerja-dl', [
+            'title'         => "Rencana Kerja Butuh DL",
+            'bidangs'       => $bidangs,
+            'pegawais'      => $pegawais,
+            'rkJpts'        => $rkJpts,
+            'jenisKegiatans' => $jenisKegiatans,
+            'ketuaTims'     => $ketuaTims
+        ]);
     }
 }

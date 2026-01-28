@@ -26,6 +26,8 @@ class Penugasan extends Model
         'tanggal_mulai',
         'tanggal_selesai',
         'status',
+        'butuh_dl',
+        'status_dl',
     ];
 
     protected $casts = [
@@ -173,7 +175,7 @@ class Penugasan extends Model
 
          // ❌ PENUGASAN BERAKHIR & BELUM ADA PENGIRIMAN
         if (! $latestPengiriman && $today->gt($selesai)) {
-            return 'danger|Penugasan telah berakhir dan anggota tidak mengirimkan';
+            return 'danger|Penugasan telah berakhir dan anggota tidak mengirimkannya';
         }
 
         return null; // aktif, tanpa tooltip
@@ -234,7 +236,7 @@ class Penugasan extends Model
 
         // ❌ TELAT
         if (!$latestPengiriman && $today->gt($selesai)) {
-            return 'danger|Penugasan telah berakhir · Anda tidak mengirimkan penugasan';
+            return 'danger|Penugasan telah berakhir dan anda tidak mengirimkannya';
         }
 
         return null; // aktif, tanpa tooltip
@@ -262,7 +264,7 @@ class Penugasan extends Model
         // 2️⃣ DEADLINE LEWAT & TIDAK ADA PENGIRIMAN
         if ($today->gt($deadline) && ! $latestPengiriman) {
             return [
-                'label' => 'Tidak Mengumpulkan',
+                'label' => 'Tidak Mengirimkan',
                 'class' => 'bg-red-100 text-red-700',
             ];
         }
@@ -291,14 +293,14 @@ class Penugasan extends Model
             )
         ) {
             return [
-                'label' => 'Menunggu Pemeriksaan',
+                'label' => 'Menunggu Penerimaan',
                 'class' => 'bg-yellow-100 text-yellow-700',
             ];
         }
 
         // 5️⃣ DEFAULT (belum deadline & belum kirim)
         return [
-            'label' => 'Menunggu Pengumpulan',
+            'label' => 'Menunggu Pengiriman',
             'class' => 'bg-gray-100 text-gray-700',
         ];
     }

@@ -117,6 +117,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [MasterKegiatanController::class, 'index'])->name('master-kegiatan.index');
         Route::post('/', [MasterKegiatanController::class, 'store'])->name('master-kegiatan.store');
     });
+
+    Route::prefix('/rencana-kerja-dl')->group(function () {
+        Route::get('/', [MasterKegiatanController::class, 'index_rk_dl'])->name('master-kegiatan.index_rk_dl');
+        // Route::post('/', [MasterKegiatanController::class, 'store_rk_dl'])->name('master-kegiatan.store_rk_dl');
+    });
     // END ROUTE MASTER KEGIATAN
 
     // ROUTE KALENDER DL
@@ -140,8 +145,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/kegiatan/export-mph-all', [MasterKegiatanController::class, 'exportMphAll'])
         ->name('kegiatan.export-mph-all');
 });
-
-
-
 
 require __DIR__ . '/auth.php';

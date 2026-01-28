@@ -51,8 +51,9 @@ class MenuHelper
                 'icon' => 'dashboard',
                 'name' => 'Rencana Kinerja',
                 'subItems' => [
-                    ['name' => 'Master Kegiatan', 'path' => '/master-kegiatan'],
-                ],
+                    ['name' => 'Rencana Kerja Per Fungsi', 'path' => '/master-kegiatan'],
+                    ['name' => 'Rencana Kerja Butuh DL', 'path' => '/rencana-kerja-dl'],
+                    ],
             ],
         ];
 

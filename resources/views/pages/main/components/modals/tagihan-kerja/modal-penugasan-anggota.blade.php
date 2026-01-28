@@ -179,6 +179,105 @@
                     </div>
                 </div>
 
+                <!-- TOGGLE BUTUH DL -->
+                <div
+                    x-data="{
+                        butuhDl: false,
+                        isLocked: false,
+                        jenisSelected: false,
+
+                        wajibDl: ['Perjalanan Dinas', 'Supervisi', 'Pengawasan', 'Pendataan'],
+
+                        checkJenisKegiatan() {
+                            const select = document.getElementById('jenis_kegiatan_select');
+                            const selectedValue = select.value;
+
+                            // belum pilih jenis kegiatan
+                            if (!selectedValue) {
+                                this.jenisSelected = false;
+                                this.butuhDl = false;
+                                this.isLocked = false;
+                                return;
+                            }
+
+                            this.jenisSelected = true;
+
+                            const selectedOption = select.options[select.selectedIndex];
+                            const text = selectedOption.dataset.text ?? '';
+
+                            if (this.wajibDl.includes(text)) {
+                                // wajib DL
+                                this.butuhDl = true;
+                                this.isLocked = true;
+                            } else {
+                                // bukan wajib DL → reset
+                                this.butuhDl = false;
+                                this.isLocked = false;
+                            }
+                        }
+                    }"
+                    x-init="
+                        butuhDl = formData.butuh_dl ?? false;
+                        $nextTick(() => checkJenisKegiatan());
+                    "
+                    @change.window="
+                        if ($event.target.id === 'jenis_kegiatan_select') {
+                            checkJenisKegiatan();
+                        }
+                    " class="mb-4">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                        Kebutuhan Dinas Luar (DL)
+                    </label>
+
+                    <div class="flex items-center gap-4">
+                        <!-- Toggle UI -->
+                        <button
+                            type="button"
+                            @click="
+                                if (!jenisSelected) return;
+                                if (!isLocked) butuhDl = !butuhDl
+                            "
+                            :class="{
+                                'bg-brand-500': butuhDl,
+                                'bg-gray-300': !butuhDl,
+                                'cursor-not-allowed opacity-70': !jenisSelected || isLocked
+                            }"
+                            class="relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-300"
+                            :title="!jenisSelected ? 'Pilih jenis kegiatan terlebih dahulu' : ''">
+                            <span
+                                :class="{
+                                    'translate-x-7': butuhDl,
+                                    'translate-x-1': !butuhDl
+                                }"
+                                class="inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300"
+                            ></span>
+                        </button>
+
+                        <!-- Text status -->
+                        <span
+                            class="text-sm font-medium"
+                            :class="butuhDl ? 'text-brand-600' : 'text-gray-500'"
+                            x-text="
+                                !jenisSelected
+                                    ? 'Pilih jenis kegiatan dulu'
+                                    : (butuhDl ? 'Butuh DL' : 'Tidak Butuh DL')
+                            "
+                        ></span>
+                    </div>
+
+                    <!-- Helper text -->
+                    <p x-show="!jenisSelected" class="mt-1 text-xs font-medium text-brand-500/80">
+                        Pilih jenis kegiatan untuk menentukan kebutuhan DL.
+                    </p>
+
+                    <p x-show="isLocked" class="mt-1 text-xs text-gray-500">
+                        Jenis kegiatan ini otomatis membutuhkan DL dan tidak dapat diubah.
+                    </p>
+
+                    <!-- Hidden input -->
+                    <input type="hidden" name="butuh_dl" :value="butuhDl ? 1 : 0">
+                </div>
+
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Target
