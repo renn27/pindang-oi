@@ -281,42 +281,44 @@
                                                             </td>
 
                                                             <td class="px-4 py-3 text-sm align-top border border-gray-200">
-                                                                <div class="flex items-center gap-2">
-                                                                    {{-- BADGE STATUS --}}
-                                                                    @if ($penugasan->status_dl === 'Menunggu')
-                                                                        <span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-1
-                                                                            text-xs font-medium text-yellow-800">
-                                                                            Menunggu
-                                                                        </span>
-                                                                    @elseif ($penugasan->status_dl === 'ACC')
-                                                                        <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-1
-                                                                            text-xs font-medium text-green-800">
-                                                                            Diterima
-                                                                        </span>
-                                                                    @elseif ($penugasan->status_dl === 'Ditolak')
-                                                                        <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-1
-                                                                            text-xs font-medium text-red-800">
-                                                                            Ditolak
-                                                                        </span>
-                                                                        @if (Auth::user()->active_role === 'Ketua Tim')
-                                                                            <button
-                                                                                type="button"
-                                                                                title="Verifikasi DL"
-                                                                                @click="$dispatch('open-smart-modal', {
-                                                                                    modalId: 'modal-verifikasi-dl',
-                                                                                    key: @js($penugasan->id_penugasan),
-                                                                                    data: {
-                                                                                        nama_pegawai: @js($penugasan->anggota->nama_pegawai),
-                                                                                        jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
-                                                                                        tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')),
-                                                                                        tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')),
-                                                                                    }
-                                                                                })"
-                                                                                class="text-blue-600 hover:text-blue-800 underline text-xs">
-                                                                                Ajukan Kembali
-                                                                            </button>
+                                                                <div class="flex items-center just gap-2">
+                                                                    <div class="justify-self-start">
+                                                                        {{-- BADGE STATUS --}}
+                                                                        @if ($penugasan->status_dl === 'Menunggu')
+                                                                            <span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-1
+                                                                                text-xs font-medium text-yellow-800">
+                                                                                Menunggu
+                                                                            </span>
+                                                                        @elseif ($penugasan->status_dl === 'ACC')
+                                                                            <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-1
+                                                                                text-xs font-medium text-green-800">
+                                                                                Diterima
+                                                                            </span>
+                                                                        @elseif ($penugasan->status_dl === 'Ditolak')
+                                                                            <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-1
+                                                                                text-xs font-medium text-red-800">
+                                                                                Ditolak
+                                                                            </span>
+                                                                            @if (Auth::user()->active_role === 'Ketua Tim')
+                                                                                <button
+                                                                                    type="button"
+                                                                                    title="Verifikasi DL"
+                                                                                    @click="$dispatch('open-smart-modal', {
+                                                                                        modalId: 'modal-verifikasi-dl',
+                                                                                        key: @js($penugasan->id_penugasan),
+                                                                                        data: {
+                                                                                            nama_pegawai: @js($penugasan->anggota->nama_pegawai),
+                                                                                            jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
+                                                                                            tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')),
+                                                                                            tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')),
+                                                                                        }
+                                                                                    })"
+                                                                                    class="text-blue-600 hover:text-blue-800 underline text-xs">
+                                                                                    Ajukan Kembali
+                                                                                </button>
+                                                                            @endif
                                                                         @endif
-                                                                    @endif
+                                                                    </div>
 
                                                                     @can('acceptDL', $penugasan)
                                                                         {{-- ================= ACC ================= --}}
@@ -325,8 +327,8 @@
                                                                             {{-- SUDAH MASUK KALENDER --}}
                                                                             @if ($penugasan->sudahMasukKalenderDL())
                                                                                 <span
-                                                                                    class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-md">
-                                                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                    class="items-center px-2 py-1 text-[8px] cursor-not-allowed font-medium bg-green-100/50 text-green-600/50 flex whitespace-nowrap border-b border-green-200">
+                                                                                    <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                                         <path stroke-width="2" d="M9 12l2 2 4-4"/>
                                                                                         <path stroke-width="2" d="M12 22a10 10 0 100-20 10 10 0 000 20z"/>
                                                                                     </svg>
@@ -343,8 +345,8 @@
                                                                                     <input type="hidden" name="tanggal_selesai" value="{{ $penugasan->tanggal_selesai }}">
 
                                                                                     <button type="submit"
-                                                                                        class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-md">
-                                                                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                        class="items-center px-2 py-1 text-[8px] font-medium bg-gray-100/80 text-gray-700 hover:bg-blue-200 flex whitespace-nowrap border-b border-gray-200">
+                                                                                        <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                                             <path stroke-width="2" d="M12 4v16m8-8H4"/>
                                                                                         </svg>
                                                                                         Masukkan Kalender DL
@@ -352,19 +354,17 @@
                                                                                 </form>
                                                                             @endif
 
-
                                                                         {{-- ================= DITOLAK ================= --}}
                                                                         @elseif ($penugasan->status_dl === 'Ditolak')
                                                                             <span
-                                                                                class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-red-700 bg-red-100 rounded-md">
-                                                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                class="items-center px-2 py-1 text-[8px] font-medium cursor-not-allowed bg-red-100/50 text-red-600/50 flex whitespace-nowrap border-b border-red-200">
+                                                                                <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                                     <path stroke-width="2" d="M12 9v4m0 4h.01"/>
                                                                                     <path stroke-width="2"
                                                                                         d="M10.29 3.86l-7.4 12.84A1 1 0 003.76 18h16.48a1 1 0 00.87-1.3l-7.4-12.84a1 1 0 00-1.72 0z"/>
                                                                                 </svg>
-                                                                                Ditolak
+                                                                                Tunggu Perubahan
                                                                             </span>
-
 
                                                                         {{-- ================= MENUNGGU / VERIFIKASI ================= --}}
                                                                         @else
@@ -380,17 +380,15 @@
                                                                                         tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')),
                                                                                     }
                                                                                 })"
-                                                                                class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-orange-700 bg-orange-100 hover:bg-orange-200 rounded-md">
-                                                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                class="items-center px-2 py-1 text-[8px] font-medium bg-gray-100/80 text-gray-700 flex whitespace-nowrap border-b border-gray-200 hover:bg-orange-200">
+                                                                                <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                                     <path stroke-width="2" d="M12 8v4l3 3"/>
                                                                                     <path stroke-width="2" d="M12 22a10 10 0 100-20 10 10 0 000 20z"/>
                                                                                 </svg>
                                                                                 Verifikasi
                                                                             </button>
                                                                         @endif
-
                                                                     @endcan
-
                                                                 </div>
                                                             </td>
                                                         </tr>

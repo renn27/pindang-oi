@@ -1,7 +1,7 @@
 @props([
     'id' => 'datepicker-' . uniqid(),
     'mode' => 'single', // 'single', 'multiple', 'range', 'time'
-    'defaultDate' => null,
+    // 'defaultDate' => null,
     'label' => null,
     'placeholder' => 'Select date',
     'name' => null,
@@ -9,32 +9,30 @@
 ])
 
 <div x-data="{
-    flatpickrInstance: null,
-    init() {
-        this.$nextTick(() => {
-            this.flatpickrInstance = flatpickr(this.$refs.dateInput, {
-                mode: '{{ $mode }}',
-                static: true,
-                monthSelectorType: 'static',
-                dateFormat: '{{ $dateFormat }}',
-                defaultDate: {{ $defaultDate ? (is_array($defaultDate) ? json_encode($defaultDate) : "'" . $defaultDate . "'") : 'null' }},
-                onChange: (selectedDates, dateStr, instance) => {
-                    this.$dispatch('date-change', {
-                        selectedDates,
-                        dateStr,
-                        instance
-                    });
+        flatpickrInstance: null,
+        value:null,
+        init() {
+            this.$nextTick(() => {
+                this.flatpickrInstance = flatpickr(this.$refs.dateInput, {
+                    mode: '{{ $mode }}',
+                    static: true,
+                    monthSelectorType: 'static',
+                    dateFormat: '{{ $dateFormat }}',
+                    onChange: (selectedDates, dateStr) => {
+                        this.value = dateStr
+                    }
+                });
+
+                // 🔥 SET DEFAULT VALUE DARI DB
+                if (this.value) {
+                    this.flatpickrInstance.setDate(this.value, true)
                 }
             });
-        });
-    },
-    destroy() {
-        if (this.flatpickrInstance) {
-            this.flatpickrInstance.destroy();
-            this.flatpickrInstance = null;
-        }
-    }
-}" x-init="init()" x-destroy="destroy()">
+        },
+    }"
+    x-init="init()"
+    x-modelable="value"
+    {{ $attributes }}>
     @if($label)
         <label for="{{ $id }}" class="mb-1.5 block text-sm font-medium text-gray-700">
             {{ $label }}
@@ -45,6 +43,8 @@
         <input
             x-ref="dateInput"
             type="text"
+            :value="value"
+            @input="value = $event.target.value"
             id="{{ $id }}"
             name="{{ $name }}"
             placeholder="{{ $placeholder }}"

@@ -56,7 +56,7 @@
     </svg>
     Lihat MPH
 </button>
-            
+
             <!-- Tombol Tambah Kegiatan -->
             <button
                 class="flex items-center justify-center gap-2 rounded-full border border-gray-300
@@ -164,17 +164,17 @@
                             @can('createSubKegiatan', $kegiatan)
                                 {{-- Tambah Sub --}}
                                 <button
+                                    class="flex items-center gap-2 rounded-full border border-gray-300
+                                    bg-white px-4 py-3 text-sm font-medium text-gray-700
+                                    shadow-theme-xs hover:bg-green-50 hover:text-green-700
+                                    hover:border-green-300 transition-all duration-200"
                                     @click="$dispatch('open-smart-modal', {
                                         modalId: 'modal-sub-kegiatan',
                                         data: {
                                             id_kegiatan: '{{ $kegiatan->id_kegiatan }}',
                                             nama_rk_kegiatan: '{{ $kegiatan->nama_rk_kegiatan }}'
                                         }
-                                    })"
-                                class="flex items-center gap-2 rounded-full border border-gray-300
-                                bg-white px-4 py-3 text-sm font-medium text-gray-700
-                                shadow-theme-xs hover:bg-green-50 hover:text-green-700
-                                hover:border-green-300 transition-all duration-200">
+                                    })">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M12 6v6m0 0v6m0-6h6m-6 0H6" />

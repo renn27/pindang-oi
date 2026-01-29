@@ -21,13 +21,10 @@ class SubKegiatanController extends Controller
             'tanggal_mulai' => [
                 'required',
                 'date',
-                'date_format:Y-m-d',
-                'after_or_equal:today',
             ],
             'tanggal_selesai' => [
                 'required',
                 'date',
-                'date_format:Y-m-d',
                 'after_or_equal:tanggal_mulai',
             ],
         ]);
@@ -97,13 +94,10 @@ class SubKegiatanController extends Controller
             'tanggal_mulai' => [
                 'required',
                 'date',
-                'date_format:Y-m-d',
-                // 'after_or_equal:today',
             ],
             'tanggal_selesai' => [
                 'required',
                 'date',
-                'date_format:Y-m-d',
                 'after_or_equal:tanggal_mulai',
             ],
             // 'status' => ['required', 'in:Belum Mulai,Berjalan,Selesai'],

@@ -12,8 +12,10 @@
             id_anggota: '',
             nama_anggota: '',
             id_jenis_kegiatan: '',
+            jenis_kegiatan: '',
             target: '',
             satuan_target: '',
+            butuh_dl: 0,
             tanggal_mulai: '',
             tanggal_selesai: '',
         }">
@@ -134,18 +136,14 @@
                         id="jenis_kegiatan_select"
                         name="id_jenis_kegiatan"
                         x-model="formData.id_jenis_kegiatan"
-                        @change="
-                            isOther = ($event.target.value === 'LAINNYA')
-                        "
-
+                        @change="isOther = ($event.target.value === 'LAINNYA')"
                         required
                         class="
                             h-11 w-full mb-4
                             rounded-lg border border-gray-300
                             bg-white
                             px-4 py-2.5 text-sm
-                            focus:ring-2 focus:ring-primary-500 focus:border-primary-500
-                        ">
+                            focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                         <option value="">-- Pilih Jenis Kegiatan --</option>
 
                         @foreach ($jenisKegiatans as $jenis)
@@ -161,7 +159,6 @@
                                 {{ $jenis->jenis_kegiatan }} ({{ $jenis->kategori }})
                             </option>
                         @endforeach
-
 
                         <option value="LAINNYA" class="text-blue-700 font-medium">
                             ➕ Lainnya
@@ -179,8 +176,185 @@
                     </div>
                 </div>
 
-                <!-- TOGGLE BUTUH DL -->
                 <div
+                    x-data="{
+                        butuhDl: false,
+                        isLocked: true,
+
+                        wajibJenis: [2,3,4,5],
+                        {{-- wajibJenis: ['Pendataan', 'Pengawasan', 'Supervisi', 'Perjalanan Dinas'], --}}
+
+                        get jenisId() {
+                            return Number(formData?.id_jenis_kegiatan || 0)
+                        },
+
+                        get jenisSelected() {
+                            return this.jenisId > 0
+                        },
+
+                        {{-- get jenisNama() {
+                            return formData?.jenis_kegiatan || ''
+                        },
+
+                        get jenisSelected() {
+                            return this.jenisNama !== ''
+                        }, --}}
+
+                        syncState() {
+                            console.log('jenis_kegiatan dari formData:', formData?.jenis_kegiatan)
+                            {{-- console.log('hasil get jenisNama:', this.jenisNama) --}}
+                            console.log('hasil get jenisNama:', this.jenisId)
+                            {{-- const isWajib = this.wajibJenis.includes(this.jenisNama) --}}
+                            const isWajib = this.wajibJenis.includes(this.jenisId)
+                            {{-- const dbButuh = Number(formData?.butuh_dl) === 1 --}}
+
+                            // ================= CREATE =================
+                            if (mode === 'create') {
+                                if (!this.jenisSelected) {
+                                    this.butuhDl = false
+                                    this.isLocked = true
+                                } else if (isWajib) {
+                                    this.butuhDl = true
+                                    this.isLocked = true
+                                } else {
+                                    this.butuhDl = false
+                                    this.isLocked = false
+                                }
+                                return
+                            }
+
+                            // ================= EDIT =================
+                            if (!this.jenisSelected) {
+                                // edge case: edit tapi jenis dikosongkan
+                                this.butuhDl = false
+                                this.isLocked = true
+                                return
+                            }
+
+                            if (isWajib) {
+                                // jenis wajib → selalu ON & terkunci
+                                this.butuhDl = true
+                                this.isLocked = true
+                            } else {
+                                // jenis tidak wajib → toggle bebas
+                                // ⚠️ PERTAHANKAN nilai user, JANGAN reset ke db
+                                this.butuhDl = false
+                                this.isLocked = false
+                            }
+                        }
+                    }"
+                    x-effect="syncState()"
+                    class="mb-4">
+
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                        Kebutuhan Dinas Luar (DL)
+                    </label>
+
+                    <div class="flex items-center gap-4">
+                        <!-- Toggle UI -->
+                        <button
+                            type="button"
+                            @click="if (!isLocked) butuhDl = !butuhDl"
+                            :class="{
+                                'bg-brand-500': butuhDl,
+                                'bg-gray-300': !butuhDl,
+                                'cursor-not-allowed opacity-70': isLocked
+                            }"
+                            class="relative inline-flex h-7 w-14 items-center rounded-full"
+                        >
+                            <span
+                                :class="butuhDl ? 'translate-x-7' : 'translate-x-1'"
+                                class="inline-block h-5 w-5 bg-white rounded-full transition"
+                            ></span>
+                        </button>
+
+                        <span
+                            class="text-sm font-medium"
+                            :class="butuhDl ? 'text-brand-600' : 'text-gray-500'"
+                            x-text="
+                                !jenisSelected
+                                    ? 'Pilih dulu jenis kegiatan'
+                                    : (butuhDl ? 'Butuh DL' : 'Tidak Butuh DL')
+                            "
+                        ></span>
+                    </div>
+
+                    <!-- Helper text -->
+                    <p x-show="!jenisSelected" class="mt-1 text-xs font-medium text-brand-500/80">
+                        Pilih jenis kegiatan untuk menentukan kebutuhan DL.
+                    </p>
+
+                    <p x-show="isLocked && jenisSelected" class="mt-1 text-xs text-gray-500">
+                        Jenis kegiatan ini otomatis membutuhkan DL dan tidak dapat diubah.
+                    </p>
+
+                    <!-- Hidden input -->
+                    <input type="hidden" name="butuh_dl" :value="butuhDl ? 1 : 0">
+                </div>
+
+                <div>
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                        Target
+                    </label>
+                    <input type="number" x-model="formData.target" name="target"
+                        placeholder="Misalnya : 200"
+                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                </div>
+
+                <div>
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                        Satuan Target
+                    </label>
+                    <input type="text" x-model="formData.satuan_target" name="satuan_target"
+                        placeholder="Misalnya : Dokumen, Kegiatan, dll"
+                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                        Tanggal Mulai
+                    </label>
+                    <x-form.date-picker
+                        x-model="formData.tanggal_mulai"
+                        id="tanggal_mulai"
+                        name="tanggal_mulai"
+                        placeholder="Tanggal Mulai"
+                    />
+                </div>
+
+                <div>
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                        Tanggal Berakhir (Deadline)
+                    </label>
+                    <x-form.date-picker
+                        x-model="formData.tanggal_selesai"
+                        id="tanggal_selesai"
+                        name="tanggal_selesai"
+                        placeholder="Tanggal Selesai"
+                    />
+                </div>
+
+            </div>
+            <!-- FOOTER -->
+            <div class="shrink-0 border-t border-gray-200 px-6 py-3">
+                <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                    <button @click="open = false" type="button"
+                        class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto">
+                        Batal
+                    </button>
+
+                    <button type="submit"
+                        class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
+                        <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</x-ui.smart-modal>
+
+<!-- TOGGLE BUTUH DL -->
+                {{-- <div
                     x-data="{
                         butuhDl: false,
                         isLocked: false,
@@ -276,65 +450,84 @@
 
                     <!-- Hidden input -->
                     <input type="hidden" name="butuh_dl" :value="butuhDl ? 1 : 0">
-                </div>
+                </div> --}}
+                {{-- <div
+                    x-data="{
+                        butuhDl: false,
+                        isLocked: true,
+                        wajibJenis: [1,2,3,4],
 
-                <div>
+                        syncState() {
+                            const jenisId = Number(formData?.id_jenis_kegiatan);
+                            const isWajib = this.wajibJenis.includes(jenisId);
+                            const dbButuh = Number(formData?.butuh_dl) === 1;
+
+                            // CREATE
+                            if (mode === 'create') {
+                                if (!jenisId) {
+                                    this.butuhDl = false;
+                                    this.isLocked = true;
+                                } else if (isWajib) {
+                                    this.butuhDl = true;
+                                    this.isLocked = true;
+                                } else {
+                                    this.butuhDl = false;
+                                    this.isLocked = false;
+                                }
+                                return;
+                            }
+
+                            // EDIT
+                            this.butuhDl = dbButuh;
+
+                            if (dbButuh && isWajib) {
+                                this.isLocked = true;
+                            } else {
+                                this.isLocked = false;
+                            }
+                        }
+                    }"
+
+                    x-effect="syncState()"
+                    class="mb-4">
+
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
-                        Target
+                        Kebutuhan Dinas Luar (DL)
                     </label>
-                    <input type="number" x-model="formData.target" name="target"
-                        placeholder="Misalnya : 200"
-                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
-                </div>
 
-                <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
-                        Satuan Target
-                    </label>
-                    <input type="text" x-model="formData.satuan_target" name="satuan_target"
-                        placeholder="Misalnya : Dokumen, Kegiatan, dll"
-                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
-                </div>
+                    <div class="flex items-center gap-4">
+                        <!-- Toggle UI -->
+                        <button
+                            type="button"
+                            @click="if (!isLocked) butuhDl = !butuhDl"
+                            :class="{
+                                'bg-brand-500': butuhDl,
+                                'bg-gray-300': !butuhDl,
+                                'cursor-not-allowed opacity-70': isLocked
+                            }"
+                            class="relative inline-flex h-7 w-14 items-center rounded-full">
+                            <span
+                                :class="butuhDl ? 'translate-x-7' : 'translate-x-1'"
+                                class="inline-block h-5 w-5 bg-white rounded-full transition"
+                            ></span>
+                        </button>
 
-                <div class="mb-4">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
-                        Tanggal Mulai
-                    </label>
-                    <x-form.date-picker
-                        x-model="formData.tanggal_mulai"
-                        id="tanggal_mulai"
-                        name="tanggal_mulai"
-                        placeholder="Tanggal Mulai"
-                    />
-                </div>
+                        <span
+                            class="text-sm font-medium"
+                            :class="butuhDl ? 'text-brand-600' : 'text-gray-500'"
+                            x-text="butuhDl ? 'Butuh DL' : 'Tidak Butuh DL'"
+                        ></span>
+                    </div>
 
-                <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
-                        Tanggal Berakhir (Deadline)
-                    </label>
-                    <x-form.date-picker
-                        x-model="formData.tanggal_selesai"
-                        id="tanggal_selesai"
-                        name="tanggal_selesai"
-                        placeholder="Tanggal Selesai"
-                    />
-                </div>
+                    <!-- Helper text -->
+                    <p x-show="!jenisSelected" class="mt-1 text-xs font-medium text-brand-500/80">
+                        Pilih jenis kegiatan untuk menentukan kebutuhan DL.
+                    </p>
 
-            </div>
-            <!-- FOOTER -->
-            <div class="shrink-0 border-t border-gray-200 px-6 py-3">
-                <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                    <button @click="open = false" type="button"
-                        class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto">
-                        Batal
-                    </button>
+                    <p x-show="isLocked" class="mt-1 text-xs text-gray-500">
+                        Jenis kegiatan ini otomatis membutuhkan DL dan tidak dapat diubah.
+                    </p>
 
-                    <button type="submit"
-                        class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
-                        <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </form>
-</x-ui.smart-modal>
+                    <!-- Hidden input -->
+                    <input type="hidden" name="butuh_dl" :value="butuhDl ? 1 : 0">
+                </div> --}}

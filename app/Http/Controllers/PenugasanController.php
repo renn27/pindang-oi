@@ -107,12 +107,54 @@ class PenugasanController extends Controller
 
             'tanggal_mulai' => ['nullable', 'date'],
             'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
+            'butuh_dl' => ['nullable', 'boolean'],
         ]);
 
         /**
-         * 🔥 DETEKSI JENIS KEGIATAN
+         * 🔥 HANDLE JENIS KEGIATAN (LAINNYA / EXISTING)
          */
-        $jenisKegiatan = JenisKegiatan::find($validated['id_jenis_kegiatan']);
+        if ($validated['id_jenis_kegiatan'] === 'LAINNYA') {
+            if (empty($validated['jenis_kegiatan_baru'])) {
+                return back()->withErrors([
+                    'jenis_kegiatan_baru' => 'Jenis kegiatan wajib diisi'
+                ])->withInput();
+            }
+
+            $jenis = JenisKegiatan::create([
+                'jenis_kegiatan' => $validated['jenis_kegiatan_baru'],
+                'kategori' => 'Tambahan',
+            ]);
+
+            $validated['id_jenis_kegiatan'] = $jenis->id;
+        }
+
+        unset($validated['jenis_kegiatan_baru']);
+
+        /**
+         * 🔐 SERVER-SIDE DL VALIDATION
+         */
+        $jenisKegiatan = JenisKegiatan::findOrFail($validated['id_jenis_kegiatan']);
+
+        $wajibDl = in_array($jenisKegiatan->jenis_kegiatan, [
+            'Perjalanan Dinas',
+            'Supervisi',
+            'Pengawasan',
+            'Pendataan',
+        ]);
+
+        if ($wajibDl) {
+            // Jika berubah menjadi WAJIB DL
+            $validated['butuh_dl'] = true;
+
+            // Jangan overwrite status kalau sudah diproses
+            if ($penugasan->status_dl === null) {
+                $validated['status_dl'] = 'Menunggu';
+            }
+        } else {
+            // Jika berubah menjadi TIDAK BUTUH DL
+            $validated['butuh_dl'] = false;
+            $validated['status_dl'] = null;
+        }
 
         try {
             $penugasan->update($validated);

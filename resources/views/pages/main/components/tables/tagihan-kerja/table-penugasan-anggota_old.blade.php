@@ -239,8 +239,11 @@
                                                         nama_anggota: @js($penugasan->anggota?->nama_pegawai),
 
                                                         id_jenis_kegiatan: @js($penugasan->jenisKegiatan->id),
+                                                        jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
                                                         target: @js($penugasan->target),
                                                         satuan_target: @js($penugasan->satuan_target),
+
+                                                        butuh_dl: @js($penugasan->butuh_dl),
 
                                                         tanggal_mulai: @js(optional($penugasan->tanggal_mulai)->format('Y-m-d')),
                                                         tanggal_selesai: @js(optional($penugasan->tanggal_selesai)->format('Y-m-d')),

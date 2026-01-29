@@ -10,6 +10,7 @@
                 nama_rk_kegiatan: '',
                 nama_sub_kegiatan: '',
                 target: '',
+                satuan_target: '',
                 tanggal_mulai: '',
                 tanggal_selesai: '',
             }">
@@ -62,10 +63,19 @@
 
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
-                        Target Kegiatan
+                        Target Sub Kegiatan
                     </label>
                     <input type="number" x-model="formData.target" name="target"
                         placeholder="Misalnya : 200"
+                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                </div>
+
+                <div>
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                        Satuan Target
+                    </label>
+                    <input type="text" x-model="formData.satuan_target" name="satuan_target"
+                        placeholder="Misalnya : Kegiatan"
                         class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                 </div>
 

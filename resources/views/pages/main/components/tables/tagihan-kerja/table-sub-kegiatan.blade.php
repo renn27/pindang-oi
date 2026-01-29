@@ -71,10 +71,10 @@
                                             nama_rk_kegiatan: @js($kegiatan->nama_rk_kegiatan),
                                             id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
                                             nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
-                                            jenis_kegiatan: @js($subKegiatan->jenis_kegiatan),
+                                            target: @js($subKegiatan->target),
                                             satuan_target: @js($subKegiatan->satuan_target),
-                                            tanggal_mulai: @js($subKegiatan->tanggal_mulai),
-                                            tanggal_selesai: @js($subKegiatan->tanggal_selesai),
+                                            tanggal_mulai: @js(optional($subKegiatan->tanggal_mulai)->format('Y-m-d')),
+                                            tanggal_selesai: @js(optional($subKegiatan->tanggal_selesai)->format('Y-m-d')),
                                             status: @js($subKegiatan->status),
                                         }
                                     })">
