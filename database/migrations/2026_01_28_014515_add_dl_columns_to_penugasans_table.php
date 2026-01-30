@@ -16,7 +16,7 @@ return new class extends Migration
                 ->default(false)
                 ->after('status');
 
-        $table->enum('status_dl', ['Menunggu', 'ACC', 'Ditolak'])
+            $table->enum('status_dl', ['Menunggu', 'ACC', 'Ditolak'])
                 ->nullable()
                 ->after('butuh_dl');
         });
