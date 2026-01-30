@@ -22,10 +22,14 @@ class Pengiriman extends Model
         'jumlah_dikirim',
         'media_pengiriman',
         'bukti_dukung',
+        'rr_kirim',
+        'rating_kirim',
     ];
 
     protected $casts = [
         'tanggal_pengiriman'   => 'date',
+        'rr_kirim'             => 'float',
+        'rating_kirim'         => 'integer',
     ];
 
     public function penugasan() {

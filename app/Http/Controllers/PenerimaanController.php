@@ -19,7 +19,7 @@ class PenerimaanController extends Controller
             'tanggal_penerimaan' => ['required', 'date'],
             'jumlah_diterima' => ['required', 'integer', 'max:255'],
             'status' => ['required', 'in:Sedang Diperiksa,Diterima,Revisi'],
-            'catatan' => ['required', 'string', 'max:255'],
+            'catatan' => ['nullable', 'string', 'max:255'],
         ]);
 
         try {

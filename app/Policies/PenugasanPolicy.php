@@ -28,7 +28,7 @@ class PenugasanPolicy
     }
 
     /**
- * Determine whether the user can view any models.
+        * Determine whether the user can view any models.
      */
     public function viewAny(Pegawai $pegawai): bool
     {
@@ -63,11 +63,26 @@ class PenugasanPolicy
      */
     public function update(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        if (! $this->canManagePenugasan($pegawai, $penugasan) || ! $penugasan->isWithinSchedule() ||
-            $penugasan->latestPenerimaan?->status === 'Diterima') {
+        // 1️⃣ Tidak berhak kelola
+        if (! $this->canManagePenugasan($pegawai, $penugasan)) {
             return false;
         }
-        
+
+        // 2️⃣ Sudah masuk kalender DL → TIDAK BOLEH EDIT
+        if ($penugasan->sudahMasukKalenderDL()) {
+            return false;
+        }
+
+        // 3️⃣ Di luar jadwal
+        if (! $penugasan->isWithinSchedule()) {
+            return false;
+        }
+
+        // 4️⃣ Sudah diterima
+        if ($penugasan->latestPenerimaan?->status === 'Diterima') {
+            return false;
+        }
+
         return true;
     }
 

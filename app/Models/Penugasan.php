@@ -63,6 +63,17 @@ class Penugasan extends Model
             ->latestOfMany('tanggal_pengiriman');
     }
 
+    public function getBintangKirimArrayAttribute(): array
+    {
+        $filled = $this->latestPengiriman?->rating_kirim ?? 0;
+
+        return array_map(
+            fn ($i) => $i <= $filled,
+            range(1, 5)
+        );
+    }
+
+
     public function latestPenerimaan() {
         return $this->hasOneThrough(
             Penerimaan::class,   // model akhir
@@ -76,21 +87,20 @@ class Penugasan extends Model
 
     public function isDinasLuar()
     {
-        $specialTypes = [
+        $jenisKegiatan = [
             'Pengawasan',
             'Pendataan',
             'Supervisi',
             'Perjalanan Dinas',
         ];
 
-        return in_array($this->jenis_kegiatan, $specialTypes);
+        return in_array($this->jenisKegiatan->jenis_kegiatan, $jenisKegiatan);
     }
 
     public function sudahMasukKalenderDL()
     {
         return $this->kalenderDLs()->exists();
     }
-
 
     public function isWithinSchedule(): bool
     {
@@ -116,23 +126,6 @@ class Penugasan extends Model
             return false;
         }
 
-        // // 3️⃣ Sudah ada penerimaan revisi, tapi BELUM ada pengiriman baru
-        // if (
-        //     $latestPenerimaan &&
-        //     $latestPenerimaan->status === 'Revisi' &&
-        //     $latestPenerimaan->id_pengiriman === $latestPengiriman->id_pengiriman
-        // ) {
-        //     return false; // tunggu anggota kirim ulang
-        // }
-
-        // // 4️⃣ Pengiriman terbaru BELUM pernah diterima → boleh terima
-        // if (
-        //     ! $latestPenerimaan ||
-        //     $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman
-        // ) {
-        //     return true;
-        // }
-        // Belum ada penerimaan untuk pengiriman TERBARU
         return
             ! $latestPenerimaan ||
             $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman;
@@ -199,6 +192,11 @@ class Penugasan extends Model
             return false;
         }
 
+        // 2️⃣ Jenis DL tapi belum masuk kalender DL
+        if ($this->isDinasLuar() && ! $this->sudahMasukKalenderDL()) {
+            return false;
+        }
+
         $latestPengiriman = $this->latestPengiriman;
         $latestPenerimaan = $this->latestPenerimaan;
 
@@ -228,12 +226,17 @@ class Penugasan extends Model
             );
         }
 
+        // 🟠 DL TAPI BELUM ACC PIMPINAN
+        if ($this->isDinasLuar() && ! $this->sudahMasukKalenderDL()) {
+            return 'warning|Pengajuan DL masih menunggu persetujuan pimpinan';
+        }
+
         $latestPengiriman = $this->latestPengiriman;
         $latestPenerimaan = $this->latestPenerimaan;
 
         // ⚠️ Sedang diperiksa
         if ($latestPengiriman && ( !$latestPenerimaan || $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman)
-            & $today->between($mulai, $selesai)) {
+            && $today->between($mulai, $selesai)) {
             return 'warning|Pengiriman sedang diperiksa oleh ketua tim';
         }
 
@@ -315,7 +318,6 @@ class Penugasan extends Model
             'class' => 'bg-gray-100 text-gray-700',
         ];
     }
-
 
     public function statusPengiriman(): array
     {

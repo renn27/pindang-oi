@@ -1,664 +1,544 @@
 <div class="border border-gray-200 rounded-lg overflow-hidden">
-    <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
-        <div>
-            <h3 class="text-lg font-medium text-gray-900">Daftar Penugasan</h3>
-            <p class="text-sm text-gray-500">Sub Kegiatan: {{ $subKegiatan->nama_sub_kegiatan }}</p>
-        </div>
-        <div class="flex items-center space-x-4">
-            <!-- Toggle untuk Pengiriman -->
-            <button id="toggle-pengiriman"
-                    class="toggle-section-btn flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                    data-section="pengiriman">
-                <svg class="w-4 h-4 mr-2 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-                <span>Pengiriman</span>
-            </button>
+    <div class="grid grid-cols-1">
+        <div class="col-span-1 w-full overflow-x-auto">
+            <table class="w-full divide-y divide-gray-200">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            No.
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            Nama
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            Jenis Kegiatan
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            Target
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            Waktu
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            Status Penugasan
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            Status Kirim
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            Status Terima
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            Aksi
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            Detail
+                        </th>
+                    </tr>
+                </thead>
 
-            <!-- Toggle untuk Penerimaan -->
-            <button id="toggle-penerimaan"
-                    class="toggle-section-btn flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                    data-section="penerimaan">
-                <svg class="w-4 h-4 mr-2 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-                <span>Penerimaan</span>
-            </button>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse ($subKegiatan->penugasans as $index => $penugasan)
+                        <!-- Row Utama -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
+                                {{ $index + 1 }}
+                            </td>
 
-            <!-- Toggle Semua -->
-            <button id="toggle-semua"
-                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-lg hover:bg-blue-700">
-                Tampilkan Semua
-            </button>
-        </div>
-    </div>
+                            <td class="px-6 py-3 text-sm text-gray-800">
+                                <div class="font-medium">{{ $penugasan->anggota->nama_pegawai ?? '-' }}</div>
+                            </td>
 
-    <div class="overflow-x-auto relative">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead>
-                <tr class="bg-gray-50">
-                    <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase sticky left-0 bg-gray-50 z-10">
-                        No.
-                    </th>
-                    <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase sticky left-[60px] bg-gray-50 z-10">
-                        Nama
-                    </th>
-                    <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Jenis Kegiatan
-                    </th>
-                    <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Target
-                    </th>
-                    <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Waktu Pelaksanaan
-                    </th>
+                            <td class="px-6 py-3 text-sm text-gray-700">
+                                {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? '-' }}
+                            </td>
 
-                    <!-- Kolom PENGIRIMAN (bisa di-toggle) -->
-                    <th colspan="3"
-                        class="section-pengiriman px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase border-l-2 border-blue-200"
-                        data-section="pengiriman">
-                        Pengiriman
-                    </th>
+                            <td class="px-6 py-3 text-sm text-gray-700 text-center">
+                                <div class="font-semibold">{{ $penugasan->target ?? '-' }}</div>
+                                <div class="text-xs text-gray-500">{{ $penugasan->satuan_target ?? '-' }}</div>
+                            </td>
+                            
+                            <td class="px-6 py-3 text-sm text-gray-700 text-center">
+                                <div class="text-xs text-gray-600">
+                                    {{ $penugasan->tanggal_mulai && $penugasan->tanggal_selesai
+                                        ? ($penugasan->tanggal_mulai->equalTo($penugasan->tanggal_selesai)
+                                            ? $penugasan->tanggal_mulai->translatedFormat('D, d M Y')
+                                            : $penugasan->tanggal_mulai->translatedFormat('D, d M Y') .
+                                                ' - ' .
+                                                $penugasan->tanggal_selesai->translatedFormat('D, d M Y'))
+                                        : '-' }}
+                                </div>
+                            </td>
+                            
+                            <td class="px-6 py-3 text-center">
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                    {{ $penugasan->statusPenugasan()['class'] }}">
+                                    {{ $penugasan->statusPenugasan()['label'] }}
+                                </span>
+                            </td>
+                            
+                            <td class="px-6 py-3 text-center">
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                    {{ $penugasan->statusPengiriman()['class'] }}">
+                                    {{ $penugasan->statusPengiriman()['label'] }}
+                                </span>
+                            </td>
 
-                    <!-- Kolom PENERIMAAN (bisa di-toggle) -->
-                    <th colspan="4"
-                        class="section-penerimaan px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase border-l-2 border-green-200"
-                        data-section="penerimaan">
-                        Penerimaan
-                    </th>
+                            <td class="px-6 py-3 text-center">
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                    {{ $penugasan->statusPenerimaan()['class'] }}">
+                                    {{ $penugasan->statusPenerimaan()['label'] }}
+                                </span>
+                            </td>
 
-                    <th rowspan="2" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase sticky right-0 bg-gray-50 z-10">
-                        Aksi
-                    </th>
-                </tr>
-                <tr class="bg-gray-50">
-                    <!-- Sub-kolom PENGIRIMAN -->
-                    <th class="section-pengiriman px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase border-l-2 border-blue-200"
-                        data-section="pengiriman">
-                        Detail
-                    </th>
-                    <th class="section-pengiriman px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                        data-section="pengiriman">
-                        RR (%)
-                    </th>
-                    <th class="section-pengiriman px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                        data-section="pengiriman">
-                        Ketepatan Waktu
-                    </th>
+                            <td class="px-6 py-3 text-center">
+                                <div class="relative inline-block" x-data="{
+                                    showDropdown: false,
+                                    dropdownPosition: { x: 0, y: 0 },
+                                    openDropdown(event) {
+                                        const button = event.currentTarget;
+                                        const rect = button.getBoundingClientRect();
+                                        const dropdownWidth = 192;
 
-                    <!-- Sub-kolom PENERIMAAN -->
-                    <th class="section-penerimaan px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase border-l-2 border-green-200"
-                        data-section="penerimaan">
-                        Detail
-                    </th>
-                    <th class="section-penerimaan px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                        data-section="penerimaan">
-                        RR (%)
-                    </th>
-                    <th class="section-penerimaan px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                        data-section="penerimaan">
-                        Ketepatan Waktu
-                    </th>
-                    <th class="section-penerimaan px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                        data-section="penerimaan">
-                        Bukti Dukung
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                @forelse ($subKegiatan->penugasans as $index => $penugasan)
-                    <tr class="hover:bg-gray-50"
-                        data-target="{{ $penugasan->target }}"
-                        data-deadline="{{ $penugasan->tanggal_selesai }}"
-                        data-kirim-jumlah="{{ $penugasan->latestPengiriman?->jumlah_dikirim ?? 0 }}"
-                        data-kirim-tanggal="{{ $penugasan->latestPengiriman?->tanggal_pengiriman ?? '' }}"
-                        data-terima-jumlah="{{ $penugasan->latestPenerimaan?->jumlah_diterima ?? 0 }}"
-                        data-terima-tanggal="{{ $penugasan->latestPenerimaan?->tanggal_penerimaan ?? '' }}">
-
-                        <!-- Kolom tetap (tidak bisa di-toggle) -->
-                        <td class="px-4 py-3 text-sm font-medium text-gray-900 text-center sticky left-0 bg-white z-10">
-                            {{ $index + 1 }}
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-700 sticky left-[60px] bg-white z-10">
-                            {{ $penugasan->anggota->nama_pegawai ?? '-' }}
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-700">
-                            {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? '-' }}
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-700 text-center">
-                            {{ $penugasan->target ?? '-' }}
-                            <span class="block text-xs text-orange-800">{{ $penugasan->satuan_target ?? '-' }}</span>
-                        </td>
-                        <td class="px-4 py-3 text-xs text-gray-700 text-center">
-                            {{
-                                    ($penugasan->tanggal_mulai && $penugasan->tanggal_selesai)
-                                        ? (
-                                            $penugasan->tanggal_mulai->equalTo($penugasan->tanggal_selesai)
-                                                ? $penugasan->tanggal_mulai->translatedFormat('D, d M Y')
-                                                : $penugasan->tanggal_mulai->translatedFormat('D, d M Y') . ' - ' . $penugasan->tanggal_selesai->translatedFormat('D, d M Y')
-                                        )
-                                        : '-'
-                                }}
-                        </td>
-
-                        <!-- Kolom PENGIRIMAN (bisa di-toggle) -->
-                        <td class="section-pengiriman px-4 py-3 text-sm text-gray-700 border-l-2 border-blue-50">
-                            <div>
-                                <p class="text-xs text-gray-500 pl-4">
-                                    {{ $penugasan->latestPengiriman?->tanggal_pengiriman?->translatedFormat('D, d M Y') ?? 'belum dikirim' }}
-                                </p>
-                                <p class="text-xs text-gray-500 pl-4">Jumlah :
-                                    {{ $penugasan->latestPengiriman->jumlah_dikirim ?? '-' }}
-                                </p>
-                                <p class="text-xs text-gray-500 pl-4">Dikirim melalui
-                                    {{ $penugasan->latestPengiriman->media_pengiriman ?? '-' }}</p>
-                            </div>
-                        </td>
-                        <td class="section-pengiriman px-4 py-3 text-sm text-gray-700 text-center">
-                            {{ $penugasan->rr_kirim ? $penugasan->rr_kirim . '%' : '-' }}
-                        </td>
-                        <td class="section-pengiriman px-4 py-3 text-sm text-gray-700 text-center">
-                            <div class="flex justify-center">
-                                <div class="flex justify-center rating-kirim"></div>
-                            </div>
-                        </td>
-
-                        <!-- Kolom PENERIMAAN (bisa di-toggle) -->
-                        <td class="section-penerimaan px-4 py-3 text-sm text-gray-700 border-l-2 border-green-50">
-                            <div>
-                                <p class="text-xs text-gray-500 pl-4">
-                                    {{ $penugasan->latestPenerimaan?->tanggal_penerimaan?->translatedFormat('D, d M Y') ?? 'belum diterima' }}
-                                </p>
-                                <p class="text-xs text-gray-500 pl-4">
-                                    Jumlah: {{ $penugasan->latestPenerimaan?->jumlah_diterima ?? '-' }}
-                                </p>
-                                <p class="text-xs text-gray-500 pl-4">
-                                    Diterima melalui:
-                                    {{ $penugasan->latestPengiriman?->media_pengiriman ?? '-' }}
-                                </p>
-                            </div>
-                        </td>
-                        <td class="section-penerimaan px-4 py-3 text-sm text-gray-700 text-center">
-                            {{ $penugasan->rr_terima ? $penugasan->rr_terima . '%' : '-' }}
-                        </td>
-                        <td class="section-penerimaan px-4 py-3 text-sm text-gray-700 text-center">
-                            <div class="flex justify-center">
-                                <div class="flex justify-center rating-terima"></div>
-                            </div>
-                        </td>
-                        <td class="section-penerimaan px-4 py-3 text-sm text-gray-700 text-center">
-                            <a href="{{ $penugasan->latestPengiriman?->bukti_dukung ?: 'https://www.youtube.com/' }}"
-                                target="_blank" rel="noopener noreferrer"
-                                title="{{ $penugasan->bukti_dukung ? 'Buka bukti dukung' : 'Belum ada bukti dukung' }}"
-                                class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800">
-                                {{ $penugasan->latestPengiriman?->bukti_dukung ? 'Lihat Bukti' : 'Belum Ada' }}
-                            </a>
-                        </td>
-
-                        <td class="px-4 py-3 text-sm text-gray-700 text-center border-r border-gray-200">
-                            <!-- Container untuk tombol saja -->
-                            <div class="relative inline-block" x-data="{
-                                showDropdown: false,
-                                dropdownPosition: { x: 0, y: 0 },
-                                calculatePosition(button) {
-                                    const rect = button.getBoundingClientRect();
-                                    const dropdownWidth = 192;
-                                    // Tinggi untuk 5 tombol: (5 * 44px) ≈ 220px, plus padding
-                                    const dropdownHeight = 236;
-
-                                    // Start dengan posisi di bawah tombol, rata kiri dengan tombol
-                                    let left = rect.left;
-                                    let top = rect.bottom + 8;
-
-                                    // Cek jika dropdown akan keluar dari viewport KANAN
-                                    // Gunakan window.innerWidth - 20 (margin) bukan -50
-                                    if (left + dropdownWidth > window.innerWidth - 20) {
-                                        // Posisikan di KIRI tombol
-                                        left = rect.left - dropdownWidth;
-
-                                        // Jika masih di luar kiri viewport
-                                        if (left < 10) {
-                                            // Posisikan di dalam viewport dengan sedikit margin
-                                            left = 10;
-                                        }
+                                        this.dropdownPosition = {
+                                            x: rect.left - dropdownWidth + 10,
+                                            y: rect.top - 10
+                                        };
+                                        this.showDropdown = true;
+                                    },
+                                    closeDropdown() {
+                                        this.showDropdown = false;
                                     }
+                                }" x-on:mouseleave="closeDropdown()">
 
-                                    // Cek jika dropdown akan keluar dari viewport KIRI
-                                    if (left < 10) {
-                                        left = 10;
-                                    }
-
-                                    // Cek jika dropdown akan keluar dari viewport BAWAH
-                                    if (top + dropdownHeight > window.innerHeight - 20) {
-                                        // Pindah ke ATAS tombol
-                                        top = rect.top - dropdownHeight - 8;
-
-                                        // Jika juga tidak muat di atas
-                                        if (top < 10) {
-                                            top = 10;
-                                        }
-                                    }
-
-                                    return { x: left, y: top };
-                                },
-                                openDropdown(event) {
-                                    const button = event.currentTarget;
-                                    this.dropdownPosition = this.calculatePosition(button);
-                                    this.showDropdown = true;
-                                },
-                                closeDropdown() {
-                                    this.showDropdown = false;
-                                }
-                            }"
-                                x-on:mouseleave="closeDropdown()">
-
-                                <!-- Tombol utama dengan hover -->
-                                <button x-on:mouseenter="openDropdown($event)"
-                                    class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800">
-                                    <svg class="fill-current" width="16" height="16" viewBox="0 0 18 18"
-                                        fill="none">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z" />
-                                    </svg>
-                                    Aksi
-                                </button>
-
-                                @php
-                                    $latestPengiriman = $penugasan->latestPengiriman;
-                                    $latestPenerimaan = $penugasan->latestPenerimaan;
-
-                                    $statusPenerimaan = $latestPenerimaan?->status;
-
-                                    // boleh melakukan aksi
-                                    $bolehAksi =
-                                        is_null($latestPengiriman) ||        // belum ada pengiriman
-                                        $statusPenerimaan === 'Direvisi';    // sudah ada tapi direvisi
-                                @endphp
-                                <!-- Dropdown menu FIXED POSITION -->
-                                <div x-show="showDropdown" x-transition:enter="transition ease-out duration-150"
-                                    x-transition:enter-start="opacity-0 scale-95"
-                                    x-transition:enter-end="opacity-100 scale-100"
-                                    x-transition:leave="transition ease-in duration-100"
-                                    x-transition:leave-start="opacity-100 scale-100"
-                                    x-transition:leave-end="opacity-0 scale-95"
-                                    class="fixed z-[9999] bg-white rounded-lg shadow-xl border border-gray-200 min-w-[192px]"
-                                    :style="`left: ${dropdownPosition.x}px; top: ${dropdownPosition.y}px;`"
-                                    x-on:mouseenter="showDropdown = true" x-on:mouseleave="closeDropdown()">
-
-                                    @can('update', $penugasan)
-                                        {{-- @if($bolehAksi) --}}
-                                            {{-- Edit Data Penugasan --}}
-                                            <button
-                                                class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
-                                                @click="
-                                                    const payload = {
-                                                        modalId: 'modal-penugasan-anggota',
-                                                        mode: 'edit',
-                                                        key: '{{ $penugasan->id_penugasan }}',
-                                                        data: {
-                                                            id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
-                                                            nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
-                                                            id_anggota: @js($penugasan->id_anggota),
-                                                            nama_anggota: @js($penugasan->anggota?->nama_pegawai),
-                                                            id_jenis_kegiatan: @js($penugasan->jenisKegiatan->id),
-                                                            target: @js($penugasan->target),
-                                                            satuan_target: @js($penugasan->satuan_target),
-                                                            tanggal_mulai: @js(optional($penugasan->tanggal_mulai)->format('Y-m-d')),
-                                                            tanggal_selesai: @js(optional($penugasan->tanggal_selesai)->format('Y-m-d')),
-
-                                                            {{-- tanggal_mulai: @js($penugasan->tanggal_mulai),
-                                                            tanggal_selesai: @js($penugasan->tanggal_selesai), --}}
-                                                            status: @js($penugasan->status),
-                                                        }
-                                                    };
-
-                                                    console.log('PAYLOAD KE MODAL:', payload);
-
-                                                    $dispatch('open-smart-modal', payload);
-                                                ">
-                                                                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                </svg> Edit Penugasan
-                                            </button>
-                                        {{-- @endif --}}
-                                    @endcan
-
-                                    @can('send', $penugasan)
-                                        {{-- @if($bolehAksi) --}}
-                                            <!-- Tombol Buat Pengiriman -->
-                                            <button
-                                                class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
-                                                @click="$dispatch('open-smart-modal', {
-                                                    modalId: 'modal-pengiriman-anggota',
-                                                    data: {
-                                                        id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
-                                                        id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                        nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
-                                                    }
-                                                })">
-                                                <!-- icon -->
-                                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                Buat Pengiriman
-                                            </button>
-                                        {{-- @endif --}}
-                                    @endcan
-
-                                    <!-- Tombol Tampilkan Histori Pengiriman -->
-                                    <button
-                                        class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700
-                                        hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
-                                        @click="$dispatch('open-smart-modal', {
-                                            modalId: 'modal-histori-pengiriman',
-                                            data: {
-                                                id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
-                                                historiData: @js($penugasan->pengirimans
-                                                ->sortByDesc(fn($p) => $p->tanggal_pengiriman) // sort sebelum format
-                                                ->map(
-                                                    fn($p) => [
-                                                        'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
-                                                        'jumlah_dikirim' => $p->jumlah_dikirim,
-                                                        'media_pengiriman' => $p->media_pengiriman,
-                                                        'bukti_dukung' => $p->bukti_dukung,
-                                                        'status' => $p->penerimaan?->status ?? 'Belum Diproses',
-                                                        'catatan' => $p->penerimaan?->catatan,
-                                                    ],
-                                                ),
-                                            )}
-                                        })">
-                                        <!-- Icon -->
-                                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 7V3m8 4V3M3 11h18M5 19h14a2 2 0 002-2v-6H3v6a2 2 0 002 2z" />
+                                    <button x-on:mouseenter="openDropdown($event)"
+                                        class="inline-flex items-center gap-2 rounded border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                        <svg class="fill-current" width="16" height="16" viewBox="0 0 18 18" fill="none">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z" />
                                         </svg>
-                                        Tampilkan Histori Pengiriman
+                                        Aksi
                                     </button>
 
-                                    @can('receive', $penugasan)
-                                        {{-- @if($bolehAksi) --}}
-                                            <!-- Tombol Buat Penerimaan -->
+                                    <div x-show="showDropdown" x-transition
+                                        class="fixed z-[9999] bg-white rounded shadow-xl border border-gray-200 min-w-[192px]"
+                                        :style="`left: ${dropdownPosition.x}px; top: ${dropdownPosition.y}px;`"
+                                        x-on:mouseenter="showDropdown = true" x-on:mouseleave="closeDropdown()">
+
+                                        @can('update', $penugasan)
                                             <button
-                                                class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100"
+                                                class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 border-b border-gray-100"
                                                 @click="$dispatch('open-smart-modal', {
-                                                    modalId: 'modal-penerimaan-anggota',
+                                                    modalId: 'modal-penugasan-anggota',
+                                                    mode: 'edit',
+                                                    key: '{{ $penugasan->id_penugasan }}',
                                                     data: {
-                                                        id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
-                                                        id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                        id_pengiriman: '{{ $penugasan->latestPengiriman?->id_pengiriman }}',
-                                                        nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                        id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
+                                                        nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
+                                                        id_anggota: @js($penugasan->id_anggota),
+                                                        nama_anggota: @js($penugasan->anggota?->nama_pegawai),
+                                                        id_jenis_kegiatan: @js($penugasan->jenisKegiatan->id),
+                                                        jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
+                                                        target: @js($penugasan->target),
+                                                        satuan_target: @js($penugasan->satuan_target),
+                                                        butuh_dl: @js($penugasan->butuh_dl),
+                                                        tanggal_mulai: @js(optional($penugasan->tanggal_mulai)->format('Y-m-d')),
+                                                        tanggal_selesai: @js(optional($penugasan->tanggal_selesai)->format('Y-m-d')),
+                                                        status: @js($penugasan->status),
                                                     }
                                                 })">
-                                                <!-- icon -->
-                                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                Buat Penerimaan
-                                            </button>
-                                        {{-- @endif --}}
-                                    @endcan
-
-                                    {{-- @if($penugasan->isDinasLuar()) --}}
-                                    @can('acceptDL', $penugasan)
-                                        <form action="{{ route('kalenderDL.store')}}"
-                                            method="POST" class="flex flex-col items-center">
-                                            @csrf
-
-                                            <input type="hidden" name="id_pegawai" value="{{ $penugasan->id_anggota }}">
-                                            <input type="hidden" name="tanggal_mulai" value="{{ $penugasan->tanggal_mulai }}">
-                                            <input type="hidden" name="tanggal_selesai" value="{{ $penugasan->tanggal_selesai }}">
-
-                                            <button type="submit" class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 flex items-center gap-2 whitespace-nowrap border-b border-gray-100">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                 </svg>
-                                                Masukkan Kalender DL
+                                                Edit Penugasan
                                             </button>
-                                        </form>
-                                    @endcan
-                                    {{-- @endif --}}
+                                        @endcan
 
-                                    <!-- Tombol Jadikan CKP -->
-                                    <button @click="closeDropdown()"
-                                        class="w-full rounded-lg text-left px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 flex items-center gap-2 whitespace-nowrap">
-                                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        <span>Jadikan CKP</span>
-                                    </button>
+                                        @can('send', $penugasan)
+                                            <div class="relative group">
+                                                <button
+                                                    class="w-full text-left px-4 py-3 text-sm flex items-center gap-2 border-b
+                                                    {{ $penugasan->bolehKirimPenugasan()
+                                                        ? 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                                                        : 'text-gray-400 bg-gray-50 cursor-not-allowed' }}"
+                                                    {{ $penugasan->bolehKirimPenugasan() ? '' : 'disabled' }}
+                                                    @if ($penugasan->bolehKirimPenugasan()) @click="$dispatch('open-smart-modal', {
+                                                        modalId: 'modal-pengiriman-anggota',
+                                                        data: {
+                                                            id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
+                                                            id_penugasan: '{{ $penugasan->id_penugasan }}',
+                                                            nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                        }
+                                                    })" @endif>
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    Buat Pengiriman
+                                                </button>
+
+                                                @if (!$penugasan->bolehKirimPenugasan() && $penugasan->tooltipPengirimanPenugasan())
+                                                    @php
+                                                        [$type, $text] = explode(
+                                                            '|',
+                                                            $penugasan->tooltipPengirimanPenugasan(),
+                                                            2,
+                                                        );
+                                                    @endphp
+                                                    <div
+                                                        class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block text-white text-xs rounded px-2 py-1
+                                                        {{ $type === 'danger' ? 'bg-red-500/80' : ($type === 'warning' ? 'bg-orange-500/80' : 'bg-blue-500/80') }}">
+                                                        {{ $text }}
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endcan
+
+                                        <button
+                                            class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 border-b border-gray-100"
+                                            @click="$dispatch('open-smart-modal', {
+                                                modalId: 'modal-histori-pengiriman',
+                                                data: {
+                                                    id_penugasan: '{{ $penugasan->id_penugasan }}',
+                                                    nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                    historiData: @js(
+                                                        $penugasan->pengirimans
+                                                            ->sortByDesc(fn($p) => $p->tanggal_pengiriman)
+                                                            ->map(
+                                                                fn($p) => [
+                                                                    'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
+                                                                    'jumlah_dikirim' => $p->jumlah_dikirim,
+                                                                    'media_pengiriman' => $p->media_pengiriman,
+                                                                    'bukti_dukung' => $p->bukti_dukung,
+                                                                    'status' => $p->penerimaan?->status ?? 'Menunggu Diperiksa',
+                                                                    'catatan' => $p->penerimaan?->catatan,
+                                                                ],
+                                                            ),
+                                                    )}
+                                                })">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M8 7V3m8 4V3M3 11h18M5 19h14a2 2 0 002-2v-6H3v6a2 2 0 002 2z" />
+                                            </svg>
+                                            Histori Pengiriman
+                                        </button>
+
+                                        @can('receive', $penugasan)
+                                            <div class="relative group">
+                                                <button
+                                                    class="w-full text-left px-4 py-3 text-sm flex items-center gap-2 border-b
+                                                    {{ $penugasan->bolehTerimaPenugasan()
+                                                        ? 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+                                                        : 'text-gray-400 bg-gray-50 cursor-not-allowed' }}"
+                                                    {{ $penugasan->bolehTerimaPenugasan() ? '' : 'disabled' }}
+                                                    @if ($penugasan->bolehTerimaPenugasan()) @click="$dispatch('open-smart-modal', {
+                                                        modalId: 'modal-penerimaan-anggota',
+                                                        data: {
+                                                            id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
+                                                            id_penugasan: '{{ $penugasan->id_penugasan }}',
+                                                            id_pengiriman: '{{ $penugasan->latestPengiriman?->id_pengiriman }}',
+                                                            nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                        }
+                                                    })" @endif>
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    Buat Penerimaan
+                                                </button>
+                                                @if (!$penugasan->bolehTerimaPenugasan() && $penugasan->tooltipPenerimaanPenugasan())
+                                                    @php
+                                                        [$type, $text] = explode(
+                                                            '|',
+                                                            $penugasan->tooltipPenerimaanPenugasan(),
+                                                            2,
+                                                        );
+                                                    @endphp
+                                                    <div
+                                                        class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block text-white text-xs rounded px-2 py-1
+                                                        {{ $type === 'danger' ? 'bg-red-500/80' : ($type === 'warning' ? 'bg-orange-500/80' : 'bg-blue-500/80') }}">
+                                                        {{ $text }}
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endcan
+
+                                        <button
+                                            class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 flex items-center gap-2"
+                                            @click="closeDropdown()">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            Jadikan CKP
+                                        </button>
+                                    </div>
                                 </div>
+                            </td>
+
+                            <td class="px-6 py-3 text-center">
+                                <button
+                                    x-data="{ isOpen: false }"
+                                    @click="isOpen = !isOpen; 
+                                            // Temukan detail row yang sesuai dan toggle
+                                            const detailRow = $el.closest('tr').nextElementSibling;
+                                            if (detailRow) {
+                                                const alpineData = Alpine.$data(detailRow);
+                                                if (alpineData) {
+                                                    alpineData.showDetails = !alpineData.showDetails;
+                                                }
+                                            }"
+                                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded bg-brand-50 text-brand-700 hover:bg-brand-100 border border-brand-200">
+                                    <svg class="w-3 h-3" 
+                                        :class="{ 'rotate-180': isOpen }" 
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                    Detail
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Row Detail - Individual per row -->
+                        <tr x-data="{ showDetails: false }" 
+                            x-show="showDetails"
+                            x-cloak>
+                            <td colspan="10" class="px-0 py-4 bg-gray-50">
+                                <div class="grid grid-cols-2 gap-4 px-6">
+                                    <!-- PENGIRIMAN -->
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-3">
+                                            <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                                            <h4 class="text-sm font-semibold text-gray-700">Pengiriman</h4>
+                                        </div>
+                                        
+                                        <div class="bg-white rounded border border-gray-200 p-4">
+                                            <div class="grid grid-cols-3 gap-3 mb-4">
+                                                <div>
+                                                    <p class="text-xs text-gray-500">Tanggal</p>
+                                                    <p class="text-sm font-medium text-gray-800">
+                                                        {{ $penugasan->latestPengiriman?->tanggal_pengiriman?->translatedFormat('D, d M Y') ?? 'Belum dikirim' }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs text-gray-500">Jumlah</p>
+                                                    <p class="text-sm font-medium text-gray-800">
+                                                        {{ $penugasan->latestPengiriman?->jumlah_dikirim ?? '-' }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs text-gray-500">Media</p>
+                                                    <p class="text-sm font-medium text-gray-800">
+                                                        {{ $penugasan->latestPengiriman?->media_pengiriman ?? '-' }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="pt-3 border-t border-gray-100">
+                                                <div class="flex items-center justify-between">
+                                                    <div>
+                                                        <p class="text-xs text-gray-500">Response Rate</p>
+                                                        <p class="text-base font-semibold text-blue-600">
+                                                            {{ $penugasan->latestPengiriman?->rr_kirim ?? 0 }}%
+                                                        </p>
+                                                    </div>
+                                                    
+                                                    <div class="text-center">
+                                                        <p class="text-xs text-gray-500">Ketepatan Waktu</p>
+                                                        <div
+                                                            x-data="{ show: false }"
+                                                            @mouseenter="show = true"
+                                                            @mouseleave="show = false"
+                                                            class="relative flex justify-center gap-0.5 cursor-pointer">
+                                                            {{-- BINTANG --}}
+                                                            @foreach ($penugasan->bintang_kirim_array as $filled)
+                                                                <span class="{{ $filled ? 'text-yellow-400' : 'text-gray-300' }}">
+                                                                    ★
+                                                                </span>
+                                                            @endforeach
+
+                                                            {{-- TOOLTIP --}}
+                                                            <div
+                                                                x-show="show"
+                                                                x-transition
+                                                                class="absolute z-50 bottom-full mb-2 w-56 rounded-lg bg-gray-900 text-white text-xs shadow-lg px-3 py-2">
+                                                                <div class="font-semibold text-yellow-400 mb-1">
+                                                                    ⭐ Rating Pengiriman
+                                                                </div>
+
+                                                                <div class="space-y-1 text-gray-200">
+                                                                    <div>
+                                                                        <span class="text-gray-400">Nilai:</span>
+                                                                        {{ $penugasan->latestPengiriman?->rating_kirim ?? 0 }}/5
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="text-gray-400">Deadline:</span>
+                                                                        {{ optional($penugasan->tanggal_selesai)->translatedFormat('d M Y') ?? '-' }}
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="text-gray-400">Dikirim:</span>
+                                                                        {{ optional($penugasan->latestPengiriman?->tanggal_pengiriman)->translatedFormat('d M Y') ?? '-' }}
+                                                                    </div>
+                                                                </div>
+
+                                                                {{-- ARROW --}}
+                                                                <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0
+                                                                    border-l-6 border-r-6 border-t-6
+                                                                    border-l-transparent border-r-transparent border-t-gray-900">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="text-right">
+                                                        <p class="text-xs text-gray-500">Bukti</p>
+                                                        <a href="{{ $penugasan->latestPengiriman?->bukti_dukung ?: '#' }}"
+                                                            target="_blank"
+                                                            class="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700">
+                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                            </svg>
+                                                            Lihat
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- PENERIMAAN -->
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-3">
+                                            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                            <h4 class="text-sm font-semibold text-gray-700">Penerimaan</h4>
+                                        </div>
+                                        
+                                        <div class="bg-white rounded border border-gray-200 p-4">
+                                            <div class="grid grid-cols-3 gap-3 mb-4">
+                                                <div>
+                                                    <p class="text-xs text-gray-500">Tanggal</p>
+                                                    <p class="text-sm font-medium text-gray-800">
+                                                        {{ $penugasan->latestPenerimaan?->tanggal_penerimaan?->translatedFormat('D, d M Y') ?? 'Belum diterima' }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs text-gray-500">Jumlah</p>
+                                                    <p class="text-sm font-medium text-gray-800">
+                                                        {{ $penugasan->latestPenerimaan?->jumlah_diterima ?? '-' }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs text-gray-500">Media</p>
+                                                    <p class="text-sm font-medium text-gray-800">
+                                                        {{ $penugasan->latestPengiriman?->media_pengiriman ?? '-' }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="pt-3 border-t border-gray-100">
+                                                <div class="flex items-center justify-between">
+                                                    <div>
+                                                        <p class="text-xs text-gray-500">Response Rate</p>
+                                                        <p class="text-base font-semibold text-green-600">
+                                                            {{ $penugasan->latestPenerimaan?->rr_terima ?? 0 }}%
+                                                        </p>
+                                                    </div>
+                                                    
+                                                    <div class="text-center">
+                                                        <p class="text-xs text-gray-500">Ketepatan Waktu</p>
+                                                        <div
+                                                            x-data="{ show: false }"
+                                                            @mouseenter="show = true"
+                                                            @mouseleave="show = false"
+                                                            class="relative flex justify-center gap-0.5 cursor-pointer">
+                                                            {{-- BINTANG --}}
+                                                            @foreach ($penugasan->bintang_kirim_array as $filled)
+                                                                <span class="{{ $filled ? 'text-yellow-400' : 'text-gray-300' }}">
+                                                                    ★
+                                                                </span>
+                                                            @endforeach
+
+                                                            {{-- TOOLTIP --}}
+                                                            <div
+                                                                x-show="show"
+                                                                x-transition
+                                                                class="absolute z-50 bottom-full mb-2 w-56 rounded-lg bg-gray-900 text-white text-xs shadow-lg px-3 py-2">
+                                                                <div class="font-semibold text-yellow-400 mb-1">
+                                                                    ⭐ Rating Penerimaan
+                                                                </div>
+
+                                                                <div class="space-y-1 text-gray-200">
+                                                                    <div>
+                                                                        <span class="text-gray-400">Nilai:</span>
+                                                                        {{ $penugasan->latestPenerimaan?->rating_terima ?? 0 }}/5
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="text-gray-400">Deadline:</span>
+                                                                        {{ optional($penugasan->tanggal_selesai)->translatedFormat('d M Y') ?? '-' }}
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="text-gray-400">Dikirim:</span>
+                                                                        {{ optional($penugasan->latestPenerimaan?->tanggal_penerimaan)->translatedFormat('d M Y') ?? '-' }}
+                                                                    </div>
+                                                                </div>
+
+                                                                {{-- ARROW --}}
+                                                                <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0
+                                                                    border-l-6 border-r-6 border-t-6
+                                                                    border-l-transparent border-r-transparent border-t-gray-900">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="10" class="px-6 py-8 text-center">
+                                <div class="flex flex-col items-center justify-center text-gray-400">
+                                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+                                    </svg>
+                                    <p class="text-base font-medium text-gray-500 mb-1">Belum ada penugasan</p>
+                                    <p class="text-sm text-gray-400">Mulai dengan menambahkan penugasan baru</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                    
+                    <!-- Total Row -->
+                    <tr class="bg-gray-50 border-t-2 border-gray-200">
+                        <td colspan="3" class="px-6 py-3 text-right text-sm font-semibold text-gray-700">
+                            Total:
+                        </td>
+                        <td class="px-6 py-3 text-center text-sm font-bold text-brand-600">
+                            {{ $subKegiatan->penugasans->sum('target') }}
+                        </td>
+                        <td colspan="3" class="px-6 py-3 text-center">
+                            <div class="inline-flex flex-col items-center">
+                                <span class="text-sm font-semibold text-gray-700">Pengiriman</span>
+                                <span class="text-base font-bold text-blue-600">{{ $totalKirim }}</span>
+                            </div>
+                        </td>
+                        <td colspan="4" class="px-6 py-3 text-center">
+                            <div class="inline-flex flex-col items-center">
+                                <span class="text-sm font-semibold text-gray-700">Penerimaan</span>
+                                <span class="text-base font-bold text-green-600">{{ $totalTerima }}</span>
                             </div>
                         </td>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="11" class="px-4 py-6 text-center text-gray-500">
-                            Belum ada penugasan pada sub kegiatan ini
-                        </td>
-                    </tr>
-                @endforelse
-                <tr class="bg-gray-50">
-                        <td colspan="3" class="px-4 py-6 text-center text-gray-500">
-                            Total
-                        </td>
-                        <td class="font-bold px-4 py-3 text-center text-xs text-gray-500 uppercase">
-                            {{ $subKegiatan->penugasans->sum('target') }}
-                        </td>
-                        <td class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-
-                        </td>
-                        <td colspan="3" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                            {{ $totalKirim}}
-                        </td>
-                        <td colspan="3" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                            {{ $totalTerima}}
-                        </td>
-                        <td colspan="2" class="px-4 py-3 text-sm text-gray-700 text-center">
-                            <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer"
-                                title="Kirim Ke Simket"
-                                class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-xs font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800">
-                                Kirim ke Simket
-                            </a>
-                        </td>
-                    </tr>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-
-<style>
-/* Styling untuk kolom yang bisa di-toggle */
-.section-pengiriman,
-.section-penerimaan {
-    position: relative;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-}
-
-/* Ketika kolom disembunyikan */
-.section-pengiriman.hidden,
-.section-penerimaan.hidden {
-    opacity: 0;
-    max-width: 0;
-    min-width: 0;
-    width: 0;
-    padding-left: 0;
-    padding-right: 0;
-    border: none;
-    overflow: hidden;
-}
-
-/* Sticky untuk kolom tetap */
-.sticky {
-    position: sticky;
-    z-index: 10;
-}
-
-.sticky.left-0 {
-    left: 0;
-}
-
-.sticky.left-\[60px\] {
-    left: 60px;
-}
-
-.sticky.right-0 {
-    right: 0;
-}
-
-/* Animasi untuk tombol toggle */
-.toggle-section-btn .rotate-90 {
-    transform: rotate(90deg);
-}
-
-.toggle-section-btn .rotate-0 {
-    transform: rotate(0deg);
-}
-
-/* Indikator visual untuk kolom yang hidden */
-.section-pengiriman.hidden::after,
-.section-penerimaan.hidden::after {
-    content: "⋮";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #6b7280;
-    font-size: 20px;
-    font-weight: bold;
-    opacity: 0.5;
-}
-
-/* Border khusus untuk memisahkan section */
-.border-l-2 {
-    border-left-width: 2px;
-}
-
-/* Hover effect untuk kolom */
-.section-pengiriman:hover {
-    background-color: #f0f9ff;
-}
-
-.section-penerimaan:hover {
-    background-color: #f0fdf4;
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // State untuk tracking visibility
-    const visibilityState = {
-        pengiriman: true,
-        penerimaan: true
-    };
-
-    // Elemen tombol toggle
-    const togglePengirimanBtn = document.getElementById('toggle-pengiriman');
-    const togglePenerimaanBtn = document.getElementById('toggle-penerimaan');
-    const toggleSemuaBtn = document.getElementById('toggle-semua');
-
-    // Fungsi untuk toggle section
-    function toggleSection(section, show = null) {
-        const shouldShow = show !== null ? show : !visibilityState[section];
-        visibilityState[section] = shouldShow;
-
-        // Toggle semua elemen dengan class section-[nama]
-        const elements = document.querySelectorAll(`.section-${section}`);
-        const button = document.querySelector(`[data-section="${section}"]`);
-
-        elements.forEach(el => {
-            if (shouldShow) {
-                el.classList.remove('hidden');
-            } else {
-                el.classList.add('hidden');
-            }
-        });
-
-        // Update icon tombol
-        if (button) {
-            const icon = button.querySelector('svg');
-            if (icon) {
-                if (shouldShow) {
-                    icon.classList.remove('rotate-90');
-                    icon.classList.add('rotate-0');
-                } else {
-                    icon.classList.remove('rotate-0');
-                    icon.classList.add('rotate-90');
-                }
-            }
-        }
-
-        updateToggleButtons();
-    }
-
-    // Fungsi untuk update tampilan tombol
-    function updateToggleButtons() {
-        // Update teks tombol
-        const sections = ['pengiriman', 'penerimaan'];
-        sections.forEach(section => {
-            const button = document.querySelector(`[data-section="${section}"]`);
-            if (button) {
-                button.classList.remove('bg-blue-100', 'text-blue-700', 'border-blue-300');
-                if (visibilityState[section]) {
-                    button.classList.add('bg-blue-100', 'text-blue-700', 'border-blue-300');
-                }
-            }
-        });
-    }
-
-    // Event listener untuk toggle pengiriman
-    togglePengirimanBtn.addEventListener('click', () => {
-        toggleSection('pengiriman');
-    });
-
-    // Event listener untuk toggle penerimaan
-    togglePenerimaanBtn.addEventListener('click', () => {
-        toggleSection('penerimaan');
-    });
-
-    // Event listener untuk toggle semua
-    toggleSemuaBtn.addEventListener('click', () => {
-        const allVisible = Object.values(visibilityState).every(v => v);
-
-        // Jika semua visible, sembunyikan semua
-        // Jika ada yang hidden, tampilkan semua
-        const shouldShow = !allVisible;
-
-        toggleSection('pengiriman', shouldShow);
-        toggleSection('penerimaan', shouldShow);
-    });
-
-    // Fungsi rating stars (tetap sama)
-    function renderStars(container, rating) {
-        container.innerHTML = '';
-        for (let i = 0; i < rating; i++) {
-            container.innerHTML += `
-                <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 20 20">
-                    <path
-                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-            `;
-        }
-    }
-
-    // Inisialisasi rating stars
-    document.querySelectorAll('tr[data-target]').forEach(row => {
-        // ... (kode rating stars tetap sama) ...
-    });
-
-    // Inisialisasi state awal
-    updateToggleButtons();
-});
-</script>
-

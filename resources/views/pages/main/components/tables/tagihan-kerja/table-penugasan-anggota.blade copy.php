@@ -1,75 +1,84 @@
 <div class="border border-gray-200 rounded-lg overflow-hidden">
     <div class="grid grid-cols-1">
-        <div class="col-span-1 overflow-x-auto">
-            <table class="max-w-[1400px] w-full divide-y divide-gray-200">
+        <div class="col-span-1 w-full overflow-x-auto">
+            <table class="max-w-[1800px] w-full divide-y divide-gray-200">
                 <thead>
-                    <tr class="bg-gray-50">
-                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <tr class="bg-gray-100">
+                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
                             No.
                         </th>
-                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
                             Nama
                         </th>
-                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
                             Jenis Kegiatan
                         </th>
-                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th rowspan="2" class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase">
                             Target
                         </th>
-                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Waktu Pelaksanaan
+                        <th rowspan="2" class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase">
+                            Waktu
                         </th>
-                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th rowspan="2" class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase">
                             Status Penugasan
                         </th>
-                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Status Pengiriman
+                        <th rowspan="2" class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase">
+                            Status Kirim
                         </th>
-                        <th rowspan="2" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Status Penerimaan
+                        <th rowspan="2" class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase">
+                            Status Terima
                         </th>
-                        <th colspan="3" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+
+                        <!-- PENGIRIMAN -->
+                        <th colspan="3"
+                            class="px-4 py-3 text-center text-xs font-semibold uppercase
+                                bg-blue-50 text-blue-700 border-l border-blue-100">
                             Pengiriman
                         </th>
-                        <th colspan="4" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+
+                        <!-- PENERIMAAN -->
+                        <th colspan="4"
+                            class="px-4 py-3 text-center text-xs font-semibold uppercase
+                                bg-green-50 text-green-700 border-l border-green-100">
                             Penerimaan
                         </th>
-                        <th rowspan="2" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+
+                        <th rowspan="2" class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase">
                             Aksi
                         </th>
                     </tr>
+
                     <tr class="bg-gray-50">
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                        <!-- Pengiriman -->
+                        <th class="px-4 py-2 text-xs text-blue-700 bg-blue-50 border-l border-blue-100">
                             Detail
                         </th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th class="px-4 py-2 text-xs text-blue-700 bg-blue-50 text-center">
                             RR (%)
                         </th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th class="px-4 py-2 text-xs text-blue-700 bg-blue-50 text-center">
                             Ketepatan Waktu
                         </th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+
+                        <!-- Penerimaan -->
+                        <th class="px-4 py-2 text-xs text-green-700 bg-green-50 border-l border-green-100">
                             Detail
                         </th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th class="px-4 py-2 text-xs text-green-700 bg-green-50 text-center">
                             RR (%)
                         </th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                        <th class="px-4 py-2 text-xs text-green-700 bg-green-50 text-center">
                             Ketepatan Waktu
                         </th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                            Bukti Dukung
+                        <th class="px-4 py-2 text-xs text-green-700 bg-green-50 text-center">
+                            Bukti
                         </th>
                     </tr>
                 </thead>
+
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse ($subKegiatan->penugasans as $index => $penugasan)
-                        <tr class="hover:bg-gray-50" data-target="{{ $penugasan->target }}"
-                            data-deadline="{{ $penugasan->tanggal_selesai }}"
-                            data-kirim-jumlah="{{ $penugasan->latestPengiriman?->jumlah_dikirim ?? 0 }}"
-                            data-kirim-tanggal="{{ $penugasan->latestPengiriman?->tanggal_pengiriman ?? '' }}"
-                            data-terima-jumlah="{{ $penugasan->latestPenerimaan?->jumlah_diterima ?? 0 }}"
-                            data-terima-tanggal="{{ $penugasan->latestPenerimaan?->tanggal_penerimaan ?? '' }}">
+                        <tr class="hover:bg-gray-50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900 text-center">
                                 {{ $index + 1 }}
                             </td>
@@ -120,26 +129,101 @@
 
 
                             {{-- PENGIRIMAN --}}
-                            <td class="px-4 py-3 text-sm text-gray-700">
-                                <div>
-                                    <p class="text-xs text-gray-500 pl-4">
-                                        {{ $penugasan->latestPengiriman?->tanggal_pengiriman?->translatedFormat('D, d M Y') ?? 'belum dikirim' }}
-                                    </p>
-                                    <p class="text-xs text-gray-500 pl-4">Jumlah :
-                                        {{ $penugasan->latestPengiriman->jumlah_dikirim ?? '-' }}
-                                    </p>
-                                    <p class="text-xs text-gray-500 pl-4">Dikirim melalui
-                                        {{ $penugasan->latestPengiriman->media_pengiriman ?? '-' }}</p>
+                            <td class="px-4 py-3 text-sm text-gray-700 bg-blue-50/40">
+                                <div class="space-y-1">
+
+                                    {{-- Tanggal --}}
+                                    <div class="flex items-center gap-2 text-xs text-gray-600">
+                                        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3M3 11h18M5 19h14a2 2 0 002-2v-6H3v6a2 2 0 002 2z" />
+                                        </svg>
+                                        <span>
+                                            {{ $penugasan->latestPengiriman?->tanggal_pengiriman?->translatedFormat('D, d M Y') ?? 'Belum dikirim' }}
+                                        </span>
+                                    </div>
+
+                                    {{-- Jumlah --}}
+                                    <div class="flex items-center gap-2 text-xs text-gray-600">
+                                        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M20 13V7a2 2 0 00-2-2H6a2 2 0 00-2 2v6m16 0l-4 4m4-4l-4-4M4 13l4 4m-4-4l4-4" />
+                                        </svg>
+                                        <span>
+                                            Jumlah:
+                                            <span class="font-medium text-gray-800">
+                                                {{ $penugasan->latestPengiriman?->jumlah_dikirim ?? '-' }}
+                                            </span>
+                                        </span>
+                                    </div>
+
+                                    {{-- Media --}}
+                                    <div class="flex items-center gap-2 text-xs text-gray-600">
+                                        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M3 7h18M3 12h18M3 17h18" />
+                                        </svg>
+                                        <span>
+                                            Media:
+                                            <span class="font-medium text-gray-800">
+                                                {{ $penugasan->latestPengiriman?->media_pengiriman ?? '-' }}
+                                            </span>
+                                        </span>
+                                    </div>
+
                                 </div>
                             </td>
 
                             <td class="px-4 py-3 text-sm text-gray-700 text-center">
-                                {{ $penugasan->rr_kirim ? $penugasan->rr_kirim . '%' : '-' }}
+                                {{ $penugasan->latestPengiriman?->rr_kirim ?? 0 }} %
                             </td>
 
                             <td class="px-4 py-3 text-sm text-gray-700 text-center">
                                 <div class="flex justify-center">
-                                    <div class="flex justify-center rating-kirim"></div>
+                                    <div
+                                        x-data="{ show: false }"
+                                        @mouseenter="show = true"
+                                        @mouseleave="show = false"
+                                        class="relative flex justify-center gap-0.5 cursor-pointer"
+                                    >
+                                        {{-- BINTANG --}}
+                                        @foreach ($penugasan->bintang_kirim_array as $filled)
+                                            <span class="{{ $filled ? 'text-yellow-400' : 'text-gray-300' }}">
+                                                ★
+                                            </span>
+                                        @endforeach
+
+                                        {{-- TOOLTIP --}}
+                                        <div
+                                            x-show="show"
+                                            x-transition
+                                            class="absolute z-50 bottom-full mb-2 w-56 rounded-lg bg-gray-900 text-white text-xs shadow-lg px-3 py-2">
+                                            <div class="font-semibold text-yellow-400 mb-1">
+                                                ⭐ Rating Pengiriman
+                                            </div>
+
+                                            <div class="space-y-1 text-gray-200">
+                                                <div>
+                                                    <span class="text-gray-400">Nilai:</span>
+                                                    {{ $penugasan->latestPengiriman?->rating_kirim ?? 0 }}/5
+                                                </div>
+                                                <div>
+                                                    <span class="text-gray-400">Deadline:</span>
+                                                    {{ optional($penugasan->tanggal_selesai)->translatedFormat('d M Y') ?? '-' }}
+                                                </div>
+                                                <div>
+                                                    <span class="text-gray-400">Dikirim:</span>
+                                                    {{ optional($penugasan->latestPengiriman?->tanggal_pengiriman)->translatedFormat('d M Y') ?? '-' }}
+                                                </div>
+                                            </div>
+
+                                            {{-- ARROW --}}
+                                            <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0
+                                                border-l-6 border-r-6 border-t-6
+                                                border-l-transparent border-r-transparent border-t-gray-900">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
 
@@ -160,12 +244,55 @@
                             </td>
 
                             <td class="px-4 py-3 text-sm text-gray-700 text-center">
-                                {{ $penugasan->rr_terima ? $penugasan->rr_terima . '%' : '-' }}
+                                {{ $penugasan->latestPenerimaan?->rr_terima ?? 0 }} %
                             </td>
 
                             <td class="px-4 py-3 text-sm text-gray-700 text-center">
                                 <div class="flex justify-center">
-                                    <div class="flex justify-center rating-terima"></div>
+                                    <div
+                                        x-data="{ show: false }"
+                                        @mouseenter="show = true"
+                                        @mouseleave="show = false"
+                                        class="relative flex justify-center gap-0.5 cursor-pointer">
+                                        {{-- BINTANG --}}
+                                        @foreach ($penugasan->bintang_kirim_array as $filled)
+                                            <span class="{{ $filled ? 'text-yellow-400' : 'text-gray-300' }}">
+                                                ★
+                                            </span>
+                                        @endforeach
+
+                                        {{-- TOOLTIP --}}
+                                        <div
+                                            x-show="show"
+                                            x-transition
+                                            class="absolute z-50 bottom-full mb-2 w-56 rounded-lg bg-gray-900 text-white text-xs shadow-lg px-3 py-2"
+                                        >
+                                            <div class="font-semibold text-yellow-400 mb-1">
+                                                ⭐ Rating Penerimaan
+                                            </div>
+
+                                            <div class="space-y-1 text-gray-200">
+                                                <div>
+                                                    <span class="text-gray-400">Nilai:</span>
+                                                    {{ $penugasan->latestPenerimaan?->rating_terima ?? 0 }}/5
+                                                </div>
+                                                <div>
+                                                    <span class="text-gray-400">Deadline:</span>
+                                                    {{ optional($penugasan->tanggal_selesai)->translatedFormat('d M Y') ?? '-' }}
+                                                </div>
+                                                <div>
+                                                    <span class="text-gray-400">Dikirim:</span>
+                                                    {{ optional($penugasan->latestPenerimaan?->tanggal_penerimaan)->translatedFormat('d M Y') ?? '-' }}
+                                                </div>
+                                            </div>
+
+                                            {{-- ARROW --}}
+                                            <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0
+                                                border-l-6 border-r-6 border-t-6
+                                                border-l-transparent border-r-transparent border-t-gray-900">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
 
@@ -345,8 +472,8 @@
                                                 {{ $penugasan->bolehTerimaPenugasan()
                                                     ? 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
                                                     : 'text-gray-400 bg-gray-50 cursor-not-allowed' }}"
-                                                                        {{ $penugasan->bolehTerimaPenugasan() ? '' : 'disabled' }}
-                                                                        @if ($penugasan->bolehTerimaPenugasan()) @click="$dispatch('open-smart-modal', {
+                                                        {{ $penugasan->bolehTerimaPenugasan() ? '' : 'disabled' }}
+                                                        @if ($penugasan->bolehTerimaPenugasan()) @click="$dispatch('open-smart-modal', {
                                                     modalId: 'modal-penerimaan-anggota',
                                                     data: {
                                                         id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
@@ -439,75 +566,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('tr[data-target]').forEach(row => {
-            const target = Number(row.dataset.target);
-            const deadline = new Date(row.dataset.deadline);
-
-            // =========================
-            // PENGIRIMAN
-            // =========================
-            const jumlahKirim = Number(row.dataset.kirimJumlah);
-            const tanggalKirim = row.dataset.kirimTanggal ?
-                new Date(row.dataset.kirimTanggal) :
-                null;
-
-            const kirimContainer = row.querySelector('.rating-kirim');
-
-            if (!jumlahKirim || !tanggalKirim) {
-                kirimContainer.textContent = '-';
-            } else {
-                let rating = 1;
-                const sesuaiTarget = jumlahKirim === target;
-                const tepatWaktu = tanggalKirim <= deadline;
-
-                if (sesuaiTarget && tepatWaktu) rating = 5;
-                else if (sesuaiTarget) rating = 4;
-                else if (tepatWaktu) rating = 3;
-                else rating = 2;
-
-                renderStars(kirimContainer, rating);
-            }
-
-            // =========================
-            // PENERIMAAN
-            // =========================
-            const jumlahTerima = Number(row.dataset.terimaJumlah);
-            const tanggalTerima = row.dataset.terimaTanggal ?
-                new Date(row.dataset.terimaTanggal) :
-                null;
-
-            const terimaContainer = row.querySelector('.rating-terima');
-
-            if (!jumlahTerima || !tanggalTerima) {
-                terimaContainer.textContent = '-';
-            } else {
-                let rating = 1;
-                const sesuaiJumlah = jumlahTerima === jumlahKirim;
-                const tepatWaktu = tanggalTerima <= deadline;
-
-                if (sesuaiJumlah && tepatWaktu) rating = 5;
-                else if (sesuaiJumlah) rating = 4;
-                else if (tepatWaktu) rating = 3;
-                else rating = 2;
-
-                renderStars(terimaContainer, rating);
-            }
-        });
-    });
-
-    function renderStars(container, rating) {
-        container.innerHTML = '';
-        for (let i = 0; i < rating; i++) {
-            container.innerHTML += `
-            <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 20 20">
-                <path
-                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-
-        `;
-        }
-    }
-</script>

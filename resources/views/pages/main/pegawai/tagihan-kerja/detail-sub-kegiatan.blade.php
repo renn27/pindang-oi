@@ -102,7 +102,7 @@
                 </div>
             @endcan
             <!-- Tabel Penugasan Anggota-->
-            @include('pages.main.components.tables.tagihan-kerja.table-penugasan-anggota_old')
+            @include('pages.main.components.tables.tagihan-kerja.table-penugasan-anggota')
             {{-- @include('pages.main.components.tables.tagihan-kerja.table-penugasan-anggota') --}}
         </div>
     </div>
