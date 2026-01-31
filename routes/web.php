@@ -20,12 +20,12 @@ use App\Http\Controllers\PegawaiRoleController;
 use Illuminate\Support\Facades\Auth;
 
 // ROUTE DASHBOARD VISUALISASI DATA
-// Route::get('/', function () {
-//     return view('pages.dashboard', [
-//         'title' => 'Dashboard',
-//     ]);
-// });
-Route::get('/', [DashboardAnalyticsController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard.visualisasi');
+Route::get('/', function () {
+    return view('pages.dashboard', [
+        'title' => 'Dashboard',
+    ]);
+});
+// Route::get('/', [DashboardAnalyticsController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard.visualisasi');
 
 // Route::prefix('/master-kegiatan')->middleware('can:create,App\Models\Kegiatan')->group(function () {
 //     Route::post('/', [MasterKegiatanController::class, 'store'])->name('master-kegiatan.store');

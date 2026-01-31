@@ -24,7 +24,7 @@ class BidangSeeder extends Seeder
         ['urutan' => 9,  'nama_bidang' => 'KIP',                'detail_bidang' => 'KIP (Keterbukaan Informasi Publik)'],
         ['urutan' => 10, 'nama_bidang' => 'PSS',                'detail_bidang' => 'PSS (Pembinaan Statistik Sektoral)'],
         ['urutan' => 11, 'nama_bidang' => 'Desa Cantik',        'detail_bidang' => 'Desa Cantik (Pembinaan Program Desa Cantik)'],
-        ['urutan' => 12, 'nama_bidang' => 'SBuKB',              'detail_bidang' => 'SBuKB (Statistik Berdampak untuk Kampus Berdampak)'],
+        ['urutan' => 12, 'nama_bidang' => 'SBUKB',              'detail_bidang' => 'SBUKB (Statistik Berdampak untuk Kampus Berdampak)'],
         ['urutan' => 13, 'nama_bidang' => 'DTSEN',              'detail_bidang' => 'DTSEN (Data Tunggal Sosial Ekonomi Nasional)'],
         ['urutan' => 14, 'nama_bidang' => 'SAKIP',              'detail_bidang' => 'SAKIP (Sistem Akuntabilitas Kinerja Instansi Pemerintah)'],
         ['urutan' => 15, 'nama_bidang' => 'Reformasi Birokrasi', 'detail_bidang' => 'Reformasi Birokrasi (Pembinaan Zona Integritas)'],
