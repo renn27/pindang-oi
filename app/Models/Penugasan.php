@@ -73,6 +73,15 @@ class Penugasan extends Model
         );
     }
 
+    public function getBintangTerimaArrayAttribute(): array
+    {
+        $filled = $this->latestPenerimaan?->rating_terima ?? 0;
+
+        return array_map(
+            fn ($i) => $i <= $filled,
+            range(1, 5)
+        );
+    }
 
     public function latestPenerimaan() {
         return $this->hasOneThrough(

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BidangController;
+use App\Http\Controllers\DashboardAnalyticsController;
 use App\Http\Controllers\IndikatorJPTController;
 use App\Http\Controllers\KalenderDLController;
 use App\Http\Controllers\KalenderKegiatanController;
@@ -18,11 +19,18 @@ use App\Http\Controllers\SubKegiatanController;
 use App\Http\Controllers\PegawaiRoleController;
 use Illuminate\Support\Facades\Auth;
 
-Route::get('/', function () {
-    return view('pages.dashboard', [
-        'title' => 'Dashboard',
-    ]);
-})->middleware(['auth', 'verified'])->name('dashboard');
+// ROUTE DASHBOARD VISUALISASI DATA
+// Route::get('/', function () {
+//     return view('pages.dashboard', [
+//         'title' => 'Dashboard',
+//     ]);
+// });
+Route::get('/', [DashboardAnalyticsController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard.visualisasi');
+
+// Route::prefix('/master-kegiatan')->middleware('can:create,App\Models\Kegiatan')->group(function () {
+//     Route::post('/', [MasterKegiatanController::class, 'store'])->name('master-kegiatan.store');
+// });
+
 
 Route::middleware('auth')->group(function () {
     // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -142,6 +150,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/kegiatan/export-mph-all', [MasterKegiatanController::class, 'exportMphAll'])
         ->name('kegiatan.export-mph-all');
+
+
 });
 
 require __DIR__ . '/auth.php';

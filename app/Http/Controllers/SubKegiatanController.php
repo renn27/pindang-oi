@@ -64,22 +64,38 @@ class SubKegiatanController extends Controller
             ->orderBy('jenis_kegiatan', 'asc')
             ->get();
 
-        $totalKirim = $subKegiatan->penugasans->sum(fn($p) =>
-            $p->latestPengiriman?->jumlah_dikirim ?? 0
-        );
+        // 🔒 VALIDASI KEPEMILIKAN (PENTING!// Ambil semua penugasan sekali saja
+        $penugasans = $subKegiatan->penugasans;
 
-        $totalTerima = $subKegiatan->penugasans->sum(fn($p) =>
-            $p->latestPenerimaan?->jumlah_diterima ?? 0
-        );
+        // === FILTER BUTUH DL / TIDAK BUTUH DL ===
+        $penugasanButuhDL = $penugasans->filter(fn ($p) => $p->butuh_dl);
+        $penugasanTidakButuhDL = $penugasans->filter(fn ($p) => ! $p->butuh_dl);
+
+        // Total (SEMUA)
+        $totalKirim = $this->hitungTotalKirim($penugasans);
+        $totalTerima = $this->hitungTotalTerima($penugasans);
+
+        // Total BUTUH DL
+        $totalKirimButuhDL = $this->hitungTotalKirim($penugasanButuhDL);
+        $totalTerimaButuhDL = $this->hitungTotalTerima($penugasanButuhDL);
+
+        // Total TIDAK BUTUH DL
+        $totalKirimTidakButuhDL = $this->hitungTotalKirim($penugasanTidakButuhDL);
+        $totalTerimaTidakButuhDL = $this->hitungTotalTerima($penugasanTidakButuhDL);
 
         return view('pages.main.pegawai.tagihan-kerja.detail-sub-kegiatan', [
             'kegiatan' => $kegiatan,
             'subKegiatan' => $subKegiatan,
             'pegawais' => $pegawais,
             'jenisKegiatans' => $jenisKegiatans,
+            'penugasanButuhDL' => $penugasanButuhDL,
+            'penugasanTidakButuhDL' => $penugasanTidakButuhDL,
             'totalKirim' => $totalKirim,
-            'totalTerima' => $totalTerima
-
+            'totalKirimTerima' => $totalTerima,
+            'totalKirimButuhDL' => $totalKirimButuhDL,
+            'totalTerimaButuhDL' => $totalTerimaButuhDL,
+            'totalKirimTidakButuhDL' => $totalKirimTidakButuhDL,
+            'totalTerimaTidakButuhDL' => $totalTerimaTidakButuhDL,
         ]);
     }
 
@@ -136,4 +152,20 @@ class SubKegiatanController extends Controller
 
         return redirect()->back()->with('success', 'Sub kegiatan berhasil dihapus');
     }
+
+    private function hitungTotalKirim($penugasans)
+    {
+        return $penugasans->sum(fn ($p) =>
+            $p->latestPengiriman?->jumlah_dikirim ?? 0
+        );
+    }
+
+    private function hitungTotalTerima($penugasans)
+    {
+        return $penugasans->sum(fn ($p) =>
+            $p->latestPenerimaan?->jumlah_diterima ?? 0
+        );
+    }
+
+
 }
