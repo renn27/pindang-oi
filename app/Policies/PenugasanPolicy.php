@@ -120,21 +120,20 @@ class PenugasanPolicy
 
     public function acceptDL(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-       // 1️⃣ Jenis kegiatan yang dianggap Dinas Luar
-        $jenisDL = [
-            'Pengawasan',
-            'Pendataan',
-            'Supervisi',
-            'Perjalanan Dinas',
-        ];
-
-        // 2️⃣ Pastikan jenis kegiatan masuk DL
-        if (! in_array($penugasan->jenisKegiatan->jenis_kegiatan, $jenisDL, true)) {
+        // 1️⃣ Hanya pimpinan
+        if ($pegawai->active_role !== 'Pimpinan') {
             return false;
         }
 
-        return $pegawai->active_role == "Pimpinan";
+        // 2️⃣ Penugasan memang butuh DL
+        // (baik karena wajib DL atau toggle manual)
+        if (! $penugasan->butuh_dl) {
+            return false;
+        }
+
+        return true;
     }
+
 
     /**
      * Determine whether the user can restore the model.

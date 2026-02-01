@@ -66,13 +66,14 @@ class PenugasanController extends Controller
             'Pendataan',
         ]);
 
-        // Tentukan butuh_dl (paksa true jika wajib DL)
-        $butuhDl = $wajibDl ? true : (bool) ($validated['butuh_dl'] ?? false);
+        // Ambil input toggle DL (0 / 1)
+        $requestButuhDl = (bool) ($validated['butuh_dl'] ?? false);
+
+        $butuhDl = $wajibDl || $requestButuhDl;
 
         $validated['butuh_dl'] = $butuhDl;
-
-        // Tentukan status_dl
         $validated['status_dl'] = $butuhDl ? 'Menunggu' : null;
+
 
         // STATUS AWAL PENUGASAN
         $validated['status'] = 'Belum Dikirim';
@@ -107,7 +108,6 @@ class PenugasanController extends Controller
                 ->withInput();
         }
     }
-
 
     public function update(Request $request, SubKegiatan $subKegiatan, Penugasan $penugasan)
     {
@@ -158,17 +158,18 @@ class PenugasanController extends Controller
             'Pendataan',
         ]);
 
-        if ($wajibDl) {
-            // Jika berubah menjadi WAJIB DL
-            $validated['butuh_dl'] = true;
+        $requestButuhDl = (bool) ($validated['butuh_dl'] ?? false);
 
-            // Jangan overwrite status kalau sudah diproses
+        // FINAL DECISION
+        $butuhDl = $wajibDl || $requestButuhDl;
+
+        $validated['butuh_dl'] = $butuhDl;
+
+        if ($butuhDl) {
             if ($penugasan->status_dl === null) {
                 $validated['status_dl'] = 'Menunggu';
             }
         } else {
-            // Jika berubah menjadi TIDAK BUTUH DL
-            $validated['butuh_dl'] = false;
             $validated['status_dl'] = null;
         }
 

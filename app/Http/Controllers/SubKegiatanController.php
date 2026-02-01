@@ -30,7 +30,7 @@ class SubKegiatanController extends Controller
         ]);
 
         // STATUS AWAL (STATE DEFAULT)
-        $validated['status'] = 'Belum Mulai';
+        $validated['status'] = 'Berjalan';
 
         try {
             // Simpan

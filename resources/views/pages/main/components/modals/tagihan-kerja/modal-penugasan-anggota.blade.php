@@ -197,11 +197,11 @@
 
                         syncState() {
                             const isWajib = this.wajibJenis.includes(this.jenisId)
+                            const fromDB = Boolean(Number(formData?.butuh_dl ?? 0))
 
                             // ================= CREATE =================
                             if (mode === 'create') {
 
-                                // 🔹 KHUSUS JENIS LAINNYA
                                 if (this.isLainnya) {
                                     this.butuhDl = false
                                     this.isLocked = false
@@ -218,12 +218,13 @@
                                     this.butuhDl = false
                                     this.isLocked = false
                                 }
+
                                 return
                             }
 
                             // ================= EDIT =================
                             if (this.isLainnya) {
-                                this.butuhDl = false
+                                this.butuhDl = fromDB
                                 this.isLocked = false
                                 return
                             }
@@ -235,17 +236,18 @@
                             }
 
                             if (isWajib) {
+                                // 🔒 Wajib DL → selalu ON & locked
                                 this.butuhDl = true
                                 this.isLocked = true
                             } else {
-                                this.butuhDl = false
+                                // ✅ OPSIONAL → ambil dari DB
+                                this.butuhDl = fromDB
                                 this.isLocked = false
                             }
                         }
                     }"
                     x-effect="syncState()"
                     class="mb-4">
-
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Kebutuhan Dinas Luar (DL)
                     </label>
@@ -291,7 +293,6 @@
                     <!-- Hidden input -->
                     <input type="hidden" name="butuh_dl" :value="butuhDl ? 1 : 0">
                 </div>
-
 
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
