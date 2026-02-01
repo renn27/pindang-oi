@@ -73,12 +73,7 @@ class PenugasanPolicy
             return false;
         }
 
-        // 3️⃣ Di luar jadwal
-        if (! $penugasan->isWithinSchedule()) {
-            return false;
-        }
-
-        // 4️⃣ Sudah diterima
+        // 3️⃣ Sudah diterima
         if ($penugasan->latestPenerimaan?->status === 'Diterima') {
             return false;
         }
@@ -109,6 +104,20 @@ class PenugasanPolicy
         return true;
     }
 
+    // === PENERIMAAN ===
+    public function receive(Pegawai $pegawai, Penugasan $penugasan): bool
+    {
+        if(!$this->canManagePenugasan($pegawai, $penugasan)) {
+            return false;
+        }
+
+        if($penugasan->latestPenerimaan?->status === 'Diterima') {
+            return false;
+        }
+
+        return true;
+    }
+
     public function acceptDL(Pegawai $pegawai, Penugasan $penugasan): bool
     {
        // 1️⃣ Jenis kegiatan yang dianggap Dinas Luar
@@ -125,20 +134,6 @@ class PenugasanPolicy
         }
 
         return $pegawai->active_role == "Pimpinan";
-    }
-
-    // === PENERIMAAN ===
-    public function receive(Pegawai $pegawai, Penugasan $penugasan): bool
-    {
-        if(!$this->canManagePenugasan($pegawai, $penugasan)) {
-            return false;
-        }
-
-        if($penugasan->latestPenerimaan?->status === 'Diterima') {
-            return false;
-        }
-
-        return true;
     }
 
     /**

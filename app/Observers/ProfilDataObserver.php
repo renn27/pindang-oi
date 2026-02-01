@@ -9,17 +9,44 @@ class ProfilDataObserver
 {
     public function updated(Pegawai $pegawai)
     {
+        /**
+         * Jalankan hanya jika photo berubah
+         */
+        if (!$pegawai->wasChanged('photo')) {
+            return;
+        }
+
+        /**
+         * Ambil foto lama
+         */
+        $oldPhoto = $pegawai->getOriginal('photo');
+
+        if ($oldPhoto) {
+
+            $oldStorage = storage_path('app/public/' . $oldPhoto);
+            $oldPublic  = public_path('storage/' . $oldPhoto);
+
+            if (file_exists($oldStorage)) {
+                File::delete($oldStorage);
+            }
+
+            if (file_exists($oldPublic)) {
+                File::delete($oldPublic);
+            }
+        }
+
+        /**
+         * Copy foto baru ke public
+         */
         if (!$pegawai->photo) return;
 
-        // SOURCE: storage/app/public/...
         $source = storage_path('app/public/' . $pegawai->photo);
+        $dest   = public_path('storage/' . $pegawai->photo);
 
-        // DESTINATION: public/storage/...
-        $publicRoot = public_path('storage');
-        $dest = $publicRoot . '/' . $pegawai->photo;
+        if (file_exists($source)) {
 
-        if (file_exists($source) && !file_exists($dest)) {
             File::ensureDirectoryExists(dirname($dest));
+
             File::copy($source, $dest);
         }
     }

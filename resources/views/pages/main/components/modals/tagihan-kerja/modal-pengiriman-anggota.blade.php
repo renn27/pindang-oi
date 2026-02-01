@@ -20,7 +20,7 @@
         @csrf
         <div
             class="relative flex h-[90vh] w-full max-w-[800px] flex-col overflow-hidden
-               rounded-3xl bg-white">
+                rounded-3xl bg-white">
 
             <!-- HEADER (FIXED) -->
             <div class="shrink-0 border-b border-gray-200 px-6 py-3">
@@ -61,7 +61,7 @@
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Tanggal Pengiriman
                     </label>
-                    <x-form.date-picker id="tanggal_pengiriman" name="tanggal_pengiriman" placeholder="Date Picker"
+                    <x-form.date-picker id="tanggal_pengiriman" name="tanggal_pengiriman" placeholder="Tanggal Pengiriman"
                         defaultDate="{{ now()->format('Y-m-d') }}" readonly="true" />
                 </div>
                 <div>

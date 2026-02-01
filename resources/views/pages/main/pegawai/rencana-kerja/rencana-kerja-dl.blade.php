@@ -295,29 +295,41 @@
                                                                                 Diterima
                                                                             </span>
                                                                         @elseif ($penugasan->status_dl === 'Ditolak')
-                                                                            <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-1
-                                                                                text-xs font-medium text-red-800">
-                                                                                Ditolak
-                                                                            </span>
-                                                                            @if (Auth::user()->active_role === 'Ketua Tim')
-                                                                                <button
-                                                                                    type="button"
-                                                                                    title="Verifikasi DL"
-                                                                                    @click="$dispatch('open-smart-modal', {
-                                                                                        modalId: 'modal-verifikasi-dl',
-                                                                                        key: @js($penugasan->id_penugasan),
-                                                                                        data: {
-                                                                                            nama_pegawai: @js($penugasan->anggota->nama_pegawai),
-                                                                                            jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
-                                                                                            tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')),
-                                                                                            tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')),
-                                                                                        }
-                                                                                    })"
-                                                                                    class="text-blue-600 hover:text-blue-800 underline text-xs">
-                                                                                    Ajukan Kembali
-                                                                                </button>
-                                                                            @endif
+                                                                            <div class="flex items-center gap-2">
+                                                                                <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-1
+                                                                                    text-xs font-medium text-red-800">
+                                                                                    Ditolak
+                                                                                </span>
+
+                                                                                @if (Auth::user()->active_role === 'Ketua Tim')
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        title="Ajukan Kembali"
+                                                                                        @click="$dispatch('open-smart-modal', {
+                                                                                            modalId: 'modal-verifikasi-dl',
+                                                                                            key: @js($penugasan->id_penugasan),
+                                                                                            data: {
+                                                                                                nama_pegawai: @js($penugasan->anggota->nama_pegawai),
+                                                                                                jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
+                                                                                                tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')),
+                                                                                                tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')),
+                                                                                            }
+                                                                                        })"
+                                                                                        class="flex items-center px-2 py-1 text-[8px] font-medium
+                                                                                            bg-gray-200/80 text-gray-700
+                                                                                            hover:bg-blue-200 hover:text-blue-700
+                                                                                            whitespace-nowrap border-b border-gray-200">
+                                                                                        <!-- ICON AJUKAN ULANG -->
+                                                                                        <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                            <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                                                                d="M4 4v6h6M20 20v-6h-6M5 19a9 9 0 0014-7M19 5a9 9 0 00-14 7"/>
+                                                                                        </svg>
+                                                                                        Ajukan Kembali
+                                                                                    </button>
+                                                                                @endif
+                                                                            </div>
                                                                         @endif
+
                                                                     </div>
 
                                                                     @can('acceptDL', $penugasan)

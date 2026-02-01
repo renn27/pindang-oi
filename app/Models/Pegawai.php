@@ -17,8 +17,7 @@ class Pegawai extends Authenticatable
     public $timestamps = true;
 
     protected $fillable = [
-        'nama_pegawai
-        ',
+        'nama_pegawai',
         'username',
         'password',
         'email',
@@ -53,12 +52,12 @@ class Pegawai extends Authenticatable
             ->contains($this->id_pegawai);
     }
 
-    public function modeKerja(): string
-    {
-        return $this->active_role === 'Ketua Tim'
-            ? 'ketua'
-            : 'anggota';
-    }
+    // public function modeKerja(): string
+    // {
+    //     return $this->active_role === 'Ketua Tim'
+    //         ? 'ketua'
+    //         : 'anggota';
+    // }
 
     public function kegiatanYangDipimpin() {
         return $this->hasMany(Kegiatan::class, 'id_penanggung_jawab', 'id_pegawai');

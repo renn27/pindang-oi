@@ -45,7 +45,7 @@
                     </a>
                 </div>
             </div>
-            <div class="space-y-4">
+            {{-- <div class="space-y-4">
                 @foreach ($bidangs as $index => $bidang)
                     <div x-data="{ open: false }" class="rounded-lg border border-gray-200 bg-white">
                         <!-- Header Fungsi -->
@@ -203,7 +203,204 @@
                         <p class="text-sm text-gray-500">Belum ada fungsi/bidang yang dibuat</p>
                     </div>
                 @endif
+            </div> --}}
+
+            <div class="space-y-4">
+    @foreach ($bidangs as $bidang)
+        <div x-data="{ open: false }" class="rounded-lg border border-gray-200 bg-white">
+
+            <!-- Header Fungsi -->
+            <button @click="open = !open"
+                class="flex w-full items-center justify-between p-4 text-left hover:bg-gray-50">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-800">{{ $bidang->nama_bidang }}</h3>
+                    <p class="text-xs text-gray-500">
+                        Total {{ $bidang->kegiatans->count() }} kegiatan
+                    </p>
+                </div>
+
+                <svg :class="{ 'rotate-180': open }"
+                    class="h-5 w-5 text-gray-500 transition-transform"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+
+            <!-- Accordion -->
+            <div x-show="open" x-collapse class="border-t border-gray-100">
+
+                @if ($bidang->kegiatans->count() > 0)
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full border border-gray-200">
+
+                            <!-- HEADER -->
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase border">Kegiatan</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase border">Sub Kegiatan</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase border">Nama Pegawai</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase border">Jenis Kegiatan</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase border">Target</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase border">Satuan</th>
+                                </tr>
+                            </thead>
+
+                            <!-- BODY -->
+                            <tbody>
+
+                                @foreach ($bidang->kegiatans as $kegiatan)
+
+                                    {{-- Kalau belum ada sub --}}
+                                    @if ($kegiatan->subKegiatans->count() === 0)
+
+                                        <tr>
+                                            <td class="px-4 py-3 align-top border">
+                                                <div class="flex flex-col">
+                                                    <span class="font-medium">
+                                                        {{ $kegiatan->nama_rk_kegiatan }}
+                                                    </span>
+                                                    <span class="text-xs text-gray-500">
+                                                        Ketua:
+                                                        {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
+                                                    </span>
+                                                </div>
+                                            </td>
+
+                                            <td class="px-4 py-3 text-gray-500 italic border">
+                                                Belum ada sub kegiatan
+                                            </td>
+
+                                            <td colspan="4"
+                                                class="px-4 py-3 text-center text-gray-500 italic border">
+                                                Belum ada penugasan
+                                            </td>
+                                        </tr>
+
+                                    @else
+
+                                        @foreach ($kegiatan->subKegiatans as $subIndex => $subKegiatan)
+
+                                            @php($penugasanCount = max($subKegiatan->penugasans->count(),1))
+
+                                            {{-- Kalau belum ada penugasan --}}
+                                            @if ($subKegiatan->penugasans->count() === 0)
+
+                                                <tr>
+
+                                                    {{-- MERGED KEGIATAN --}}
+                                                    @if ($subIndex === 0)
+                                                        <td rowspan="{{ $kegiatan->subKegiatans->sum(fn($s)=> max($s->penugasans->count(),1)) }}"
+                                                            class="px-4 py-3 align-top border">
+                                                            <div class="flex flex-col">
+                                                                <span class="font-medium">
+                                                                    {{ $kegiatan->nama_rk_kegiatan }}
+                                                                </span>
+                                                                <span class="text-xs text-gray-500">
+                                                                    Ketua:
+                                                                    {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
+                                                                </span>
+                                                            </div>
+                                                        </td>
+                                                    @endif
+
+                                                    {{-- MERGED SUB --}}
+                                                    <td rowspan="1"
+                                                        class="px-4 py-3 align-top border">
+                                                        {{ $subKegiatan->nama_sub_kegiatan }}
+                                                    </td>
+
+                                                    <td colspan="4"
+                                                        class="px-4 py-3 text-center text-gray-500 italic border">
+                                                        Belum ada penugasan
+                                                    </td>
+
+                                                </tr>
+
+                                            @else
+
+                                                @foreach ($subKegiatan->penugasans as $penugasanIndex => $penugasan)
+
+                                                    <tr>
+
+                                                        {{-- KEGIATAN --}}
+                                                        @if ($subIndex === 0 && $penugasanIndex === 0)
+                                                            <td rowspan="{{ $kegiatan->subKegiatans->sum(fn($s)=> max($s->penugasans->count(),1)) }}"
+                                                                class="px-4 py-3 align-top border">
+                                                                <div class="flex flex-col">
+                                                                    <span class="font-medium">
+                                                                        {{ $kegiatan->nama_rk_kegiatan }}
+                                                                    </span>
+                                                                    <span class="text-xs text-gray-500">
+                                                                        Ketua:
+                                                                        {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
+                                                                    </span>
+                                                                </div>
+                                                            </td>
+                                                        @endif
+
+                                                        {{-- SUB KEGIATAN --}}
+                                                        @if ($penugasanIndex === 0)
+                                                            <td rowspan="{{ $penugasanCount }}"
+                                                                class="px-4 py-3 align-top border">
+                                                                {{ $subKegiatan->nama_sub_kegiatan }}
+                                                            </td>
+                                                        @endif
+
+                                                        <td class="px-4 py-3 border">
+                                                            {{ $penugasan->anggota->nama_pegawai ?? '-' }}
+                                                        </td>
+
+                                                        <td class="px-4 py-3 border">
+                                                            {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? '-' }}
+                                                        </td>
+
+                                                        <td class="px-4 py-3 border">
+                                                            {{ $penugasan->target ?? '-' }}
+                                                        </td>
+
+                                                        <td class="px-4 py-3 border">
+                                                            {{ $penugasan->satuan_target ?? '-' }}
+                                                        </td>
+
+                                                    </tr>
+
+                                                @endforeach
+                                            @endif
+
+                                        @endforeach
+                                    @endif
+
+                                @endforeach
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                @else
+                    <div class="p-4 text-center border-t">
+                        <p class="text-sm text-gray-500 italic">
+                            Belum ada kegiatan untuk fungsi ini
+                        </p>
+                    </div>
+                @endif
+
             </div>
+        </div>
+    @endforeach
+
+
+    {{-- Kalau belum ada bidang --}}
+    @if ($bidangs->count() === 0)
+        <div class="text-center py-8 border border-gray-200 rounded-lg">
+            <p class="text-sm text-gray-500">
+                Belum ada fungsi/bidang yang dibuat
+            </p>
+        </div>
+    @endif
+</div>
+
         </x-common.component-card>
     </div>
 

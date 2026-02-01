@@ -23,6 +23,8 @@ class Penerimaan extends Model
         'jumlah_diterima',
         'status',
         'catatan',
+        'rr_terima',
+        'rating_terima',
     ];
 
     protected $casts = [

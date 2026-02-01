@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Penugasan;
+use App\Models\Pegawai;
 use App\Models\SubKegiatan;
 use App\Models\JenisKegiatan;
 use Illuminate\Http\Request;
@@ -23,8 +24,8 @@ class PenugasanController extends Controller
             'target' => ['required', 'integer', 'min:1'],
             'satuan_target' => ['required', 'string', 'max:50'],
 
-            'tanggal_mulai' => ['nullable', 'date'],
-            'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
+            'tanggal_mulai' => ['required', 'date'],
+            'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
             'butuh_dl' => ['nullable', 'boolean'],
         ]);
 
@@ -73,11 +74,25 @@ class PenugasanController extends Controller
         // Tentukan status_dl
         $validated['status_dl'] = $butuhDl ? 'Menunggu' : null;
 
-        // STATUS AWAL
+        // STATUS AWAL PENUGASAN
         $validated['status'] = 'Belum Dikirim';
 
         try {
+            /**
+             * ✅ BUAT PENUGASAN
+             */
             $subKegiatan->penugasans()->create($validated);
+
+            /**
+             * 🔄 SET ACTIVE ROLE PEGAWAI → ANGGOTA TIM (KONTEKSTUAL)
+             */
+            $pegawai = Pegawai::find($validated['id_anggota']);
+
+            if ($pegawai && $pegawai->active_role !== 'Anggota Tim') {
+                $pegawai->update([
+                    'active_role' => 'Anggota Tim'
+                ]);
+            }
 
             return redirect()
                 ->route('sub.kegiatan.show', [
@@ -92,6 +107,7 @@ class PenugasanController extends Controller
                 ->withInput();
         }
     }
+
 
     public function update(Request $request, SubKegiatan $subKegiatan, Penugasan $penugasan)
     {

@@ -41,7 +41,7 @@
                     <div class="flex items-start justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-800">
-                                Pengiriman ke-<span x-text="index + 1"></span>
+                                Pengiriman ke-<span x-text="Number(index) + 1"></span>
                             </p>
                             <p class="mt-1 text-xs text-gray-500" x-text="item.tanggal_pengiriman">
                             </p>

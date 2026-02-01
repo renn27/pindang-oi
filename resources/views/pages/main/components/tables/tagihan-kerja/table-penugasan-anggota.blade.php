@@ -90,8 +90,8 @@
                                         @endphp
 
                                         <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full
-                                            {{ $dlStatus === 'diterima' ? 'bg-green-100 text-green-700' :
-                                            ($dlStatus === 'ditolak' ? 'bg-red-100 text-red-700' :
+                                            {{ $dlStatus === 'ACC' ? 'bg-green-100 text-green-700' :
+                                            ($dlStatus === 'Ditolak' ? 'bg-red-100 text-red-700' :
                                             'bg-yellow-100 text-yellow-700') }}">
                                             {{ ucfirst($dlStatus) }}
                                         </span>
@@ -483,7 +483,7 @@
                                                                     @mouseleave="show = false"
                                                                     class="relative flex justify-center gap-0.5 cursor-pointer">
                                                                     {{-- BINTANG --}}
-                                                                    @foreach ($penugasan->bintang_kirim_array as $filled)
+                                                                    @foreach ($penugasan->bintang_terima_array as $filled)
                                                                         <span class="{{ $filled ? 'text-yellow-400' : 'text-gray-300' }}">
                                                                             ★
                                                                         </span>

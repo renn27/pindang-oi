@@ -33,53 +33,50 @@ class ProfileController extends Controller
         // dd($request->all());
         $user = $request->user();
         $data = $request->validated();
+
         // mapping name → nama_pegawai
         if (isset($data['name'])) {
             $data['nama_pegawai'] = $data['name'];
             unset($data['name']);
         }
 
-        // Update field selain password
-        $user->fill(
-            collect($data)
-                ->except('password')
-                ->toArray()
-        );
-
-        // Jika password diisi, update password
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
+        /**
+            * Handle password dulu (jangan ikut fill)
+        */
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
         }
 
-        // Jika email berubah, reset verifikasi
+        /**
+         * Reset verifikasi email jika berubah
+         */
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
 
-        //foto
+        /**
+         * FOTO PROFIL
+         */
         if ($request->hasFile('photo')) {
 
-            // hapus foto lama (pakai full path dari DB)
+            // 🔥 Hapus foto lama dulu
             if ($user->photo && Storage::disk('public')->exists($user->photo)) {
                 Storage::disk('public')->delete($user->photo);
             }
 
-            // folder tujuan
-            $folder = 'foto-profil';
+            // Simpan foto baru
+            $path = $request->file('photo')
+                ->store('foto-profil', 'public');
 
-            // nama file unik
-            $filename = uniqid() . '.' . $request->photo->extension();
-
-            // full path yang akan disimpan ke DB
-            $path = $folder . '/' . $filename;
-
-            // simpan file
-            $request->photo->storeAs($folder, $filename, 'public');
-
-            // simpan path ke DB
-            $user->photo = $path;
+            $data['photo'] = $path;
         }
 
+        /**
+         * Update user
+         */
+        $user->fill($data);
 
         $user->save();
 

@@ -30,19 +30,22 @@ class SubKegiatanSeeder extends Seeder
                 $subKegiatanList = [
                     [
                         'nama'   => 'Persiapan dan Koordinasi ' . $kegiatan->nama_rk_kegiatan,
-                        'target' => '1 dokumen rencana',
+                        'target' => '3',
+                        'satuan_target' => 'Dokumen ',
                         'mulai'  => $startDate,
                         'selesai'=> $startDate->copy()->addDays(14),
                     ],
                     [
                         'nama'   => 'Pelaksanaan ' . $kegiatan->nama_rk_kegiatan,
-                        'target' => '100% kegiatan terlaksana',
+                        'target' => '40',
+                        'satuan_target' => 'Kegiatan Terlaksana',
                         'mulai'  => $startDate->copy()->addDays(15),
                         'selesai'=> $startDate->copy()->addDays(60),
                     ],
                     [
                         'nama'   => 'Monitoring, Evaluasi, dan Pelaporan ' . $kegiatan->nama_rk_kegiatan,
-                        'target' => '1 laporan kegiatan',
+                        'target' => '20',
+                        'satuan_target' => 'Laporan Kegiatan',
                         'mulai'  => $startDate->copy()->addDays(61),
                         'selesai'=> $startDate->copy()->addDays(90),
                     ],
@@ -53,6 +56,7 @@ class SubKegiatanSeeder extends Seeder
                         'id_kegiatan'        => $kegiatan->id_kegiatan,
                         'nama_sub_kegiatan'  => $sub['nama'],
                         'target'             => $sub['target'],
+                        'satuan_target'      => $sub['satuan_target'],
                         'tanggal_mulai'      => $sub['mulai'],
                         'tanggal_selesai'    => $sub['selesai'],
                     ]);

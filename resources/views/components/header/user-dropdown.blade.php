@@ -15,7 +15,7 @@
         type="button"
     >
         <span class="mr-3 overflow-hidden rounded-full h-11 w-11">
-            <img src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/user/owner.png') }}"
+            <img src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/user/userlogodefault.png') }}"
                 class="h-full w-full object-cover"/>
         </span>
 

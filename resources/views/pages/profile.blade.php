@@ -7,6 +7,5 @@
         <x-profile.profile-card />
         <x-profile.personal-info-card />
         <x-profile.update-password-card />
-
     </div>
 @endsection

@@ -61,9 +61,8 @@
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         Tanggal Penerimaan
                     </label>
-                    <x-form.date-picker id="tanggal_penerimaan" name="tanggal_penerimaan"
-                        x-model="formData.tanggal_penerimaan" placeholder="Date Picker"
-                        defaultDate="{{ now()->format('Y-m-d') }}" readonly="true" />
+                    <x-form.date-picker id="tanggal_penerimaan" name="tanggal_penerimaan" placeholder="Tanggal Penerimaan"
+                        defaultDate="{{ now()->format('Y-m-d') }}" />
                 </div>
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
@@ -82,7 +81,7 @@
                                             h-11 w-full mb-4 appearance-none rounded-lg
                                             border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm
                                             placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
-                                           
+
                                            "
                         :class="isOptionSelected && 'text-gray-800'"
                         @change="isOptionSelected = true">

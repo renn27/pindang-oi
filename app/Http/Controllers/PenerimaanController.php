@@ -7,35 +7,113 @@ use App\Models\Penugasan;
 use App\Models\SubKegiatan;
 use App\Models\Pengiriman;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class PenerimaanController extends Controller
 {
-    public function store(Request $request, SubKegiatan $subKegiatan, Penugasan $penugasan, Pengiriman $pengirimans) {
+    public function store(
+        Request $request,
+        SubKegiatan $subKegiatan,
+        Penugasan $penugasan,
+        Pengiriman $pengirimans
+    ) {
         // dd($request->all());
-
+        // Autorisasi
         $this->authorize('receive', $penugasan);
 
+        // Validasi
         $validated = $request->validate([
-            'tanggal_penerimaan' => ['required', 'date'],
-            'jumlah_diterima' => ['required', 'integer', 'max:255'],
-            'status' => ['required', 'in:Sedang Diperiksa,Diterima,Revisi'],
-            'catatan' => ['nullable', 'string', 'max:255'],
+            'tanggal_penerimaan' => ['required', 'date', 'date_format:Y-m-d'],
+            'jumlah_diterima'    => ['required', 'integer', 'min:1'],
+            'status'             => ['required', 'in:Diterima,Revisi'],
+            'catatan'            => ['nullable', 'string', 'max:255'],
         ]);
 
         try {
-            $pengirimans->penerimaan()->create($validated);
+            DB::transaction(function () use ($validated, $pengirimans, $penugasan) {
+
+                /* =====================================================
+                * 1️⃣ HITUNG RR TERIMA (PERSEN)
+                * ===================================================== */
+
+                // Target dari penugasan
+                $targetPenugasan = (int) $penugasan->target;
+
+                // Jumlah diterima (input user)
+                $jumlahDiterima = (int) $validated['jumlah_diterima'];
+
+                $rrTerima = $targetPenugasan > 0
+                    ? round(($jumlahDiterima / $targetPenugasan) * 100, 2)
+                    : 0;
+
+                // Anti over 100%
+                $rrTerima = min($rrTerima, 100);
+
+
+                /* =====================================================
+                * 2️⃣ HITUNG RATING TERIMA (BINTANG 1–5)
+                * ===================================================== */
+
+                // Waktu penerimaan (dibulatkan ke awal hari)
+                $tanggalPenerimaan = Carbon::parse($validated['tanggal_penerimaan'])->startOfDay();
+
+                // Deadline penugasan (tanggal selesai, awal hari)
+                $tanggalDeadline = Carbon::parse($penugasan->tanggal_selesai)->startOfDay();
+
+                /*
+                |--------------------------------------------------------------------------
+                | Hitung hari keterlambatan penerimaan (INTEGER)
+                |--------------------------------------------------------------------------
+                | - Terima <= deadline → 0 hari telat
+                | - Terima H+1 → 1 hari telat
+                */
+                if ($tanggalPenerimaan->lte($tanggalDeadline)) {
+                    $hariTelat = 0;
+                } else {
+                    $hariTelat = (int) $tanggalDeadline->diffInDays($tanggalPenerimaan);
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | Mapping hari telat → rating penerimaan
+                |--------------------------------------------------------------------------
+                */
+                $ratingTerima = match (true) {
+                    $hariTelat === 0 => 5,
+                    $hariTelat === 1 => 4,
+                    $hariTelat === 2 => 3,
+                    $hariTelat === 3 => 2,
+                    default          => 1,
+                };
+
+                /* =====================================================
+                * 3️⃣ SIMPAN DATA PENERIMAAN
+                * ===================================================== */
+                $pengirimans->penerimaan()->create([
+                    'tanggal_penerimaan' => $validated['tanggal_penerimaan'],
+                    'jumlah_diterima'    => $jumlahDiterima,
+                    'status'             => $validated['status'],
+                    'catatan'            => $validated['catatan'],
+                    'rr_terima'          => $rrTerima,
+                    'rating_terima'      => $ratingTerima,
+
+                    // ✅ ID PENERIMA (USER LOGIN)
+                    'id_penerima'        => Auth::id(),
+                ]);
+            });
 
             return redirect()
                 ->route('sub.kegiatan.show', [
-                    'kegiatan'     => $penugasan->subKegiatan->kegiatan->id_kegiatan,
-                    'subKegiatan'  => $subKegiatan->id_sub_kegiatan,
+                    'kegiatan'    => $penugasan->subKegiatan->kegiatan->id_kegiatan,
+                    'subKegiatan' => $subKegiatan->id_sub_kegiatan,
                 ])
                 ->with('success', 'Penerimaan hasil kerja berhasil dilakukan.');
 
         } catch (\Exception $e) {
             dd($e->getMessage());
-
-            return redirect()->back()
+            return redirect()
+                ->back()
                 ->with('error', 'Gagal melakukan penerimaan hasil kerja. Silakan coba lagi.')
                 ->withInput();
         }

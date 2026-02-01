@@ -181,35 +181,33 @@
                         butuhDl: false,
                         isLocked: true,
 
-                        wajibJenis: [2,3,4,5],
-                        {{-- wajibJenis: ['Pendataan', 'Pengawasan', 'Supervisi', 'Perjalanan Dinas'], --}}
+                        wajibJenis: [3,4,5,6],
 
                         get jenisId() {
                             return Number(formData?.id_jenis_kegiatan || 0)
                         },
 
-                        get jenisSelected() {
-                            return this.jenisId > 0
-                        },
-
-                        {{-- get jenisNama() {
-                            return formData?.jenis_kegiatan || ''
+                        get isLainnya() {
+                            return formData?.id_jenis_kegiatan === 'LAINNYA'
                         },
 
                         get jenisSelected() {
-                            return this.jenisNama !== ''
-                        }, --}}
+                            return this.jenisId > 0 || this.isLainnya
+                        },
 
                         syncState() {
-                            console.log('jenis_kegiatan dari formData:', formData?.jenis_kegiatan)
-                            {{-- console.log('hasil get jenisNama:', this.jenisNama) --}}
-                            console.log('hasil get jenisNama:', this.jenisId)
-                            {{-- const isWajib = this.wajibJenis.includes(this.jenisNama) --}}
                             const isWajib = this.wajibJenis.includes(this.jenisId)
-                            {{-- const dbButuh = Number(formData?.butuh_dl) === 1 --}}
 
                             // ================= CREATE =================
                             if (mode === 'create') {
+
+                                // 🔹 KHUSUS JENIS LAINNYA
+                                if (this.isLainnya) {
+                                    this.butuhDl = false
+                                    this.isLocked = false
+                                    return
+                                }
+
                                 if (!this.jenisSelected) {
                                     this.butuhDl = false
                                     this.isLocked = true
@@ -224,20 +222,22 @@
                             }
 
                             // ================= EDIT =================
+                            if (this.isLainnya) {
+                                this.butuhDl = false
+                                this.isLocked = false
+                                return
+                            }
+
                             if (!this.jenisSelected) {
-                                // edge case: edit tapi jenis dikosongkan
                                 this.butuhDl = false
                                 this.isLocked = true
                                 return
                             }
 
                             if (isWajib) {
-                                // jenis wajib → selalu ON & terkunci
                                 this.butuhDl = true
                                 this.isLocked = true
                             } else {
-                                // jenis tidak wajib → toggle bebas
-                                // ⚠️ PERTAHANKAN nilai user, JANGAN reset ke db
                                 this.butuhDl = false
                                 this.isLocked = false
                             }
@@ -291,6 +291,7 @@
                     <!-- Hidden input -->
                     <input type="hidden" name="butuh_dl" :value="butuhDl ? 1 : 0">
                 </div>
+
 
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">

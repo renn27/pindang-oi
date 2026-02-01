@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Penugasan;
 use App\Models\SubKegiatan;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class PengirimanController extends Controller
 {
@@ -17,7 +18,7 @@ class PengirimanController extends Controller
 
         // Validasi
         $validated = $request->validate([
-            'tanggal_pengiriman' => ['required', 'date', 'date_format:Y-m-d'],
+            'tanggal_pengiriman' => ['required', 'date'],
             'jumlah_dikirim'     => ['required', 'integer', 'min:1'],
             'media_pengiriman'   => ['required', 'string', 'max:255'],
             'bukti_dukung'       => ['required', 'string', 'max:255'],
@@ -29,43 +30,65 @@ class PengirimanController extends Controller
                 /* =====================================================
                 * 1️⃣ HITUNG RR KIRIM (PERSEN)
                 * ===================================================== */
-                $target = (int) $penugasan->target; // target penugasan
-                $jumlah = (int) $validated['jumlah_dikirim'];
 
-                $rrKirim = $target > 0
-                    ? round(($jumlah / $target) * 100, 2)
+                // Target penugasan
+                $targetPenugasan = (int) $penugasan->target;
+
+                // Jumlah yang dikirim
+                $jumlahDikirim = (int) $validated['jumlah_dikirim'];
+
+                $rrKirim = $targetPenugasan > 0
+                    ? round(($jumlahDikirim / $targetPenugasan) * 100, 2)
                     : 0;
 
-                // Anti over 100%
+                // Batasi maksimal 100%
                 $rrKirim = min($rrKirim, 100);
+
 
                 /* =====================================================
                 * 2️⃣ HITUNG RATING KIRIM (BINTANG 1–5)
                 * ===================================================== */
-                $tanggalPengiriman = \Carbon\Carbon::parse($validated['tanggal_pengiriman']);
-                $tanggalSelesai    = \Carbon\Carbon::parse($penugasan->tanggal_selesai);
 
-                // Selisih hari (negatif = lebih cepat)
-                $selisihHari = $tanggalPengiriman->diffInDays($tanggalSelesai, false);
+                // Waktu pengiriman (real)
+                $tanggalPengiriman = Carbon::parse($validated['tanggal_pengiriman'])->startOfDay();
 
-                if ($selisihHari <= 0) {
-                    $ratingKirim = 5;
-                } elseif ($selisihHari === 1) {
-                    $ratingKirim = 4;
-                } elseif ($selisihHari === 2) {
-                    $ratingKirim = 3;
-                } elseif ($selisihHari === 3) {
-                    $ratingKirim = 2;
+                // Deadline = TANGGAL selesai (bukan endOfDay)
+                $tanggalDeadline = Carbon::parse($penugasan->tanggal_selesai)->startOfDay();
+
+                /*
+                |--------------------------------------------------------------------------
+                | Hitung hari keterlambatan
+                |--------------------------------------------------------------------------
+                | - Kirim di tanggal selesai → 0 hari telat
+                | - Kirim H+1 → 1 hari telat
+                | - Kirim H+2 → 2 hari telat
+                */
+                if ($tanggalPengiriman->lte($tanggalDeadline)) {
+                    $hariTelat = 0;
                 } else {
-                    $ratingKirim = 1;
+                    $hariTelat = (int) $tanggalDeadline->diffInDays($tanggalPengiriman);
+                    // dd($hariTelat);
                 }
 
+                /*
+                |--------------------------------------------------------------------------
+                | Mapping hari telat → rating
+                |--------------------------------------------------------------------------
+                */
+                $ratingKirim = match (true) {
+                    $hariTelat === 0 => 5,
+                    $hariTelat === 1 => 4,
+                    $hariTelat === 2 => 3,
+                    $hariTelat === 3 => 2,
+                    default          => 1,
+                };
+            
                 /* =====================================================
                 * 3️⃣ SIMPAN DATA PENGIRIMAN
                 * ===================================================== */
                 $penugasan->pengirimans()->create([
                     'tanggal_pengiriman' => $validated['tanggal_pengiriman'],
-                    'jumlah_dikirim'     => $jumlah,
+                    'jumlah_dikirim'     => $jumlahDikirim,
                     'media_pengiriman'   => $validated['media_pengiriman'],
                     'bukti_dukung'       => $validated['bukti_dukung'],
                     'rr_kirim'           => $rrKirim,
@@ -87,7 +110,8 @@ class PengirimanController extends Controller
                 ])
                 ->with('success', 'Pengiriman hasil kerja berhasil dilakukan.');
 
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
+            dd($e->getMessage());
             return redirect()
                 ->back()
                 ->with('error', 'Gagal mengirimkan hasil kerja. Silakan coba lagi.')
