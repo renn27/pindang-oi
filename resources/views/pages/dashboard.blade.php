@@ -48,25 +48,27 @@
     </div>
 
     {{-- ===== SECTION PENUGASAN ASTRI ===== --}}
-    <div class="mb-8">
-        <div class="rounded-2xl border border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 dark:from-gray-800 dark:to-gray-900 dark:border-gray-700">
-            <div class="mb-6 text-center">
-                <h2 class="mb-2 text-2xl font-bold text-gray-800 dark:text-white">Rekap Penugasan dari {{ Auth::user()->nama_pegawai }}</h2>
-                <p class="text-gray-600 dark:text-gray-300">
-                    Setiap tugas adalah kesempatan untuk tumbuh dan menunjukkan potensi terbaikmu.
-                    Laksanakan dengan penuh tanggung jawab dan dedikasi!
-                </p>
-            </div>
+    @if (auth()->user()->isAnggota())
+        <div class="mb-8">
+            <div class="rounded-2xl border border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 dark:from-gray-800 dark:to-gray-900 dark:border-gray-700">
+                <div class="mb-6 text-center">
+                    <h2 class="mb-2 text-2xl font-bold text-gray-800 dark:text-white">Rekap Penugasan dari {{ Auth::user()->nama_pegawai }}</h2>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        Setiap tugas adalah kesempatan untuk tumbuh dan menunjukkan potensi terbaikmu.
+                        Laksanakan dengan penuh tanggung jawab dan dedikasi!
+                    </p>
+                </div>
 
-            <div class="col-span-12 xl:col-span-5 space-y-6">
-                @auth
-                    @if (auth()->user()->isAnggota())
-                        <x-profile.vis-total-penugasan-pegawai />
-                    @endif
-                @endauth
+                <div class="col-span-12 xl:col-span-5 space-y-6">
+                    @auth
+                        @if (auth()->user()->isAnggota())
+                            <x-profile.vis-total-penugasan-pegawai />
+                        @endif
+                    @endauth
+                </div>
             </div>
         </div>
-    </div>
+    @endif
 
     {{-- ===== SECTION ALL PENILAIAN KARYAWAN ===== --}}
     <div class="mb-8">
