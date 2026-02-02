@@ -39,7 +39,7 @@
             <div class="col-span-12 xl:col-span-6">
                 <div class="mb-5 rounded-2xl space-6 border border-gray-200 bg-white p-5 lg:p-6 dark:border-gray-800 dark:bg-gray-900">
                     <div class="mb-4">
-                        <x-profile.employe-rank-card />
+                        <x-profile.employe-rank-card :bestEmployee="app(\App\Services\DashboardAnalyticsService::class)->rankPegawai(1)->first()"/>
                     </div>
                 </div>
                 {{-- <x-profile.resume-kegiatan /> --}}
@@ -62,7 +62,7 @@
                 <div class="col-span-12 xl:col-span-5 space-y-6">
                     @auth
                         @if (auth()->user()->isAnggota())
-                            <x-profile.vis-total-penugasan-pegawai />
+                            <x-profile.vis-total-penugasan-pegawai :totalpenugasanPegawai="app(\App\Services\DashboardAnalyticsService::class)->summaryPenugasanAnggota(Auth::user()->id_pegawai)"/>
                         @endif
                     @endauth
                 </div>
@@ -82,7 +82,7 @@
 
             <div class="col-span-12 xl:col-span-5 space-y-6">
                 @auth
-                    <x-profile.vis-rank-pegawai />
+                    <x-profile.vis-rank-pegawai :rankPegawai="app(\App\Services\DashboardAnalyticsService::class)->rankPegawai()"/>
                 @endauth
             </div>
         </div>
