@@ -31,27 +31,27 @@
         </template>
 
         <div class="relative flex h-[90vh] w-full max-w-[800px] flex-col overflow-hidden
-                rounded-3xl bg-white">
+                rounded-3xl bg-white dark:bg-gray-900 dark:border dark:border-gray-800">
 
             <!-- HEADER (FIXED) -->
-            <div class="shrink-0 border-b border-gray-200 px-6 py-3">
-                <h4 class="text-2xl font-semibold text-gray-800"
+            <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-700">
+                <h4 class="text-2xl font-semibold text-gray-800 dark:text-white"
                     x-text="mode === 'create' ? 'Tambah Anggota' : 'Edit Data Anggota'"></h4>
-                <p class="mt-1 text-sm text-gray-500"
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400"
                     x-text="mode === 'create' ? 'Tambahkan penugasan kepada anggota' : 'Edit anggota yang sudah ditugaskan'">
                 </p>
             </div>
 
             <!-- BODY (SCROLL DI SINI) -->
-            <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar">
+            <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar dark:bg-gray-900">
                 <!-- Nama Sub Kegiatan (readonly tampilan) -->
                 <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Sub Kegiatan
                     </label>
 
                     <input type="text" :value="formData.nama_sub_kegiatan" disabled
-                        class="w-full mb-4 h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800 cursor-not-allowed">
+                        class="w-full mb-4 h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800 cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
                 </div>
 
                 {{-- Nama Ketua / Penanggung Jawab --}}
@@ -92,11 +92,11 @@
                     highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
                     selectHighlighted() { if (this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]); }
                 }">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Nama Anggota
                     </label>
                     <!-- Input search -->
-                    <input type="text" x-model="search" class="h-11 w-full mb-4 rounded-lg border px-4 py-2 text-sm"
+                    <input type="text" x-model="search" class="h-11 w-full mb-4 rounded-lg border border-gray-300 px-4 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
                         placeholder="Ketik untuk cari nama" {{-- x-model="formData.nama_anggota" --}} @focus="open = true"
                         @input="open = true; selectedId = ''" {{-- @focus="open = !!search" @input="open = search.length > 0; selectedId = ''" --}}
                         @keydown.arrow-down.prevent="highlightedIndex++" @keydown.arrow-up.prevent="highlightedIndex--"
@@ -107,27 +107,26 @@
 
                     <!-- Dropdown -->
                     <div x-show="open" x-transition
-                        class="absolute z-50 mt-1 w-full mb-4 rounded-lg border bg-white max-h-60 overflow-y-auto">
+                        class="absolute z-50 mt-1 w-full mb-4 rounded-lg border border-gray-300 bg-white max-h-60 overflow-y-auto dark:border-gray-700 dark:bg-gray-800">
                         <template
                             x-for="(pegawai, index) in pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase()))"
                             :key="pegawai.id_pegawai">
                             <div @click="search = pegawai.nama_pegawai; selectedId = pegawai.id_pegawai; open = false"
                                 :class="{
-                                    'bg-blue-100': highlightedIndex ===
-                                        index,
-                                    'hover:bg-gray-100': highlightedIndex !== index
+                                    'bg-blue-100 dark:bg-blue-900/40': highlightedIndex === index,
+                                    'hover:bg-gray-100 dark:hover:bg-gray-700': highlightedIndex !== index
                                 }"
-                                class="cursor-pointer px-4 py-2 text-sm" x-text="pegawai.nama_pegawai"></div>
+                                class="cursor-pointer px-4 py-2 text-sm dark:text-gray-300" x-text="pegawai.nama_pegawai"></div>
                         </template>
                         <template
                             x-if="pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase())).length === 0">
-                            <div class="px-4 py-2 text-sm text-gray-500">Data tidak ditemukan</div>
+                            <div class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">Data tidak ditemukan</div>
                         </template>
                     </div>
                 </div>
 
                 <div x-data="{ isOther: false }">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Jenis Kegiatan
                     </label>
 
@@ -143,8 +142,9 @@
                             rounded-lg border border-gray-300
                             bg-white
                             px-4 py-2.5 text-sm
-                            focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                        <option value="">-- Pilih Jenis Kegiatan --</option>
+                            focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+                            dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                        <option value="" class="dark:text-gray-400">-- Pilih Jenis Kegiatan --</option>
 
                         @foreach ($jenisKegiatans as $jenis)
                             <option
@@ -152,15 +152,15 @@
                                 data-text="{{ $jenis->jenis_kegiatan }}"
                                 class="
                                     @if($jenis->kategori === 'Utama')
-                                        text-green-700 font-medium
+                                        text-green-700 font-medium dark:text-green-300
                                     @elseif($jenis->kategori === 'Tambahan')
-                                        text-orange-700
+                                        text-orange-700 dark:text-orange-300
                                     @endif">
                                 {{ $jenis->jenis_kegiatan }} ({{ $jenis->kategori }})
                             </option>
                         @endforeach
 
-                        <option value="LAINNYA" class="text-blue-700 font-medium">
+                        <option value="LAINNYA" class="text-blue-700 font-medium dark:text-blue-300">
                             ➕ Lainnya
                         </option>
                     </select>
@@ -171,7 +171,7 @@
                             type="text"
                             name="jenis_kegiatan_baru"
                             placeholder="Masukkan jenis kegiatan baru"
-                            class="dark:bg-dark-900 h-11 w-full mb-4 rounded-lg border px-4 py-2.5 text-sm"
+                            class="h-11 w-full mb-4 rounded-lg border border-gray-300 px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
                         />
                     </div>
                 </div>
@@ -248,7 +248,7 @@
                     }"
                     x-effect="syncState()"
                     class="mb-4">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Kebutuhan Dinas Luar (DL)
                     </label>
 
@@ -258,21 +258,21 @@
                             type="button"
                             @click="if (!isLocked) butuhDl = !butuhDl"
                             :class="{
-                                'bg-brand-500': butuhDl,
-                                'bg-gray-300': !butuhDl,
+                                'bg-brand-500 dark:bg-brand-600': butuhDl,
+                                'bg-gray-300 dark:bg-gray-600': !butuhDl,
                                 'cursor-not-allowed opacity-70': isLocked
                             }"
                             class="relative inline-flex h-7 w-14 items-center rounded-full"
                         >
                             <span
                                 :class="butuhDl ? 'translate-x-7' : 'translate-x-1'"
-                                class="inline-block h-5 w-5 bg-white rounded-full transition"
+                                class="inline-block h-5 w-5 bg-white dark:bg-gray-300 rounded-full transition"
                             ></span>
                         </button>
 
                         <span
                             class="text-sm font-medium"
-                            :class="butuhDl ? 'text-brand-600' : 'text-gray-500'"
+                            :class="butuhDl ? 'text-brand-600 dark:text-brand-400' : 'text-gray-500 dark:text-gray-400'"
                             x-text="
                                 !jenisSelected
                                     ? 'Pilih dulu jenis kegiatan'
@@ -282,11 +282,11 @@
                     </div>
 
                     <!-- Helper text -->
-                    <p x-show="!jenisSelected" class="mt-1 text-xs font-medium text-brand-500/80">
+                    <p x-show="!jenisSelected" class="mt-1 text-xs font-medium text-brand-500/80 dark:text-brand-400">
                         Pilih jenis kegiatan untuk menentukan kebutuhan DL.
                     </p>
 
-                    <p x-show="isLocked && jenisSelected" class="mt-1 text-xs text-gray-500">
+                    <p x-show="isLocked && jenisSelected" class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                         Jenis kegiatan ini otomatis membutuhkan DL dan tidak dapat diubah.
                     </p>
 
@@ -295,25 +295,25 @@
                 </div>
 
                 <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Target
                     </label>
                     <input type="number" x-model="formData.target" name="target"
                         placeholder="Misalnya : 200"
-                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                        class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
                 </div>
 
                 <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Satuan Target
                     </label>
                     <input type="text" x-model="formData.satuan_target" name="satuan_target"
                         placeholder="Misalnya : Dokumen, Kegiatan, dll"
-                        class="dark:bg-dark-900 h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                        class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
                 </div>
 
                 <div class="mb-4">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Tanggal Mulai
                     </label>
                     <x-form.date-picker
@@ -325,7 +325,7 @@
                 </div>
 
                 <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Tanggal Berakhir (Deadline)
                     </label>
                     <x-form.date-picker
@@ -338,15 +338,15 @@
 
             </div>
             <!-- FOOTER -->
-            <div class="shrink-0 border-t border-gray-200 px-6 py-3">
+            <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-700">
                 <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                     <button @click="open = false" type="button"
-                        class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto">
+                        class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
                         Batal
                     </button>
 
                     <button type="submit"
-                        class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
+                        class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto dark:bg-brand-600 dark:hover:bg-brand-700">
                         <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
                     </button>
                 </div>
@@ -354,182 +354,3 @@
         </div>
     </form>
 </x-ui.smart-modal>
-
-<!-- TOGGLE BUTUH DL -->
-                {{-- <div
-                    x-data="{
-                        butuhDl: false,
-                        isLocked: false,
-                        jenisSelected: false,
-
-                        wajibDl: ['Perjalanan Dinas', 'Supervisi', 'Pengawasan', 'Pendataan'],
-
-                        checkJenisKegiatan() {
-                            const select = document.getElementById('jenis_kegiatan_select');
-                            const selectedValue = select.value;
-
-                            // belum pilih jenis kegiatan
-                            if (!selectedValue) {
-                                this.jenisSelected = false;
-                                this.butuhDl = false;
-                                this.isLocked = false;
-                                return;
-                            }
-
-                            this.jenisSelected = true;
-
-                            const selectedOption = select.options[select.selectedIndex];
-                            const text = selectedOption.dataset.text ?? '';
-
-                            if (this.wajibDl.includes(text)) {
-                                // wajib DL
-                                this.butuhDl = true;
-                                this.isLocked = true;
-                            } else {
-                                // bukan wajib DL → reset
-                                this.butuhDl = false;
-                                this.isLocked = false;
-                            }
-                        }
-                    }"
-                    x-init="
-                        butuhDl = formData.butuh_dl ?? false;
-                        $nextTick(() => checkJenisKegiatan());
-                    "
-                    @change.window="
-                        if ($event.target.id === 'jenis_kegiatan_select') {
-                            checkJenisKegiatan();
-                        }
-                    " class="mb-4">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
-                        Kebutuhan Dinas Luar (DL)
-                    </label>
-
-                    <div class="flex items-center gap-4">
-                        <!-- Toggle UI -->
-                        <button
-                            type="button"
-                            @click="
-                                if (!jenisSelected) return;
-                                if (!isLocked) butuhDl = !butuhDl
-                            "
-                            :class="{
-                                'bg-brand-500': butuhDl,
-                                'bg-gray-300': !butuhDl,
-                                'cursor-not-allowed opacity-70': !jenisSelected || isLocked
-                            }"
-                            class="relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-300"
-                            :title="!jenisSelected ? 'Pilih jenis kegiatan terlebih dahulu' : ''">
-                            <span
-                                :class="{
-                                    'translate-x-7': butuhDl,
-                                    'translate-x-1': !butuhDl
-                                }"
-                                class="inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300"
-                            ></span>
-                        </button>
-
-                        <!-- Text status -->
-                        <span
-                            class="text-sm font-medium"
-                            :class="butuhDl ? 'text-brand-600' : 'text-gray-500'"
-                            x-text="
-                                !jenisSelected
-                                    ? 'Pilih jenis kegiatan dulu'
-                                    : (butuhDl ? 'Butuh DL' : 'Tidak Butuh DL')
-                            "
-                        ></span>
-                    </div>
-
-                    <!-- Helper text -->
-                    <p x-show="!jenisSelected" class="mt-1 text-xs font-medium text-brand-500/80">
-                        Pilih jenis kegiatan untuk menentukan kebutuhan DL.
-                    </p>
-
-                    <p x-show="isLocked" class="mt-1 text-xs text-gray-500">
-                        Jenis kegiatan ini otomatis membutuhkan DL dan tidak dapat diubah.
-                    </p>
-
-                    <!-- Hidden input -->
-                    <input type="hidden" name="butuh_dl" :value="butuhDl ? 1 : 0">
-                </div> --}}
-                {{-- <div
-                    x-data="{
-                        butuhDl: false,
-                        isLocked: true,
-                        wajibJenis: [1,2,3,4],
-
-                        syncState() {
-                            const jenisId = Number(formData?.id_jenis_kegiatan);
-                            const isWajib = this.wajibJenis.includes(jenisId);
-                            const dbButuh = Number(formData?.butuh_dl) === 1;
-
-                            // CREATE
-                            if (mode === 'create') {
-                                if (!jenisId) {
-                                    this.butuhDl = false;
-                                    this.isLocked = true;
-                                } else if (isWajib) {
-                                    this.butuhDl = true;
-                                    this.isLocked = true;
-                                } else {
-                                    this.butuhDl = false;
-                                    this.isLocked = false;
-                                }
-                                return;
-                            }
-
-                            // EDIT
-                            this.butuhDl = dbButuh;
-
-                            if (dbButuh && isWajib) {
-                                this.isLocked = true;
-                            } else {
-                                this.isLocked = false;
-                            }
-                        }
-                    }"
-
-                    x-effect="syncState()"
-                    class="mb-4">
-
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
-                        Kebutuhan Dinas Luar (DL)
-                    </label>
-
-                    <div class="flex items-center gap-4">
-                        <!-- Toggle UI -->
-                        <button
-                            type="button"
-                            @click="if (!isLocked) butuhDl = !butuhDl"
-                            :class="{
-                                'bg-brand-500': butuhDl,
-                                'bg-gray-300': !butuhDl,
-                                'cursor-not-allowed opacity-70': isLocked
-                            }"
-                            class="relative inline-flex h-7 w-14 items-center rounded-full">
-                            <span
-                                :class="butuhDl ? 'translate-x-7' : 'translate-x-1'"
-                                class="inline-block h-5 w-5 bg-white rounded-full transition"
-                            ></span>
-                        </button>
-
-                        <span
-                            class="text-sm font-medium"
-                            :class="butuhDl ? 'text-brand-600' : 'text-gray-500'"
-                            x-text="butuhDl ? 'Butuh DL' : 'Tidak Butuh DL'"
-                        ></span>
-                    </div>
-
-                    <!-- Helper text -->
-                    <p x-show="!jenisSelected" class="mt-1 text-xs font-medium text-brand-500/80">
-                        Pilih jenis kegiatan untuk menentukan kebutuhan DL.
-                    </p>
-
-                    <p x-show="isLocked" class="mt-1 text-xs text-gray-500">
-                        Jenis kegiatan ini otomatis membutuhkan DL dan tidak dapat diubah.
-                    </p>
-
-                    <!-- Hidden input -->
-                    <input type="hidden" name="butuh_dl" :value="butuhDl ? 1 : 0">
-                </div> --}}

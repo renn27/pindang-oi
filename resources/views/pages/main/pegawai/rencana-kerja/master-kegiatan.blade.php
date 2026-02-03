@@ -10,9 +10,9 @@
             <div class="flex justify-end">
                 @can('create', App\Models\Kegiatan::class)
                     <button
-                        class="flex items-center gap-2 rounded-full border border-gray-300
-                        bg-white px-4 py-3 text-sm font-medium text-gray-700
-                        shadow-theme-xs hover:bg-gray-50 hover:text-gray-800"
+                        class="flex items-center gap-2 rounded-full border border-gray-300 dark:border-gray-600
+                        bg-white dark:bg-gray-800 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300
+                        shadow-theme-xs hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200"
                         @click="$dispatch('open-smart-modal', {
                             modalId: 'modal-master-kegiatan',
                     })">
@@ -32,12 +32,12 @@
         <!-- Tampilan Card Fungsi dengan Accordion -->
         <x-common.component-card title="Matriks Peran Hasil">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold text-gray-800"></h2>
+                <h2 class="text-lg font-semibold text-gray-800 dark:text-white"></h2>
                 <div class="flex items-center gap-2">
                     <a href="{{ route('kegiatan.export-mph-all') }}"
-                        class="flex items-center gap-2 rounded-lg border border-green-500
-                            bg-green-50 px-4 py-2 text-sm font-medium text-green-700
-                            hover:bg-green-100 hover:text-green-800 transition-colors">
+                        class="flex items-center gap-2 rounded-lg border border-green-500 dark:border-green-600
+                            bg-green-50 dark:bg-green-900/30 px-4 py-2 text-sm font-medium text-green-700 dark:text-green-400
+                            hover:bg-green-100 dark:hover:bg-green-800/30 hover:text-green-800 dark:hover:text-green-300 transition-colors">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 384 512">
                             <path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c-8.1-10.5-6.3-25.5-4.2-33.7s-23.2-12.3-33.7-4.2L192 280.9l-37.1-47.6z"/>
                         </svg>
@@ -45,361 +45,202 @@
                     </a>
                 </div>
             </div>
-            {{-- <div class="space-y-4">
-                @foreach ($bidangs as $index => $bidang)
-                    <div x-data="{ open: false }" class="rounded-lg border border-gray-200 bg-white">
+
+            <div class="space-y-4">
+                @foreach ($bidangs as $bidang)
+                    <div x-data="{ open: false }" class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+
                         <!-- Header Fungsi -->
                         <button @click="open = !open"
-                            class="flex w-full items-center justify-between p-4 text-left hover:bg-gray-50">
-                            <div class="flex items-center gap-3">
-                                <div>
-                                    <h3 class="text-sm font-semibold text-gray-800">{{ $bidang->nama_bidang }}</h3>
-                                    <p class="text-xs text-gray-500">
-                                        Total {{ $bidang->kegiatans->count() }} kegiatan
-                                    </p>
-                                </div>
+                            class="flex w-full items-center justify-between p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-800 dark:text-white">{{ $bidang->nama_bidang }}</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    Total {{ $bidang->kegiatans->count() }} kegiatan
+                                </p>
                             </div>
-                            <svg :class="{ 'rotate-180': open }" class="h-5 w-5 text-gray-500 transition-transform"
+
+                            <svg :class="{ 'rotate-180': open }"
+                                class="h-5 w-5 text-gray-500 dark:text-gray-400 transition-transform"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
 
-                        <!-- Accordion Content -->
-                        <div x-show="open" x-collapse class="border-t border-gray-100">
+                        <!-- Accordion -->
+                        <div x-show="open" x-collapse class="border-t border-gray-100 dark:border-gray-700">
+
                             @if ($bidang->kegiatans->count() > 0)
+
                                 <div class="overflow-x-auto">
-                                    <table class="min-w-full border border-gray-200">
-                                        <thead class="bg-gray-50">
+                                    <table class="min-w-full border border-gray-200 dark:border-gray-700">
+
+                                        <!-- HEADER -->
+                                        <thead class="bg-gray-50 dark:bg-gray-900">
                                             <tr>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">
-                                                    Kegiatan
-                                                </th>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">
-                                                    Sub Kegiatan
-                                                </th>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">
-                                                    Nama Pegawai
-                                                </th>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">
-                                                    Jenis Kegiatan
-                                                </th>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">
-                                                    Target
-                                                </th>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200">
-                                                    Satuan
-                                                </th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase border dark:border-gray-700">Kegiatan</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase border dark:border-gray-700">Sub Kegiatan</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase border dark:border-gray-700">Nama Pegawai</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase border dark:border-gray-700">Jenis Kegiatan</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase border dark:border-gray-700">Target</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase border dark:border-gray-700">Satuan</th>
                                             </tr>
                                         </thead>
+
+                                        <!-- BODY -->
                                         <tbody>
-                                            @php
-                                                $rowCounter = 0;
-                                            @endphp
 
                                             @foreach ($bidang->kegiatans as $kegiatan)
-                                                @php
-                                                    $kegiatanRowCount = 0;
-                                                    // Hitung total baris untuk kegiatan ini
-                                                    foreach ($kegiatan->subKegiatans as $subKegiatan) {
-                                                        $kegiatanRowCount += $subKegiatan->penugasans->count();
-                                                    }
-                                                @endphp
 
-                                                @foreach ($kegiatan->subKegiatans as $subIndex => $subKegiatan)
-                                                    @php
-                                                        $subRowCount = $subKegiatan->penugasans->count();
-                                                    @endphp
+                                                {{-- Kalau belum ada sub --}}
+                                                @if ($kegiatan->subKegiatans->count() === 0)
 
-                                                    @foreach ($subKegiatan->penugasans as $penugasanIndex => $penugasan)
-                                                        <tr
-                                                            class="{{ !($loop->parent->last && $loop->last) ? 'border-b border-gray-200' : '' }}">
-                                                            <!-- Kolom Kegiatan (rowspan hanya untuk baris pertama tiap kegiatan) -->
-                                                            @if ($subIndex === 0 && $penugasanIndex === 0)
-                                                                <td class="px-4 py-3 align-top border border-gray-200"
-                                                                    rowspan="{{ $kegiatanRowCount }}">
-                                                                    <div class="flex flex-col">
-                                                                        <span class="text-sm font-medium text-gray-800">
-                                                                            {{ $kegiatan->nama_rk_kegiatan }}
-                                                                        </span>
-                                                                        <span class="text-xs text-gray-500 mt-1">
-                                                                            Ketua:
-                                                                            {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
-                                                                        </span>
-                                                                    </div>
-                                                                </td>
-                                                            @endif
-
-                                                            <!-- Kolom Sub Kegiatan (rowspan hanya untuk baris pertama tiap sub kegiatan) -->
-                                                            @if ($penugasanIndex === 0)
-                                                                <td class="px-4 py-3 text-sm text-gray-800 align-top border border-gray-200"
-                                                                    rowspan="{{ $subRowCount }}">
-                                                                    {{ $subKegiatan->nama_sub_kegiatan }}
-                                                                </td>
-                                                            @endif
-
-                                                            <!-- Kolom Nama Pegawai -->
-                                                            <td
-                                                                class="px-4 py-3 text-sm text-gray-800 align-top border border-gray-200">
-                                                                {{ $penugasan->anggota->nama_pegawai ?? '-' }}
-                                                            </td>
-
-                                                            <!-- Kolom Jenis Kegiatan dengan Badge -->
-                                                            <td
-                                                                class="px-4 py-3 text-sm text-gray-800 align-top border border-gray-200">
-                                                                {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? '-' }}
-                                                            </td>
-
-                                                            <!-- Kolom Target -->
-                                                            <td
-                                                                class="px-4 py-3 text-sm text-gray-800 align-top border border-gray-200">
-                                                                {{ $penugasan->target ?? '-' }}
-                                                            </td>
-
-                                                            <!-- Kolom Satuan -->
-                                                            <td
-                                                                class="px-4 py-3 text-sm text-gray-800 align-top border border-gray-200">
-                                                                {{ $penugasan->satuan_target ?? '-' }}
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
-                                                @endforeach
-                                            @endforeach
-
-                                            @if ($bidang->kegiatans->count() === 0)
-                                                <tr>
-                                                    <td colspan="6"
-                                                        class="px-4 py-6 text-center text-sm text-gray-500 border border-gray-200">
-                                                        Belum ada kegiatan untuk bidang ini
-                                                    </td>
-                                                </tr>
-                                            @endif
-                                        </tbody>
-                                    </table>
-                                </div>
-                            @else
-                                <div class="p-4 text-center border border-gray-200 border-t-0">
-                                    <p class="text-sm text-gray-500 italic">Belum ada kegiatan untuk fungsi ini</p>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                @endforeach
-
-                @if ($bidangs->count() === 0)
-                    <div class="text-center py-8 border border-gray-200 rounded-lg">
-                        <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 mb-3">
-                            <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                            </svg>
-                        </div>
-                        <p class="text-sm text-gray-500">Belum ada fungsi/bidang yang dibuat</p>
-                    </div>
-                @endif
-            </div> --}}
-
-            <div class="space-y-4">
-    @foreach ($bidangs as $bidang)
-        <div x-data="{ open: false }" class="rounded-lg border border-gray-200 bg-white">
-
-            <!-- Header Fungsi -->
-            <button @click="open = !open"
-                class="flex w-full items-center justify-between p-4 text-left hover:bg-gray-50">
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-800">{{ $bidang->nama_bidang }}</h3>
-                    <p class="text-xs text-gray-500">
-                        Total {{ $bidang->kegiatans->count() }} kegiatan
-                    </p>
-                </div>
-
-                <svg :class="{ 'rotate-180': open }"
-                    class="h-5 w-5 text-gray-500 transition-transform"
-                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        stroke-width="2" d="M19 9l-7 7-7-7"/>
-                </svg>
-            </button>
-
-            <!-- Accordion -->
-            <div x-show="open" x-collapse class="border-t border-gray-100">
-
-                @if ($bidang->kegiatans->count() > 0)
-
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full border border-gray-200">
-
-                            <!-- HEADER -->
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase border">Kegiatan</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase border">Sub Kegiatan</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase border">Nama Pegawai</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase border">Jenis Kegiatan</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase border">Target</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase border">Satuan</th>
-                                </tr>
-                            </thead>
-
-                            <!-- BODY -->
-                            <tbody>
-
-                                @foreach ($bidang->kegiatans as $kegiatan)
-
-                                    {{-- Kalau belum ada sub --}}
-                                    @if ($kegiatan->subKegiatans->count() === 0)
-
-                                        <tr>
-                                            <td class="px-4 py-3 align-top border">
-                                                <div class="flex flex-col">
-                                                    <span class="font-medium">
-                                                        {{ $kegiatan->nama_rk_kegiatan }}
-                                                    </span>
-                                                    <span class="text-xs text-gray-500">
-                                                        Ketua:
-                                                        {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
-                                                    </span>
-                                                </div>
-                                            </td>
-
-                                            <td class="px-4 py-3 text-gray-500 italic border">
-                                                Belum ada sub kegiatan
-                                            </td>
-
-                                            <td colspan="4"
-                                                class="px-4 py-3 text-center text-gray-500 italic border">
-                                                Belum ada penugasan
-                                            </td>
-                                        </tr>
-
-                                    @else
-
-                                        @foreach ($kegiatan->subKegiatans as $subIndex => $subKegiatan)
-
-                                            @php($penugasanCount = max($subKegiatan->penugasans->count(),1))
-
-                                            {{-- Kalau belum ada penugasan --}}
-                                            @if ($subKegiatan->penugasans->count() === 0)
-
-                                                <tr>
-
-                                                    {{-- MERGED KEGIATAN --}}
-                                                    @if ($subIndex === 0)
-                                                        <td rowspan="{{ $kegiatan->subKegiatans->sum(fn($s)=> max($s->penugasans->count(),1)) }}"
-                                                            class="px-4 py-3 align-top border">
+                                                    <tr>
+                                                        <td class="px-4 py-3 align-top border dark:border-gray-700">
                                                             <div class="flex flex-col">
-                                                                <span class="font-medium">
+                                                                <span class="font-medium text-gray-800 dark:text-gray-300">
                                                                     {{ $kegiatan->nama_rk_kegiatan }}
                                                                 </span>
-                                                                <span class="text-xs text-gray-500">
+                                                                <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                                     Ketua:
                                                                     {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
                                                                 </span>
                                                             </div>
                                                         </td>
-                                                    @endif
 
-                                                    {{-- MERGED SUB --}}
-                                                    <td rowspan="1"
-                                                        class="px-4 py-3 align-top border">
-                                                        {{ $subKegiatan->nama_sub_kegiatan }}
-                                                    </td>
-
-                                                    <td colspan="4"
-                                                        class="px-4 py-3 text-center text-gray-500 italic border">
-                                                        Belum ada penugasan
-                                                    </td>
-
-                                                </tr>
-
-                                            @else
-
-                                                @foreach ($subKegiatan->penugasans as $penugasanIndex => $penugasan)
-
-                                                    <tr>
-
-                                                        {{-- KEGIATAN --}}
-                                                        @if ($subIndex === 0 && $penugasanIndex === 0)
-                                                            <td rowspan="{{ $kegiatan->subKegiatans->sum(fn($s)=> max($s->penugasans->count(),1)) }}"
-                                                                class="px-4 py-3 align-top border">
-                                                                <div class="flex flex-col">
-                                                                    <span class="font-medium">
-                                                                        {{ $kegiatan->nama_rk_kegiatan }}
-                                                                    </span>
-                                                                    <span class="text-xs text-gray-500">
-                                                                        Ketua:
-                                                                        {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
-                                                                    </span>
-                                                                </div>
-                                                            </td>
-                                                        @endif
-
-                                                        {{-- SUB KEGIATAN --}}
-                                                        @if ($penugasanIndex === 0)
-                                                            <td rowspan="{{ $penugasanCount }}"
-                                                                class="px-4 py-3 align-top border">
-                                                                {{ $subKegiatan->nama_sub_kegiatan }}
-                                                            </td>
-                                                        @endif
-
-                                                        <td class="px-4 py-3 border">
-                                                            {{ $penugasan->anggota->nama_pegawai ?? '-' }}
+                                                        <td class="px-4 py-3 text-gray-500 dark:text-gray-400 italic border dark:border-gray-700">
+                                                            Belum ada sub kegiatan
                                                         </td>
 
-                                                        <td class="px-4 py-3 border">
-                                                            {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? '-' }}
+                                                        <td colspan="4"
+                                                            class="px-4 py-3 text-center text-gray-500 dark:text-gray-400 italic border dark:border-gray-700">
+                                                            Belum ada penugasan
                                                         </td>
-
-                                                        <td class="px-4 py-3 border">
-                                                            {{ $penugasan->target ?? '-' }}
-                                                        </td>
-
-                                                        <td class="px-4 py-3 border">
-                                                            {{ $penugasan->satuan_target ?? '-' }}
-                                                        </td>
-
                                                     </tr>
 
-                                                @endforeach
-                                            @endif
+                                                @else
 
-                                        @endforeach
-                                    @endif
+                                                    @foreach ($kegiatan->subKegiatans as $subIndex => $subKegiatan)
 
-                                @endforeach
+                                                        @php($penugasanCount = max($subKegiatan->penugasans->count(),1))
 
-                            </tbody>
-                        </table>
+                                                        {{-- Kalau belum ada penugasan --}}
+                                                        @if ($subKegiatan->penugasans->count() === 0)
+
+                                                            <tr>
+
+                                                                {{-- MERGED KEGIATAN --}}
+                                                                @if ($subIndex === 0)
+                                                                    <td rowspan="{{ $kegiatan->subKegiatans->sum(fn($s)=> max($s->penugasans->count(),1)) }}"
+                                                                        class="px-4 py-3 align-top border dark:border-gray-700">
+                                                                        <div class="flex flex-col">
+                                                                            <span class="font-medium text-gray-800 dark:text-gray-300">
+                                                                                {{ $kegiatan->nama_rk_kegiatan }}
+                                                                            </span>
+                                                                            <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                                                Ketua:
+                                                                                {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
+                                                                            </span>
+                                                                        </div>
+                                                                    </td>
+                                                                @endif
+
+                                                                {{-- MERGED SUB --}}
+                                                                <td rowspan="1"
+                                                                    class="px-4 py-3 align-top border dark:border-gray-700 text-gray-800 dark:text-gray-300">
+                                                                    {{ $subKegiatan->nama_sub_kegiatan }}
+                                                                </td>
+
+                                                                <td colspan="4"
+                                                                    class="px-4 py-3 text-center text-gray-500 dark:text-gray-400 italic border dark:border-gray-700">
+                                                                    Belum ada penugasan
+                                                                </td>
+
+                                                            </tr>
+
+                                                        @else
+
+                                                            @foreach ($subKegiatan->penugasans as $penugasanIndex => $penugasan)
+
+                                                                <tr>
+
+                                                                    {{-- KEGIATAN --}}
+                                                                    @if ($subIndex === 0 && $penugasanIndex === 0)
+                                                                        <td rowspan="{{ $kegiatan->subKegiatans->sum(fn($s)=> max($s->penugasans->count(),1)) }}"
+                                                                            class="px-4 py-3 align-top border dark:border-gray-700">
+                                                                            <div class="flex flex-col">
+                                                                                <span class="font-medium text-gray-800 dark:text-gray-300">
+                                                                                    {{ $kegiatan->nama_rk_kegiatan }}
+                                                                                </span>
+                                                                                <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                                                    Ketua:
+                                                                                    {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
+                                                                                </span>
+                                                                            </div>
+                                                                        </td>
+                                                                    @endif
+
+                                                                    {{-- SUB KEGIATAN --}}
+                                                                    @if ($penugasanIndex === 0)
+                                                                        <td rowspan="{{ $penugasanCount }}"
+                                                                            class="px-4 py-3 align-top border dark:border-gray-700 text-gray-800 dark:text-gray-300">
+                                                                            {{ $subKegiatan->nama_sub_kegiatan }}
+                                                                        </td>
+                                                                    @endif
+
+                                                                    <td class="px-4 py-3 border dark:border-gray-700 text-gray-800 dark:text-gray-300">
+                                                                        {{ $penugasan->anggota->nama_pegawai ?? '-' }}
+                                                                    </td>
+
+                                                                    <td class="px-4 py-3 border dark:border-gray-700 text-gray-800 dark:text-gray-300">
+                                                                        {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? '-' }}
+                                                                    </td>
+
+                                                                    <td class="px-4 py-3 border dark:border-gray-700 text-gray-800 dark:text-gray-300">
+                                                                        {{ $penugasan->target ?? '-' }}
+                                                                    </td>
+
+                                                                    <td class="px-4 py-3 border dark:border-gray-700 text-gray-800 dark:text-gray-300">
+                                                                        {{ $penugasan->satuan_target ?? '-' }}
+                                                                    </td>
+
+                                                                </tr>
+
+                                                            @endforeach
+                                                        @endif
+
+                                                    @endforeach
+                                                @endif
+
+                                            @endforeach
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            @else
+                                <div class="p-4 text-center border-t dark:border-gray-700">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 italic">
+                                        Belum ada kegiatan untuk fungsi ini
+                                    </p>
+                                </div>
+                            @endif
+
+                        </div>
                     </div>
+                @endforeach
 
-                @else
-                    <div class="p-4 text-center border-t">
-                        <p class="text-sm text-gray-500 italic">
-                            Belum ada kegiatan untuk fungsi ini
+
+                {{-- Kalau belum ada bidang --}}
+                @if ($bidangs->count() === 0)
+                    <div class="text-center py-8 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                            Belum ada fungsi/bidang yang dibuat
                         </p>
                     </div>
                 @endif
-
             </div>
-        </div>
-    @endforeach
-
-
-    {{-- Kalau belum ada bidang --}}
-    @if ($bidangs->count() === 0)
-        <div class="text-center py-8 border border-gray-200 rounded-lg">
-            <p class="text-sm text-gray-500">
-                Belum ada fungsi/bidang yang dibuat
-            </p>
-        </div>
-    @endif
-</div>
 
         </x-common.component-card>
     </div>
@@ -431,13 +272,13 @@
             detailAnggotaCounter[sectionId] = 0;
 
             const sectionHTML = `
-                <div id="${sectionId}" class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                <div id="${sectionId}" class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
                     <div class="mb-4 flex items-center justify-between">
-                        <h5 class="text-sm font-semibold text-gray-800">
+                        <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-300">
                             Sub Kegiatan ${rkAnggotaCounter}
                         </h5>
                         <button type="button" onclick="hapusRKAnggota('${sectionId}')"
-                            class="rounded-lg p-1 text-gray-500 hover:bg-gray-200 hover:text-gray-700">
+                            class="rounded-lg p-1 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-300">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
@@ -448,25 +289,25 @@
 
                     <div class="space-y-4">
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                                 Nama Sub Kegiatan
                             </label>
                             <input name="rk_anggota[]" type="text" placeholder="Masukkan rk anggota"
-                                class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                                class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 dark:text-gray-300 shadow-theme-xs placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-brand-300 dark:focus:border-brand-500 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                         </div>
 
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                                 Target Kegiatan
                             </label>
                             <input type="number" name="target[]"
                                 placeholder="Misalnya : 200"
-                                class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                                class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 dark:text-gray-300 shadow-theme-xs placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-brand-300 dark:focus:border-brand-500 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                         </div>
 
                         <!-- Tanggal Mulai dan Tanggal Selesai untuk Detail Anggota -->
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                                 Tanggal Mulai
                             </label>
                             <div class="md:w-3/4">
@@ -477,7 +318,7 @@
                             </div>
                         </div>
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                                 Tanggal Selesai
                             </label>
                             <div class="md:w-3/4">
@@ -494,7 +335,7 @@
                             <div class="md:w-1/4"></div>
                             <div class="md:w-3/4">
                                 <button type="button" onclick="tambahDetailAnggota('${sectionId}')"
-                                    class="flex items-center gap-2 rounded-lg border border-dashed border-gray-300 bg-transparent px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                    class="flex items-center gap-2 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 bg-transparent px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <svg class="fill-current" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path fill-rule="evenodd" clip-rule="evenodd" d="M8 3.5C8.27614 3.5 8.5 3.72386 8.5 4V7.5H12C12.2761 7.5 12.5 7.72386 12.5 8C12.5 8.27614 12.2761 8.5 12 8.5H8.5V12C8.5 12.2761 8.27614 12.5 8 12.5C7.72386 12.5 7.5 12.2761 7.5 12V8.5H4C3.72386 8.5 3.5 8.27614 3.5 8C3.5 7.72386 3.72386 7.5 4 7.5H7.5V4C7.5 3.72386 7.72386 3.5 8 3.5Z" fill=""/>
                                     </svg>
@@ -556,13 +397,13 @@
             const detailId = sectionId + '-detail-' + detailAnggotaCounter[sectionId];
 
             const detailHTML = `
-                <div id="${detailId}" class="rounded-lg border border-dashed border-gray-300 bg-white p-4">
+                <div id="${detailId}" class="rounded-lg border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-4">
                     <div class="mb-3 flex items-center justify-between">
-                        <h6 class="text-xs font-medium text-gray-700">
+                        <h6 class="text-xs font-medium text-gray-700 dark:text-gray-400">
                             Anggota ${detailAnggotaCounter[sectionId]}
                         </h6>
                         <button type="button" onclick="hapusDetailAnggota('${detailId}')"
-                            class="rounded-lg p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600">
+                            class="rounded-lg p-1 text-gray-400 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
@@ -603,7 +444,7 @@
                                     if(this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]);
                                 }
                             }">
-                            <label class="mb-1.5 block text-xs font-medium text-gray-700 md:w-1/4">
+                            <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                                 Nama Anggota
                             </label>
 
@@ -618,7 +459,7 @@
                                     @keydown.arrow-up.prevent="highlightPrev()"
                                     @keydown.enter.prevent="selectHighlighted()"
                                     placeholder="Ketik untuk cari nama anggota"
-                                    class="detail-nama-anggota h-10 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10">
+                                    class="detail-nama-anggota h-10 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 dark:text-gray-300 shadow-theme-xs placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-brand-300 dark:focus:border-brand-500 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10">
 
                                 <!-- Hidden input untuk menyimpan ID -->
                                 <input type="hidden"
@@ -640,24 +481,24 @@
                                     x-transition:leave-start="opacity-100 scale-100"
                                     x-transition:leave-end="opacity-0 scale-95"
                                     @click.away="open = false"
-                                    class="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-60 overflow-y-auto">
+                                    class="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg max-h-60 overflow-y-auto">
 
                                     <template x-if="filtered().length > 0">
                                         <template x-for="(pegawai, index) in filtered()" :key="pegawai.id_pegawai">
                                             <div
                                                 @click="selectPegawai(pegawai)"
                                                 :class="{
-                                                    'bg-brand-50': highlightedIndex===index,
-                                                    'hover:bg-gray-50': highlightedIndex!==index
+                                                    'bg-brand-50 dark:bg-brand-900/30': highlightedIndex===index,
+                                                    'hover:bg-gray-50 dark:hover:bg-gray-700': highlightedIndex!==index
                                                 }"
-                                                class="cursor-pointer px-3 py-2 text-xs text-gray-700"
+                                                class="cursor-pointer px-3 py-2 text-xs text-gray-700 dark:text-gray-300"
                                                 x-text="pegawai.nama_pegawai">
                                             </div>
                                         </template>
                                     </template>
 
                                     <template x-if="search.length > 0 && filtered().length === 0">
-                                        <div class="px-3 py-2 text-xs text-gray-500">
+                                        <div class="px-3 py-2 text-xs text-gray-500 dark:text-gray-400">
                                             Data tidak ditemukan
                                         </div>
                                     </template>
@@ -668,7 +509,7 @@
                         <div x-data="{ isOther: false, idJenisKegiatan: '' }"
                             class="flex flex-col gap-2 md:flex-row md:items-start">
 
-                            <label class="mb-1.5 block text-xs font-medium text-gray-700 md:w-1/4">
+                            <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                                 Jenis Kegiatan
                             </label>
 
@@ -679,15 +520,15 @@
                                     x-model="idJenisKegiatan"
                                     @change="isOther = (idJenisKegiatan === 'LAINNYA')"
                                     required
-                                    class="h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-xs">
+                                    class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 px-3 py-2 text-xs">
                                     <option value="">-- Pilih Jenis Kegiatan --</option>
 
                                     @foreach ($jenisKegiatans as $jenis)
                                         <option value="{{ $jenis->id }}"
                                             class="
-                                                @if ($jenis->kategori === 'Utama') text-green-700 font-medium
+                                                @if ($jenis->kategori === 'Utama') text-green-700 dark:text-green-400 font-medium
                                                 @elseif($jenis->kategori === 'Tambahan')
-                                                    text-orange-700 @endif">
+                                                    text-orange-700 dark:text-orange-400 @endif">
                                             {{ $jenis->jenis_kegiatan }}
                                             ({{ $jenis->kategori }})
                                         </option>
@@ -702,7 +543,7 @@
                                         type="text"
                                         name="detail_jenis_kegiatan_baru[${sectionId}][]"
                                         placeholder="Masukkan jenis kegiatan baru"
-                                        class="dark:bg-dark-900 h-10 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10"
+                                        class="dark:bg-gray-800 h-10 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 dark:text-gray-300 shadow-theme-xs placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-brand-300 dark:focus:border-brand-500 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10"
                                     />
                                 </div>
                             </div>
@@ -710,24 +551,24 @@
 
                         <!-- Target Input -->
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                            <label class="mb-1.5 block text-xs font-medium text-gray-700 md:w-1/4">
+                            <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                                 Target
                             </label>
                             <input name="detail_target[${sectionId}][]" type="text" placeholder="Masukkan target"
-                                class="md:w-3/4 h-10 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                                class="md:w-3/4 h-10 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 dark:text-gray-300 shadow-theme-xs placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-brand-300 dark:focus:border-brand-500 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                         </div>
 
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                            <label class="mb-1.5 block text-xs font-medium text-gray-700 md:w-1/4">
+                            <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                                 Satuan Target
                             </label>
                             <input name="detail_satuan_target[${sectionId}][]" type="text" placeholder="Masukkan satuan target"
-                                class="md:w-3/4 h-10 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                                class="md:w-3/4 h-10 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 dark:text-gray-300 shadow-theme-xs placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-brand-300 dark:focus:border-brand-500 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                         </div>
 
                         <!-- Tanggal Mulai -->
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                            <label class="mb-1.5 block text-xs font-medium text-gray-700 md:w-1/4">
+                            <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                                 Tanggal Mulai
                             </label>
                             <div class="md:w-3/4">
@@ -740,7 +581,7 @@
 
                         <!-- Tanggal Selesai -->
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                            <label class="mb-1.5 block text-xs font-medium text-gray-700 md:w-1/4">
+                            <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                                 Tanggal Berakhir (Deadline)
                             </label>
                             <div class="md:w-3/4">
@@ -868,12 +709,12 @@
                     const keterangan = keteranganInput ? keteranganInput.value : '';
 
                     sectionHTML += `
-                    <div class="border border-gray-200 rounded-lg p-4 mb-4">
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4 bg-white dark:bg-gray-800">
                         <div class="flex items-center justify-between mb-3">
-                            <h5 class="text-sm font-semibold text-gray-700">
+                            <h5 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
                                 RK Anggota ${sectionIndex + 1}
                             </h5>
-                            <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                            <span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:text-blue-400">
                                 Bagian ${sectionIndex + 1}
                             </span>
                         </div>
@@ -881,29 +722,29 @@
                         <div class="space-y-3">
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <span class="block text-xs font-medium text-gray-500 mb-1">RK Anggota</span>
-                                    <span class="block text-sm text-gray-800">${rkAnggota || '-'}</span>
+                                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">RK Anggota</span>
+                                    <span class="block text-sm text-gray-800 dark:text-gray-300">${rkAnggota || '-'}</span>
                                 </div>
                                 <div>
-                                    <span class="block text-xs font-medium text-gray-500 mb-1">Satuan Target</span>
-                                    <span class="block text-sm text-gray-800">${satuanTarget || '-'}</span>
+                                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Satuan Target</span>
+                                    <span class="block text-sm text-gray-800 dark:text-gray-300">${satuanTarget || '-'}</span>
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <span class="block text-xs font-medium text-gray-500 mb-1">Tanggal Mulai</span>
-                                    <span class="block text-sm text-gray-800">${tanggalMulai || '-'}</span>
+                                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tanggal Mulai</span>
+                                    <span class="block text-sm text-gray-800 dark:text-gray-300">${tanggalMulai || '-'}</span>
                                 </div>
                                 <div>
-                                    <span class="block text-xs font-medium text-gray-500 mb-1">Tanggal Selesai</span>
-                                    <span class="block text-sm text-gray-800">${tanggalAkhir || '-'}</span>
+                                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tanggal Selesai</span>
+                                    <span class="block text-sm text-gray-800 dark:text-gray-300">${tanggalAkhir || '-'}</span>
                                 </div>
                             </div>
 
                             <div>
-                                <span class="block text-xs font-medium text-gray-500 mb-1">Keterangan</span>
-                                    <span class="block text-sm text-gray-800">${keterangan || '-'}</span>
+                                <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Keterangan</span>
+                                    <span class="block text-sm text-gray-800 dark:text-gray-300">${keterangan || '-'}</span>
                             </div>
                     `;
 
@@ -917,8 +758,8 @@
 
                     if (detailAnggotas.length > 0) {
                         sectionHTML += `
-                            <div class="mt-3 border-t border-gray-100 pt-3">
-                                <p class="text-xs font-medium text-gray-600 mb-2">Anggota:</p>
+                            <div class="mt-3 border-t border-gray-100 dark:border-gray-700 pt-3">
+                                <p class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Anggota:</p>
                                 <div class="space-y-2">
                             `;
 
@@ -944,22 +785,22 @@
                                 detailTanggalSelesaiInput.value : '';
 
                             sectionHTML += `
-                            <div class="rounded-lg border border-gray-200 bg-gray-50 p-3">
+                            <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-3">
                                 <div class="flex items-center justify-between mb-2">
-                                    <span class="text-xs font-medium text-gray-700">Anggota ${detailIndex + 1}</span>
+                                    <span class="text-xs font-medium text-gray-700 dark:text-gray-400">Anggota ${detailIndex + 1}</span>
                                     <div>
-                                        <span class="text-xs font-medium text-gray-800">${namaAnggota || '-'}</span>
-                                        ${idAnggota ? `<span class="ml-2 text-xs text-gray-500">(ID: ${idAnggota})</span>` : ''}
+                                        <span class="text-xs font-medium text-gray-800 dark:text-gray-300">${namaAnggota || '-'}</span>
+                                        ${idAnggota ? `<span class="ml-2 text-xs text-gray-500 dark:text-gray-500">(ID: ${idAnggota})</span>` : ''}
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-2 gap-2 text-xs">
                                     <div>
-                                        <span class="block text-gray-500 mb-1">Target</span>
-                                        <span class="block text-gray-700">${target || '-'}</span>
+                                        <span class="block text-gray-500 dark:text-gray-500 mb-1">Target</span>
+                                        <span class="block text-gray-700 dark:text-gray-300">${target || '-'}</span>
                                     </div>
                                     <div>
-                                        <span class="block text-gray-500 mb-1">Tanggal</span>
-                                        <span class="block text-gray-700">${detailTanggalMulai || '-'} s/d ${detailTanggalSelesai || '-'}</span>
+                                        <span class="block text-gray-500 dark:text-gray-500 mb-1">Tanggal</span>
+                                        <span class="block text-gray-700 dark:text-gray-300">${detailTanggalMulai || '-'} s/d ${detailTanggalSelesai || '-'}</span>
                                     </div>
                                 </div>
                             </div>
@@ -981,58 +822,58 @@
         <div class="space-y-6">
             <!-- Header -->
             <div class="text-center">
-                <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 mb-3">
-                    <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 mb-3">
+                    <svg class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-800 mb-1">DATA RENCANA KINERJA KETUA</h3>
-                <p class="text-sm text-gray-500">Review data sebelum disimpan ke database</p>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-1">DATA RENCANA KINERJA KETUA</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Review data sebelum disimpan ke database</p>
             </div>
 
             <!-- Data Utama -->
-            <div class="border border-gray-200 rounded-lg p-4">
-                <h4 class="text-sm font-semibold text-gray-700 mb-3">DATA KETUA</h4>
+            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
+                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">DATA KETUA</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-3">
                         <div>
-                            <span class="block text-xs font-medium text-gray-500 mb-1">Tahun</span>
-                            <span class="block text-sm text-gray-800 font-medium">${tahun || '-'}</span>
+                            <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tahun</span>
+                            <span class="block text-sm text-gray-800 dark:text-gray-300 font-medium">${tahun || '-'}</span>
                         </div>
                         <div>
-                            <span class="block text-xs font-medium text-gray-500 mb-1">RK JPT</span>
-                            <span class="block text-sm text-gray-800">${rkJpt || '-'}</span>
+                            <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">RK JPT</span>
+                            <span class="block text-sm text-gray-800 dark:text-gray-300">${rkJpt || '-'}</span>
                         </div>
                         <div>
-                            <span class="block text-xs font-medium text-gray-500 mb-1">IKI JPT</span>
-                            <span class="block text-sm text-gray-800">${ikiJpt || '-'}</span>
+                            <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">IKI JPT</span>
+                            <span class="block text-sm text-gray-800 dark:text-gray-300">${ikiJpt || '-'}</span>
                         </div>
                     </div>
                     <div class="space-y-3">
                         <div>
-                            <span class="block text-xs font-medium text-gray-500 mb-1">Bidang</span>
-                            <span class="block text-sm text-gray-800 font-medium">${bidangNama || '-'}</span>
+                            <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Bidang</span>
+                            <span class="block text-sm text-gray-800 dark:text-gray-300 font-medium">${bidangNama || '-'}</span>
                         </div>
                         <div>
-                            <span class="block text-xs font-medium text-gray-500 mb-1">Ketua</span>
+                            <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Ketua</span>
                             <div>
-                                <span class="block text-sm text-gray-800 font-medium">${namaKetua || '-'}</span>
-                                ${idKetua ? `<span class="block text-xs text-gray-500 mt-1">ID: ${idKetua}</span>` : ''}
+                                <span class="block text-sm text-gray-800 dark:text-gray-300 font-medium">${namaKetua || '-'}</span>
+                                ${idKetua ? `<span class="block text-xs text-gray-500 dark:text-gray-500 mt-1">ID: ${idKetua}</span>` : ''}
                             </div>
                         </div>
                         <div>
-                            <span class="block text-xs font-medium text-gray-500 mb-1">Rencana Kinerja Ketua</span>
-                            <span class="block text-sm text-gray-800">${rkKetua || '-'}</span>
+                            <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Rencana Kinerja Ketua</span>
+                            <span class="block text-sm text-gray-800 dark:text-gray-300">${rkKetua || '-'}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Data RK Anggota -->
-            <div class="border border-gray-200 rounded-lg p-4">
+            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
                 <div class="flex items-center justify-between mb-3">
-                    <h4 class="text-sm font-semibold text-gray-700">DATA RK ANGGOTA</h4>
-                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
+                    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">DATA RK ANGGOTA</h4>
+                    <span class="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-700 dark:text-gray-300">
                         ${sections.length} bagian
                     </span>
                 </div>
@@ -1043,18 +884,18 @@
                                         </div>
                                     ` : `
                                         <div class="text-center py-4">
-                                            <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 mb-2">
-                                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 mb-2">
+                                                <svg class="h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                                 </svg>
                                             </div>
-                                            <p class="text-sm text-gray-500">Belum ada RK Anggota yang ditambahkan</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Belum ada RK Anggota yang ditambahkan</p>
                                         </div>
                                     `}
             </div>
 
             <!-- Note -->
-            <div class="flex items-center text-sm text-gray-500">
+            <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
                 <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>

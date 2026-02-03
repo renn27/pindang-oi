@@ -2,25 +2,27 @@
 
 @section('content')
     {{-- ===== HEADER IDENTITAS ===== --}}
-    <div class="mb-6 rounded-2xl border border-gray-200 bg-white p-6">
+    <div
+        class="mb-6 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
         @auth
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <p class="text-sm text-gray-500">Selamat Datang</p>
-                    <h1 class="text-xl font-bold text-gray-800">
+                    <p class="text-sm text-gray-500 dark:text-gray-300">Selamat Datang</p>
+                    <h1 class="text-xl font-bold text-gray-800 dark:text-white">
                         {{ Auth::user()->nama_pegawai }}
                     </h1>
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-500">Role</span>
-                    <span class="rounded-full bg-brand-100 px-3 py-1 text-sm font-semibold text-brand-700">
+                    <span class="text-sm text-gray-500 dark:text-gray-300">Role</span>
+                    <span
+                        class="rounded-full bg-brand-100 px-3 py-1 text-sm font-semibold text-brand-700 dark:bg-blue-900/30 dark:text-blue-300">
                         {{ Auth::user()->active_role ?? 'Anggota Tim' }}
                     </span>
                 </div>
             </div>
         @else
-            <p class="text-gray-500">Belum login</p>
+            <p class="text-gray-500 dark:text-gray-300">Belum login</p>
         @endauth
     </div>
 
@@ -181,9 +183,9 @@
     @endif
 
     {{-- ===== SECTION ALL PENILAIAN KARYAWAN ===== --}}
-        <div class="w-full">
-            @auth
-                <x-profile.vis-rank-pegawai :rankPegawai="app(\App\Services\DashboardAnalyticsService::class)->rankPegawai()" :perPage="5" />
-            @endauth
-        </div>
+    <div class="w-full">
+        @auth
+            <x-profile.vis-rank-pegawai :rankPegawai="app(\App\Services\DashboardAnalyticsService::class)->rankPegawai()" :perPage="5" />
+        @endauth
+    </div>
 @endsection

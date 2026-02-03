@@ -7,21 +7,21 @@
     :isOpen="false"
     class="max-w-[800px]">
     <div class="relative flex h-[80vh] w-full max-w-[800px] flex-col overflow-hidden
-               rounded-3xl bg-white">
+               rounded-3xl bg-white dark:bg-gray-800">
 
         <!-- HEADER -->
-        <div class="shrink-0 border-b border-gray-200 px-6 py-3">
+        <div class="shrink-0 border-b border-gray-200 dark:border-gray-700 px-6 py-3">
             <div class="flex items-center justify-between">
                 <div>
-                    <h4 class="text-xl font-semibold text-gray-800">
+                    <h4 class="text-xl font-semibold text-gray-800 dark:text-white">
                         Konfirmasi Data
                     </h4>
-                    <p class="mt-1 text-sm text-gray-500">
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                         Review data sebelum disimpan
                     </p>
                 </div>
                 <button @click="open = false"
-                    class="rounded-lg p-2 text-gray-500 hover:bg-gray-100">
+                    class="rounded-lg p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -37,15 +37,15 @@
         </div>
 
         <!-- FOOTER -->
-        <div class="shrink-0 border-t border-gray-200 px-6 py-3">
+        <div class="shrink-0 border-t border-gray-200 dark:border-gray-700 px-6 py-3">
             <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                 <button @click="open = false" type="button"
-                    class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto">
+                    class="flex w-full justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 sm:w-auto">
                     Batal
                 </button>
 
                 <button onclick="confirmSave()" type="button"
-                    class="flex w-full justify-center rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 sm:w-auto">
+                    class="flex w-full justify-center rounded-lg bg-green-600 hover:bg-green-700 px-4 py-2.5 text-sm font-medium text-white sm:w-auto">
                     Ya, Simpan Data
                 </button>
             </div>

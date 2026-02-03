@@ -3,69 +3,69 @@
 @section('content')
     <x-common.page-breadcrumb pageTitle="Detail Kegiatan" />
 
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 mb-6">
+    <div class="rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 mb-6 dark:border-gray-800 dark:bg-gray-900">
         <!-- Header Kegiatan -->
         <div class="mb-8">
-            <h1 class="text-2xl font-bold text-gray-800 mb-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6 dark:text-white">
                 {{ $subKegiatan->nama_sub_kegiatan }}
             </h1>
 
             <!-- Informasi Kegiatan dalam Tabel Format -->
-            <div class="border border-gray-200 rounded-lg overflow-hidden">
-                <table class="w-full divide-y divide-gray-200">
-                    <tbody class="bg-white divide-y divide-gray-200">
+            <div class="border border-gray-200 rounded-lg overflow-hidden dark:border-gray-700">
+                <table class="w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
                         <tr>
                             <td
-                                class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 w-32">
+                                class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 w-32 dark:bg-gray-800 dark:text-gray-400">
                                 Sumber Kegiatan
                             </td>
-                            <td class="px-4 py-3 text-sm text-gray-800">
+                            <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-300">
                                 {{ $subKegiatan->kegiatan->nama_rk_kegiatan }}
                             </td>
                         </tr>
                         <tr>
                             <td
-                                class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 w-32">
+                                class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 w-32 dark:bg-gray-800 dark:text-gray-400">
                                 Nama Ketua
                             </td>
-                            <td class="px-4 py-3 text-sm text-gray-800">
+                            <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-300">
                                 {{ $subKegiatan->kegiatan->penanggungJawab->nama_pegawai }}
                             </td>
                         </tr>
                         <tr>
                             <td
-                                class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">
+                                class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
                                 Tanggal Mulai
                             </td>
-                            <td class="px-4 py-3 text-sm text-gray-800">
+                            <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-300">
                                 {{ $subKegiatan->tanggal_mulai->format('d M Y') }}
                             </td>
                         </tr>
                         <tr>
                             <td
-                                class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">
+                                class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
                                 Tanggal Berakhir
                             </td>
-                            <td class="px-4 py-3 text-sm text-gray-800">
+                            <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-300">
                                 {{ $subKegiatan->tanggal_selesai->format('d M Y') }}
                             </td>
                         </tr>
                         <tr>
                             <td
-                                class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">
+                                class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
                                 Target
                             </td>
-                            <td class="px-4 py-3 text-sm text-gray-800">
+                            <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-300">
                                 {{ $subKegiatan->target }} {{ $subKegiatan->satuan_target }} 
                             </td>
                             </td>
                         </tr>
                         <tr>
                             <td
-                                class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">
+                                class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 dark:bg-gray-800 dark:text-gray-400">
                                 Status
                             </td>
-                            <td class="px-4 py-3 text-sm text-gray-800">
+                            <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-300">
                                 {{ $subKegiatan->status }}
                             </td>
                         </tr>
@@ -76,13 +76,14 @@
 
         <!-- Section Progres -->
         <div class="mb-8 max-w-full overflow-hidden">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">Progres</h2>
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 dark:text-white">Progres</h2>
             @can('create', [App\Models\Penugasan::class, $subKegiatan])
                 <div class="flex justify-start mb-6">
                     <button
                         class="flex items-center gap-2 rounded-full border border-gray-300
                             bg-white px-4 py-3 text-sm font-medium text-gray-700
-                            shadow-theme-xs hover:bg-gray-50 hover:text-gray-800"
+                            shadow-theme-xs hover:bg-gray-50 hover:text-gray-800
+                            dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
                         @click="$dispatch('open-smart-modal', {
                                 modalId: 'modal-penugasan-anggota',
                                 data: {

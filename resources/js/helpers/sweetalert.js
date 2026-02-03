@@ -15,83 +15,84 @@ const toastConfig = {
 
 const SwalHelper = {
     confirmDelete(formId, itemName) {
-    Swal.fire({
-        html: `
-            <div class="text-center px-2 py-5">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-red-50 to-red-100 mb-6">
-                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
+        Swal.fire({
+            html: `
+                <div class="text-center px-2 py-5">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-900/10 mb-6">
+                        <svg class="w-8 h-8 text-red-600 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Hapus Data</h3>
+                    <p class="text-gray-600 dark:text-gray-300 mb-1 font-medium">"${itemName}"</p>
+                    <p class="text-sm text-gray-400 dark:text-gray-400 mb-6">Data yang dihapus tidak dapat dikembalikan</p>
+                    
+                    <div class="flex gap-3 justify-center">
+                        <button type="button" data-action="cancel" 
+                            class="px-5 py-2.5 rounded-lg font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-colors">
+                            Batal
+                        </button>
+                        <button type="button" data-action="confirm" 
+                            class="px-5 py-2.5 rounded-lg font-medium bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white transition-colors">
+                            Ya, Hapus
+                        </button>
+                    </div>
                 </div>
-                <h3 class="text-xl font-semibold text-gray-900 mb-2">Hapus Data</h3>
-                <p class="text-gray-600 mb-1 font-medium">"${itemName}"</p>
-                <p class="text-sm text-gray-400 mb-6">Data yang dihapus tidak dapat dikembalikan</p>
-                
-                <div class="flex gap-3 justify-center">
-                    <button type="button" data-action="cancel" 
-                        class="px-5 py-2.5 rounded-lg font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors">
-                        Batal
-                    </button>
-                    <button type="button" data-action="confirm" 
-                        class="px-5 py-2.5 rounded-lg font-medium bg-red-600 hover:bg-red-700 text-white transition-colors">
-                        Ya, Hapus
-                    </button>
-                </div>
-            </div>
-        `,
-        showConfirmButton: false,
-        showCancelButton: false,
-        showCloseButton: false,
-        allowOutsideClick: true,
-        allowEscapeKey: true,
-        customClass: {
-            popup: '!rounded-3xl !border !border-gray-200 !shadow-2xl !bg-white !p-0 !max-w-sm',
-            title: '!hidden',
-            htmlContainer: '!p-0 !m-0',
-            container: '!p-5'
-        },
-        backdrop: 'rgba(107, 114, 128, 0.3)',
-        buttonsStyling: false,
-        didOpen: (popup) => {
-            // Gunakan event delegation di popup
-            popup.addEventListener('click', (e) => {
-                const target = e.target.closest('button[data-action]');
-                if (!target) return;
-                
-                const action = target.dataset.action;
-                if (action === 'cancel') {
-                    Swal.close();
-                } else if (action === 'confirm') {
-                    const form = document.getElementById(formId);
-                    if (form) {
-                        form.submit();
+            `,
+            showConfirmButton: false,
+            showCancelButton: false,
+            showCloseButton: false,
+            allowOutsideClick: true,
+            allowEscapeKey: true,
+            customClass: {
+                popup: '!rounded-3xl !border !border-gray-200 !shadow-2xl !bg-white dark:!border-gray-700 dark:!bg-gray-900 !p-0 !max-w-sm',
+                title: '!hidden',
+                htmlContainer: '!p-0 !m-0',
+                container: '!p-5'
+            },
+            backdrop: 'rgba(107, 114, 128, 0.3) dark:rgba(0, 0, 0, 0.5)',
+            buttonsStyling: false,
+            didOpen: (popup) => {
+                // Gunakan event delegation di popup
+                popup.addEventListener('click', (e) => {
+                    const target = e.target.closest('button[data-action]');
+                    if (!target) return;
+                    
+                    const action = target.dataset.action;
+                    if (action === 'cancel') {
+                        Swal.close();
+                    } else if (action === 'confirm') {
+                        const form = document.getElementById(formId);
+                        if (form) {
+                            form.submit();
+                        }
+                        Swal.close();
+                        this.toast('success', 'Data berhasil dihapus');
                     }
-                    Swal.close();
-                    this.toast('success', 'Data berhasil dihapus');
-                }
-            });
-            
-            // Focus ke tombol batal
-            popup.querySelector('button[data-action="cancel"]')?.focus();
-        }
-    });
-},
+                });
+                
+                // Focus ke tombol batal
+                popup.querySelector('button[data-action="cancel"]')?.focus();
+            }
+        });
+    },
+    
     success(message, title = 'Berhasil', duration = 3000) {
         return Swal.fire({
             ...toastConfig,
             timer: duration,
             html: `
                 <div class="flex items-start gap-3 p-4">
-                    <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-green-100">
-                        <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+                        <svg class="h-4 w-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="font-medium text-gray-900">${title}</p>
-                        <p class="mt-1 text-sm text-gray-600">${message}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">${title}</p>
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">${message}</p>
                     </div>
-                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600">
+                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -113,16 +114,16 @@ const SwalHelper = {
             timer: duration,
             html: `
                 <div class="flex items-start gap-3 p-4">
-                    <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-red-100">
-                        <svg class="h-4 w-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+                        <svg class="h-4 w-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="font-medium text-gray-900">${title}</p>
-                        <p class="mt-1 text-sm text-gray-600">${message}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">${title}</p>
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">${message}</p>
                     </div>
-                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600">
+                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -144,16 +145,16 @@ const SwalHelper = {
             timer: duration,
             html: `
                 <div class="flex items-start gap-3 p-4">
-                    <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-blue-100">
-                        <svg class="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+                        <svg class="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="font-medium text-gray-900">${title}</p>
-                        <p class="mt-1 text-sm text-gray-600">${message}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">${title}</p>
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">${message}</p>
                     </div>
-                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600">
+                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -175,16 +176,16 @@ const SwalHelper = {
             timer: duration,
             html: `
                 <div class="flex items-start gap-3 p-4">
-                    <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-yellow-100">
-                        <svg class="h-4 w-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/30">
+                        <svg class="h-4 w-4 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.346 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                         </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="font-medium text-gray-900">${title}</p>
-                        <p class="mt-1 text-sm text-gray-600">${message}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">${title}</p>
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">${message}</p>
                     </div>
-                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600">
+                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -208,11 +209,11 @@ const SwalHelper = {
             showConfirmButton: false,
             html: `
                 <div class="flex items-center gap-3 p-4">
-                    <div class="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"></div>
+                    <div class="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent dark:border-blue-400"></div>
                     <div class="flex-1">
-                        <p class="font-medium text-gray-900">${message}</p>
+                        <p class="font-medium text-gray-900 dark:text-white">${message}</p>
                     </div>
-                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600">
+                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -227,23 +228,27 @@ const SwalHelper = {
         const configs = {
             success: {
                 bgColor: 'bg-green-100',
+                darkBgColor: 'dark:bg-green-900/30',
                 iconColor: '#10b981',
-                icon: `<svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`
+                icon: `<svg class="h-4 w-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`
             },
             error: {
                 bgColor: 'bg-red-100',
+                darkBgColor: 'dark:bg-red-900/30',
                 iconColor: '#ef4444',
-                icon: `<svg class="h-4 w-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`
+                icon: `<svg class="h-4 w-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`
             },
             info: {
                 bgColor: 'bg-blue-100',
+                darkBgColor: 'dark:bg-blue-900/30',
                 iconColor: '#3b82f6',
-                icon: `<svg class="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
+                icon: `<svg class="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
             },
             warning: {
                 bgColor: 'bg-yellow-100',
+                darkBgColor: 'dark:bg-yellow-900/30',
                 iconColor: '#f59e0b',
-                icon: `<svg class="h-4 w-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.346 16.5c-.77.833.192 2.5 1.732 2.5z"></path></svg>`
+                icon: `<svg class="h-4 w-4 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.346 16.5c-.77.833.192 2.5 1.732 2.5z"></path></svg>`
             }
         }
 
@@ -254,13 +259,13 @@ const SwalHelper = {
             timer: duration,
             html: `
                 <div class="flex items-center gap-3 p-4">
-                    <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${config.bgColor}">
+                    <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${config.bgColor} ${config.darkBgColor}">
                         ${config.icon}
                     </div>
                     <div class="flex-1">
-                        <p class="text-gray-900">${message}</p>
+                        <p class="text-gray-900 dark:text-white">${message}</p>
                     </div>
-                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600">
+                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -282,7 +287,7 @@ const SwalHelper = {
     }
 }
 
-// CSS untuk toast - tanpa background, benar-benar clean
+// CSS untuk toast - dengan dark mode
 const style = document.createElement('style')
 style.textContent = `
     /* Reset semua styling SweetAlert2 */
@@ -304,7 +309,7 @@ style.textContent = `
         max-width: 400px !important;
     }
     
-    /* Toast container utama - HILANGKAN semua background */
+    /* Toast container utama */
     .swal2-popup.swal2-toast {
         background: transparent !important;
         background-color: transparent !important;
@@ -319,7 +324,7 @@ style.textContent = `
         max-width: 380px !important;
     }
     
-    /* Toast content - white background solid */
+    /* Toast content */
     .swal2-html-container {
         margin: 0 !important;
         padding: 0 !important;
@@ -335,13 +340,20 @@ style.textContent = `
         overflow: hidden !important;
     }
     
+    /* Dark mode untuk toast content */
+    .dark .swal2-popup.swal2-toast > div {
+        background: #1f2937 !important;
+        border-color: #374151 !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+    }
+    
     /* Hilangkan semua overlay/background blur */
     .swal2-backdrop-show,
     .swal2-no-backdrop {
         background: transparent !important;
     }
     
-    /* Progress bar - transparan */
+    /* Progress bar */
     .swal2-timer-progress-bar {
         height: 2px !important;
         background: transparent !important;
@@ -421,10 +433,10 @@ style.textContent = `
         display: none !important;
     }
     
-    /* Pastikan tidak ada background di icon */
-    .swal2-popup.swal2-toast .rounded-full {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
+    /* Dark mode untuk modal confirm delete */
+    .dark .swal2-container .swal2-popup {
+        background-color: #1f2937 !important;
+        color: #f3f4f6 !important;
     }
 `
 document.head.appendChild(style)

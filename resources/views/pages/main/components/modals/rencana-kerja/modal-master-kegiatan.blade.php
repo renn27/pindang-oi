@@ -54,16 +54,16 @@
         action="{{ route('master-kegiatan.store') }}">
         @csrf
         <div class="relative flex h-[90vh] w-full max-w-[900px] flex-col overflow-hidden
-                rounded-3xl bg-white">
+                rounded-3xl bg-white dark:bg-gray-800">
 
             <!-- HEADER -->
-            <div class="shrink-0 border-b border-gray-200 px-6 py-3">
+            <div class="shrink-0 border-b border-gray-200 dark:border-gray-700 px-6 py-3">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h4 class="text-2xl font-semibold text-gray-800">
+                        <h4 class="text-2xl font-semibold text-gray-800 dark:text-white">
                             Tambahkan Kegiatan
                         </h4>
-                        <p class="mt-1 text-sm text-gray-500">
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                             Masukkan data kegiatan yang baru
                         </p>
                     </div>
@@ -75,16 +75,16 @@
                 <div class="grid grid-cols-1 gap-y-5">
                     <!-- Tahun -->
                     <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                             Tahun
                         </label>
                         <input type="text" name="tahun_kegiatan" id="tahunInput" value="{{ now()->format('Y') }}"
-                            class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                            class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 dark:text-gray-300 shadow-theme-xs placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-brand-300 dark:focus:border-brand-500 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                     </div>
 
                     {{-- Rencana JPT --}}
                     <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                             Rencana JPT
                         </label>
                         <select
@@ -99,7 +99,7 @@
                                         .then(res => res.json())
                                         .then(data => formData.ikiOptions = data);
                             }"
-                            class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10">
+                            class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 dark:text-gray-300 shadow-theme-xs placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-brand-300 dark:focus:border-brand-500 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10">
                             <option value="">-- Pilih RK JPT --</option>
                             @foreach ($rkJpts as $rk)
                             <option value="{{ $rk->id }}">
@@ -111,12 +111,12 @@
 
                     {{-- Indikator JPT --}}
                     <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                             Indikator JPT
                         </label>
 
                         <select id="iki_jpt" name="iki_jpt" x-model="formData.iki_jpt"
-                            class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10">
+                            class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 dark:text-gray-300 shadow-theme-xs placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-brand-300 dark:focus:border-brand-500 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10">
 
                             <!-- OPTION DINAMIS -->
                             <option value=""
@@ -134,21 +134,21 @@
 
                     <!-- Kolom Bidang -->
                     <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                             Bidang
                         </label>
                         <div class="relative z-20 bg-transparent w-full md:w-3/4">
                             <select
                                 id="bidang"
                                 name="id_bidang"
-                                class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10">
+                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 dark:text-gray-300 shadow-theme-xs focus:border-brand-300 dark:focus:border-brand-500 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10">
                                 @foreach ($bidangs as $bidang)
                                 <option value="{{ $bidang->id_bidang }}">
                                     {{ $bidang->nama_bidang }}
                                 </option>
                                 @endforeach
                             </select>
-                            <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-500">
+                            <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
                                 <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
@@ -183,7 +183,7 @@
                         selectHighlighted() { if (this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]); }}"
                         class="flex flex-col gap-2 md:flex-row md:items-start">
                         <!-- LABEL -->
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                             Nama Ketua
                         </label>
 
@@ -195,7 +195,7 @@
                                 type="text"
                                 x-model="search"
                                 placeholder="Ketik untuk cari nama"
-                                class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10"
+                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 dark:text-gray-300 shadow-theme-xs placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-brand-300 dark:focus:border-brand-500 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10"
                                 @focus="open = !!search"
                                 @input="open = search.length > 0; selectedId = ''"
                                 @keydown.arrow-down.prevent="highlightedIndex++"
@@ -217,23 +217,23 @@
                                 x-show="open"
                                 x-transition
                                 class="absolute left-0 top-full z-50 mt-1 w-full
-                                    rounded-lg border bg-white shadow-lg
+                                    rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg
                                     max-h-60 overflow-y-auto"
                             >
                                 <template x-for="(pegawai, index) in filtered()" :key="pegawai.id_pegawai">
                                     <div
                                         @click="selectPegawai(pegawai)"
-                                        class="cursor-pointer px-4 py-2 text-sm"
+                                        class="cursor-pointer px-4 py-2 text-sm dark:text-gray-300"
                                         :class="{
-                                            'bg-blue-100': highlightedIndex === index,
-                                            'hover:bg-gray-100': highlightedIndex !== index
+                                            'bg-blue-100 dark:bg-blue-900/30': highlightedIndex === index,
+                                            'hover:bg-gray-100 dark:hover:bg-gray-700': highlightedIndex !== index
                                         }"
                                         x-text="pegawai.nama_pegawai"
                                     ></div>
                                 </template>
 
                                 <template x-if="filtered().length === 0 && search.length > 0">
-                                    <div class="px-4 py-2 text-sm text-gray-500">
+                                    <div class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
                                         Data tidak ditemukan
                                     </div>
                                 </template>
@@ -244,11 +244,11 @@
 
                     <!-- Kolom RK Ketua-->
                     <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                             Nama Kegiatan
                         </label>
                         <input type="text" placeholder="Tulis Nama Kegiatan" name="nama_rk_kegiatan" id="rkKetua"
-                            class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                            class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 dark:text-gray-300 shadow-theme-xs placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-brand-300 dark:focus:border-brand-500 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                     </div>
 
                     <!-- CONTAINER UNTUK SECTION RK ANGGOTA -->
@@ -261,7 +261,7 @@
                         <div class="md:w-1/4"></div>
                         <div class="md:w-3/4">
                             <button type="button" @click="tambahRKAnggota()"
-                                class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                class="flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M9 3.75C9.41421 3.75 9.75 4.08579 9.75 4.5V8.25H13.5C13.9142 8.25 14.25 8.58579 14.25 9C14.25 9.41421 13.9142 9.75 13.5 9.75H9.75V13.5C9.75 13.9142 9.41421 14.25 9 14.25C8.58579 14.25 8.25 13.9142 8.25 13.5V9.75H4.5C4.08579 9.75 3.75 9.41421 3.75 9C3.75 8.58579 4.08579 8.25 4.5 8.25H8.25V4.5C8.25 4.08579 8.58579 3.75 9 3.75Z" fill="" />
                                 </svg>
@@ -273,10 +273,10 @@
             </div>
 
             <!-- FOOTER (FIXED) -->
-            <div class="shrink-0 border-t border-gray-200 px-6 py-3">
+            <div class="shrink-0 border-t border-gray-200 dark:border-gray-700 px-6 py-3">
                 <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                     <button @click="open = false" type="button"
-                        class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto">
+                        class="flex w-full justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 sm:w-auto">
                         Close
                     </button>
 
