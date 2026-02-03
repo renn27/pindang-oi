@@ -20,7 +20,7 @@ class MenuHelper
                 'path' => '/',
             ],
             [
-                'icon' => 'dashboard',
+                'icon' => 'admin',
                 'name' => 'Admin',
                 'subItems' => [
                     ['name' => 'Bidang Kerja', 'path' => '/bidang-kerja'],
@@ -28,19 +28,19 @@ class MenuHelper
                 ],
             ],
             [
-                'icon' => 'dashboard',
+                'icon' => 'pimpinan',
                 'name' => 'Pimpinan',
                 'subItems' => [
                     ['name' => 'RK & IKI Pimpinan', 'path' => '/rencana-indikator-jpt/rencana'],
                 ],
             ],
             [
-                'icon' => 'dashboard',
+                'icon' => 'tagihan-kerja',
                 'name' => 'Tagihan Kerja',
                 'subItems' => Bidang::getNavItems(),
             ],
             [
-                'icon' => 'dashboard',
+                'icon' => 'kalender',
                 'name' => 'Kalender',
                 'subItems' => [
                     ['name' => 'Kalender DL', 'path' => '/kalender-dl'],
@@ -48,7 +48,7 @@ class MenuHelper
                 ],
             ],
             [
-                'icon' => 'dashboard',
+                'icon' => 'rencana-kerja',
                 'name' => 'Rencana Kinerja',
                 'subItems' => [
                     ['name' => 'Rencana Kerja Per Fungsi', 'path' => '/master-kegiatan'],
@@ -101,7 +101,7 @@ class MenuHelper
     {
         return [
             [
-                'icon' => 'dashboard',
+                'icon' => 'mangcek',
                 'name' => 'MANGCEK SE2026',
                 'path' => 'https://mangcek.bpsoganilir.com/admin',
                 'is_external' => true,
@@ -189,7 +189,59 @@ class MenuHelper
     {
         $icons = [
             'dashboard' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.5 3.25C4.25736 3.25 3.25 4.25736 3.25 5.5V8.99998C3.25 10.2426 4.25736 11.25 5.5 11.25H9C10.2426 11.25 11.25 10.2426 11.25 8.99998V5.5C11.25 4.25736 10.2426 3.25 9 3.25H5.5ZM4.75 5.5C4.75 5.08579 5.08579 4.75 5.5 4.75H9C9.41421 4.75 9.75 5.08579 9.75 5.5V8.99998C9.75 9.41419 9.41421 9.74998 9 9.74998H5.5C5.08579 9.74998 4.75 9.41419 4.75 8.99998V5.5ZM5.5 12.75C4.25736 12.75 3.25 13.7574 3.25 15V18.5C3.25 19.7426 4.25736 20.75 5.5 20.75H9C10.2426 20.75 11.25 19.7427 11.25 18.5V15C11.25 13.7574 10.2426 12.75 9 12.75H5.5ZM4.75 15C4.75 14.5858 5.08579 14.25 5.5 14.25H9C9.41421 14.25 9.75 14.5858 9.75 15V18.5C9.75 18.9142 9.41421 19.25 9 19.25H5.5C5.08579 19.25 4.75 18.9142 4.75 18.5V15ZM12.75 5.5C12.75 4.25736 13.7574 3.25 15 3.25H18.5C19.7426 3.25 20.75 4.25736 20.75 5.5V8.99998C20.75 10.2426 19.7426 11.25 18.5 11.25H15C13.7574 11.25 12.75 10.2426 12.75 8.99998V5.5ZM15 4.75C14.5858 4.75 14.25 5.08579 14.25 5.5V8.99998C14.25 9.41419 14.5858 9.74998 15 9.74998H18.5C18.9142 9.74998 19.25 9.41419 19.25 8.99998V5.5C19.25 5.08579 18.9142 4.75 18.5 4.75H15ZM15 12.75C13.7574 12.75 12.75 13.7574 12.75 15V18.5C12.75 19.7426 13.7574 20.75 15 20.75H18.5C19.7426 20.75 20.75 19.7427 20.75 18.5V15C20.75 13.7574 19.7426 12.75 18.5 12.75H15ZM14.25 15C14.25 14.5858 14.5858 14.25 15 14.25H18.5C18.9142 14.25 19.25 14.5858 19.25 15V18.5C19.25 18.9142 18.9142 19.25 18.5 19.25H15C14.5858 19.25 14.25 18.9142 14.25 18.5V15Z" fill="currentColor"></path></svg>',
-
+            'rencana-kerja' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M12 12H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M12 16H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M9 9H9.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M9 13H9.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M9 17H9.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M9 3C9 2.44772 9.44772 2 10 2H14C14.5523 2 15 2.44772 15 3V5H9V3Z" stroke="currentColor" stroke-width="1.5"/>
+                <rect x="3" y="9" width="18" height="12" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                </svg>',
+            'tagihan-kerja' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 8V5L19 2L21 4L22 3L20 1L17 4H14V8H16Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                <path d="M22 12V19C22 20.1046 21.1046 21 20 21H4C2.89543 21 2 20.1046 2 19V5C2 3.89543 2.89543 3 4 3H12" stroke="currentColor" stroke-width="1.5"/>
+                <rect x="7" y="7" width="10" height="1" rx="0.5" fill="currentColor"/>
+                <rect x="7" y="10" width="10" height="1" rx="0.5" fill="currentColor"/>
+                <rect x="7" y="13" width="7" height="1" rx="0.5" fill="currentColor"/>
+                <rect x="7" y="16" width="10" height="1" rx="0.5" fill="currentColor"/>
+                <circle cx="18" cy="18" r="1" fill="currentColor"/>
+                </svg>',
+            'kalender' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M16 2V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M8 2V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M3 10H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="7.5" cy="14.5" r="0.5" fill="currentColor"/>
+                <circle cx="10.5" cy="14.5" r="0.5" fill="currentColor"/>
+                <circle cx="13.5" cy="14.5" r="0.5" fill="currentColor"/>
+                <circle cx="16.5" cy="14.5" r="0.5" fill="currentColor"/>
+                <circle cx="7.5" cy="17.5" r="0.5" fill="currentColor"/>
+                <circle cx="10.5" cy="17.5" r="0.5" fill="currentColor"/>
+                <circle cx="13.5" cy="17.5" r="0.5" fill="currentColor"/>
+                <circle cx="16.5" cy="17.5" r="0.5" fill="currentColor"/>
+                </svg>',
+            'admin' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M20 18C20 15.7909 18.2091 14 16 14H8C5.79086 14 4 15.7909 4 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M12 2L16 4.5V7.5C16 10 14 12.5 12 14C10 12.5 8 10 8 7.5V4.5L12 2Z" stroke="currentColor" stroke-width="1.5"/>
+                </svg>',
+            'pimpinan' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M5 20C5 16.134 8.13401 14 12 14C15.866 14 19 16.134 19 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M12 2L13.5 5.5L17 6L14.5 8.5L15 12L12 10.5L9 12L9.5 8.5L7 6L10.5 5.5L12 2Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                </svg>',
+            'mangcek' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M7 15H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M7 9H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M16 12H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M12 15V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="12" cy="12" r="1" fill="currentColor"/>
+                <circle cx="8" cy="12" r="1" fill="currentColor"/>
+                <circle cx="16" cy="12" r="1" fill="currentColor"/>
+                </svg>',
             'ai-assistant' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.75 2.42969V7.70424M9.42261 13.673C10.0259 14.4307 10.9562 14.9164 12 14.9164C13.0438 14.9164 13.9742 14.4307 14.5775 13.673M20 12V18.5C20 19.3284 19.3284 20 18.5 20H5.5C4.67157 20 4 19.3284 4 18.5V12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18.75 2.42969V2.43969M9.50391 9.875L9.50391 9.885M14.4961 9.875V9.885" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
 
             'ecommerce' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.31641 4H3.49696C4.24468 4 4.87822 4.55068 4.98234 5.29112L5.13429 6.37161M5.13429 6.37161L6.23641 14.2089C6.34053 14.9493 6.97407 15.5 7.72179 15.5L17.0833 15.5C17.6803 15.5 18.2205 15.146 18.4587 14.5986L21.126 8.47023C21.5572 7.4795 20.8312 6.37161 19.7507 6.37161H5.13429Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7.7832 19.5H7.7932M16.3203 19.5H16.3303" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',

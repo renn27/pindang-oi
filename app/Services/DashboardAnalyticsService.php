@@ -4,11 +4,13 @@ namespace App\Services;
 
 use App\Models\Penugasan;
 use App\Models\Pengiriman;
+use App\Models\Kegiatan;
+use App\Models\SubKegiatan;
 use Illuminate\Support\Facades\Cache;
 
 class DashboardAnalyticsService
 {
-    public function rankPegawai(int $limit = 5)
+    public function rankPegawai(int $perPage = 5)
     {
         /**
          * Subquery:
@@ -18,9 +20,9 @@ class DashboardAnalyticsService
             ->select('pengirimans.*')
             ->joinSub(
                 Pengiriman::selectRaw('
-                    id_penugasan,
-                    MAX(created_at) as latest_created
-                ')
+                id_penugasan,
+                MAX(created_at) as latest_created
+            ')
                     ->groupBy('id_penugasan'),
                 'latest',
                 function ($join) {
@@ -29,31 +31,32 @@ class DashboardAnalyticsService
                 }
             );
 
-        return Penugasan::query()
+        $query = Penugasan::query()
             ->joinSub($latestPengiriman, 'latest_pengiriman', function ($join) {
                 $join->on('penugasans.id_penugasan', '=', 'latest_pengiriman.id_penugasan');
             })
             ->join('pegawais', 'pegawais.id_pegawai', '=', 'penugasans.id_anggota')
 
             ->selectRaw('
-                pegawais.id_pegawai,
-                pegawais.nama_pegawai,
+            pegawais.id_pegawai,
+            pegawais.nama_pegawai,
 
-                AVG(latest_pengiriman.rr_kirim)      as rr_kirim,
-                AVG(latest_pengiriman.rating_kirim) as rating_kirim,
+            AVG(latest_pengiriman.rr_kirim)      as rr_kirim,
+            AVG(latest_pengiriman.rating_kirim) as rating_kirim,
 
-                (AVG(latest_pengiriman.rating_kirim) * 20) as rating_persen,
+            (AVG(latest_pengiriman.rating_kirim) * 20) as rating_persen,
 
-                (
-                    AVG(latest_pengiriman.rr_kirim)
-                    + (AVG(latest_pengiriman.rating_kirim) * 20)
-                ) / 2 as rata_rata
-            ')
+            (
+                AVG(latest_pengiriman.rr_kirim)
+                + (AVG(latest_pengiriman.rating_kirim) * 20)
+            ) / 2 as rata_rata
+        ')
             ->groupBy('pegawais.id_pegawai', 'pegawais.nama_pegawai')
-            ->orderByDesc('rata_rata')
-            ->limit($limit)
-            ->get()
-            ->map(function ($item) {
+            ->orderByDesc('rata_rata');
+
+        // Return pagination result
+        return $query->paginate($perPage)
+            ->through(function ($item) {
                 $rating = round($item->rating_kirim, 1);
 
                 $full  = floor($rating);
@@ -70,43 +73,6 @@ class DashboardAnalyticsService
 
     public function summaryPenugasanAnggota(string $idPegawai): array
     {
-        // return Cache::remember(
-        //     "dashboard_summary_penugasan_anggota_{$idPegawai}",
-        //     now()->addMinutes(5),
-        //     function () use ($idPegawai) {
-
-        //         $today = now()->startOfDay();
-
-        //         // Semua penugasan milik pegawai ini
-        //         $penugasans = Penugasan::query()
-        //             ->where('id_anggota', $idPegawai)
-        //             ->get(['id_penugasan', 'tanggal_mulai', 'status']);
-
-        //         $belumMulai = $penugasans->filter(function ($p) use ($today) {
-        //             return
-        //                 $p->tanggal_mulai &&
-        //                 $p->tanggal_mulai->startOfDay()->gt($today);
-        //         })->count();
-
-        //         $sudahSelesai = $penugasans->filter(function ($p) {
-        //             return $p->status_penerimaan === 'Diterima';
-        //         })->count();
-
-        //         $sedangBerjalan = $penugasans->filter(function ($p) use ($today) {
-        //             return
-        //                 $p->tanggal_mulai &&
-        //                 $p->tanggal_mulai->startOfDay()->lte($today) &&
-        //                 $p->status_penerimaan !== 'Diterima';
-        //         })->count();
-
-        //         return [
-        //             'total'           => $penugasans->count(),
-        //             'belum_mulai'     => $belumMulai,
-        //             'sedang_berjalan' => $sedangBerjalan,
-        //             'sudah_selesai'   => $sudahSelesai,
-        //         ];
-        //     }
-        // );
         $today = now()->startOfDay();
 
         // Ambil penugasan + latest pengiriman + penerimaan
@@ -167,5 +133,73 @@ class DashboardAnalyticsService
         ];
     }
 
+    /**
+     * Get statistik lengkap untuk dashboard
+     */
+    public function getDashboardStats(): array
+    {
+        // Total Kegiatan
+        $totalKegiatan = Kegiatan::count();
 
+        // Total Sub Kegiatan
+        $totalSubKegiatan = SubKegiatan::count();
+
+        // Total Penugasan
+        $totalPenugasan = Penugasan::count();
+
+        // Total Penugasan Selesai (yang sudah diterima)
+        // Menggunakan query manual untuk menghindari masalah relationship
+        $penugasanSelesai = Penugasan::whereHas('pengirimans.penerimaan', function ($query) {
+            $query->where('status', 'Diterima');
+        })->count();
+
+        // Hitung persentase
+        $persentaseSelesai = $totalPenugasan > 0
+            ? round(($penugasanSelesai / $totalPenugasan) * 100, 1)
+            : 0;
+
+        // Penugasan Berjalan
+        $penugasanBerjalan = $totalPenugasan - $penugasanSelesai;
+
+        return [
+            'total_kegiatan' => $totalKegiatan,
+            'total_sub_kegiatan' => $totalSubKegiatan,
+            'total_penugasan' => $totalPenugasan,
+            'penugasan_selesai' => $penugasanSelesai,
+            'persentase_selesai' => $persentaseSelesai,
+            'penugasan_berjalan' => $penugasanBerjalan,
+        ];
+    }
+
+    /**
+     * Get total kegiatan semua pegawai
+     */
+    public function totalKegiatan(): int
+    {
+        return Penugasan::query()
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+    }
+
+    /**
+     * Get jumlah kegiatan selesai semua pegawai
+     */
+    public function kegiatanSelesai(): int
+    {
+        // Ambil penugasan dengan pengiriman yang sudah diterima
+        return Penugasan::query()
+            ->whereHas('pengirimans.penerimaan', function ($query) {
+                $query->where('status', 'Diterima')
+                    ->whereMonth('penerimaans.created_at', now()->month)
+                    ->whereYear('penerimaans.created_at', now()->year);
+            })
+            ->orWhereHas('pengirimans', function ($query) {
+                // Jika ada pengiriman terakhir dengan penerimaan diterima
+                $query->whereHas('penerimaan', function ($subQuery) {
+                    $subQuery->where('status', 'Diterima');
+                });
+            })
+            ->count();
+    }
 }
