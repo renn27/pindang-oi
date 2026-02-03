@@ -183,7 +183,7 @@
     {{-- ===== SECTION ALL PENILAIAN KARYAWAN ===== --}}
         <div class="w-full">
             @auth
-                <x-profile.vis-rank-pegawai :bestEmployee="app(\App\Services\DashboardAnalyticsService::class)->rankPegawai()" :perPage="5" />
+                <x-profile.vis-rank-pegawai :rankPegawai="app(\App\Services\DashboardAnalyticsService::class)->rankPegawai()" :perPage="5" />
             @endauth
         </div>
 @endsection
