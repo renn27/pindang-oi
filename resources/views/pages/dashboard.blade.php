@@ -3,7 +3,7 @@
 @section('content')
     {{-- ===== HEADER IDENTITAS ===== --}}
     <div
-        class="mb-6 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
+        class="mb-6 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-100">
         @auth
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
@@ -41,7 +41,7 @@
                         {{ now()->format('F Y') }}
                     </div>
                 </div>
-                ss
+                
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {{-- TOTAL KEGIATAN --}}
                     <div

@@ -331,7 +331,7 @@
                                 <tr x-data="{ showDetails: false }"
                                     x-show="showDetails"
                                     x-cloak>
-                                    <td colspan="10" class="px-0 py-4 bg-gray-50 dark:bg-gray-800">
+                                    <td colspan="11" class="px-0 py-4 bg-gray-50 dark:bg-gray-800">
                                         <div class="grid grid-cols-2 gap-4 px-6">
                                             <!-- PENGIRIMAN -->
                                             <div>

@@ -1,10 +1,11 @@
 @extends('layouts.dashboard')
 
 @section('content')
-    <x-common.page-breadcrumb pageTitle="{{$title}}" />
+    <x-common.page-breadcrumb pageTitle="{{ $title }}" />
 
     <!-- Bagian Tahun -->
-    <div class="flex flex-row justify-between items-center rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 mb-6 dark:border-gray-800 dark:bg-gray-900">
+    <div
+        class="flex flex-row justify-between items-center rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 mb-6 dark:border-gray-800 dark:bg-gray-900">
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <!-- Label -->
             <div class="flex items-center h-10">
@@ -47,11 +48,12 @@
                 Tampilkan
             </button>
         </div>
-        <button class="gap-2 rounded-full border border-gray-300
+        <button
+            class="gap-2 rounded-full border border-gray-300
             bg-white px-4 py-3 text-sm font-medium text-gray-700
             shadow-theme-xs hover:bg-gray-50 hover:text-gray-800
             dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
-                @click="$dispatch('open-smart-modal', {
+            @click="$dispatch('open-smart-modal', {
                     modalId: 'modal-rencana-jpt',
             })">
             Tambah RK JPT
@@ -60,114 +62,134 @@
 
     <!-- Modal untuk Rencana JPT -->
     <x-ui.smart-modal id="modal-rencana-jpt" class="max-w-xl"
-            @open-smart-modal.window="
+        @open-smart-modal.window="
+    if ($event.detail.modalId !== 'modal-rencana-jpt') return;
 
-            if ($event.detail.modalId !== 'modal-rencana-jpt') return;
-
-            mode    = $event.detail.mode ?? 'create'
-
-            itemKey  = $event.detail.key ?? null
-            formData = $event.detail.data ?? { tahun: '', nama_rencana_jpt: '' }">
+    mode    = $event.detail.mode ?? 'create'
+    itemKey  = $event.detail.key ?? null
+    formData = $event.detail.data ?? { tahun: '', nama_rencana_jpt: '' }">
 
         <!-- HEADER -->
-        <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-700">
-            <h4 class="text-2xl font-semibold text-gray-800 dark:text-white" x-text="mode === 'create' ? 'Tambah Rencana Kerja JPT' : 'Edit Rencana Kerja JPT'"></h4>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400" x-text="mode === 'create' ? 'Masukkan rencana kerja JPT baru' : 'Edit rencana kerja JPT'"></p>
+        <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+            <h4 class="text-xl font-semibold text-gray-800 dark:text-white"
+                x-text="mode === 'create' ? 'Tambah Rencana Kerja JPT' : 'Edit Rencana Kerja JPT'"></h4>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+                x-text="mode === 'create' ? 'Masukkan rencana kerja JPT baru' : 'Edit rencana kerja JPT'"></p>
         </div>
 
         <!-- BODY -->
-        <div class="flex-1 px-6 py-5 dark:bg-gray-900">
-            <form :action="mode === 'edit'
-                    ? `{{ url('rencana-indikator-jpt/rencana') }}/${itemKey}`
-                    : `{{ route('rencana-indikator-jpt.rencana.store') }}`"
-                method="POST" class="grid grid-cols-1 gap-y-5">
+        <div class="flex-1 px-6 py-6 dark:bg-gray-900">
+            <form
+                :action="mode === 'edit'
+                    ?
+                    `{{ url('rencana-indikator-jpt/rencana') }}/${itemKey}` :
+                    `{{ route('rencana-indikator-jpt.rencana.store') }}`"
+                method="POST" class="space-y-6">
                 @csrf
                 <template x-if="mode === 'edit'">
                     <input type="hidden" name="_method" value="PUT">
                 </template>
 
-
-                <!-- Field 1: Tahun -->
-                <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 md:w-1/4 dark:text-gray-300">
-                        Tahun
+                <!-- Tahun -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
+                        Tahun <span class="text-red-500">*</span>
                     </label>
-                    <div class="md:w-3/4">
-                        <select name="tahun" x-model="formData.tahun"
-                                class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                                required>
-                            <option value="2025">2025</option>
-                            <option value="2026">2026</option>
-                            <option value="2027">2027</option>
-                        </select>
-                    </div>
+                    <select name="tahun" x-model="formData.tahun"
+                        class="w-full h-11 rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors
+                    dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                        <option value="">Pilih Tahun</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                    </select>
                 </div>
 
-                <!-- Field 2: Nama Rencana -->
-                <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                    <label class="block text-sm font-medium text-gray-700 md:w-1/4 dark:text-gray-300">
-                        Rencana Kerja JPT
+                <!-- Nama Rencana -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
+                        Rencana Kerja JPT <span class="text-red-500">*</span>
                     </label>
                     <input type="text" x-model="formData.nama_rencana_jpt" name="nama_rencana_jpt"
-                        placeholder="Masukkan rencana kerja JPT"
-                        class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
+                        placeholder="Contoh: Pengembangan Sistem Manajemen Kinerja"
+                        class="w-full h-11 rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors
+                    dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
+                        required />
                 </div>
 
                 <!-- OPSIONAL: Tambah IKI saat CREATE -->
                 <template x-if="mode === 'create'">
-                    <div class="mt-2" x-data="{ addIki: false, ikis: [''] }">
+                    <div class="pt-4 border-t border-gray-200 dark:border-gray-700" x-data="{ addIki: false, ikis: [''] }">
 
                         <!-- Toggle -->
-                        <div class="flex items-center gap-2 mb-3">
-                            <input type="checkbox" x-model="addIki"
-                                class="rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700">
-                            <span class="text-sm text-gray-700 dark:text-gray-300">
+                        <div class="flex items-center gap-3 mb-4">
+                            <input type="checkbox" id="add-iki-toggle" x-model="addIki"
+                                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 
+                            dark:border-gray-600 dark:bg-gray-700">
+                            <label for="add-iki-toggle" class="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Tambah IKI JPT sekaligus
-                            </span>
+                            </label>
                         </div>
 
                         <!-- List IKI -->
-                        <template x-if="addIki">
-                            <div class="space-y-3 border rounded-lg p-4 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
-                                <template x-for="(iki, index) in ikis" :key="index">
-                                    <div class="flex gap-2 items-center">
-                                        <input type="text"
-                                                :name="`ikis[${index}]`"
-                                                x-model="ikis[index]"
-                                                placeholder="Nama Indikator Kinerja Individu (IKI)"
-                                                class="flex-1 h-10 rounded-lg border border-gray-300 px-3 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:placeholder:text-gray-500">
+                        <div x-show="addIki" x-transition class="space-y-4">
+                            <div
+                                class="rounded-lg border border-gray-200 p-4 bg-gray-50 
+                            dark:border-gray-700 dark:bg-gray-800/50">
+                                <div class="space-y-3">
+                                    <template x-for="(iki, index) in ikis" :key="index">
+                                        <div class="flex gap-3 items-center">
+                                            <input type="text" :name="`ikis[${index}]`" x-model="ikis[index]"
+                                                placeholder="Masukkan indikator kinerja individu"
+                                                class="flex-1 h-10 rounded-lg border border-gray-300 px-3 text-sm 
+                                            focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors
+                                            dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:placeholder:text-gray-500">
 
-                                        <!-- Remove -->
-                                        <button type="button"
-                                                @click="ikis.splice(index,1)"
-                                                x-show="ikis.length > 1"
-                                                class="text-red-500 hover:text-red-700 text-sm dark:text-red-400 dark:hover:text-red-300">
-                                            ✕
-                                        </button>
-                                    </div>
-                                </template>
+                                            <!-- Remove button -->
+                                            <button type="button" @click="ikis.splice(index,1)" x-show="ikis.length > 1"
+                                                class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg 
+                                            text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors
+                                            dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-red-900/20">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </template>
+                                </div>
 
-                                <!-- Add IKI -->
-                                <button type="button"
-                                        @click="ikis.push('')"
-                                        class="text-sm text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300">
-                                    + Tambah IKI
+                                <!-- Add IKI button -->
+                                <button type="button" @click="ikis.push('')"
+                                    class="mt-4 flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 
+                                dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    Tambah IKI
                                 </button>
                             </div>
-                        </template>
+                        </div>
                     </div>
                 </template>
 
-
                 <!-- FOOTER -->
-                <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-700">
+                <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
                     <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                         <button @click="open = false" type="button"
-                                class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
+                            class="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-gray-300 bg-white 
+                        text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors
+                        dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
                             Batal
                         </button>
                         <button type="submit"
-                                class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto dark:bg-brand-600 dark:hover:bg-brand-700">
+                            class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-blue-600 
+                        text-sm font-medium text-white hover:bg-blue-700 transition-colors
+                        dark:bg-blue-600 dark:hover:bg-blue-700">
                             <span x-text="mode === 'create' ? 'Simpan Data' : 'Update Data'"></span>
                         </button>
                     </div>
@@ -178,7 +200,7 @@
 
     <!-- Modal untuk Indikator JPT -->
     <x-ui.smart-modal id="modal-indikator-jpt" class="max-w-xl"
-            @open-smart-modal.window="
+        @open-smart-modal.window="
                 if ($event.detail.modalId !== 'modal-indikator-jpt') return;
 
                 mode        = $event.detail.mode ?? 'create'
@@ -203,13 +225,12 @@
 
         <!-- BODY -->
         <div class="flex-1 px-6 py-5 dark:bg-gray-900">
-            <form
-                method="POST"
+            <form method="POST"
                 :action="mode === 'edit'
-
-                ? `{{ url('rencana-indikator-jpt') }}/${formData.id_rencana_jpt}/indikator/${itemKey}`
-                : `{{ url('rencana-indikator-jpt') }}/${formData.id_rencana_jpt}/indikator`"
-
+                
+                    ?
+                    `{{ url('rencana-indikator-jpt') }}/${formData.id_rencana_jpt}/indikator/${itemKey}` :
+                    `{{ url('rencana-indikator-jpt') }}/${formData.id_rencana_jpt}/indikator`"
                 class="grid grid-cols-1 gap-y-5">
 
                 @csrf
@@ -223,14 +244,9 @@
                     <label class="text-sm font-medium text-gray-700 md:w-1/4 dark:text-gray-300">
                         Rencana Kerja JPT
                     </label>
-                    <input
-                        type="text"
-                        name="nama_rencana_jpt"
-                        x-model="formData.nama_rencana_jpt"
-                        disabled
+                    <input type="text" name="nama_rencana_jpt" x-model="formData.nama_rencana_jpt" disabled
                         class="md:w-3/4 h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800
-                            cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
-                    >
+                            cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
                 </div>
 
                 <!-- INPUT IKI -->
@@ -238,24 +254,18 @@
                     <label class="text-sm font-medium text-gray-700 md:w-1/4 dark:text-gray-300">
                         Indikator JPT
                     </label>
-                    <input
-                        type="text"
-                        name="nama_indikator_jpt"
-                        x-model="formData.nama_indikator_jpt"
-                        placeholder="Masukkan indikator kinerja"
-                        required
+                    <input type="text" name="nama_indikator_jpt" x-model="formData.nama_indikator_jpt"
+                        placeholder="Masukkan indikator kinerja" required
                         class="md:w-3/4 h-11 rounded-lg border border-gray-300 px-4 text-sm
                             focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                            dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
-                    >
+                            dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500">
                 </div>
 
                 <!-- FOOTER -->
                 <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-700">
                     <div class="flex justify-end gap-3">
-                        <button type="button"
-                                @click="open = false"
-                                class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium
+                        <button type="button" @click="open = false"
+                            class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium
                                     text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
                             Batal
                         </button>
@@ -298,7 +308,8 @@
                 <!-- Baris Rencana Kerja -->
                 @forelse ($rencanaJpts as $index => $rencanaJpt)
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center dark:text-gray-300">
+                        <td
+                            class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center dark:text-gray-300">
                             {{ $index + 1 }}
                         </td>
                         <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -311,24 +322,30 @@
                             <button type="button"
                                 class="expand-indicator-btn inline-flex items-center gap-1 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200 transition-colors dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                                 data-target="indicator-{{ $rencanaJpt->id }}">
-                                <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
                                 </svg>
                                 Tampilkan Indikator
                             </button>
                             <div class="relative inline-block group">
                                 <!-- Button Minimalis -->
-                                <button class="inline-flex items-center gap-1.5 rounded-lg bg-white border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:border-green-400 hover:text-green-600 transition-all duration-200 shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:border-green-500 dark:hover:text-green-400">
+                                <button
+                                    class="inline-flex items-center gap-1.5 rounded-lg bg-white border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:border-green-400 hover:text-green-600 transition-all duration-200 shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:border-green-500 dark:hover:text-green-400">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                     </svg>
                                     Aksi
                                 </button>
 
                                 <!-- Dropdown Simple -->
-                                <div class="absolute right-0 mt-1 w-36 origin-top-right rounded-md bg-white border border-gray-200 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 dark:bg-gray-800 dark:border-gray-700">
+                                <div
+                                    class="absolute right-0 mt-1 w-36 origin-top-right rounded-md bg-white border border-gray-200 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 dark:bg-gray-800 dark:border-gray-700">
                                     <div class="py-1">
-                                        <button class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 dark:text-gray-300 dark:hover:bg-gray-700"
+                                        <button
+                                            class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 dark:text-gray-300 dark:hover:bg-gray-700"
                                             @click="$dispatch('open-smart-modal', {
                                                 modalId: 'modal-rencana-jpt',
                                                 mode: 'edit',
@@ -338,8 +355,11 @@
                                                     nama_rencana_jpt: '{{ $rencanaJpt->nama_rencana_jpt }}'
                                                 }
                                             })">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                </path>
                                             </svg>
                                             Edit
                                         </button>
@@ -356,7 +376,8 @@
                                                     '{{ $rencanaJpt->nama_rencana_jpt }}'
                                                 )"
                                                 class="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2 dark:text-red-400 dark:hover:bg-gray-700">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
@@ -364,16 +385,19 @@
                                             </button>
                                         </form>
 
-                                        <button class="w-full text-left px-3 py-2 text-sm text-green-600 hover:bg-gray-100 flex items-center gap-2 dark:text-green-400 dark:hover:bg-gray-700"
+                                        <button
+                                            class="w-full text-left px-3 py-2 text-sm text-green-600 hover:bg-gray-100 flex items-center gap-2 dark:text-green-400 dark:hover:bg-gray-700"
                                             @click="$dispatch('open-smart-modal', {
                                             modalId: 'modal-indikator-jpt',
                                             data: {
                                                 id_rencana_jpt: '{{ $rencanaJpt->id }}',
                                                 nama_rencana_jpt: '{{ $rencanaJpt->nama_rencana_jpt }}'
                                             }
-                                        })" >
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                        })">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 4v16m8-8H4"></path>
                                             </svg>
                                             Tambah IKI
                                         </button>
@@ -389,18 +413,24 @@
                             <div class="ml-8">
                                 <h4 class="text-sm font-semibold text-gray-700 mb-3 dark:text-gray-300">IKI JPT</h4>
 
-                                @if($rencanaJpt->indikatorjpts && $rencanaJpt->indikatorjpts->count() > 0)
+                                @if ($rencanaJpt->indikatorjpts && $rencanaJpt->indikatorjpts->count() > 0)
                                     <div class="overflow-x-auto">
                                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                             <thead>
                                                 <tr class="bg-gray-100 dark:bg-gray-700">
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-300">No.</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-300">Nama Indikator</th>
-                                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-300">Aksi</th>
+                                                    <th
+                                                        class="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-300">
+                                                        No.</th>
+                                                    <th
+                                                        class="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-300">
+                                                        Nama Indikator</th>
+                                                    <th
+                                                        class="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-300">
+                                                        Aksi</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                                @foreach($rencanaJpt->indikatorjpts as $indikatorIndex => $indikator)
+                                                @foreach ($rencanaJpt->indikatorjpts as $indikatorIndex => $indikator)
                                                     <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
                                                         <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
                                                             {{ $indikatorIndex + 1 }}
@@ -421,16 +451,21 @@
                                                                         nama_indikator_jpt: '{{ $indikator->nama_indikator_jpt }}'
                                                                     }
                                                                 })">
-                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                                    </path>
                                                                 </svg>
                                                                 Edit
                                                             </button>
 
                                                             <form id="delete-indikator-{{ $indikator->id }}"
                                                                 action="{{ route('rencana-indikator-jpt.indikator.delete', [
-                                                                'rencanaJpt' => $rencanaJpt->id,
-                                                                'indikatorJpt' => $indikator->id]) }}"
+                                                                    'rencanaJpt' => $rencanaJpt->id,
+                                                                    'indikatorJpt' => $indikator->id,
+                                                                ]) }}"
                                                                 method="POST" class="inline">
                                                                 @csrf
                                                                 @method('DELETE')
@@ -441,8 +476,10 @@
                                                                         '{{ $indikator->nama_indikator_jpt }}'
                                                                     )"
                                                                     class="inline-flex items-center text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
-                                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                    <svg class="w-4 h-4" fill="none"
+                                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round"
+                                                                            stroke-linejoin="round" stroke-width="2"
                                                                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                                     </svg>
                                                                     Hapus
@@ -462,7 +499,7 @@
                             </div>
                         </td>
                     </tr>
-                    @empty
+                @empty
                     <tr>
                         <td colspan="4" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                             Tidak ada data rencana kerja.
@@ -476,40 +513,40 @@
 
 
     @push('scripts')
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Toggle dropdown indikator
-        document.querySelectorAll('.expand-indicator-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const targetId = this.getAttribute('data-target');
-                const targetRow = document.getElementById(targetId);
-                const icon = this.querySelector('svg');
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Toggle dropdown indikator
+                document.querySelectorAll('.expand-indicator-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const targetId = this.getAttribute('data-target');
+                        const targetRow = document.getElementById(targetId);
+                        const icon = this.querySelector('svg');
 
-                // Toggle visibility
-                targetRow.classList.toggle('hidden');
+                        // Toggle visibility
+                        targetRow.classList.toggle('hidden');
 
-                // Rotate icon
-                if (targetRow.classList.contains('hidden')) {
-                    icon.style.transform = 'rotate(0deg)';
-                    this.innerHTML = `
+                        // Rotate icon
+                        if (targetRow.classList.contains('hidden')) {
+                            icon.style.transform = 'rotate(0deg)';
+                            this.innerHTML = `
                         <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                         Tampilkan Indikator
                     `;
-                } else {
-                    icon.style.transform = 'rotate(180deg)';
-                    this.innerHTML = `
+                        } else {
+                            icon.style.transform = 'rotate(180deg)';
+                            this.innerHTML = `
                         <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="transform: rotate(180deg);">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                         Sembunyikan Indikator
                     `;
-                }
+                        }
+                    });
+                });
             });
-        });
-    });
-    </script>
+        </script>
     @endpush
 
 @endsection

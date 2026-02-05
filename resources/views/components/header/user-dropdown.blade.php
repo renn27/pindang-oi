@@ -46,128 +46,131 @@
         x-transition:leave="transition ease-in duration-75"
         x-transition:leave-start="transform opacity-100 scale-100"
         x-transition:leave-end="transform opacity-0 scale-95"
-        class="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark z-50"
+        class="absolute right-0 mt-3 w-[280px] rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800 z-50"
         style="display: none;"
     >
 
         <!-- User Info -->
-        <div>
-            <span class="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-                {{ Auth::user()->nama_pegawai }}
-            </span>
-            <span class="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-                {{ Auth::user()->email }}
-            </span>
+        <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+            <div class="flex items-center gap-4">
+                <div class="h-14 w-14 overflow-hidden rounded-full border border-gray-200 dark:border-gray-600">
+                    <img 
+                        src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/user/userlogodefault.png') }}"
+                        class="h-full w-full object-cover"
+                        alt="{{ Auth::user()->username }}"
+                    />
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="font-medium text-gray-900 dark:text-white text-sm truncate">
+                        {{ Auth::user()->nama_pegawai }}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                        {{ Auth::user()->email }}
+                    </p>
+                </div>
+            </div>
         </div>
 
         @php
             $user = Auth::user();
-
-            // 1. Ambil role struktural (dari tabel roles)
-            $roles = $user->roles
-                ->pluck('nama_role')
-                ->toArray();
-
-            // 2. Cek apakah user terlibat penugasan (punya role Anggota Tim)
-            // asumsi relasi: $user->penugasans
+            $roles = $user->roles->pluck('nama_role')->toArray();
             $isAnggotaTim = $user->penugasanSebagaiAnggota()->exists();
 
             if ($isAnggotaTim) {
                 $roles[] = 'Anggota Tim';
             }
 
-            // 3. Hilangkan duplikat
             $roles = array_values(array_unique($roles));
-
-            // 4. Role aktif
             $activeRole = $user->active_role ?? null;
-
-            // 5. Flag
             $hasRole = !empty($roles);
         @endphp
 
         <!-- Switch Role -->
-        <div class="mt-3 border-t border-gray-200 pt-3 dark:border-gray-800">
-            <span class="block mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
-                @if(!$hasRole)
-                    Belum Ada Role Aktif
-                @elseif(count($roles) > 1)
-                    Switch Role
-                @else
-                    Role Aktif
-                @endif
-            </span>
+        <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+            <div class="mb-3">
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                    @if(!$hasRole)
+                        STATUS ROLE
+                    @elseif(count($roles) > 1)
+                        SWITCH ROLE
+                    @else
+                        ROLE AKTIF
+                    @endif
+                </span>
+            </div>
 
             @if(!$hasRole)
-                <!-- 1. BELUM ADA ROLE SAMA SEKALI -->
-                <div class="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-500 italic dark:bg-gray-800 dark:text-gray-300">
-                    Belum Ada Role Aktif
+                <!-- Tidak ada role -->
+                <div class="text-sm text-gray-500 dark:text-gray-400 italic px-1 py-2">
+                    Belum ada role aktif
                 </div>
 
             @elseif(count($roles) > 1)
-                <!-- 2. MULTI ROLE (Admin / Ketua Tim / Anggota Tim, dll) -->
-                <ul class="space-y-1">
+                <!-- Multi role -->
+                <div class="space-y-2">
                     @foreach($roles as $role)
-                        <li>
-                            <form method="POST" action="{{ route('pegawai-role.switchRolePegawai', $role) }}">
-                                @csrf
-                                <button
-                                    type="submit"
-                                    class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium
-                                        {{ $activeRole === $role
-                                            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                                            : 'hover:bg-gray-100 text-gray-700 dark:hover:bg-gray-800 dark:text-gray-300 dark:hover:text-white'
-                                        }}"
-                                >
-                                    {{ $role }}
+                        <form method="POST" action="{{ route('pegawai-role.switchRolePegawai', $role) }}">
+                            @csrf
+                            <button
+                                type="submit"
+                                class="w-full text-left px-4 py-3 rounded-lg text-sm transition-colors duration-150
+                                    {{ $activeRole === $role
+                                        ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800'
+                                        : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 border border-transparent hover:border-gray-200 dark:hover:border-gray-700'
+                                    }}"
+                            >
+                                <div class="flex items-center justify-between">
+                                    <span class="font-medium">{{ $role }}</span>
                                     @if($activeRole === $role)
-                                        <span class="ml-2 text-xs dark:text-green-200">(active)</span>
+                                        <svg class="w-5 h-5 text-blue-500 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
                                     @endif
-                                </button>
-                            </form>
-                        </li>
+                                </div>
+                            </button>
+                        </form>
                     @endforeach
-                </ul>
+                </div>
 
             @else
-                <!-- 3. SINGLE ROLE -->
-                <div class="px-3 py-2 rounded-lg text-sm font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
-                    {{ $roles[0] }}
-                    <span class="ml-2 text-xs dark:text-green-200">(active)</span>
+                <!-- Single role -->
+                <div class="px-4 py-3 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800 text-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="font-medium">{{ $roles[0] }}</span>
+                        <svg class="w-5 h-5 text-blue-500 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
                 </div>
             @endif
-
         </div>
 
         <!-- Menu -->
-        <ul class="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">
-            <li>
-                <a
-                    href="{{ route('profile') }}"
-                    class="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
-                >
-                    <span class="text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300">
-                        <!-- icon -->
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                d="M12 3.5C7.30558 3.5 3.5 7.30558 3.5 12C3.5 17.5228 6.47715 20.5 12 20.5C17.5228 20.5 20.5 17.5228 20.5 12C20.5 7.30558 16.6944 3.5 12 3.5Z"
-                                fill="currentColor"/>
-                        </svg>
-                    </span>
-                    Edit Profile
-                </a>
-            </li>
-        </ul>
+        <div class="px-2 py-2">
+            <a
+                href="{{ route('profile') }}"
+                class="flex items-center gap-3 px-4 py-3.5 rounded-lg text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors duration-150"
+            >
+                <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="font-medium">Edit Profile</span>
+            </a>
+        </div>
 
         <!-- Logout -->
-        <div class="flex items-center w-full gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white">
-            <form method="POST" action="{{ route('logout') }}">
+        <div class="px-2 py-2 border-t border-gray-100 dark:border-gray-700">
+            <form method="POST" action="{{ route('logout') }}" class="w-full">
                 @csrf
                 <button
                     type="submit"
-                    class="text-theme-sm font-medium dark:text-gray-400 dark:hover:text-white"
+                    class="flex items-center gap-3 w-full px-4 py-3.5 rounded-lg text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors duration-150"
                 >
-                    Log Out
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    <span class="font-medium">Log Out</span>
                 </button>
             </form>
         </div>

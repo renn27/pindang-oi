@@ -96,8 +96,7 @@
                             </h3>
 
                             <p class="text-sm text-gray-600 mt-1 dark:text-gray-300">
-                                Ketua: {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }} •
-                                Tahun: {{ $kegiatan->tahun_kegiatan }}
+                                Ketua: {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
                             </p>
                         </div>
                         <!-- ACTION BUTTON -->
