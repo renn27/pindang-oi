@@ -42,6 +42,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/role-pegawai', [PegawaiRoleController::class, 'store'])
         ->name('pegawai-role.store');
 
+    Route::post('/role-pegawai/{pegawais:id_pegawai}', [PegawaiRoleController::class, 'update'])
+        ->name('pegawai-role.update');
+
     Route::post('/switch-role/{role}', [PegawaiRoleController::class, 'switchRolePegawai'])
         ->name('pegawai-role.switchRolePegawai');
 
@@ -129,13 +132,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [KalenderDLController::class, 'index'])->name('kalenderDL.index');
         Route::post('/', [KalenderDLController::class, 'store'])->name('kalenderDL.store');
     });
+    // END ROUTE KALENDER DL
 
-    // ROUTE KALENDER DL
+    // ROUTE KALENDER KEGIATAN
     Route::prefix('/kalender-kegiatan')->group(function () {
         Route::get('/', [KalenderKegiatanController::class, 'index'])->name('kalenderKegiatan.index');
         // Route::post('/', [KalenderKegiatanController::class, 'store'])->name('kalenderKegiatan.store');
     });
-    // END ROUTE MASTER KEGIATAN
+    // END ROUTE KALENDER KEGIATAN
 
     Route::get(
         '/bidang/{bidang:slug}/kegiatan/export-mph',

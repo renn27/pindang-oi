@@ -10,72 +10,137 @@ class PegawaiRoleController extends Controller
 {
     public function index()
     {
-        $pegawais = Pegawai::with('roles')->get();
-        $roles    = Role::all();
-
         return view('pages.main.admin.role-pegawai.index', [
             'title'    => 'Manajemen Role Pegawai',
-            'pegawais' => $pegawais,
-            'roles'    => $roles,
+            'pegawais' => Pegawai::with('roles')->get(),
+            'roles'    => Role::all(),
         ]);
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'pegawai_id' => 'required|exists:pegawais,id_pegawai',
-            'roles'      => 'required|array',
+    public function store(Request $request) {
+        $validated = $request->validate([
+            'id_pegawai' => 'required|exists:pegawais,id_pegawai',
+            'roles'      => 'required|array|min:1',
             'roles.*'    => 'exists:roles,id',
         ]);
 
-        $pegawai = Pegawai::findOrFail($request->pegawai_id);
+        $pegawai = Pegawai::with('roles')->findOrFail($validated['id_pegawai']);
 
-        // role yang sudah dimiliki
+        // role existing
         $existingRoleIds = $pegawai->roles->pluck('id')->toArray();
 
-        // role baru yang benar-benar belum dimiliki
-        $newRoleIds = array_diff($request->roles, $existingRoleIds);
+        // hanya role baru
+        $rolesToAttach = array_diff($validated['roles'], $existingRoleIds);
 
-        // ❗ kalau tidak ada role baru
-        if (empty($newRoleIds)) {
+        if (empty($rolesToAttach)) {
             return back()->with('info', 'Role tersebut sudah dimiliki pegawai');
         }
 
-        // attach hanya role baru
-        $pegawai->roles()->attach($newRoleIds);
+        $pegawai->roles()->attach($rolesToAttach);
 
-        // set active role jika belum ada
+        // set active_role jika belum ada
         if (! $pegawai->active_role) {
             $pegawai->update([
                 'active_role' => $pegawai->roles()->first()?->nama_role
             ]);
         }
 
-        return back()->with('success', 'Role baru berhasil ditambahkan');
+        return back()->with('success', 'Role pegawai berhasil ditambahkan');
+    }
+
+    public function update(Request $request, Pegawai $pegawais) {
+        $validated = $request->validate([
+            'id_pegawai' => 'required|exists:pegawais,id_pegawai',
+            'roles'      => 'nullable|array',
+            'roles.*'    => 'exists:roles,id',
+        ]);
+
+        // 🛡️ safety: URL & body harus konsisten
+        abort_if(
+            $validated['id_pegawai'] != $pegawais->id_pegawai,
+            422,
+            'Pegawai tidak valid'
+        );
+
+        $pegawai = Pegawai::with('roles')->findOrFail($validated['id_pegawai']);
+
+        // SIMPAN STATE SEBELUM UPDATE
+        $previousActiveRole = $pegawai->active_role;
+        $previousRoleNames  = $pegawai->roles->pluck('nama_role')->toArray();
+
+        // PROSES ATTACH / DETACH
+        $existingRoleIds  = $pegawai->roles->pluck('id')->toArray();
+        $incomingRoleIds  = $validated['roles'] ?? [];
+
+        $rolesToAttach = array_diff($incomingRoleIds, $existingRoleIds);
+        $rolesToDetach = array_diff($existingRoleIds, $incomingRoleIds);
+
+        if (empty($rolesToAttach) && empty($rolesToDetach)) {
+            return back()->with('info', 'Tidak ada perubahan role');
+        }
+
+        if (! empty($rolesToAttach)) {
+            $pegawai->roles()->attach($rolesToAttach);
+        }
+
+        if (! empty($rolesToDetach)) {
+            $pegawai->roles()->detach($rolesToDetach);
+        }
+
+        // reload roles terbaru
+        $pegawai->load('roles');
+
+        // PENENTUAN ACTIVE ROLE (FIX BUG)
+        $currentRoleNames = $pegawai->roles->pluck('nama_role')->toArray();
+
+        // 1️⃣ Jika active_role lama masih ada → BIARKAN
+        if (
+            $previousActiveRole &&
+            in_array($previousActiveRole, $currentRoleNames)
+        ) {
+            // do nothing
+        }
+
+        // 2️⃣ Jika masih ada role struktural lain → pakai itu
+        elseif (! empty($currentRoleNames)) {
+            $pegawai->update([
+                'active_role' => $currentRoleNames[0],
+            ]);
+        }
+
+        // 3️⃣ Tidak ada role struktural → fallback ke role kontekstual
+        elseif ($pegawai->penugasanSebagaiAnggota()->exists()) {
+            $pegawai->update([
+                'active_role' => 'Anggota Tim',
+            ]);
+        }
+
+        // 4️⃣ Benar-benar kosong
+        else {
+            $pegawai->update([
+                'active_role' => null,
+            ]);
+        }
+
+        return back()->with('success', 'Role pegawai berhasil diperbarui');
     }
 
     public function switchRolePegawai(Request $request, string $role) {
         $user = $request->user();
-
         abort_if(! $user, 401);
 
-        // daftar role kontekstual yang diperbolehkan
-        $contextualRoles = [
-            'Anggota Tim',
-        ];
+        $contextualRoles = ['Anggota Tim'];
 
-        // jika BUKAN role kontekstual, wajib role struktural
         if (! in_array($role, $contextualRoles)) {
             abort_if(! $user->hasRole($role), 403);
         }
 
-        // simpan role aktif
         $user->update([
             'active_role' => $role
         ]);
 
-        return redirect()->route('dashboard')
-        ->with('success', 'Berhasil switching role');
+        return redirect()
+            ->route('dashboard')
+            ->with('success', 'Berhasil switching role');
     }
-
 }

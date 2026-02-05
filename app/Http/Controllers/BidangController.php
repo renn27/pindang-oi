@@ -10,10 +10,15 @@ use Illuminate\Validation\Rule;
 class BidangController extends Controller
 {
 
-    public function index()
-    {
-        $bidangs = Bidang::all();
-        return view('pages.main.admin.bidang-kerja.index', ['title' => 'Seluruh Bidang Kerja', 'bidangs' => $bidangs]);
+    public function index() {
+        $bidangs = Bidang::orderBy('urutan', 'asc')
+            ->orderBy('nama_bidang', 'asc')
+            ->get();
+
+        return view('pages.main.admin.bidang-kerja.index', [
+            'title'   => 'Seluruh Bidang Kerja',
+            'bidangs' => $bidangs,
+        ]);
     }
 
     public function store(Request $request) {
@@ -21,6 +26,7 @@ class BidangController extends Controller
             'nama_bidang' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:bidangs,slug',
             'detail_bidang' => 'required|string|max:255',
+            'urutan' => 'required|integer|min:1',
         ]);
 
             // Kalau slug kosong (misal user hapus)

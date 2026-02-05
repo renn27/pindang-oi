@@ -18,17 +18,8 @@
             <select
                 class="dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:placeholder:text-gray-500 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden"
                 :class="isOptionSelected && 'text-gray-800'" @change="isOptionSelected = true">
-                <option value="" class="text-gray-700 dark:text-gray-300">
-                2025
-                </option>
-                <option value="" class="text-gray-700 dark:text-gray-300">
-                2024
-                </option>
-                <option value="" class="text-gray-700 dark:text-gray-300">
-                2023
-                </option>
-                <option value="" class="text-gray-700 dark:text-gray-300">
-                2022
+                <option value="2026" class="text-gray-700 dark:text-gray-300">
+                2026
                 </option>
             </select>
             <span
@@ -52,9 +43,7 @@
         <button class="gap-2 rounded-full border border-gray-300
             bg-white px-4 py-3 text-sm font-medium text-gray-700
             shadow-theme-xs hover:bg-gray-50 hover:text-gray-800
-            dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white
-
-           "
+            dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
                 @click="$dispatch('open-smart-modal', {
                     modalId: 'modal-bidang-kerja',
             })">
@@ -70,7 +59,7 @@
 
             mode    = $event.detail.mode ?? 'create'
             itemKey  = $event.detail.key ?? null
-            formData = $event.detail.data ?? { nama_bidang: '', slug: '', detail_bidang: '' }">
+            formData = $event.detail.data ?? { nama_bidang: '', slug: '', detail_bidang: '', urutan: '' }">
         <!-- HEADER -->
         <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-700">
             <h4 class="text-2xl font-semibold text-gray-800 dark:text-white" x-text="mode === 'create' ? 'Tambah Bidang Kerja' : 'Edit Bidang Kerja'"></h4>
@@ -79,7 +68,6 @@
 
         <!-- BODY -->
         <div class="flex-1 px-6 py-5 dark:bg-gray-900">
-
             <form :action="mode === 'edit'
                     ? `{{ url('bidang-kerja') }}/${itemKey}`
                     : `{{ route('bidang.store') }}`"
@@ -115,6 +103,15 @@
                         class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
                 </div>
 
+                <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                    <label class="block text-sm font-medium text-gray-700 md:w-1/4 dark:text-gray-300">
+                        Urutan ke-<span class="ml-1 text-xs text-gray-700 dark:text-blue-600/80">(urutan di sidebar)</span>
+                    </label>
+                    <input type="number" x-model="formData.urutan" name="urutan"
+                        placeholder="Misal : 7"
+                        class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
+                </div>
+
                 <!-- FOOTER -->
                 <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-700">
                     <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
@@ -132,102 +129,87 @@
         </div>
     </x-ui.smart-modal>
 
-
     <!-- Tabel Utama -->
-    <div class="rounded-2xl border border-gray-200 bg-white overflow-hidden dark:border-gray-800 dark:bg-gray-900">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead>
-                    <tr class="bg-gray-50 dark:bg-gray-800">
-                        <th scope="col"
-                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16 dark:text-gray-400">
-                            No.
-                        </th>
-                        <th scope="col"
-                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                            Nama Bidang
-                        </th>
-                        <th scope="col"
-                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                            Detail/Kepanjangan Bidang
-                        </th>
-                        <th scope="col"
-                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32 dark:text-gray-400">
-                            Aksi
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
-                    <!-- Baris Rencana Kerja -->
-                    @foreach ($bidangs as $index => $bidang)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center dark:text-gray-300">
-                                {{ $index + 1 }}
-                            </td>
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                {{ $bidang->nama_bidang }}
-                            </td>
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                {{ $bidang->detail_bidang }}
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-center">
-                                <div class="relative inline-block group">
-                                    <!-- Button Minimalis -->
-                                    <button class="inline-flex items-center gap-1.5 rounded-lg bg-white border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:border-green-400 hover:text-green-600 transition-all duration-200 shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:border-green-500 dark:hover:text-green-400">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                        </svg>
-                                        Aksi
-                                    </button>
+    <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead>
+                <tr class="bg-gray-50 dark:bg-gray-800">
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-16 dark:text-gray-400">No.</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Nama Bidang <span class="ml-3 text-[10px] text-gray-700 dark:text-blue-600/80">(urutan)</span></th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Detail/Kepanjangan Bidang</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-32 dark:text-gray-400">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+                @foreach ($bidangs as $index => $bidang)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center dark:text-gray-300">
+                            {{ $index + 1 }}
+                        </td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                            {{ $bidang->nama_bidang }} <span class="ml-3 text-[10px] text-gray-700 dark:text-blue-600/80">({{ $bidang->urutan }})</span>
+                        </td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                            {{ $bidang->detail_bidang }}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center">
+                            <div class="relative inline-block group">
+                                <!-- Button Minimalis -->
+                                <button class="inline-flex items-center gap-1.5 rounded-lg bg-white border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:border-green-400 hover:text-green-600 transition-all duration-200 shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:border-green-500 dark:hover:text-green-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    Aksi
+                                </button>
 
-                                    <!-- Dropdown Simple -->
-                                    <div class="absolute right-0 mt-1 w-36 origin-top-right rounded-md bg-white border border-gray-200 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 dark:bg-gray-800 dark:border-gray-700">
-                                        <div class="py-1">
-                                            <button class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 dark:text-gray-300 dark:hover:bg-gray-700"
-                                                @click="$dispatch('open-smart-modal', {
-                                                    modalId: 'modal-bidang-kerja',
-                                                    mode: 'edit',
-                                                    key: '{{ $bidang->slug }}',
-                                                    data: {
-                                                        nama_bidang: '{{ $bidang->nama_bidang }}',
-                                                        slug: '{{ $bidang->slug }}',
-                                                        detail_bidang: '{{ $bidang->detail_bidang }}'
-                                                    }
-                                                })">
+                                <!-- Dropdown Simple -->
+                                <div class="absolute right-5 top-0 w-36 origin-top-right rounded-md bg-white border border-gray-200 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 dark:bg-gray-800 dark:border-gray-700">
+                                    <div class="py-1">
+                                        <button class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 dark:text-gray-300 dark:hover:bg-gray-700"
+                                            @click="$dispatch('open-smart-modal', {
+                                                modalId: 'modal-bidang-kerja',
+                                                mode: 'edit',
+                                                key: '{{ $bidang->slug }}',
+                                                data: {
+                                                    nama_bidang: '{{ $bidang->nama_bidang }}',
+                                                    slug: '{{ $bidang->slug }}',
+                                                    detail_bidang: '{{ $bidang->detail_bidang }}',
+                                                    urutan: '{{ $bidang->urutan }}'
+                                                }
+                                            })">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                            </svg>
+                                            Edit
+                                        </button>
+
+                                        <form id="delete-rencana-{{ $bidang->id_bidang }}"
+                                            action="{{ route('bidang.delete', $bidang->slug) }}"
+                                            method="POST">
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button type="button"
+                                                onclick="SwalHelper.confirmDelete(
+                                                    'delete-rencana-{{ $bidang->id_bidang }}',
+                                                    '{{ $bidang->nama_bidang }}',
+                                                )"
+                                                class="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2 dark:text-red-400 dark:hover:bg-gray-700">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
-                                                Edit
+                                                Hapus
                                             </button>
-
-                                            <form id="delete-rencana-{{ $bidang->id_bidang }}"
-                                                action="{{ route('bidang.delete', $bidang->slug) }}"
-                                                method="POST">
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button type="button"
-                                                    onclick="SwalHelper.confirmDelete(
-                                                        'delete-rencana-{{ $bidang->id_bidang }}',
-                                                        '{{ $bidang->nama_bidang }}',
-                                                    )"
-                                                    class="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2 dark:text-red-400 dark:hover:bg-gray-700">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                    Hapus
-                                                </button>
-                                            </form>
-                                        </div>
+                                        </form>
                                     </div>
                                 </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 
     {{-- Handle Slug Otomatis --}}

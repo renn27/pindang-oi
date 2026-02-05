@@ -20,7 +20,7 @@
                 <select
                     class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
                     :class="isOptionSelected && 'text-gray-800'" @change="isOptionSelected = true">
-                    <option value="" class="text-gray-700 dark:text-gray-300">
+                    <option value="2026" class="text-gray-700 dark:text-gray-300">
                         2026
                     </option>
                 </select>
@@ -46,8 +46,8 @@
                         transition-colors duration-200 w-full sm:w-auto
                         dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
                     @click="$dispatch('open-smart-modal', {
-                modalId: 'modal-mph',
-    })">
+                    modalId: 'modal-mph',
+                })">
                     <!-- icon mata -->
                     <svg class="fill-current" width="18" height="18" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
@@ -105,6 +105,11 @@
                             @can('update', $kegiatan)
                                 {{-- Edit --}}
                                 <button
+                                    class="flex items-center gap-2 rounded-full border border-gray-300
+                                        bg-white px-4 py-3 text-sm font-medium text-gray-700
+                                        shadow-theme-xs hover:bg-yellow-50 hover:text-yellow-700
+                                        hover:border-yellow-300 transition-all duration-200
+                                        dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-yellow-900/30 dark:hover:text-yellow-400"
                                     @click="$dispatch('open-smart-modal', {
                                             modalId: 'modal-kegiatan',
                                             mode: 'edit',
@@ -118,12 +123,7 @@
                                                 rk_jpt: '{{ $kegiatan->rk_jpt }}',
                                                 iki_jpt: '{{ $kegiatan->iki_jpt }}'
                                             }
-                                        })"
-                                    class="flex items-center gap-2 rounded-full border border-gray-300
-                                        bg-white px-4 py-3 text-sm font-medium text-gray-700
-                                        shadow-theme-xs hover:bg-yellow-50 hover:text-yellow-700
-                                        hover:border-yellow-300 transition-all duration-200
-                                        dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-yellow-900/30 dark:hover:text-yellow-400">
+                                        })">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -143,14 +143,14 @@
 
                                     <button type="button"
                                         onclick="SwalHelper.confirmDelete(
-        'delete-kegiatan-{{ $kegiatan->id_kegiatan }}',
-        '{{ $kegiatan->nama_rk_kegiatan }}'
-    )"
-                                        class="flex items-center gap-2 rounded-full border border-gray-300
-    bg-white px-4 py-3 text-sm font-medium text-gray-700
-    shadow-theme-xs hover:bg-red-50 hover:text-red-700
-    hover:border-red-300 transition-all duration-200
-    dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-red-900/30 dark:hover:text-red-400">
+                                            'delete-kegiatan-{{ $kegiatan->id_kegiatan }}',
+                                            '{{ $kegiatan->nama_rk_kegiatan }}'
+                                        )"
+                                                                            class="flex items-center gap-2 rounded-full border border-gray-300
+                                        bg-white px-4 py-3 text-sm font-medium text-gray-700
+                                        shadow-theme-xs hover:bg-red-50 hover:text-red-700
+                                        hover:border-red-300 transition-all duration-200
+                                        dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-red-900/30 dark:hover:text-red-400">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
