@@ -18,6 +18,7 @@ class PegawaiRoleController extends Controller
     }
 
     public function store(Request $request) {
+        // dd($request->all());
         $validated = $request->validate([
             'id_pegawai' => 'required|exists:pegawais,id_pegawai',
             'roles'      => 'required|array|min:1',
@@ -49,6 +50,7 @@ class PegawaiRoleController extends Controller
     }
 
     public function update(Request $request, Pegawai $pegawais) {
+        // dd($request->all());
         $validated = $request->validate([
             'id_pegawai' => 'required|exists:pegawais,id_pegawai',
             'roles'      => 'nullable|array',
