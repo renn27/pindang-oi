@@ -54,74 +54,55 @@
                         class="w-full mb-4 h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800 cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
                 </div>
 
-                {{-- Nama Ketua / Penanggung Jawab --}}
-                <div x-data="{
-                    open: false,
-                    search: '',
-                    selectedId: '',
-                    highlightedIndex: -1,
-                    pegawais: @js($pegawais),
+                {{-- Nama Anggota --}}
+                <div x-data="pegawaiDropdown()"
+                    @open-smart-modal.window="
+                        if ($event.detail.modalId !== 'modal-penugasan-anggota') return;
+                        initFromModal($event.detail);
+                    " class="mb-4">
 
-                    init() {
-                        // ketika modal edit dibuka
-                        if (this.$root.formData?.nama_anggota) {
-                            this.search = this.$root.formData.nama_anggota;
-                            this.selectedId = this.$root.formData.id_anggota;
-                        }
-                    },
-
-                    filtered() {
-                        if (this.search.length === 0) return [];
-                        return this.pegawais.filter(p =>
-                            p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase())
-                        );
-                    },
-
-                    selectPegawai(p) {
-                        this.search = p.nama_pegawai;
-                        this.selectedId = p.id_pegawai;
-                        // sinkron ke formData (PENTING)
-                        this.$root.formData.nama_anggota = p.nama_pegawai;
-                        this.$root.formData.id_anggota = p.id_pegawai;
-
-                        this.open = false;
-                        this.highlightedIndex = -1;
-                    },
-
-                    highlightNext() { if (this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++; },
-                    highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
-                    selectHighlighted() { if (this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]); }
-                }">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Nama Anggota
+                        Nama Pegawai
                     </label>
-                    <!-- Input search -->
-                    <input type="text" x-model="search" class="h-11 w-full mb-4 rounded-lg border border-gray-300 px-4 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
-                        placeholder="Ketik untuk cari nama" {{-- x-model="formData.nama_anggota" --}} @focus="open = true"
-                        @input="open = true; selectedId = ''" {{-- @focus="open = !!search" @input="open = search.length > 0; selectedId = ''" --}}
-                        @keydown.arrow-down.prevent="highlightedIndex++" @keydown.arrow-up.prevent="highlightedIndex--"
-                        @keydown.enter.prevent="if(highlightedIndex>=0){ search = pegawais[highlightedIndex].nama_pegawai; selectedId = pegawais[highlightedIndex].id_pegawai; open=false; }">
 
-                    <!-- Hidden input -->
-                    <input type="hidden" name="id_anggota" :value="selectedId" required>
+                    <!-- Hidden ID Pegawai (WAJIB buat submit) -->
+                    <input type="hidden" name="id_anggota" x-model="selectedId">
 
-                    <!-- Dropdown -->
-                    <div x-show="open" x-transition
-                        class="absolute z-50 mt-1 w-full mb-4 rounded-lg border border-gray-300 bg-white max-h-60 overflow-y-auto dark:border-gray-700 dark:bg-gray-800">
-                        <template
-                            x-for="(pegawai, index) in pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase()))"
-                            :key="pegawai.id_pegawai">
-                            <div @click="search = pegawai.nama_pegawai; selectedId = pegawai.id_pegawai; open = false"
-                                :class="{
-                                    'bg-blue-100 dark:bg-blue-900/40': highlightedIndex === index,
-                                    'hover:bg-gray-100 dark:hover:bg-gray-700': highlightedIndex !== index
-                                }"
-                                class="cursor-pointer px-4 py-2 text-sm dark:text-gray-300" x-text="pegawai.nama_pegawai"></div>
-                        </template>
-                        <template
-                            x-if="pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase())).length === 0">
-                            <div class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">Data tidak ditemukan</div>
-                        </template>
+                    <!-- Input Visible -->
+                    <div class="relative">
+                        <input
+                            type="text"
+                            x-model="search"
+                            @click="mode === 'create' && (open = true)"
+                            @input="mode === 'create' && (open = true)"
+                            @keydown.escape="open = false"
+                            :readonly="mode === 'edit'"
+                            placeholder="Pilih pegawai..."
+                            class="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors">
+
+                        <!-- Dropdown -->
+                        <div x-show="open && mode === 'create'"
+                            x-transition
+                            @click.outside="open = false"
+                            class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto
+                                    rounded-lg border border-gray-200 bg-white shadow-lg
+                                    dark:border-gray-700 dark:bg-gray-800">
+                            <template x-if="filteredPegawais.length === 0">
+                                <div class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 italic">
+                                    Pegawai tidak ditemukan
+                                </div>
+                            </template>
+
+                            <template x-for="pegawai in filteredPegawais" :key="pegawai.id_pegawai">
+                                <button type="button"
+                                        @click="selectPegawai(pegawai)"
+                                        class="flex w-full items-center px-4 py-3 text-left text-sm
+                                            hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
+                                    <div class="font-medium text-gray-800 dark:text-gray-200"
+                                        x-text="pegawai.nama_pegawai"></div>
+                                </button>
+                            </template>
+                        </div>
                     </div>
                 </div>
 
@@ -354,3 +335,118 @@
         </div>
     </form>
 </x-ui.smart-modal>
+<script>
+    function pegawaiDropdown() {
+        return {
+            open: false,
+            search: '',
+            selectedId: '',
+            mode: 'create',
+
+            pegawais: @js(
+                $pegawais->map(fn($p) => [
+                    'id_pegawai'   => $p->id_pegawai,
+                    'nama_pegawai' => $p->nama_pegawai
+                ])
+            ),
+
+            initFromModal(detail) {
+                this.mode = detail.mode ?? 'create';
+
+                if (this.mode === 'edit') {
+                    this.selectedId = detail.data.id_anggota;
+                    this.search     = detail.data.nama_anggota;
+                    this.open       = false;
+                } else {
+                    this.selectedId = '';
+                    this.search     = '';
+                    this.open       = true;
+                }
+            },
+
+            get filteredPegawais() {
+                if (!this.search) return this.pegawais;
+
+                return this.pegawais.filter(p =>
+                    p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase())
+                );
+            },
+
+            selectPegawai(p) {
+                this.selectedId = p.id_pegawai;
+                this.search     = p.nama_pegawai;
+                this.open       = false;
+            }
+        }
+    }
+</script>
+{{-- <div x-data="{
+    open: false,
+    search: '',
+    selectedId: '',
+    highlightedIndex: -1,
+    pegawais: @js($pegawais),
+
+    init() {
+        // ketika modal edit dibuka
+        if (this.$root.formData?.nama_anggota) {
+            this.search = this.$root.formData.nama_anggota;
+            this.selectedId = this.$root.formData.id_anggota;
+        }
+    },
+
+    filtered() {
+        if (this.search.length === 0) return [];
+        return this.pegawais.filter(p =>
+            p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase())
+        );
+    },
+
+    selectPegawai(p) {
+        this.search = p.nama_pegawai;
+        this.selectedId = p.id_pegawai;
+        // sinkron ke formData (PENTING)
+        this.$root.formData.nama_anggota = p.nama_pegawai;
+        this.$root.formData.id_anggota = p.id_pegawai;
+
+        this.open = false;
+        this.highlightedIndex = -1;
+    },
+
+    highlightNext() { if (this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++; },
+    highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
+    selectHighlighted() { if (this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]); }
+}">
+    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        Nama Anggota
+    </label>
+    <!-- Input search -->
+    <input type="text" x-model="search" class="h-11 w-full mb-4 rounded-lg border border-gray-300 px-4 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
+        placeholder="Ketik untuk cari nama"
+        @focus="open = true"
+        @input="open = true; selectedId = ''" 
+        @keydown.arrow-down.prevent="highlightedIndex++" @keydown.arrow-up.prevent="highlightedIndex--"
+        @keydown.enter.prevent="if(highlightedIndex>=0){ search = pegawais[highlightedIndex].nama_pegawai; selectedId = pegawais[highlightedIndex].id_pegawai; open=false; }">
+
+    <!-- Hidden input -->
+    <input type="hidden" name="id_anggota" :value="selectedId" required>
+
+    <!-- Dropdown -->
+    <div x-show="open" x-transition
+        class="absolute z-50 mt-1 w-full mb-4 rounded-lg border border-gray-300 bg-white max-h-60 overflow-y-auto dark:border-gray-700 dark:bg-gray-800">
+        <template
+            x-for="(pegawai, index) in pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase()))"
+            :key="pegawai.id_pegawai">
+            <div @click="search = pegawai.nama_pegawai; selectedId = pegawai.id_pegawai; open = false"
+                :class="{
+                    'bg-blue-100 dark:bg-blue-900/40': highlightedIndex === index,
+                    'hover:bg-gray-100 dark:hover:bg-gray-700': highlightedIndex !== index
+                }"
+                class="cursor-pointer px-4 py-2 text-sm dark:text-gray-300" x-text="pegawai.nama_pegawai"></div>
+        </template>
+        <template
+            x-if="pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase())).length === 0">
+            <div class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">Data tidak ditemukan</div>
+        </template>
+    </div>
+</div> --}}

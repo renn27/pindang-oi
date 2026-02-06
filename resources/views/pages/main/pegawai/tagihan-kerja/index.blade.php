@@ -200,25 +200,42 @@
     @include('pages.main.components.modals.tagihan-kerja.modal-sub-kegiatan')
 
     <script>
-        function loadIkiByRk(rkId, formData) {
-            const selectedIki = formData.iki_jpt;
-
+        async function loadIkiByRk(rkId, formData) {
             if (!rkId) {
                 formData.ikiOptions = [];
                 formData.iki_jpt = '';
                 return;
             }
 
-            fetch(`/rencana-indikator-jpt/${rkId}/indikator`)
-                .then(res => res.json())
-                .then(data => {
-                    formData.ikiOptions = data;
+            try {
+                const res  = await fetch(`/rencana-indikator-jpt/${rkId}/indikator`);
+                const data = await res.json();
 
-                    // 🔥 pastikan value dipilih SETELAH option ada
-                    if (selectedIki) {
-                        formData.iki_jpt = selectedIki;
-                    }
-                });
+                formData.ikiOptions = data;
+            } catch (error) {
+                console.error('Gagal load IKI JPT:', error);
+                formData.ikiOptions = [];
+            }
         }
+        // function loadIkiByRk(rkId, formData) {
+        //     const selectedIki = formData.iki_jpt;
+
+        //     if (!rkId) {
+        //         formData.ikiOptions = [];
+        //         formData.iki_jpt = '';
+        //         return;
+        //     }
+
+        //     fetch(`/rencana-indikator-jpt/${rkId}/indikator`)
+        //         .then(res => res.json())
+        //         .then(data => {
+        //             formData.ikiOptions = data;
+
+        //             // 🔥 pastikan value dipilih SETELAH option ada
+        //             if (selectedIki) {
+        //                 formData.iki_jpt = selectedIki;
+        //             }
+        //         });
+        // }
     </script>
 @endsection

@@ -24,11 +24,40 @@
             search     = formData.nama_penanggung_jawab ?? '';
 
             // ✅ PENTING: tunggu DOM & Alpine sync
-            $nextTick(() => {
+            {{-- $nextTick(async () => {
+                if (formData.rk_jpt) {
+                    const selectedIki = formData.iki_jpt;
+
+                    // reset dulu
+                    formData.iki_jpt = '';
+
+                    await loadIkiByRk(formData.rk_jpt, formData);
+
+                    // set ulang SETELAH options ada
+                    formData.iki_jpt = selectedIki;
+                }
+            }); --}}
+
+            $nextTick(async () => {
+                if (formData.rk_jpt) {
+                    const selectedIki = formData.iki_jpt;
+
+                    // reset dulu supaya Alpine re-evaluate
+                    formData.iki_jpt = '';
+
+                    await loadIkiByRk(formData.rk_jpt, formData);
+
+                    // set ulang SETELAH options masuk
+                    formData.iki_jpt = selectedIki;
+                }
+            });
+
+
+            {{-- $nextTick(() => {
                 if (formData.rk_jpt) {
                     loadIkiByRk(formData.rk_jpt, formData);
                 }
-            });
+            }); --}}
         ">
     <form
         :action="mode === 'edit'
@@ -51,7 +80,6 @@
 
             <!-- BODY (SCROLL DI SINI) -->
             <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar dark:bg-gray-900">
-
                 <!-- Nama Bidang (readonly tampilan) -->
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -66,61 +94,55 @@
                 <!-- ID Bidang (yang benar-benar dikirim ke backend) -->
                 <input type="hidden" name="id_bidang" value="{{ $bidang->id_bidang }}">
 
-                {{-- Nama Ketua / Penanggung Jawab --}}
-                <div x-data="{
-                    open: false,
-                    search: '',
-                    selectedId: '',
-                    highlightedIndex: -1,
-                    ketuaTims: @js($ketuaTims),
-                
-                    filtered() {
-                        if (this.search.length === 0) return [];
-                        return this.ketuaTims.filter(p => p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase()));
-                    },
-                
-                    selectPegawai(p) {
-                        this.search = p.nama_pegawai;
-                        this.selectedId = p.id_pegawai;
-                        this.open = false;
-                        this.highlightedIndex = -1;
-                    },
-                
-                    highlightNext() { if (this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++; },
-                    highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
-                    selectHighlighted() { if (this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]); }
-                }" class="relative">
+                {{-- Nama Anggota --}}
+                <div x-data="ketuaDropdown()"
+                    @open-smart-modal.window="
+                        if ($event.detail.modalId !== 'modal-kegiatan') return;
+                        initFromModal($event.detail);
+                    " class="mb-4">
+
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Nama Ketua
                     </label>
-                    <!-- Input search -->
-                    <input type="text" x-model="search" @focus="open = !!search"
-                        @input="open = search.length > 0; selectedId = ''"
-                        @keydown.arrow-down.prevent="highlightedIndex++" @keydown.arrow-up.prevent="highlightedIndex--"
-                        @keydown.enter.prevent="if(highlightedIndex>=0){ search = ketuaTims[highlightedIndex].nama_pegawai; selectedId = ketuaTims[highlightedIndex].id_pegawai; open=false; }"
-                        placeholder="Ketik untuk cari nama" 
-                        class="h-11 w-full mb-4 rounded-lg border border-gray-300 px-4 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500">
 
-                    <!-- Hidden input -->
-                    <input type="hidden" name="id_penanggung_jawab" :value="selectedId" required>
+                    <!-- Hidden ID Pegawai (WAJIB buat submit) -->
+                    <input type="hidden" name="id_penanggung_jawab" x-model="selectedId">
 
-                    <!-- Dropdown -->
-                    <div x-show="open" x-transition
-                        class="absolute z-50 mt-1 w-full mb-4 rounded-lg border border-gray-300 bg-white max-h-60 overflow-y-auto dark:border-gray-700 dark:bg-gray-800">
-                        <template
-                            x-for="(pegawai, index) in ketuaTims.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase()))"
-                            :key="pegawai.id_pegawai">
-                            <div @click="search = pegawai.nama_pegawai; selectedId = pegawai.id_pegawai; open = false"
-                                :class="{
-                                    'bg-blue-100 dark:bg-blue-900/40': highlightedIndex === index,
-                                    'hover:bg-gray-100 dark:hover:bg-gray-700': highlightedIndex !== index
-                                }"
-                                class="cursor-pointer px-4 py-2 text-sm dark:text-gray-300" x-text="pegawai.nama_pegawai"></div>
-                        </template>
-                        <template
-                            x-if="ketuaTims.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase())).length === 0">
-                            <div class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">Data tidak ditemukan</div>
-                        </template>
+                    <!-- Input Visible -->
+                    <div class="relative">
+                        <input
+                            type="text"
+                            x-model="search"
+                            @click="mode === 'create' && (open = true)"
+                            @input="mode === 'create' && (open = true)"
+                            @keydown.escape="open = false"
+                            :readonly="mode === 'edit'"
+                            placeholder="Pilih Ketua Kegiatan..."
+                            class="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors">
+
+                        <!-- Dropdown -->
+                        <div x-show="open && mode === 'create'"
+                            x-transition
+                            @click.outside="open = false"
+                            class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto
+                                    rounded-lg border border-gray-200 bg-white shadow-lg
+                                    dark:border-gray-700 dark:bg-gray-800">
+                            <template x-if="filteredPegawais.length === 0">
+                                <div class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 italic">
+                                    Ketua tidak ditemukan
+                                </div>
+                            </template>
+
+                            <template x-for="pegawai in filteredPegawais" :key="pegawai.id_pegawai">
+                                <button type="button"
+                                        @click="selectPegawai(pegawai)"
+                                        class="flex w-full items-center px-4 py-3 text-left text-sm
+                                            hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
+                                    <div class="font-medium text-gray-800 dark:text-gray-200"
+                                        x-text="pegawai.nama_pegawai"></div>
+                                </button>
+                            </template>
+                        </div>
                     </div>
                 </div>
 
@@ -139,7 +161,10 @@
                         Rencana JPT
                     </label>
                     <select id="rk_jpt" name="rk_jpt" x-model="formData.rk_jpt"
-                        @change="loadIkiByRk(formData.rk_jpt, formData)"
+                        @change="
+                            formData.iki_jpt = '';
+                            loadIkiByRk(formData.rk_jpt, formData)
+                            "
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                         <option value="" class="dark:text-gray-400">-- Pilih RK JPT --</option>
                         @foreach ($rkJpts as $rk)
@@ -202,3 +227,48 @@
         </div>
     </form>
 </x-ui.smart-modal>
+<script>
+    function ketuaDropdown() {
+        return {
+            open: false,
+            search: '',
+            selectedId: '',
+            mode: 'create',
+
+            ketuaTims: @js(
+                $ketuaTims->map(fn($p) => [
+                    'id_pegawai'   => $p->id_pegawai,
+                    'nama_pegawai' => $p->nama_pegawai
+                ])
+            ),
+
+            initFromModal(detail) {
+                this.mode = detail.mode ?? 'create';
+
+                if (this.mode === 'edit') {
+                    this.selectedId = detail.data.id_penanggung_jawab;
+                    this.search     = detail.data.nama_penanggung_jawab;
+                    this.open       = false;
+                } else {
+                    this.selectedId = '';
+                    this.search     = '';
+                    this.open       = true;
+                }
+            },
+
+            get filteredPegawais() {
+                if (!this.search) return this.ketuaTims;
+
+                return this.ketuaTims.filter(p =>
+                    p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase())
+                );
+            },
+
+            selectPegawai(p) {
+                this.selectedId = p.id_pegawai;
+                this.search     = p.nama_pegawai;
+                this.open       = false;
+            }
+        }
+    }
+</script>
