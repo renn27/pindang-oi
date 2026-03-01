@@ -35,7 +35,7 @@ class KegiatanPolicy
         if (! $bidang) {
             return false;
         }
-        
+
         // KETUA TIM
         if ($pegawai->active_role === 'Ketua Tim') {
             return Kegiatan::where('id_bidang', $bidang->id_bidang)

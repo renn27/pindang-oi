@@ -305,6 +305,15 @@
                                 class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 dark:text-gray-300 shadow-theme-xs placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-brand-300 dark:focus:border-brand-500 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
                         </div>
 
+                        <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
+                                Satuan Target
+                            </label>
+                            <input type="text" name="satuan_target[]"
+                                placeholder="Misalnya : Kegiatan, Dokumen, dll"
+                                class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 dark:text-gray-300 shadow-theme-xs placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-brand-300 dark:focus:border-brand-500 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                        </div>
+
                         <!-- Tanggal Mulai dan Tanggal Selesai untuk Detail Anggota -->
                         <div class="flex flex-col gap-2 md:flex-row md:items-center">
                             <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">

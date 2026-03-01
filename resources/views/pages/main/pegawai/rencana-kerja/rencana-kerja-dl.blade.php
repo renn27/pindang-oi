@@ -98,7 +98,7 @@
 
     <div class="space-y-6">
         <!-- Tampilan Card Fungsi dengan Accordion -->
-        <x-common.component-card title="Daftar Rencana Kerja Butuh DL">
+        <x-common.component-card title="Daftar Rencana Kerja DL">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <div class="rounded-xl border dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Rencana Kerja</p>

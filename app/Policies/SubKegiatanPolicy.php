@@ -42,7 +42,7 @@ class SubKegiatanPolicy
         }
 
         return $SubKegiatan->penugasans()
-            ->whereHas('anggota', function ($q) use ($pegawai) {
+            ->whereHas('penugasans.anggota', function ($q) use ($pegawai) {
                 $q->where('id_anggota', $pegawai->id_pegawai);
             })->exists();
     }

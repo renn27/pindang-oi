@@ -11,11 +11,11 @@ class JenisKegiatanSeeder extends Seeder
     {
         $data = [
             ['jenis_kegiatan' => 'Pengolahan',        'kategori' => 'Utama'],
-            ['jenis_kegiatan' => 'Pencacahan',        'kategori' => 'Utama'],
+            ['jenis_kegiatan' => 'Pemeriksaan',       'kategori' => 'Utama'],
             ['jenis_kegiatan' => 'Pendataan',         'kategori' => 'Utama'],
+            ['jenis_kegiatan' => 'Pengawasan',        'kategori' => 'Utama'],
             ['jenis_kegiatan' => 'Supervisi',         'kategori' => 'Utama'],
             ['jenis_kegiatan' => 'Perjalanan Dinas',  'kategori' => 'Utama'],
-            ['jenis_kegiatan' => 'Pengawasan',        'kategori' => 'Utama'],
         ];
 
         foreach ($data as $item) {

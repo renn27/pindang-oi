@@ -84,6 +84,7 @@ class MasterKegiatanController extends Controller
                 // 'status' => ['required', 'array'],
                 // 'status.*' => ['required', 'in:Belum Mulai,Berjalan,Selesai'],
 
+                'target' => ['array'],
                 'satuan_target' => ['array'],
                 'tanggal_mulai' => ['array'],
                 'tanggal_akhir' => ['array'],
@@ -122,6 +123,7 @@ class MasterKegiatanController extends Controller
                     $subKegiatan = $kegiatan->subKegiatans()->create([
                         'nama_sub_kegiatan' => $rkAnggota,
                         'target'            => $request->target[$index] ?? null,
+                        'satuan_target'     => $request->satuan_target[$index] ?? null,
                         'tanggal_mulai'     => $request->tanggal_mulai[$index] ?? null,
                         'tanggal_selesai'   => $request->tanggal_selesai[$index] ?? null,
                         'status'            => 'Belum Mulai', // ✅ DEFAULT
@@ -169,8 +171,8 @@ class MasterKegiatanController extends Controller
                         $subKegiatan->penugasans()->create([
                             'id_anggota'      => $idAnggota,
                             'id_jenis_kegiatan' => $idJenisKegiatan,
-                            'satuan_target'   => $satuanTargets[$i] ?? null,
                             'target'          => $targets[$i] ?? null,
+                            'satuan_target'   => $satuanTargets[$i] ?? null,
                             'tanggal_mulai'   => $tglMulais[$i] ?? null,
                             'tanggal_selesai' => $tglSelesais[$i] ?? null,
                             'status'          => 'Belum Dikirim', // ✅ DEFAULT
@@ -294,7 +296,7 @@ class MasterKegiatanController extends Controller
             ->flatMap(fn ($sub) => $sub->penugasans);
 
         return view('pages.main.pegawai.rencana-kerja.rencana-kerja-dl', [
-            'title'         => "Rencana Kerja Butuh DL",
+            'title'         => "Rencana Kerja DL",
             'bidangs'       => $bidangs,
             'pegawais'      => $pegawais,
             'ketuaTims'     => $ketuaTims,

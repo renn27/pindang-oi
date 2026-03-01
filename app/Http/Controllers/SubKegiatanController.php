@@ -18,6 +18,7 @@ class SubKegiatanController extends Controller
         $validated = $request->validate([
             'nama_sub_kegiatan' => ['required', 'string', 'max:255'],
             'target' => ['required', 'integer', 'min:1'],
+            'satuan_target' => ['required', 'string'],
             'tanggal_mulai' => [
                 'required',
                 'date',
@@ -107,6 +108,7 @@ class SubKegiatanController extends Controller
         $validated = $request->validate([
             'nama_sub_kegiatan' => ['required', 'string', 'max:255'],
             'target' => ['required', 'integer', 'min:1'],
+            'satuan_target' => ['required', 'string'],
             'tanggal_mulai' => [
                 'required',
                 'date',

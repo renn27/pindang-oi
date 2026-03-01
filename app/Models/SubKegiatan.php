@@ -19,6 +19,7 @@ class SubKegiatan extends Model
     protected $fillable = [
         'nama_sub_kegiatan',
         'target',
+        'satuan_target',
         'tanggal_mulai',
         'tanggal_selesai',
     ];
