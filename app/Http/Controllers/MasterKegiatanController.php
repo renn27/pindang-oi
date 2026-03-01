@@ -296,7 +296,7 @@ class MasterKegiatanController extends Controller
             ->flatMap(fn ($sub) => $sub->penugasans);
 
         return view('pages.main.pegawai.rencana-kerja.rencana-kerja-dl', [
-            'title'         => "Rencana Kerja DL",
+            'title'         => "Rencana Kerja Perlu DL",
             'bidangs'       => $bidangs,
             'pegawais'      => $pegawais,
             'ketuaTims'     => $ketuaTims,

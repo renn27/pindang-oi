@@ -52,7 +52,7 @@ class MenuHelper
                 'name' => 'Rencana Kinerja',
                 'subItems' => [
                     ['name' => 'Rencana Kerja Per Fungsi', 'path' => '/master-kegiatan'],
-                    ['name' => 'Rencana Kerja DL', 'path' => '/rencana-kerja-dl'],
+                    ['name' => 'Rencana Kerja Perlu DL', 'path' => '/rencana-kerja-dl'],
                     ],
             ],
         ];

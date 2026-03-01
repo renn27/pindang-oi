@@ -113,7 +113,12 @@ class Penugasan extends Model
 
     public function isStarted(): bool
     {
-        return now()->gte($this->tanggal_mulai);
+        return now()->gte($this->tanggal_mulai->copy()->startOfDay());
+    }
+
+    public function isEnded(): bool
+    {
+        return now()->gt($this->tanggal_selesai->copy()->endOfDay());
     }
 
     public function bolehTerimaPenugasan(): bool
@@ -296,12 +301,12 @@ class Penugasan extends Model
         | 2️⃣ DEADLINE LEWAT & TIDAK PERNAH KIRIM
         |--------------------------------------------------------------------------
         */
-        if ($today->gt($deadline) && ! $latestPengiriman) {
-            return [
-                'label' => 'Tidak Mengirimkan',
-                'class' => 'bg-red-100 text-red-700',
-            ];
-        }
+        // if ($today->gt($deadline) && ! $latestPengiriman) {
+        //     return [
+        //         'label' => 'Tidak Mengirimkan',
+        //         'class' => 'bg-red-100 text-red-700',
+        //     ];
+        // }
 
         /*
         |--------------------------------------------------------------------------
