@@ -18,11 +18,11 @@ class DatabaseSeeder extends Seeder
             RencanaJPTSeeder::class,
             IndikatorJPTSeeder::class,
             JenisKegiatanSeeder::class,
-            RoleSeeder::class,        
+            RoleSeeder::class,
             PegawaiSeeder::class,
             PegawaiRoleSeeder::class,
             KegiatanSeeder::class,
-            SubKegiatanSeeder::class, 
+            SubKegiatanSeeder::class,
         ]);
     }
 }

@@ -37,14 +37,18 @@ class SubKegiatanPolicy
             return true;
         }
 
-        if ($SubKegiatan->kegiatan->id_penanggung_jawab == $pegawai->id_pegawai) {
-            return true;
+        if ($pegawai->active_role === 'Ketua Tim') {
+            return $SubKegiatan->kegiatan->id_penanggung_jawab === $pegawai->id_pegawai;
         }
 
-        return $SubKegiatan->penugasans()
-            ->whereHas('penugasans.anggota', function ($q) use ($pegawai) {
-                $q->where('id_anggota', $pegawai->id_pegawai);
-            })->exists();
+        if ($pegawai->active_role === 'Anggota Tim') {
+            return $SubKegiatan->penugasans()
+                ->whereHas('anggota', function ($q) use ($pegawai) {
+                    $q->where('id_anggota', $pegawai->id_pegawai);
+                })->exists();
+        }
+
+        return false;
     }
 
     /**
