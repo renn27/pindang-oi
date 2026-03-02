@@ -84,16 +84,16 @@ class PenugasanController extends Controller
              */
             $subKegiatan->penugasans()->create($validated);
 
-            /**
-             * 🔄 SET ACTIVE ROLE PEGAWAI → ANGGOTA TIM (KONTEKSTUAL)
-             */
-            $pegawai = Pegawai::find($validated['id_anggota']);
+            // /**
+            //  * 🔄 SET ACTIVE ROLE PEGAWAI → ANGGOTA TIM (KONTEKSTUAL)
+            //  */
+            // $pegawai = Pegawai::find($validated['id_anggota']);
 
-            if ($pegawai && $pegawai->active_role !== 'Anggota Tim') {
-                $pegawai->update([
-                    'active_role' => 'Anggota Tim'
-                ]);
-            }
+            // if ($pegawai && $pegawai->active_role !== 'Anggota Tim') {
+            //     $pegawai->update([
+            //         'active_role' => 'Anggota Tim'
+            //     ]);
+            // }
 
             return redirect()
                 ->route('sub.kegiatan.show', [

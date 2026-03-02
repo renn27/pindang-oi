@@ -25,7 +25,16 @@ class MasterKegiatanController extends Controller
         // Data referensi untuk dropdown modal
         $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
         $rkJpts   = RencanaJPT::orderBy('nama_rencana_jpt')->get(['id', 'nama_rencana_jpt']);
-        $jenisKegiatans = JenisKegiatan::orderBy('jenis_kegiatan')->get();
+        $jenisKegiatans = JenisKegiatan::query()
+            ->orderByRaw("
+                CASE
+                    WHEN kategori = 'Utama' THEN 1
+                    WHEN kategori = 'Tambahan' THEN 2
+                    ELSE 3
+                END
+            ")
+            ->orderBy('jenis_kegiatan', 'asc')
+            ->get();
         $ketuaTims = Pegawai::join('pegawai_role', 'pegawais.id_pegawai', '=', 'pegawai_role.pegawai_id')
             ->join('roles', 'pegawai_role.role_id', '=', 'roles.id')
             ->where('roles.nama_role', 'Ketua Tim')
@@ -66,7 +75,6 @@ class MasterKegiatanController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
         // dd($request->all());
         $this->authorize('create', Kegiatan::class);
         try {

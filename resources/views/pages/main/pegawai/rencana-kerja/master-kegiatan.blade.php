@@ -607,19 +607,16 @@
                                     </select>
 
                                     <!-- INPUT JENIS BARU (FIXED) -->
-                                    <template x-if="isOther">
-                                        <div>
-                                            <input
-                                                type="text"
-                                                name="detail_jenis_kegiatan_baru[${sectionId}][]"
-                                                placeholder="Masukkan jenis kegiatan baru"
-                                                class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-600
-                                                    dark:bg-gray-700 dark:text-gray-300 px-3 py-2 text-xs
-                                                    focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 transition"
-                                            />
-                                        </div>
-                                    </template>
-
+                                    <div x-show="isOther">
+                                        <input
+                                            type="text"
+                                            name="detail_jenis_kegiatan_baru[${sectionId}][]"
+                                            placeholder="Masukkan jenis kegiatan baru"
+                                            class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-600
+                                                dark:bg-gray-700 dark:text-gray-300 px-3 py-2 text-xs
+                                                focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 transition"
+                                        />
+                                    </div>
                                 </div>
 
                                 <!-- TOGGLE DL -->

@@ -58,6 +58,18 @@ class Penugasan extends Model
     }
     // END RELATIONS
 
+    protected static function booted() {
+        static::created(function ($penugasan) {
+            $pegawai = Pegawai::find($penugasan->id_anggota);
+
+            if ($pegawai && $pegawai->active_role !== 'Anggota Tim') {
+                $pegawai->update([
+                    'active_role' => 'Anggota Tim'
+                ]);
+            }
+        });
+    }
+
     public function latestPengiriman() {
         return $this->hasOne(Pengiriman::class, 'id_penugasan', 'id_penugasan')
             ->latestOfMany('tanggal_pengiriman');
