@@ -67,6 +67,7 @@ class MasterKegiatanController extends Controller
     public function store(Request $request)
     {
         // dd($request->all());
+        // dd($request->all());
         $this->authorize('create', Kegiatan::class);
         try {
             $validated = $request->validate([
@@ -81,8 +82,8 @@ class MasterKegiatanController extends Controller
                 'rk_anggota.*' => ['required', 'string'],
 
                 // ⬇️ PENTING (karena dipakai di controller)
-                // 'status' => ['required', 'array'],
-                // 'status.*' => ['required', 'in:Belum Mulai,Berjalan,Selesai'],
+                // 'status' => ['nullable', 'array'],
+                // 'status.*' => ['nullable', 'in:Belum Mulai,Berjalan,Selesai'],
 
                 'target' => ['array'],
                 'satuan_target' => ['array'],
@@ -97,6 +98,11 @@ class MasterKegiatanController extends Controller
                 'detail_id_jenis_kegiatan.*.*' => ['required'],
 
                 'detail_jenis_kegiatan_baru' => ['nullable', 'array'],
+                'detail_jenis_kegiatan_baru.*.*' => ['nullable', 'string'],
+
+                'detail_butuh_dl' => ['nullable', 'array'],
+                'detail_butuh_dl.*' => ['array'],
+                'detail_butuh_dl.*.*' => ['nullable', 'boolean'],
 
                 'detail_target' => ['array'],
                 'detail_satuan_target' => ['array'],
@@ -136,6 +142,7 @@ class MasterKegiatanController extends Controller
 
                     $anggotaIds     = $request->detail_id_anggota[$sectionKey] ?? [];
                     $jenisKegiatans = $request->detail_id_jenis_kegiatan[$sectionKey] ?? [];
+                    $butuhDlInputs  = $request->detail_butuh_dl[$sectionKey] ?? [];
                     $targets        = $request->detail_target[$sectionKey] ?? [];
                     $satuanTargets  = $request->detail_satuan_target[$sectionKey] ?? [];
                     $tglMulais      = $request->detail_tanggal_mulai[$sectionKey] ?? [];
@@ -168,6 +175,22 @@ class MasterKegiatanController extends Controller
                             }
                         }
 
+                        $jenisKegiatan = JenisKegiatan::find($idJenisKegiatan);
+
+                        // ===============================
+                        // 🔐 SERVER-SIDE DL VALIDATION
+                        // ===============================
+                        $wajibDl = in_array($jenisKegiatan->jenis_kegiatan, [
+                            'Perjalanan Dinas',
+                            'Supervisi',
+                            'Pengawasan',
+                            'Pendataan',
+                        ]);
+
+                        $requestButuhDl = (bool) ($butuhDlInputs[$i] ?? false);
+
+                        $butuhDlFinal = $wajibDl || $requestButuhDl;
+
                         $subKegiatan->penugasans()->create([
                             'id_anggota'      => $idAnggota,
                             'id_jenis_kegiatan' => $idJenisKegiatan,
@@ -175,6 +198,8 @@ class MasterKegiatanController extends Controller
                             'satuan_target'   => $satuanTargets[$i] ?? null,
                             'tanggal_mulai'   => $tglMulais[$i] ?? null,
                             'tanggal_selesai' => $tglSelesais[$i] ?? null,
+                            'butuh_dl'        => $butuhDlFinal,
+                            'status_dl'       => $butuhDlFinal ? 'Menunggu' : null,
                             'status'          => 'Belum Dikirim', // ✅ DEFAULT
                         ]);
                     }
@@ -187,7 +212,7 @@ class MasterKegiatanController extends Controller
             // ->with('success', 'RK berhasil disimpan.');
         } catch (QueryException $e) {
             // log error DB
-            Log::error('Gagal simpan RK', [
+            Log::error('Gagal simpan Data Rencana Kegiatan', [
                 'error' => $e->getMessage()
             ]);
 

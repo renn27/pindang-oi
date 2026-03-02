@@ -22,6 +22,7 @@ class SubKegiatan extends Model
         'satuan_target',
         'tanggal_mulai',
         'tanggal_selesai',
+        'status'
     ];
 
     protected $casts = [

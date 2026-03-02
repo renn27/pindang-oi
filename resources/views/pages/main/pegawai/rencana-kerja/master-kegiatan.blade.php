@@ -515,47 +515,170 @@
                             </div>
                         </div>
 
-                        <div x-data="{ isOther: false, idJenisKegiatan: '' }"
-                            class="flex flex-col gap-2 md:flex-row md:items-start">
+                        <div
+                            x-data="{
+                                idJenisKegiatan: '',
+                                isOther: false,
 
-                            <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
-                                Jenis Kegiatan
-                            </label>
+                                butuhDl: false,
+                                isLocked: true,
 
-                            <div class="md:w-3/4 w-full space-y-2">
-                                <!-- SELECT -->
-                                <select
-                                    name="detail_id_jenis_kegiatan[${sectionId}][]"
-                                    x-model="idJenisKegiatan"
-                                    @change="isOther = (idJenisKegiatan === 'LAINNYA')"
-                                    required
-                                    class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 px-3 py-2 text-xs">
-                                    <option value="">-- Pilih Jenis Kegiatan --</option>
+                                wajibJenis: [3,4,5,6],
 
-                                    @foreach ($jenisKegiatans as $jenis)
-                                        <option value="{{ $jenis->id }}"
-                                            class="
-                                                @if ($jenis->kategori === 'Utama') text-green-700 dark:text-green-400 font-medium
-                                                @elseif($jenis->kategori === 'Tambahan')
-                                                    text-orange-700 dark:text-orange-400 @endif">
-                                            {{ $jenis->jenis_kegiatan }}
-                                            ({{ $jenis->kategori }})
-                                        </option>
-                                    @endforeach
+                                get jenisId() {
+                                    return Number(this.idJenisKegiatan || 0)
+                                },
 
-                                    <option value="LAINNYA">➕ Lainnya</option>
-                                </select>
+                                get isLainnya() {
+                                    return this.idJenisKegiatan === 'LAINNYA'
+                                },
 
-                                <!-- INPUT JENIS KEGIATAN BARU -->
-                                <div x-show="isOther" x-transition>
-                                    <input
-                                        type="text"
-                                        name="detail_jenis_kegiatan_baru[${sectionId}][]"
-                                        placeholder="Masukkan jenis kegiatan baru"
-                                        class="dark:bg-gray-800 h-10 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent bg-none px-3 py-2 text-xs text-gray-800 dark:text-gray-300 shadow-theme-xs placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-brand-300 dark:focus:border-brand-500 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10"
-                                    />
+                                get jenisSelected() {
+                                    return this.jenisId > 0 || this.isLainnya
+                                },
+
+                                syncState() {
+                                    const isWajib = this.wajibJenis.includes(this.jenisId)
+
+                                    // sync isOther seperti referensi pertama
+                                    this.isOther = this.idJenisKegiatan === 'LAINNYA'
+
+                                    // ================= CREATE MODE STYLE =================
+
+                                    if (this.isLainnya) {
+                                        this.butuhDl = false
+                                        this.isLocked = false
+                                        return
+                                    }
+
+                                    if (!this.jenisSelected) {
+                                        this.butuhDl = false
+                                        this.isLocked = true
+                                        return
+                                    }
+
+                                    if (isWajib) {
+                                        this.butuhDl = true
+                                        this.isLocked = true
+                                    } else {
+                                        this.butuhDl = false
+                                        this.isLocked = false
+                                    }
+                                }
+                            }"
+                            x-effect="syncState()"
+                            class="space-y-4"
+                        >
+
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+
+                                <!-- LABEL -->
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 md:col-span-1 pt-2">
+                                    Jenis Kegiatan
+                                </label>
+
+                                <!-- SELECT + INPUT -->
+                                <div class="md:col-span-2 space-y-2">
+
+                                    <select
+                                        name="detail_id_jenis_kegiatan[${sectionId}][]"
+                                        x-model="idJenisKegiatan"
+                                        @change="isOther = (idJenisKegiatan === 'LAINNYA')"
+                                        required
+                                        class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-600
+                                            dark:bg-gray-700 dark:text-gray-300 px-3 py-2 text-xs
+                                            focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 transition"
+                                    >
+                                        <option value="">-- Pilih Jenis Kegiatan --</option>
+
+                                        @foreach ($jenisKegiatans as $jenis)
+                                            <option
+                                                value="{{ $jenis->id }}"
+                                                class="
+                                                    @if ($jenis->kategori === 'Utama') text-green-700 dark:text-green-400 font-medium
+                                                    @elseif($jenis->kategori === 'Tambahan')
+                                                        text-orange-700 dark:text-orange-400
+                                                    @endif">
+                                                {{ $jenis->jenis_kegiatan }} ({{ $jenis->kategori }})
+                                            </option>
+                                        @endforeach
+
+                                        <option value="LAINNYA">➕ Lainnya</option>
+                                    </select>
+
+                                    <!-- INPUT JENIS BARU (FIXED) -->
+                                    <template x-if="isOther">
+                                        <div>
+                                            <input
+                                                type="text"
+                                                name="detail_jenis_kegiatan_baru[${sectionId}][]"
+                                                placeholder="Masukkan jenis kegiatan baru"
+                                                class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-600
+                                                    dark:bg-gray-700 dark:text-gray-300 px-3 py-2 text-xs
+                                                    focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 transition"
+                                            />
+                                        </div>
+                                    </template>
+
+                                </div>
+
+                                <!-- TOGGLE DL -->
+                                <div class="md:col-span-1 flex md:justify-end items-center gap-3 pt-2">
+
+                                    <button
+                                        type="button"
+                                        @click="if (!isLocked) butuhDl = !butuhDl"
+                                        :class="{
+                                            'bg-brand-500 dark:bg-brand-600 shadow-sm': butuhDl,
+                                            'bg-gray-200 dark:bg-gray-700 shadow-sm': !butuhDl,
+                                            'cursor-not-allowed opacity-60': isLocked
+                                        }"
+                                        class="relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-200"
+                                    >
+                                        <span
+                                            :class="butuhDl ? 'translate-x-7' : 'translate-x-1'"
+                                            class="inline-block h-5 w-5 bg-white dark:bg-gray-300 rounded-full shadow-sm transition-all duration-200"
+                                        ></span>
+                                    </button>
+
+                                    <span
+                                        class="text-xs font-medium transition-colors duration-200 whitespace-nowrap"
+                                        :class="butuhDl
+                                            ? 'text-brand-600 dark:text-brand-400'
+                                            : 'text-gray-500 dark:text-gray-400'"
+                                        x-text="
+                                            !jenisSelected
+                                                ? 'Pilih dulu'
+                                                : (butuhDl ? 'Butuh DL' : 'Tidak DL')
+                                        "
+                                    ></span>
+
                                 </div>
                             </div>
+
+                            <!-- Helper Text -->
+                            <div class="mt-2 md:ml-[25%]">
+
+                                <p
+                                    x-show="!jenisSelected"
+                                    class="text-xs text-brand-500/70 dark:text-brand-400/70">
+                                    Pilih jenis kegiatan untuk menentukan kebutuhan DL.
+                                </p>
+
+                                <p
+                                    x-show="isLocked && jenisSelected"
+                                    class="text-xs text-gray-400 dark:text-gray-500">
+                                    Jenis kegiatan ini otomatis membutuhkan DL dan tidak dapat diubah.
+                                </p>
+
+                                <!-- Hidden -->
+                                <input
+                                    type="hidden"
+                                    name="detail_butuh_dl[${sectionId}][]"
+                                    :value="butuhDl ? 1 : 0"
+                                >
+                            </div>
+
                         </div>
 
                         <!-- Target Input -->
@@ -706,16 +829,16 @@
 
                     // Ambil data dari section
                     const rkAnggotaInput = section.querySelector('input[name="rk_anggota[]"]');
+                    const TargetInput = section.querySelector('input[name="target[]"]');
                     const satuanTargetInput = section.querySelector('input[name="satuan_target[]"]');
-                    const keteranganInput = section.querySelector('input[name="keterangan[]"]');
                     const tanggalMulaiInput = section.querySelector('input[name="tanggal_mulai[]"]');
-                    const tanggalSelesaiInput = section.querySelector('input[name="tanggal_akhir[]"]');
+                    const tanggalSelesaiInput = section.querySelector('input[name="tanggal_selesai[]"]');
 
                     const rkAnggota = rkAnggotaInput ? rkAnggotaInput.value : '';
+                    const target = TargetInput ? TargetInput.value : '';
                     const satuanTarget = satuanTargetInput ? satuanTargetInput.value : '';
                     const tanggalMulai = tanggalMulaiInput ? tanggalMulaiInput.value : '';
                     const tanggalAkhir = tanggalSelesaiInput ? tanggalSelesaiInput.value : '';
-                    const keterangan = keteranganInput ? keteranganInput.value : '';
 
                     sectionHTML += `
                     <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-4 bg-white dark:bg-gray-800">
@@ -735,8 +858,8 @@
                                     <span class="block text-sm text-gray-800 dark:text-gray-300">${rkAnggota || '-'}</span>
                                 </div>
                                 <div>
-                                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Satuan Target</span>
-                                    <span class="block text-sm text-gray-800 dark:text-gray-300">${satuanTarget || '-'}</span>
+                                    <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Target</span>
+                                    <span class="block text-sm text-gray-800 dark:text-gray-300">${target || '-'} ${satuanTarget || ''}</span>
                                 </div>
                             </div>
 
@@ -749,11 +872,6 @@
                                     <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tanggal Selesai</span>
                                     <span class="block text-sm text-gray-800 dark:text-gray-300">${tanggalAkhir || '-'}</span>
                                 </div>
-                            </div>
-
-                            <div>
-                                <span class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Keterangan</span>
-                                    <span class="block text-sm text-gray-800 dark:text-gray-300">${keterangan || '-'}</span>
                             </div>
                     `;
 
@@ -783,6 +901,40 @@
                             const targetInput = detail.querySelector('input[name*="detail_target"]');
                             const target = targetInput ? targetInput.value : '';
 
+                            const satuanTargetInput = detail.querySelector('input[name*="detail_satuan_target"]');
+                            const satuanTarget = satuanTargetInput ? satuanTargetInput.value : '';
+
+                            const jenisSelect = detail.querySelector('select[name*="detail_id_jenis_kegiatan"]');
+                            const jenisBaruInput = detail.querySelector('input[name*="detail_jenis_kegiatan_baru"]');
+
+                            let jenisKegiatan = '-';
+
+                            if (jenisSelect) {
+                                if (jenisSelect.value === 'LAINNYA') {
+                                    jenisKegiatan = jenisBaruInput && jenisBaruInput.value
+                                        ? jenisBaruInput.value
+                                        : '-';
+                                } else {
+                                    const selectedOption = jenisSelect.options[jenisSelect.selectedIndex];
+                                    jenisKegiatan = selectedOption ? selectedOption.text : '-';
+                                }
+                            }
+
+                            const butuhDLInput = detail.querySelector('input[name*="detail_butuh_dl"]');
+                            const butuhDL = butuhDLInput ? Number(butuhDLInput.value) === 1 : false;
+
+                            const butuhDLText = butuhDL
+                                ? 'Butuh Dinas Luar / Surat Tugas'
+                                : 'Tidak Butuh Dinas Luar / Surat Tugas';
+
+                            const butuhDLBadge = butuhDL
+                                ? `<span class="inline-flex items-center rounded-md bg-green-100 dark:bg-green-900/40 px-2 py-1 text-[11px] font-medium text-green-700 dark:text-green-400">
+                                        ✓ ${butuhDLText}
+                                </span>`
+                                : `<span class="inline-flex items-center rounded-md bg-orange-100 dark:bg-orange-900/40 px-2 py-1 text-[11px] font-medium text-orange-700 dark:text-orange-400">
+                                        ✕ ${butuhDLText}
+                                </span>`;
+
                             const detailTanggalMulaiInput = detail.querySelector(
                                 'input[name*="detail_tanggal_mulai"]');
                             const detailTanggalSelesaiInput = detail.querySelector(
@@ -803,14 +955,31 @@
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <div class="col-span-2">
+                                        <span class="block text-gray-500 dark:text-gray-500 mb-1">Jenis Kegiatan</span>
+                                        <span class="block text-gray-700 dark:text-gray-300 font-medium">
+                                            ${jenisKegiatan}
+                                        </span>
+                                    </div>
+
                                     <div>
                                         <span class="block text-gray-500 dark:text-gray-500 mb-1">Target</span>
-                                        <span class="block text-gray-700 dark:text-gray-300">${target || '-'}</span>
+                                        <span class="block text-gray-700 dark:text-gray-300">
+                                            ${target || '-'} ${satuanTarget || '-'}
+                                        </span>
+
+                                        <div class="mt-2">
+                                            ${butuhDLBadge}
+                                        </div>
                                     </div>
+
                                     <div>
                                         <span class="block text-gray-500 dark:text-gray-500 mb-1">Tanggal</span>
-                                        <span class="block text-gray-700 dark:text-gray-300">${detailTanggalMulai || '-'} s/d ${detailTanggalSelesai || '-'}</span>
+                                        <span class="block text-gray-700 dark:text-gray-300">
+                                            ${detailTanggalMulai || '-'} s/d ${detailTanggalSelesai || '-'}
+                                        </span>
                                     </div>
+
                                 </div>
                             </div>
                             `;

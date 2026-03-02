@@ -20,7 +20,7 @@ class PenugasanController extends Controller
         $validated = $request->validate([
             'id_anggota' => ['required', 'exists:pegawais,id_pegawai'],
             'id_jenis_kegiatan' => ['required'],
-            'jenis_kegiatan_baru' => ['nullable', 'string', 'max:100'],
+            'jenis_kegiatan_baru' => ['nullable', 'string'],
             'target' => ['required', 'integer', 'min:1'],
             'satuan_target' => ['required', 'string', 'max:50'],
 
