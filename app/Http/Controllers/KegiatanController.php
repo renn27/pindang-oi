@@ -151,7 +151,7 @@ class KegiatanController extends Controller
 
         try {
             // 🗑️ Hapus kegiatan
-            $kegiatan->delete();
+            $kegiatan->forceDelete();
 
             return redirect()
                 ->route('kegiatan.index', $kegiatan->bidang->slug)
@@ -163,8 +163,6 @@ class KegiatanController extends Controller
                 ->with('error', 'Gagal menghapus Kegiatan. Silakan coba lagi.');
         }
     }
-
-    
 
     public function exportMph(Bidang $bidang)
     {

@@ -150,7 +150,7 @@ class SubKegiatanController extends Controller
             abort(403, 'Sub kegiatan tidak sesuai dengan kegiatan');
         }
 
-        $subKegiatan->delete();
+        $subKegiatan->forceDelete();
 
         return redirect()->back()->with('success', 'Sub kegiatan berhasil dihapus');
     }

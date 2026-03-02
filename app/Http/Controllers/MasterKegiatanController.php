@@ -126,7 +126,7 @@ class MasterKegiatanController extends Controller
                         'satuan_target'     => $request->satuan_target[$index] ?? null,
                         'tanggal_mulai'     => $request->tanggal_mulai[$index] ?? null,
                         'tanggal_selesai'   => $request->tanggal_selesai[$index] ?? null,
-                        'status'            => 'Belum Mulai', // ✅ DEFAULT
+                        'status'            => 'Berjalan', // ✅ DEFAULT
                     ]);
 
                     // Ambil key section (rk-anggota-1, dst)
