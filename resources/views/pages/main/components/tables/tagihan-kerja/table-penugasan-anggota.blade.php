@@ -1,3 +1,43 @@
+@php
+    $loginUserId = auth()->user()->id_pegawai;
+
+    // Helper untuk mengurutkan: user yang sedang login akan berada di paling atas
+    $penugasanButuhDL = $penugasanButuhDL->sortByDesc(function ($penugasan) use ($loginUserId) {
+        return $penugasan->id_anggota === $loginUserId ? 1 : 0;
+    });
+
+    $penugasanTidakButuhDL = $penugasanTidakButuhDL->sortByDesc(function ($penugasan) use ($loginUserId) {
+        return $penugasan->id_anggota === $loginUserId ? 1 : 0;
+    });
+@endphp
+
+<!-- Legenda Status Penugasan -->
+<div class="mb-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 block">Legenda Status Penugasan (Garis Tepi Kiri):</h4>
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-gray-400"></div>
+            <span class="text-xs text-gray-600 dark:text-gray-400">Menunggu Pengiriman</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+            <span class="text-xs text-gray-600 dark:text-gray-400">Menunggu Penerimaan</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-orange-400"></div>
+            <span class="text-xs text-gray-600 dark:text-gray-400">Menunggu Pengiriman Ulang</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-red-400"></div>
+            <span class="text-xs text-gray-600 dark:text-gray-400">Belum Diterima / Terlambat</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+            <span class="text-xs text-gray-600 dark:text-gray-400">Tugas Selesai</span>
+        </div>
+    </div>
+</div>
+
 <div class="mb-6">
     <div class="flex items-center gap-3 mb-3">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
@@ -32,9 +72,7 @@
                                 <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-400 uppercase tracking-wider">
                                     Status DL
                                 </th>
-                                <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-400 uppercase tracking-wider">
-                                    Status Penugasan
-                                </th>
+
                                 <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-400 uppercase tracking-wider">
                                     Status Kirim
                                 </th>
@@ -52,8 +90,20 @@
 
                         <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                             @forelse ($penugasanButuhDL as $penugasan)
+                                @php
+                                    $isMe = $penugasan->id_anggota === $loginUserId;
+                                    $statusClass = $penugasan->statusPenugasan()['class'];
+                                    
+                                    // Ekstrak warna dari statusClass model
+                                    $borderColor = 'border-l-transparent';
+                                    if (str_contains($statusClass, 'bg-gray-100')) $borderColor = 'border-l-gray-400';
+                                    if (str_contains($statusClass, 'bg-yellow-100')) $borderColor = 'border-l-yellow-400';
+                                    if (str_contains($statusClass, 'bg-orange-100')) $borderColor = 'border-l-orange-400';
+                                    if (str_contains($statusClass, 'bg-red-100')) $borderColor = 'border-l-red-500';
+                                    if (str_contains($statusClass, 'bg-green-200')) $borderColor = 'border-l-green-500';
+                                @endphp
                                 <!-- Row Utama -->
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                <tr class="border-l-4 {{ $borderColor }} {{ $isMe ? 'bg-blue-50/50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800' }}">
                                     <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300 text-center">
                                         {{ $loop->iteration }}
                                     </td>
@@ -97,12 +147,7 @@
                                         </span>
                                     </td>
 
-                                    <td class="px-6 py-3 text-center">
-                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                                            {{ $penugasan->statusPenugasan()['class'] }}">
-                                            {{ $penugasan->statusPenugasan()['label'] }}
-                                        </span>
-                                    </td>
+
 
                                     <td class="px-6 py-3 text-center">
                                         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
@@ -763,9 +808,7 @@
                                 <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-400 uppercase tracking-wider">
                                     Waktu
                                 </th>
-                                <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-400 uppercase tracking-wider">
-                                    Status Penugasan
-                                </th>
+
                                 <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-400 uppercase tracking-wider">
                                     Status Kirim
                                 </th>
@@ -783,8 +826,20 @@
 
                         <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                             @forelse ($penugasanTidakButuhDL as $penugasan)
+                                @php
+                                    $isMe = $penugasan->id_anggota === $loginUserId;
+                                    $statusClass = $penugasan->statusPenugasan()['class'];
+                                    
+                                    // Ekstrak warna dari statusClass model
+                                    $borderColor = 'border-l-transparent';
+                                    if (str_contains($statusClass, 'bg-gray-100')) $borderColor = 'border-l-gray-400';
+                                    if (str_contains($statusClass, 'bg-yellow-100')) $borderColor = 'border-l-yellow-400';
+                                    if (str_contains($statusClass, 'bg-orange-100')) $borderColor = 'border-l-orange-400';
+                                    if (str_contains($statusClass, 'bg-red-100')) $borderColor = 'border-l-red-500';
+                                    if (str_contains($statusClass, 'bg-green-200')) $borderColor = 'border-l-green-500';
+                                @endphp
                                 <!-- Row Utama -->
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                <tr class="border-l-4 {{ $borderColor }} {{ $isMe ? 'bg-blue-50/50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800' }}">
                                     <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300 text-center">
                                         {{ $loop->iteration }}
                                     </td>
@@ -814,12 +869,7 @@
                                         </div>
                                     </td>
 
-                                    <td class="px-6 py-3 text-center">
-                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                                            {{ $penugasan->statusPenugasan()['class'] }}">
-                                            {{ $penugasan->statusPenugasan()['label'] }}
-                                        </span>
-                                    </td>
+
 
                                     <td class="px-6 py-3 text-center">
                                         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium

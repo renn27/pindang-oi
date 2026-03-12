@@ -44,7 +44,7 @@ class MenuHelper
                 'name' => 'Kalender',
                 'subItems' => [
                     ['name' => 'Kalender DL', 'path' => '/kalender-dl'],
-                    // ['name' => 'Kalender Kegiatan', 'path' => '/kalender-kegiatan'],
+                    ['name' => 'Kalender Kegiatan', 'path' => '/kalender-kegiatan'],
                 ],
             ],
             [
@@ -104,6 +104,12 @@ class MenuHelper
                 'icon' => 'mangcek',
                 'name' => 'MANGCEK SE2026',
                 'path' => 'https://mangcek.bpsoganilir.com/admin',
+                'is_external' => true,
+            ],
+            [
+                'icon' => 'besti',
+                'name' => 'BESTI OGAN ILIR',
+                'path' => 'https://besti.bpsoganilir.com/',
                 'is_external' => true,
             ]
         ];
@@ -241,6 +247,15 @@ class MenuHelper
                 <circle cx="12" cy="12" r="1" fill="currentColor"/>
                 <circle cx="8" cy="12" r="1" fill="currentColor"/>
                 <circle cx="16" cy="12" r="1" fill="currentColor"/>
+                </svg>',
+            'besti' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M8 7H16C16.5523 7 17 7.44772 17 8V16C17 16.5523 16.5523 17 16 17H8C7.44772 17 7 16.5523 7 16V8C7 7.44772 7.44772 7 8 7Z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M10 10H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M10 13H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M7 9H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M7 12H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M7 15H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>',
             'ai-assistant' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.75 2.42969V7.70424M9.42261 13.673C10.0259 14.4307 10.9562 14.9164 12 14.9164C13.0438 14.9164 13.9742 14.4307 14.5775 13.673M20 12V18.5C20 19.3284 19.3284 20 18.5 20H5.5C4.67157 20 4 19.3284 4 18.5V12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18.75 2.42969V2.43969M9.50391 9.875L9.50391 9.885M14.4961 9.875V9.885" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
 

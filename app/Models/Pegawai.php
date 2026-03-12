@@ -33,10 +33,7 @@ class Pegawai extends Authenticatable
 
     public function isSuperUser(): bool
     {
-        return $this->hasAnyRole([
-            'Admin',
-            'Pimpinan'
-        ]);
+        return $this->isActiveRole('Admin') || $this->isActiveRole('Pimpinan');
     }
 
     public function isKetuaTim(): bool

@@ -12,9 +12,18 @@ class KalenderKegiatanController extends Controller
 
     public function index(Request $request) {
         $pegawaiId = $request->query('pegawai');
+        
+        // Menangani Parameter Bulan dan Tahun dari URL
+        $month = $request->query('month', date('n'));
+        $year = $request->query('year', date('Y'));
+        
+        // Filter range bulan ini
+        $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+        $endDate   = $startDate->copy()->endOfMonth();
 
         $subKegiatans = SubKegiatan::with([
-                'kegiatan:id_kegiatan,nama_rk_kegiatan',
+                'kegiatan.bidang:id_bidang,nama_bidang', // Narik relasi ke bidang
+                'kegiatan:id_kegiatan,id_bidang,nama_rk_kegiatan', 
                 'penugasans.anggota:id_pegawai,nama_pegawai'
             ])
             ->when(
@@ -25,6 +34,11 @@ class KalenderKegiatanController extends Controller
                     });
                 }
             )
+            ->where(function ($q) use ($startDate, $endDate) {
+                // Filter sub kegiatan yang pelaksanaannya melintasi / ada di dalam bulan ini
+                $q->where('tanggal_mulai', '<=', $endDate->format('Y-m-d'))
+                  ->where('tanggal_selesai', '>=', $startDate->format('Y-m-d'));
+            })
             ->orderBy('tanggal_mulai')
             ->get();
 
@@ -51,6 +65,7 @@ class KalenderKegiatanController extends Controller
                 'start_date'  => $sub->tanggal_mulai,
                 'end_date'    => $sub->tanggal_selesai,
                 'status'      => $status,
+                'bidang'      => $sub->kegiatan->bidang->nama_bidang ?? 'Umum',
                 'participants'=> $sub->penugasans
                     ->pluck('anggota.nama_pegawai')
                     ->filter()
@@ -75,9 +90,11 @@ class KalenderKegiatanController extends Controller
          */
         return view('pages.main.pegawai.kalender-kegiatan.index', [
             'title'        => 'Kalender Kegiatan',
-            'events'       => $events,      // 🔥 DATA SIAP JSON
+            'events'       => $events,
             'pegawais'     => $pegawais,
             'activeFilter' => $pegawaiId ?? 'all',
+            'currentMonth' => $month, // Kirim parameter ke view
+            'currentYear'  => $year,  // Kirim parameter ke view
         ]);
     }
 

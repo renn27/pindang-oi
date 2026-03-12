@@ -17,9 +17,12 @@ class VisRankPegawai extends Component
      */
     public function __construct(DashboardAnalyticsService $analytics, int $perPage = 5)
     {
+        $month = request('month', now()->month);
+        $year = request('year', now()->year);
+
         $this->perPage = $perPage;
         // ambil data ranking dari service dengan pagination
-        $this->rankPegawai = $analytics->rankPegawai($perPage);
+        $this->rankPegawai = $analytics->rankPegawai($perPage, $month, $year);
     }
 
     /**

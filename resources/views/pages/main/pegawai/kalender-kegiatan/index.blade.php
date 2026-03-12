@@ -40,30 +40,26 @@
         {{-- Quick Stats --}}
         <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div
-                class="bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 p-4 rounded-2xl border border-blue-100 dark:border-gray-700 shadow-sm">
+                class="bg-gradient-to-br from-yellow-50 to-white dark:from-gray-800 dark:to-gray-900 p-4 rounded-2xl border border-yellow-100 dark:border-gray-700 shadow-sm">
                 <div class="flex items-center gap-3">
-                    <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
-                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <div class="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl">
+                        <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Total Kegiatan</p>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white" id="total-events">0</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Belum Mulai</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white" id="pending-events">0</p>
                     </div>
                 </div>
             </div>
 
             <div
-                class="bg-gradient-to-br from-yellow-50 to-white dark:from-gray-800 dark:to-gray-900 p-4 rounded-2xl border border-yellow-100 dark:border-gray-700 shadow-sm">
+                class="bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 p-4 rounded-2xl border border-blue-100 dark:border-gray-700 shadow-sm">
                 <div class="flex items-center gap-3">
-                    <div class="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl">
-                        <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
                     <div>
@@ -77,10 +73,8 @@
                 class="bg-gradient-to-br from-green-50 to-white dark:from-gray-800 dark:to-gray-900 p-4 rounded-2xl border border-green-100 dark:border-gray-700 shadow-sm">
                 <div class="flex items-center gap-3">
                     <div class="p-2 bg-green-100 dark:bg-green-900/30 rounded-xl">
-                        <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
                     <div>
@@ -132,226 +126,156 @@
             </div>
         </div>
 
-        {{-- Event Modal --}}
-        <div id="event-modal"
-            class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-95 opacity-0"
-                id="modal-content">
-                <div class="relative">
-                    <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-2xl"
-                        id="modal-header-bar"></div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Detail Kegiatan</h3>
-                            <button id="close-modal"
-                                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-
-                        <div class="space-y-6">
-                            <div>
-                                <div class="flex items-start gap-3 mb-4">
-                                    <div id="event-color" class="h-12 w-2 rounded-full mt-1"></div>
-                                    <div class="flex-1">
-                                        <h4 id="event-title" class="font-bold text-xl text-gray-900 dark:text-white mb-2">
-                                        </h4>
-                                        <div class="flex items-center gap-4 text-sm">
-                                            <div class="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                </svg>
-                                                <span id="event-date"></span>
-                                            </div>
-                                            <div class="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                <span id="event-duration"></span>
-                                            </div>
+        {{-- Smart Modal Detail Kegiatan --}}
+        <x-ui.smart-modal id="modal-detail-kegiatan" :isOpen="false" :showCloseButton="true" class="max-w-md">
+            <div class="relative">
+                <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-3xl" id="modal-header-bar"></div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 mt-2">Detail Kegiatan</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex items-start gap-3 mb-4">
+                                <div id="event-color" class="h-12 w-2 rounded-full mt-1"></div>
+                                <div class="flex-1">
+                                    <h4 id="event-title" class="font-bold text-xl text-gray-900 dark:text-white mb-2"></h4>
+                                    <div class="flex items-center gap-4 text-sm">
+                                        <div class="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span id="event-date"></span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span id="event-duration"></span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="space-y-4">
-                                <div>
-                                    <h5
-                                        class="font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                        </svg>
-                                        Status
-                                    </h5>
-                                    <p id="event-status"
-                                        class="text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-                                    </p>
-                                </div>
+                        <div class="space-y-4">
+                            <div>
+                                <h5 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    Asal Bidang
+                                </h5>
+                                <p id="event-bidang" class="text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg font-medium">
+                                </p>
+                            </div>
+                            
+                            <div>
+                                <h5 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Status
+                                </h5>
+                                <span id="event-status" class="inline-block px-3 py-1 text-sm font-medium rounded border"></span>
+                            </div>
 
-                                {{-- <div>
-                                    <h5
-                                        class="font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Deskripsi
-                                    </h5>
-                                    <p id="event-description"
-                                        class="text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-                                    </p>
-                                </div> --}}
-
-                                {{-- <div>
-                                    <h5
-                                        class="font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                        Lokasi
-                                    </h5>
-                                    <p id="event-location"
-                                        class="text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-                                    </p>
-                                </div> --}}
-
-                                <div>
-                                    <h5
-                                        class="font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 4.75v-4.5" />
-                                        </svg>
-                                        Peserta
-                                    </h5>
-                                    <div id="event-participants" class="flex flex-wrap gap-2"></div>
-                                </div>
+                            <div>
+                                <h5 class="font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 4.75v-4.5" />
+                                    </svg>
+                                    Peserta
+                                </h5>
+                                <div id="event-participants" class="flex flex-wrap gap-2"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </x-ui.smart-modal>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Current date
-            let currentDate = new Date();
-            let currentYear = currentDate.getFullYear();
-            let currentMonth = currentDate.getMonth();
-
-            // Event status categories with colors
-            const eventStatuses = {
-                'Belum Mulai': {
-                    name: 'Belum Mulai',
-                    color: 'from-yellow-500 to-yellow-400',
-                    bgColor: 'bg-gradient-to-r from-yellow-100 to-yellow-50 dark:from-yellow-900/20 dark:to-yellow-800/10',
-                    textColor: 'text-yellow-700 dark:text-yellow-400',
-                    borderColor: 'border-yellow-200 dark:border-yellow-800/30'
-                },
-                'Berjalan': {
-                    name: 'Sedang Berjalan',
-                    color: 'from-blue-500 to-blue-400',
-                    bgColor: 'bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-900/20 dark:to-blue-800/10',
-                    textColor: 'text-blue-700 dark:text-blue-400',
-                    borderColor: 'border-blue-200 dark:border-blue-800/30'
-                },
-                'Selesai': {
-                    name: 'Selesai',
-                    color: 'from-green-500 to-green-400',
-                    bgColor: 'bg-gradient-to-r from-green-100 to-green-50 dark:from-green-900/20 dark:to-green-800/10',
-                    textColor: 'text-green-700 dark:text-green-400',
-                    borderColor: 'border-green-200 dark:border-green-800/30'
-                }
-            };
-
+        document.addEventListener('DOMContentLoaded', async function() {
+            let currentMonth = {{ count($events) > 0 ? $currentMonth : date('n') }};
+            let currentYear = {{ count($events) > 0 ? $currentYear : date('Y') }};
+            let jsMonth = currentMonth - 1; // 0-11
             let events = @js($events);
-            // console.log(events);
-
-            // DOM Elements
+            
+            // Re-assign variable scope safely if not set:
+            if(typeof currentMonth === 'undefined' || !currentMonth) { currentMonth = new Date().getMonth() + 1; }
+            if(typeof currentYear === 'undefined' || !currentYear) { currentYear = new Date().getFullYear(); }
+            
             const calendarGrid = document.getElementById('calendar-grid');
-            const currentMonthYear = document.getElementById('current-month-year');
-            const currentMonthNav = document.getElementById('current-month-nav');
             const prevMonthBtn = document.getElementById('prev-month');
             const nextMonthBtn = document.getElementById('next-month');
-            const eventModal = document.getElementById('event-modal');
-            const closeModalBtn = document.getElementById('close-modal');
-            const modalContent = document.getElementById('modal-content');
-
-            // Modal event elements
+            const currentMonthYear = document.getElementById('current-month-year');
+            const currentMonthNav = document.getElementById('current-month-nav');
+            
             const eventTitle = document.getElementById('event-title');
+            const eventBidang = document.getElementById('event-bidang');
             const eventDate = document.getElementById('event-date');
             const eventDuration = document.getElementById('event-duration');
             const eventStatus = document.getElementById('event-status');
-            // const eventDescription = document.getElementById('event-description');
-            // const eventLocation = document.getElementById('event-location');
             const eventParticipants = document.getElementById('event-participants');
             const eventColor = document.getElementById('event-color');
             const modalHeaderBar = document.getElementById('modal-header-bar');
 
-            // Stats elements
-            const totalEvents = document.getElementById('total-events');
+            const pendingEvents = document.getElementById('pending-events');
             const ongoingEvents = document.getElementById('ongoing-events');
             const completedEvents = document.getElementById('completed-events');
 
-             // Current selected event
-            let selectedEvent = null;
+            // Beautiful Colors for Bidang coding
+            const bidangColors = [
+                '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', 
+                '#06B6D4', '#EAB308', '#22C55E', '#F97316', '#6366F1', '#14B8A6',
+                '#A855F7', '#84CC16', '#D946EF', '#0EA5E9', '#F43F5E', '#64748B'
+            ];
 
-            // Initialize calendar
-            renderCalendar(currentYear, currentMonth);
+            function getColorForBidang(bidangName) {
+                let hash = 0;
+                for (let i = 0; i < bidangName.length; i++) {
+                    hash = bidangName.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                return bidangColors[Math.abs(hash) % bidangColors.length];
+            }
+
+            // Fetch Holidays
+            let holidays = [];
+            try {
+                // Fetch public holidays API
+                const response = await fetch(`https://dayoffapi.vercel.app/api?month=${currentMonth}&year=${currentYear}`);
+                const data = await response.json();
+                holidays = data.filter(h => h.is_national_holiday).map(h => {
+                     return new Date(h.holiday_date).getDate();
+                });
+            } catch(e) {
+                console.warn('Gagal memuat info API Hari Libur', e);
+            }
+
+            renderCalendar(currentYear, jsMonth);
             updateStats();
 
-            // Event Listeners
             prevMonthBtn.addEventListener('click', () => {
-                currentMonth--;
-                if (currentMonth < 0) {
-                    currentMonth = 11;
-                    currentYear--;
-                }
-                renderCalendar(currentYear, currentMonth);
+                let newMonth = currentMonth - 1;
+                let newYear = currentYear;
+                if (newMonth < 1) { newMonth = 12; newYear--; }
+                window.location.href = `?month=${newMonth}&year=${newYear}`;
             });
 
             nextMonthBtn.addEventListener('click', () => {
-                currentMonth++;
-                if (currentMonth > 11) {
-                    currentMonth = 0;
-                    currentYear++;
-                }
-                renderCalendar(currentYear, currentMonth);
+                let newMonth = currentMonth + 1;
+                let newYear = currentYear;
+                if (newMonth > 12) { newMonth = 1; newYear++; }
+                window.location.href = `?month=${newMonth}&year=${newYear}`;
             });
 
-            closeModalBtn.addEventListener('click', () => {
-                closeModal(eventModal, modalContent);
-            });
-
-            eventModal.addEventListener('click', (e) => {
-                if (e.target === eventModal) {
-                    closeModal(eventModal, modalContent);
-                }
-            });
-
-            // Functions
             function renderCalendar(year, month) {
                 calendarGrid.innerHTML = '';
-
                 const firstDay = new Date(year, month, 1);
                 const lastDay = new Date(year, month + 1, 0);
                 const daysInMonth = lastDay.getDate();
                 const startingDay = firstDay.getDay();
 
-                // Update month-year display
                 const monthNames = [
                     'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
                     'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
@@ -359,276 +283,234 @@
                 currentMonthYear.textContent = `${monthNames[month]} ${year}`;
                 currentMonthNav.textContent = `${monthNames[month]}`;
 
-                // Add empty cells for days before the first day of month
+                // Padding blank cells before first day
                 for (let i = 0; i < startingDay; i++) {
                     const emptyCell = document.createElement('div');
-                    emptyCell.className =
-                        'min-h-32 p-3 bg-gradient-to-b from-gray-50/50 to-white dark:from-gray-800/50 dark:to-gray-900';
+                    emptyCell.className = 'min-h-32 bg-gray-50/50 dark:bg-gray-800/10 border-r border-b border-gray-100 dark:border-gray-700';
                     calendarGrid.appendChild(emptyCell);
                 }
 
-                // Add days of the month
+                // Days blocks
                 for (let day = 1; day <= daysInMonth; day++) {
-                    const date = new Date(year, month, day);
-                    const cell = createDateCell(date, day);
+                    const cell = createDateCell(year, month, day);
                     calendarGrid.appendChild(cell);
                 }
 
-                // Calculate and add empty cells after the last day
+                // Padding blank cells after last day
                 const totalCells = Math.ceil((startingDay + daysInMonth) / 7) * 7;
                 const emptyCellsAfter = totalCells - (startingDay + daysInMonth);
-
                 for (let i = 0; i < emptyCellsAfter; i++) {
                     const emptyCell = document.createElement('div');
-                    emptyCell.className =
-                        'min-h-32 p-3 bg-gradient-to-b from-gray-50/50 to-white dark:from-gray-800/50 dark:to-gray-900';
+                    emptyCell.className = 'min-h-32 bg-gray-50/50 dark:bg-gray-800/10 border-r border-b border-gray-100 dark:border-gray-700';
                     calendarGrid.appendChild(emptyCell);
                 }
 
-                // Render events
-                renderEventsOnCalendar(year, month);
+                // Draw actual bars
+                renderEventsOnCalendar(year, month, startingDay);
             }
 
-            function createDateCell(date, day) {
+            function createDateCell(year, month, day) {
+                const date = new Date(year, month, day);
                 const cell = document.createElement('div');
+                
                 const isToday = isSameDate(date, new Date());
                 const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                const isHoliday = holidays.includes(day);
 
-                cell.className =
-                    `min-h-36 p-3 relative group transition-all duration-200 hover:bg-gradient-to-b hover:from-blue-50/30 hover:to-white dark:hover:from-gray-700/30 dark:hover:to-gray-800 ${isWeekend ? 'bg-gradient-to-b from-gray-50/30 to-white dark:from-gray-800/30 dark:to-gray-900' : 'bg-white dark:bg-gray-800'} border-r border-b border-gray-100 dark:border-gray-700`;
+                let bgClass = isWeekend || isHoliday 
+                    ? 'bg-red-50/20 dark:bg-red-900/10' 
+                    : 'bg-white dark:bg-gray-800';
 
-                // Date header
+                cell.className = `min-h-36 py-1 flex flex-col items-stretch group transition-all duration-200 ${bgClass} border-r border-b border-gray-100 dark:border-gray-700 relative overflow-hidden`;
+
+                // Date Number Header
                 const dateHeader = document.createElement('div');
-                dateHeader.className = `flex justify-between items-start mb-2`;
+                dateHeader.className = `flex justify-end items-start mt-1 px-1 min-h-[1.75rem] z-10`;
 
                 const dayNumber = document.createElement('span');
-                dayNumber.className =
-                    `inline-flex items-center justify-center h-8 w-8 rounded-full text-sm font-bold transition-all duration-200 ${isToday ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg' : 'text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400'}`;
+                let dayColor = 'text-gray-700 dark:text-gray-300';
+                if (isToday) {
+                    dayColor = 'bg-blue-600 dark:bg-blue-500 text-white shadow-lg';
+                } else if (isHoliday || date.getDay() === 0) { // Minggu juga merah
+                    dayColor = 'text-red-500 dark:text-red-400 font-bold'; 
+                }
+
+                dayNumber.className = `inline-flex items-center justify-center h-7 w-7 rounded-full text-sm font-medium transition-all duration-200 ${dayColor}`;
                 dayNumber.textContent = day;
 
                 dateHeader.appendChild(dayNumber);
                 cell.appendChild(dateHeader);
 
-                // Events container for this date
+                // Container untuk event slot rows pada hari ini
                 const eventsContainer = document.createElement('div');
-                eventsContainer.className = 'space-y-1.5 mt-2 overflow-y-auto max-h-28 scrollbar-thin';
+                eventsContainer.className = 'flex flex-col flex-1 pb-1 px-0 relative z-10 gap-0.5';
+                
+                // Tambahkan minimum skeleton slot yang cukup tinggi
+                // Biar tinggi cell merata saat grid tidak penuh acara
+                for(let slot=0; slot<5; slot++) {
+                     let row = document.createElement('div');
+                     row.className = 'h-5 w-full';
+                     eventsContainer.appendChild(row);
+                }
+                
                 cell.appendChild(eventsContainer);
-
-                // Add click event to show events for this date
-                cell.addEventListener('click', (e) => {
-                    showEventsForDate(date);
-                });
-
                 return cell;
             }
 
-            // function renderEventsOnCalendar(year, month) {
-            //     // Get all date cells
-            //     const dateCells = document.querySelectorAll('#calendar-grid > div');
-
-            //     events.forEach(event => {
-            //         const eventStart = new Date(event.start_date);
-            //         const eventEnd = new Date(event.end_date);
-
-            //         // Check if event is in current month
-            //         if (eventStart.getFullYear() === year && eventStart.getMonth() === month) {
-            //             const startDay = eventStart.getDate();
-            //             const endDay = eventEnd.getDate();
-
-            //             // For multi-day events
-            //             for (let day = startDay; day <= endDay && day <= new Date(year, month + 1, 0)
-            //                 .getDate(); day++) {
-            //                 const cellIndex = getDayCellIndex(year, month, day);
-            //                 if (cellIndex < dateCells.length) {
-            //                     const cell = dateCells[cellIndex];
-            //                     const eventsContainer = cell.querySelector('div:last-child');
-
-            //                     if (eventsContainer) {
-            //                         const eventElement = createEventElement(event, day === startDay);
-            //                         eventsContainer.appendChild(eventElement);
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //     });
-            // }
-            function renderEventsOnCalendar(year, month) {
+            function renderEventsOnCalendar(year, month, startingDay) {
                 const dateCells = document.querySelectorAll('#calendar-grid > div');
-
                 const monthStart = new Date(year, month, 1);
                 const monthEnd   = new Date(year, month + 1, 0);
+                
+                // Array track ketersediaan baris. slots[day][row] = isOccupied
+                const slotMap = [];
+                for(let i=0; i<31; i++) slotMap.push({});
+
+                // Sort events (Event panjang pertama)
+                events.sort((a, b) => {
+                    const spanA = new Date(a.end_date) - new Date(a.start_date);
+                    const spanB = new Date(b.end_date) - new Date(b.start_date);
+                    return spanB - spanA; // Descending length
+                });
 
                 events.forEach(event => {
                     const eventStart = new Date(event.start_date);
                     const eventEnd   = new Date(event.end_date);
 
-                    // ✅ CEK OVERLAP RANGE
-                    if (eventEnd < monthStart || eventStart > monthEnd) {
-                        return; // tidak overlap bulan ini
-                    }
+                    if (eventEnd < monthStart || eventStart > monthEnd) return; 
 
-                    // Tentukan start & end yang jatuh di bulan ini
                     const startDay = eventStart < monthStart ? 1 : eventStart.getDate();
                     const endDay   = eventEnd > monthEnd ? monthEnd.getDate() : eventEnd.getDate();
+                    const color = getColorForBidang(event.bidang || 'Umum');
 
+                    // Cari row slot yang kosong berturut-turut dari startDay ke endDay
+                    let slotAssigned = -1;
+                    for (let slot = 0; slot < 10; slot++) { // Max 10 tumpuk visualnya
+                        let canFit = true;
+                        for (let day = startDay; day <= endDay; day++) {
+                            if (slotMap[day-1][slot]) { canFit = false; break; }
+                        }
+                        if (canFit) {
+                            slotAssigned = slot;
+                            break;
+                        }
+                    }
+                    if (slotAssigned === -1) slotAssigned = 10; // Fallback jika penuh
+
+                    // Tandai row slot menjadi occupied
                     for (let day = startDay; day <= endDay; day++) {
-                        const cellIndex = getDayCellIndex(year, month, day);
+                        slotMap[day-1][slotAssigned] = true;
+                        
+                        const cellIndex = startingDay + day - 1;
+                        if (cellIndex < dateCells.length && dateCells[cellIndex]) {
+                            const eventsContainer = dateCells[cellIndex].querySelector('div:last-child');
+                            
+                            if (eventsContainer && slotAssigned < eventsContainer.children.length) {
+                                
+                                const isFirstDay = (day === startDay) || (new Date(year, month, day).getDay() === 1); // print text di senin juga
+                                const isRealFirstDay = (day === startDay);
+                                const isLastDay = (day === endDay);
+                                
+                                const targetSlot = eventsContainer.children[slotAssigned];
+                                
+                                // Buat komponen batangnya
+                                targetSlot.className = `h-5 flex items-center px-1 text-[10px] leading-none cursor-pointer text-white overflow-hidden`;
+                                targetSlot.style.backgroundColor = color;
+                                
+                                if (isRealFirstDay && isLastDay) {
+                                    targetSlot.classList.add('rounded-md', 'mx-1');
+                                } else if (isRealFirstDay) {
+                                    targetSlot.classList.add('rounded-l-md', 'ml-1');
+                                } else if (isLastDay) {
+                                    targetSlot.classList.add('rounded-r-md', 'mr-1');
+                                }
 
-                        if (cellIndex < dateCells.length) {
-                            const cell = dateCells[cellIndex];
-                            const eventsContainer = cell.querySelector('div:last-child');
+                                if (isFirstDay || isRealFirstDay) {
+                                    targetSlot.innerHTML = `<span class="font-semibold truncate w-full z-20">${event.title}</span>`;
+                                } else {
+                                    targetSlot.innerHTML = `<span></span>`; 
+                                }
 
-                            if (eventsContainer) {
-                                const eventElement = createEventElement(
-                                    event,
-                                    day === startDay // hanya tampilkan title di hari pertama
-                                );
-                                eventsContainer.appendChild(eventElement);
+                                targetSlot.title = event.title + ` (${event.bidang})`;
+                                
+                                // Event Listener Modal
+                                targetSlot.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    showEventDetails(event, color);
+                                });
+                                targetSlot.addEventListener('mouseenter', (e) => {
+                                    targetSlot.style.filter = 'brightness(0.8)';
+                                });
+                                targetSlot.addEventListener('mouseleave', (e) => {
+                                    targetSlot.style.filter = 'brightness(1)';
+                                });
                             }
                         }
                     }
                 });
             }
 
-
-            function createEventElement(event, showTitle = true) {
-                const eventDiv = document.createElement('div');
-                const status = eventStatuses[event.status] || eventStatuses['Belum Mulai'];
-
-                eventDiv.className =
-                    `rounded-lg px-2.5 py-1.5 text-xs cursor-pointer truncate ${status.bgColor} border-l-4 border-l-transparent hover:shadow-sm transition-all duration-200 group`;
-                eventDiv.style.borderLeftColor = 'var(--event-color)';
-                eventDiv.setAttribute('data-color', status.color);
-
-                if (showTitle) {
-                    eventDiv.innerHTML = `
-                <div class="flex items-center gap-1.5">
-                    <div class="h-1.5 w-1.5 rounded-full" style="background: linear-gradient(to right, ${status.color.split('from-')[1].split(' ')[0]}, ${status.color.split('to-')[1]})"></div>
-                    <span class="font-medium ${status.textColor}">${event.title}</span>
-                </div>
-            `;
-                } else {
-                    eventDiv.innerHTML = `
-                <div class="flex items-center gap-1">
-                    <div class="h-1.5 w-1.5 rounded-full" style="background: linear-gradient(to right, ${status.color.split('from-')[1].split(' ')[0]}, ${status.color.split('to-')[1]})"></div>
-                    <span class="${status.textColor}">⋯</span>
-                </div>
-            `;
-                }
-
-                eventDiv.title = event.title;
-
-                eventDiv.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    showEventDetails(event);
-                });
-
-                return eventDiv;
-            }
-
-            function showEventDetails(event) {
-                selectedEvent = event;
-                const status = eventStatuses[event.status] || eventStatuses['Belum Mulai'];
-
-                // Format date
+            function showEventDetails(event, color) {
                 const startDate = new Date(event.start_date);
                 const endDate = new Date(event.end_date);
-                const dateFormatOptions = {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                };
+                const dateFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
                 let dateText = startDate.toLocaleDateString('id-ID', dateFormatOptions);
                 if (!isSameDate(startDate, endDate)) {
                     dateText += ' s/d ' + endDate.toLocaleDateString('id-ID', dateFormatOptions);
                 }
 
-                // Calculate duration
                 const diffTime = Math.abs(endDate - startDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end date
-                const durationText = diffDays === 1 ? '1 hari' : `${diffDays} hari`;
-
-                // Update modal content
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                
                 eventTitle.textContent = event.title;
-                eventDate.textContent = dateText;
-                eventDuration.textContent = durationText;
-                eventStatus.textContent = status.name;
-                // eventDescription.textContent = event.description || 'Tidak ada deskripsi';
-                // eventLocation.textContent = event.location || 'Tidak ditentukan';
-                eventColor.className = `h-12 w-2 rounded-full bg-gradient-to-b ${status.color}`;
-                modalHeaderBar.className =
-                    `absolute top-0 left-0 right-0 h-2 rounded-t-2xl bg-gradient-to-r ${status.color}`;
-
-                // Update participants
-                eventParticipants.innerHTML = '';
-                if (event.participants && event.participants.length > 0) {
-                    event.participants.forEach(participant => {
-                        const badge = document.createElement('span');
-                        badge.className =
-                            'inline-flex items-center px-3 py-1.5 rounded-full text-xs bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-800 text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-600';
-                        badge.textContent = participant;
-                        eventParticipants.appendChild(badge);
-                    });
-                } else {
-                    eventParticipants.innerHTML =
-                        '<span class="text-gray-500 dark:text-gray-400 italic">Tidak ada peserta</span>';
+                if(eventBidang) eventBidang.textContent = event.bidang || 'Umum';
+                if(eventDate) eventDate.textContent = dateText;
+                if(eventDuration) eventDuration.textContent = diffDays === 1 ? '1 hari' : `${diffDays} hari`;
+                
+                if(eventColor) eventColor.style.backgroundColor = color;
+                if(modalHeaderBar) Object.assign(modalHeaderBar.style, { background: color }); // ubah header color
+                
+                const statusMap = {
+                    'Belum Mulai': 'bg-yellow-50 text-yellow-700 border-yellow-200',
+                    'Berjalan': 'bg-blue-50 text-blue-700 border-blue-200',
+                    'Selesai': 'bg-green-50 text-green-700 border-green-200'
+                };
+                if(eventStatus) {
+                    eventStatus.className = `inline-block px-3 py-1 text-xs font-semibold rounded-md border ${statusMap[event.status] || ''}`;
+                    eventStatus.textContent = event.status;
                 }
 
-                // Show modal with animation
-                openModal(eventModal, modalContent);
-            }
-
-            function showEventsForDate(date) {
-                const dayEvents = events.filter(event => {
-                    const eventStart = new Date(event.start_date);
-                    const eventEnd = new Date(event.end_date);
-                    return date >= eventStart && date <= eventEnd;
-                });
-
-                if (dayEvents.length > 0) {
-                    // Show first event details
-                    showEventDetails(dayEvents[0]);
+                if(eventParticipants) {
+                    eventParticipants.innerHTML = '';
+                    if (event.participants && event.participants.length > 0) {
+                        event.participants.forEach(participant => {
+                            const badge = document.createElement('span');
+                            badge.className = 'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700';
+                            badge.textContent = participant;
+                            eventParticipants.appendChild(badge);
+                        });
+                    } else {
+                        eventParticipants.innerHTML = '<span class="text-gray-500 dark:text-gray-400 italic text-sm">Tidak ada peserta yang disematkan</span>';
+                    }
                 }
+
+                // Pancarkan Custom Event Alpine JS
+                window.dispatchEvent(new CustomEvent('open-smart-modal', {
+                    detail: { modalId: 'modal-detail-kegiatan' }
+                }));
             }
 
-            function getDayCellIndex(year, month, day) {
-                const firstDay = new Date(year, month, 1).getDay();
-                return firstDay + day - 1;
-            }
-
-            function isSameDate(date1, date2) {
-                return date1.getFullYear() === date2.getFullYear() &&
-                    date1.getMonth() === date2.getMonth() &&
-                    date1.getDate() === date2.getDate();
-            }
-
-            function openModal(modal, content) {
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    content.style.transform = 'scale(1)';
-                    content.style.opacity = '1';
-                }, 10);
-            }
-
-            function closeModal(modal, content) {
-                content.style.transform = 'scale(0.95)';
-                content.style.opacity = '0';
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                }, 300);
+            function isSameDate(d1, d2) {
+                return d1.getFullYear() === d2.getFullYear() &&
+                    d1.getMonth() === d2.getMonth() &&
+                    d1.getDate() === d2.getDate();
             }
 
             function updateStats() {
-                totalEvents.textContent = events.length;
-
-                // Count events by status
-                const ongoingCount = events.filter(event => event.status === 'Berjalan').length;
-                const completedCount = events.filter(event => event.status === 'Selesai').length;
-
-                ongoingEvents.textContent = ongoingCount;
-                completedEvents.textContent = completedCount;
+                pendingEvents.textContent = events.filter(e => e.status === 'Belum Mulai').length;
+                ongoingEvents.textContent = events.filter(e => e.status === 'Berjalan').length;
+                completedEvents.textContent = events.filter(e => e.status === 'Selesai').length;
             }
         });
     </script>

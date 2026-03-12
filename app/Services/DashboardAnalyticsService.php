@@ -10,8 +10,11 @@ use Illuminate\Support\Facades\Cache;
 
 class DashboardAnalyticsService
 {
-    public function rankPegawai(int $perPage = 5)
+    public function rankPegawai(int $perPage = 5, $month = null, $year = null)
     {
+        $month = $month ?? now()->month;
+        $year = $year ?? now()->year;
+
         /**
          * Subquery:
          * ambil pengiriman TERAKHIR per penugasan
@@ -32,6 +35,8 @@ class DashboardAnalyticsService
             );
 
         $query = Penugasan::query()
+            ->whereMonth('penugasans.created_at', $month)
+            ->whereYear('penugasans.created_at', $year)
             ->joinSub($latestPengiriman, 'latest_pengiriman', function ($join) {
                 $join->on('penugasans.id_penugasan', '=', 'latest_pengiriman.id_penugasan');
             })
@@ -191,20 +196,31 @@ class DashboardAnalyticsService
     /**
      * Get statistik lengkap untuk dashboard
      */
-    public function getDashboardStats(): array
+    public function getDashboardStats($month = null, $year = null): array
     {
+        $month = $month ?? now()->month;
+        $year = $year ?? now()->year;
+
         // Total Kegiatan
-        $totalKegiatan = Kegiatan::count();
+        $totalKegiatan = Kegiatan::whereMonth('created_at', $month)
+            ->whereYear('created_at', $year)
+            ->count();
 
         // Total Sub Kegiatan
-        $totalSubKegiatan = SubKegiatan::count();
+        $totalSubKegiatan = SubKegiatan::whereMonth('created_at', $month)
+            ->whereYear('created_at', $year)
+            ->count();
 
         // Total Penugasan
-        $totalPenugasan = Penugasan::count();
+        $totalPenugasan = Penugasan::whereMonth('created_at', $month)
+            ->whereYear('created_at', $year)
+            ->count();
 
         // Total Penugasan Selesai (yang sudah diterima)
         // Menggunakan query manual untuk menghindari masalah relationship
-        $penugasanSelesai = Penugasan::whereHas('pengirimans.penerimaan', function ($query) {
+        $penugasanSelesai = Penugasan::whereMonth('created_at', $month)
+            ->whereYear('created_at', $year)
+            ->whereHas('pengirimans.penerimaan', function ($query) {
             $query->where('status', 'Diterima');
         })->count();
 

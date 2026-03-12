@@ -17,9 +17,12 @@ class EmployeRankCard extends Component
      */
     public function __construct(DashboardAnalyticsService $analytics)
     {
+        $month = request('month', now()->month);
+        $year = request('year', now()->year);
+
         // ambil ranking, cukup 1 teratas
         $this->bestEmployee = $analytics
-            ->rankPegawai(1)
+            ->rankPegawai(1, $month, $year)
             ->first();
     }
 
