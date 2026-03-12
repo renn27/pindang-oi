@@ -1,7 +1,7 @@
 <div class="mb-6">
     <div class="flex items-center gap-3 mb-3">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
-            Butuh Dinas Luar
+            Perlu Dinas Luar
         </h3>
         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
             {{ $penugasanButuhDL->count() }} Penugasan
@@ -545,22 +545,182 @@
 
                             <!-- Total Row -->
                             <tr class="bg-gray-50 dark:bg-gray-800 border-t-2 border-gray-200 dark:border-gray-700">
-                                <td colspan="3" class="px-6 py-3 text-right text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    Total:
-                                </td>
-                                <td class="px-6 py-3 text-center text-sm font-bold text-brand-600 dark:text-brand-400">
-                                    {{ $penugasanButuhDL->sum('target') }}
-                                </td>
-                                <td colspan="3" class="px-6 py-3 text-center">
-                                    <div class="inline-flex flex-col items-center">
-                                        <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Pengiriman</span>
-                                        <span class="text-base font-bold text-blue-600 dark:text-blue-400">{{ $totalKirimButuhDL }}</span>
-                                    </div>
-                                </td>
-                                <td colspan="4" class="px-6 py-3 text-center">
-                                    <div class="inline-flex flex-col items-center">
-                                        <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Penerimaan</span>
-                                        <span class="text-base font-bold text-green-600 dark:text-green-400">{{ $totalTerimaButuhDL }}</span>
+                                <td colspan="20" class="px-6 py-5">
+                                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                        <!-- ================= SUMMARY ================= -->
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Ringkasan</h4>
+                                            </div>
+                                            <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                                                <div class="grid grid-cols-3 text-center gap-4">
+
+                                                    <div>
+                                                        <p class="text-xs text-gray-500">Target</p>
+                                                        <p class="text-xl font-bold text-blue-600">
+                                                            {{ $penugasanButuhDL->sum('target') }}
+                                                        </p>
+                                                    </div>
+
+                                                    <div>
+                                                        <p class="text-xs text-gray-500">Pengiriman</p>
+                                                        <p class="text-xl font-bold text-blue-600">
+                                                            {{ $totalKirimButuhDL }}
+                                                        </p>
+                                                    </div>
+
+                                                    <div>
+                                                        <p class="text-xs text-gray-500">Penerimaan</p>
+                                                        <p class="text-xl font-bold text-green-600">
+                                                            {{ $totalTerimaButuhDL }}
+                                                        </p>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <!-- ================= PENGIRIMAN ================= -->
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Pengiriman</h4>
+                                            </div>
+
+                                            <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                                                <div class="grid grid-cols-3 gap-4 items-center">
+
+                                                    <!-- Response Rate -->
+                                                    <div>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Response Rate</p>
+                                                        <p class="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                                                            {{ $penugasan->latestPengiriman?->rr_kirim ?? 0 }}%
+                                                        </p>
+                                                    </div>
+
+                                                    <!-- Rating -->
+                                                    <div class="text-center">
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Ketepatan Waktu</p>
+
+                                                        <div
+                                                            x-data="{ show: false }"
+                                                            @mouseenter="show = true"
+                                                            @mouseleave="show = false"
+                                                            class="relative flex justify-center gap-0.5 cursor-pointer">
+
+                                                            @foreach ($penugasan->bintang_kirim_array as $filled)
+                                                                <span class="{{ $filled ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-500' }}">★</span>
+                                                            @endforeach
+
+                                                            <div
+                                                                x-show="show"
+                                                                x-transition
+                                                                class="absolute z-50 bottom-full mb-2 w-56 rounded-lg bg-gray-900 text-white text-xs shadow-lg px-3 py-2">
+
+                                                                <div class="font-semibold text-yellow-400 mb-1">
+                                                                    ⭐ Rating Pengiriman
+                                                                </div>
+
+                                                                <div class="space-y-1 text-gray-200">
+                                                                    <div>
+                                                                        <span class="text-gray-400">Nilai:</span>
+                                                                        {{ $penugasan->latestPengiriman?->rating_kirim ?? 0 }}/5
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="text-gray-400">Deadline:</span>
+                                                                        {{ optional($penugasan->tanggal_selesai)->translatedFormat('d M Y') ?? '-' }}
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="text-gray-400">Dikirim:</span>
+                                                                        {{ optional($penugasan->latestPengiriman?->tanggal_pengiriman)->translatedFormat('d M Y') ?? '-' }}
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0
+                                                                    border-l-6 border-r-6 border-t-6
+                                                                    border-l-transparent border-r-transparent border-t-gray-900">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- ================= PENERIMAAN ================= -->
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Penerimaan</h4>
+                                            </div>
+
+                                            <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+
+                                                <div class="grid grid-cols-2 gap-4 items-center">
+
+                                                    <!-- Response Rate -->
+                                                    <div>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Response Rate</p>
+                                                        <p class="text-lg font-semibold text-green-600 dark:text-green-400">
+                                                            {{ $penugasan->latestPenerimaan?->rr_terima ?? 0 }}%
+                                                        </p>
+                                                    </div>
+
+                                                    <!-- Rating -->
+                                                    <div class="text-center">
+
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Ketepatan Waktu</p>
+
+                                                        <div
+                                                            x-data="{ show: false }"
+                                                            @mouseenter="show = true"
+                                                            @mouseleave="show = false"
+                                                            class="relative flex justify-center gap-0.5 cursor-pointer">
+
+                                                            @foreach ($penugasan->bintang_terima_array as $filled)
+                                                                <span class="{{ $filled ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-500' }}">★</span>
+                                                            @endforeach
+
+                                                            <div
+                                                                x-show="show"
+                                                                x-transition
+                                                                class="absolute z-50 bottom-full mb-2 w-56 rounded-lg bg-gray-900 text-white text-xs shadow-lg px-3 py-2">
+
+                                                                <div class="font-semibold text-yellow-400 mb-1">
+                                                                    ⭐ Rating Penerimaan
+                                                                </div>
+
+                                                                <div class="space-y-1 text-gray-200">
+                                                                    <div>
+                                                                        <span class="text-gray-400">Nilai:</span>
+                                                                        {{ $penugasan->latestPenerimaan?->rating_terima ?? 0 }}/5
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="text-gray-400">Deadline:</span>
+                                                                        {{ optional($penugasan->tanggal_selesai)->translatedFormat('d M Y') ?? '-' }}
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="text-gray-400">Diterima:</span>
+                                                                        {{ optional($penugasan->latestPenerimaan?->tanggal_penerimaan)->translatedFormat('d M Y') ?? '-' }}
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0
+                                                                    border-l-6 border-r-6 border-t-6
+                                                                    border-l-transparent border-r-transparent border-t-gray-900">
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -575,7 +735,7 @@
 <div class="mb-6">
     <div class="flex items-center gap-3 mb-3">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
-            Tidak Butuh Dinas Luar
+            Tidak Perlu Dinas Luar
         </h3>
         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
             {{ $penugasanTidakButuhDL->count() }} Penugasan
@@ -1102,22 +1262,182 @@
 
                             <!-- Total Row -->
                             <tr class="bg-gray-50 dark:bg-gray-800 border-t-2 border-gray-200 dark:border-gray-700">
-                                <td colspan="3" class="px-6 py-3 text-right text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    Total:
-                                </td>
-                                <td class="px-6 py-3 text-center text-sm font-bold text-brand-600 dark:text-brand-400">
-                                    {{ $penugasanTidakButuhDL->sum('target') }}
-                                </td>
-                                <td colspan="3" class="px-6 py-3 text-center">
-                                    <div class="inline-flex flex-col items-center">
-                                        <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Pengiriman</span>
-                                        <span class="text-base font-bold text-blue-600 dark:text-blue-400">{{ $totalKirimTidakButuhDL }}</span>
-                                    </div>
-                                </td>
-                                <td colspan="4" class="px-6 py-3 text-center">
-                                    <div class="inline-flex flex-col items-center">
-                                        <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Penerimaan</span>
-                                        <span class="text-base font-bold text-green-600 dark:text-green-400">{{ $totalTerimaTidakButuhDL }}</span>
+                                <td colspan="20" class="px-6 py-5">
+                                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                        <!-- ================= SUMMARY ================= -->
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Ringkasan</h4>
+                                            </div>
+                                            <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                                                <div class="grid grid-cols-3 text-center gap-4">
+
+                                                    <div>
+                                                        <p class="text-xs text-gray-500">Target</p>
+                                                        <p class="text-xl font-bold text-blue-600">
+                                                            {{ $penugasanTidakButuhDL->sum('target') }}
+                                                        </p>
+                                                    </div>
+
+                                                    <div>
+                                                        <p class="text-xs text-gray-500">Pengiriman</p>
+                                                        <p class="text-xl font-bold text-blue-600">
+                                                            {{ $totalKirimTidakButuhDL }}
+                                                        </p>
+                                                    </div>
+
+                                                    <div>
+                                                        <p class="text-xs text-gray-500">Penerimaan</p>
+                                                        <p class="text-xl font-bold text-green-600">
+                                                            {{ $totalTerimaTidakButuhDL }}
+                                                        </p>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <!-- ================= PENGIRIMAN ================= -->
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Pengiriman</h4>
+                                            </div>
+
+                                            <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                                                <div class="grid grid-cols-3 gap-4 items-center">
+
+                                                    <!-- Response Rate -->
+                                                    <div>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Response Rate</p>
+                                                        <p class="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                                                            {{ $penugasan->latestPengiriman?->rr_kirim ?? 0 }}%
+                                                        </p>
+                                                    </div>
+
+                                                    <!-- Rating -->
+                                                    <div class="text-center">
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Ketepatan Waktu</p>
+
+                                                        <div
+                                                            x-data="{ show: false }"
+                                                            @mouseenter="show = true"
+                                                            @mouseleave="show = false"
+                                                            class="relative flex justify-center gap-0.5 cursor-pointer">
+
+                                                            @foreach ($penugasan->bintang_kirim_array as $filled)
+                                                                <span class="{{ $filled ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-500' }}">★</span>
+                                                            @endforeach
+
+                                                            <div
+                                                                x-show="show"
+                                                                x-transition
+                                                                class="absolute z-50 bottom-full mb-2 w-56 rounded-lg bg-gray-900 text-white text-xs shadow-lg px-3 py-2">
+
+                                                                <div class="font-semibold text-yellow-400 mb-1">
+                                                                    ⭐ Rating Pengiriman
+                                                                </div>
+
+                                                                <div class="space-y-1 text-gray-200">
+                                                                    <div>
+                                                                        <span class="text-gray-400">Nilai:</span>
+                                                                        {{ $penugasan->latestPengiriman?->rating_kirim ?? 0 }}/5
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="text-gray-400">Deadline:</span>
+                                                                        {{ optional($penugasan->tanggal_selesai)->translatedFormat('d M Y') ?? '-' }}
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="text-gray-400">Dikirim:</span>
+                                                                        {{ optional($penugasan->latestPengiriman?->tanggal_pengiriman)->translatedFormat('d M Y') ?? '-' }}
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0
+                                                                    border-l-6 border-r-6 border-t-6
+                                                                    border-l-transparent border-r-transparent border-t-gray-900">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- ================= PENERIMAAN ================= -->
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Penerimaan</h4>
+                                            </div>
+
+                                            <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+
+                                                <div class="grid grid-cols-2 gap-4 items-center">
+
+                                                    <!-- Response Rate -->
+                                                    <div>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Response Rate</p>
+                                                        <p class="text-lg font-semibold text-green-600 dark:text-green-400">
+                                                            {{ $penugasan->latestPenerimaan?->rr_terima ?? 0 }}%
+                                                        </p>
+                                                    </div>
+
+                                                    <!-- Rating -->
+                                                    <div class="text-center">
+
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Ketepatan Waktu</p>
+
+                                                        <div
+                                                            x-data="{ show: false }"
+                                                            @mouseenter="show = true"
+                                                            @mouseleave="show = false"
+                                                            class="relative flex justify-center gap-0.5 cursor-pointer">
+
+                                                            @foreach ($penugasan->bintang_terima_array as $filled)
+                                                                <span class="{{ $filled ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-500' }}">★</span>
+                                                            @endforeach
+
+                                                            <div
+                                                                x-show="show"
+                                                                x-transition
+                                                                class="absolute z-50 bottom-full mb-2 w-56 rounded-lg bg-gray-900 text-white text-xs shadow-lg px-3 py-2">
+
+                                                                <div class="font-semibold text-yellow-400 mb-1">
+                                                                    ⭐ Rating Penerimaan
+                                                                </div>
+
+                                                                <div class="space-y-1 text-gray-200">
+                                                                    <div>
+                                                                        <span class="text-gray-400">Nilai:</span>
+                                                                        {{ $penugasan->latestPenerimaan?->rating_terima ?? 0 }}/5
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="text-gray-400">Deadline:</span>
+                                                                        {{ optional($penugasan->tanggal_selesai)->translatedFormat('d M Y') ?? '-' }}
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="text-gray-400">Diterima:</span>
+                                                                        {{ optional($penugasan->latestPenerimaan?->tanggal_penerimaan)->translatedFormat('d M Y') ?? '-' }}
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0
+                                                                    border-l-6 border-r-6 border-t-6
+                                                                    border-l-transparent border-r-transparent border-t-gray-900">
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>

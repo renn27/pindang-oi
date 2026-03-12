@@ -31,26 +31,36 @@ class Pegawai extends Authenticatable
         'password',
     ];
 
-    public function isAnggota(): bool
+    public function isSuperUser(): bool
     {
-        return ! $this->hasAnyRole([
+        return $this->hasAnyRole([
             'Admin',
-            'Pimpinan',
-            'Ketua Tim',
+            'Pimpinan'
         ]);
     }
 
-    // Cek apakah pegawai ini penanggung jawab kegiatan
-    public function isKetuaOfKegiatan(Kegiatan $kegiatan): bool {
-        return $kegiatan->id_penanggung_jawab === $this->id_pegawai;
+    public function isKetuaTim(): bool
+    {
+        return $this->isActiveRole('Ketua Tim');
     }
 
-    // Cek apakah pegawai ini anggota penugasan pada sub kegiatan tertentu
-    public function isAnggotaOfSubKegiatan(SubKegiatan $subKegiatan): bool {
-        return $subKegiatan->penugasan
-            ->pluck('id_pegawai')
-            ->contains($this->id_pegawai);
+    public function isAnggotaTim(): bool
+    {
+        return
+            $this->isActiveRole('Anggota Tim');
     }
+
+    // // Cek apakah pegawai ini penanggung jawab kegiatan
+    // public function isKetuaOfKegiatan(Kegiatan $kegiatan): bool {
+    //     return $kegiatan->id_penanggung_jawab === $this->id_pegawai;
+    // }
+
+    // // Cek apakah pegawai ini anggota penugasan pada sub kegiatan tertentu
+    // public function isAnggotaOfSubKegiatan(SubKegiatan $subKegiatan): bool {
+    //     return $subKegiatan->penugasan
+    //         ->pluck('id_pegawai')
+    //         ->contains($this->id_pegawai);
+    // }
 
     public function kegiatanYangDipimpin() {
         return $this->hasMany(Kegiatan::class, 'id_penanggung_jawab', 'id_pegawai');
@@ -77,6 +87,22 @@ class Pegawai extends Authenticatable
         return $this->roles->contains('nama_role', $namaRole);
     }
 
+    public function getDisplayRoleAttribute(): string
+    {
+        // 1️⃣ Kalau active role ada
+        if (!empty($this->active_role)) {
+            return $this->active_role;
+        }
+
+        // 2️⃣ Kalau tidak ada active role tapi punya penugasan
+        if (\App\Models\Penugasan::where('id_anggota', $this->id_pegawai)->exists()) {
+            return 'Anggota Tim';
+        }
+
+        // 3️⃣ Default
+        return 'Belum Ada Role';
+    }
+
     // ❗ TAMBAHAN (dibutuhkan oleh isAnggota)
     public function hasAnyRole(array $roles): bool
     {
@@ -85,7 +111,7 @@ class Pegawai extends Authenticatable
 
     public function isActiveRole(string $namaRole): bool
     {
-        return $this->active_role === $namaRole;
+        return $this->getActiveRole() === $namaRole;
     }
 
     public function getActiveRole(): ?string

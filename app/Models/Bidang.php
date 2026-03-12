@@ -32,7 +32,6 @@ class Bidang extends Model
         $query = self::query()->whereNull('deleted_at');
 
         if ($user) {
-
             // MODE KETUA TIM
             if ($user->active_role === 'Ketua Tim') {
                 $query->whereHas('kegiatans', function ($q) use ($user) {
@@ -48,18 +47,43 @@ class Bidang extends Model
             }
         }
 
-        return $query
-            ->orderBy('urutan')
-            ->get()
-            ->map(function ($bidang) use ($currentBidang) {
-                return [
-                    'name'      => $bidang->nama_bidang,
-                    'path'      => route('kegiatan.index', $bidang->slug),
-                    'icon'      => 'dashboard',
-                    'is_active' => $currentBidang && $currentBidang->slug === $bidang->slug,
-                ];
-            })
-            ->toArray();
+        $bidangs = $query->orderBy('urutan')->get();
+
+        // 🔥 TAMBAHAN LOGIC UNTUK KETUA TIM TANPA KEGIATAN
+        if ($user && $user->active_role === 'Ketua Tim' && $bidangs->isEmpty()) {
+            return [
+                [
+                    'name' => 'Belum ada Bidang Kerja',
+                    'path' => route('master-kegiatan.index'), // arahkan ke master kegiatan
+                    'is_active' => false,
+                    'is_placeholder' => true, // flag tambahan'
+                ]
+            ];
+        }
+
+        return $bidangs
+        ->map(function ($bidang) use ($currentBidang) {
+            return [
+                'name'      => $bidang->nama_bidang,
+                'path'      => route('kegiatan.index', $bidang->slug),
+                'icon'      => 'dashboard',
+                'is_active' => $currentBidang && $currentBidang->slug === $bidang->slug,
+            ];
+        })
+        ->toArray();
+
+        // return $query
+        //     ->orderBy('urutan')
+        //     ->get()
+        //     ->map(function ($bidang) use ($currentBidang) {
+        //         return [
+        //             'name'      => $bidang->nama_bidang,
+        //             'path'      => route('kegiatan.index', $bidang->slug),
+        //             'icon'      => 'dashboard',
+        //             'is_active' => $currentBidang && $currentBidang->slug === $bidang->slug,
+        //         ];
+        //     })
+        //     ->toArray();
     }
 
 

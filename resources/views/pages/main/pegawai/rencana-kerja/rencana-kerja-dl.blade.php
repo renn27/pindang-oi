@@ -98,7 +98,7 @@
 
     <div class="space-y-6">
         <!-- Tampilan Card Fungsi dengan Accordion -->
-        <x-common.component-card title="Daftar Rencana Kerja Butuh DL">
+        <x-common.component-card title="Daftar Rencana Kerja Perlu DL">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <div class="rounded-xl border dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Rencana Kerja</p>
@@ -131,9 +131,38 @@
 
             <div class="space-y-4">
                 @foreach ($bidangs as $index => $bidang)
-                    <div x-data="{ open: false }" class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                    <div x-data="{
+                        id: 'accordion-{{ $bidang->id_bidang }}',
+                        open: false,
+
+                        init() {
+                            const saved = JSON.parse(localStorage.getItem(this.id))
+
+                            if (saved) {
+                                const now = Date.now()
+                                const limit = 1 * 60 * 1000 // 1 menit
+
+                                if (now - saved.time < limit) {
+                                    this.open = saved.open
+                                } else {
+                                    localStorage.removeItem(this.id)
+                                }
+                            }
+                        },
+
+                        toggle() {
+                            this.open = !this.open
+
+                            localStorage.setItem(this.id, JSON.stringify({
+                                open: this.open,
+                                time: Date.now()
+                            }))
+                        }
+                    }"
+                        x-init="init()"
+                        class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                         <!-- Header Fungsi -->
-                        <button @click="open = !open"
+                        <button @click="toggle()"
                             class="flex w-full items-center justify-between p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-700">
                             <div class="flex items-center gap-3">
                                 <div>

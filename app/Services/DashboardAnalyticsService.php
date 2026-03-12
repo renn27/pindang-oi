@@ -133,6 +133,61 @@ class DashboardAnalyticsService
         ];
     }
 
+    public function summaryKegiatanKetua(string $idPegawai): array
+    {
+        $today = now()->startOfDay();
+
+        // Ambil penugasan + latest pengiriman + penerimaan
+        $kegiatans = Kegiatan::query()
+        ->where('id_penanggung_jawab', $idPegawai)
+        ->get();
+
+        $belumMulai = 0;
+        $sudahSelesai = 0;
+        $sedangBerjalan = 0;
+
+        // foreach ($kegiatans as $kegiatan) {
+
+        //     // 1️⃣ BELUM MULAI
+        //     if (
+        //         $kegiatan->tanggal_mulai &&
+        //         $kegiatan->tanggal_mulai->startOfDay()->gt($today)
+        //     ) {
+        //         $belumMulai++;
+        //         continue;
+        //     }
+
+        //     // Ambil latest pengiriman (kalau ada)
+        //     $latestPengiriman = $penugasan->pengirimans->first();
+
+        //     // Ambil penerimaan dari latest pengiriman
+        //     $statusPenerimaan = optional(
+        //         optional($latestPengiriman)->penerimaan
+        //     )->status;
+
+        //     // 2️⃣ SUDAH SELESAI
+        //     if ($statusPenerimaan === 'Diterima') {
+        //         $sudahSelesai++;
+        //         continue;
+        //     }
+
+        //     // 3️⃣ SEDANG BERJALAN
+        //     if (
+        //         $penugasan->tanggal_mulai &&
+        //         $penugasan->tanggal_mulai->startOfDay()->lte($today)
+        //     ) {
+        //         $sedangBerjalan++;
+        //     }
+        // }
+
+        return [
+            'total'           => $kegiatans->count(),
+            // 'belum_mulai'     => $belumMulai,
+            // 'sedang_berjalan' => $sedangBerjalan,
+            // 'sudah_selesai'   => $sudahSelesai,
+        ];
+    }
+
     /**
      * Get statistik lengkap untuk dashboard
      */

@@ -139,7 +139,11 @@
                                             <ul class="mt-2 space-y-1 ml-9">
                                                 @foreach ($item['subItems'] as $subItem)
                                                     <li>
-                                                        <a href="{{ $subItem['path'] }}" class="menu-dropdown-item"
+                                                        <a href="{{ $subItem['path'] }}"
+                                                            class="menu-dropdown-item
+                                                                {{ !empty($subItem['is_placeholder']) ?
+                                                                    'italic text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400'
+                                                                    : '' }}"
                                                             :class="{{ $subItem['is_active'] ?? false ? 'true' : 'false' }} ?
                                                                 'menu-dropdown-item-active' :
                                                                 'menu-dropdown-item-inactive'">

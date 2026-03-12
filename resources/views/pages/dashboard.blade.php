@@ -17,7 +17,7 @@
                     <span class="text-sm text-gray-500 dark:text-gray-300">Role</span>
                     <span
                         class="rounded-full bg-brand-100 px-3 py-1 text-sm font-semibold text-brand-700 dark:bg-blue-900/30 dark:text-blue-300">
-                        {{ Auth::user()->active_role ?? 'Anggota Tim' }}
+                        {{ Auth::user()->display_role }}
                     </span>
                 </div>
             </div>
@@ -26,7 +26,89 @@
         @endauth
     </div>
 
-    @if (!auth()->user()->isAnggota())
+    @if (!auth()->user()->isSuperUser())
+        @if (auth()->user()->isAnggotaTim() ||
+                (auth()->user()->isKetuaTim() && auth()->user()->kegiatanYangDipimpin()->exists()))
+            @auth
+                @if (auth()->user()->isAnggotaTim())
+                    <div class="mb-8">
+                        <div
+                            class="rounded-2xl border border-gray-200 p-6 dark:from-gray-800 dark:to-gray-900 bg-white dark:bg-gray-900 dark:border-gray-800">
+                            <div class="mb-6 text-center">
+                                <h2 class="mb-2 text-2xl font-bold text-gray-800 dark:text-white">Rekap Penugasan untuk
+                                    {{ Auth::user()->nama_pegawai }}</h2>
+                                {{-- <p class="text-gray-600 dark:text-gray-300">
+                                    Setiap tugas adalah kesempatan untuk tumbuh dan menunjukkan potensi terbaikmu.
+                                    Laksanakan dengan penuh tanggung jawab dan dedikasi!
+                                </p> --}}
+                            </div>
+
+                            <div class="col-span-12 xl:col-span-5 space-y-6">
+                                <x-profile.vis-total-penugasan-pegawai :totalpenugasanPegawai="app(\App\Services\DashboardAnalyticsService::class)->summaryPenugasanAnggota(
+                                    Auth::user()->id_pegawai,
+                                )" />
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            @endauth
+
+            @auth
+                @if (auth()->user()->isKetuaTim())
+                    <div class="mb-8">
+                        <div
+                            class="rounded-2xl border border-gray-200 p-6 dark:from-gray-800 dark:to-gray-900 bg-white dark:bg-gray-900 dark:border-gray-800">
+                            <div class="mb-6 text-center">
+                                <h2 class="mb-2 text-2xl font-bold text-gray-800 dark:text-white">Rekap Kegiatan milik
+                                    {{ Auth::user()->nama_pegawai }}</h2>
+                            </div>
+
+                            <div class="col-span-12 xl:col-span-5 space-y-6">
+                                <x-profile.vis-total-kegiatan-ketua :totalkegiatanKetua="app(\App\Services\DashboardAnalyticsService::class)->summaryKegiatanKetua(
+                                    Auth::user()->id_pegawai,
+                                )" />
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            @endauth
+        @elseif (auth()->user()->isKetuaTim())
+            <div class="mb-8">
+                <div
+                    class="rounded-2xl border border-dashed border-gray-300 p-6 bg-gray-50 dark:bg-gray-900 dark:border-gray-700">
+
+                    <div class="text-center">
+                        <h2 class="mb-2 text-xl font-semibold text-gray-700 dark:text-gray-300 italic">
+                            Belum Ada Kegiatan yang Dibuat
+                        </h2>
+
+                        <p class="text-gray-500 dark:text-gray-400">
+                            Saat ini Anda belum membuat kegiatan apapun. Silakan buat kegiatan baru untuk mulai mengelola
+                            penugasan bersama Anggota Tim Anda.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @else
+            <div class="mb-8">
+                <div
+                    class="rounded-2xl border border-dashed border-gray-300 p-6 bg-gray-50 dark:bg-gray-900 dark:border-gray-700">
+
+                    <div class="text-center">
+                        <h2 class="mb-2 text-xl font-semibold text-gray-700 dark:text-gray-300 italic">
+                            Belum Termasuk Dalam Penugasan
+                        </h2>
+
+                        <p class="text-gray-500 dark:text-gray-400">
+                            Saat ini Anda belum termasuk dalam penugasan pada bidang manapun.
+                            Silakan menunggu penugasan dari Ketua Tim atau hubungi atasan Anda
+                            untuk mendapatkan informasi lebih lanjut.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @else()
         {{-- ===== SECTION STATISTIK KEGIATAN ===== --}}
         <div class="mb-8">
             <div class="rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 dark:border-gray-800 dark:bg-gray-900">
@@ -41,7 +123,7 @@
                         {{ now()->format('F Y') }}
                     </div>
                 </div>
-                
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {{-- TOTAL KEGIATAN --}}
                     <div
@@ -141,31 +223,6 @@
         </div>
     @endif
 
-    {{-- ===== SECTION PENUGASAN ASTRI ===== --}}
-    @if (auth()->user()->isAnggota())
-        <div class="mb-8">
-            <div
-                class="rounded-2xl border border-gray-200 p-6 dark:from-gray-800 dark:to-gray-900 bg-white dark:bg-gray-900 dark:border-gray-800">
-                <div class="mb-6 text-center">
-                    <h2 class="mb-2 text-2xl font-bold text-gray-800 dark:text-white">Rekap Penugasan dari
-                        {{ Auth::user()->nama_pegawai }}</h2>
-                    <p class="text-gray-600 dark:text-gray-300">
-                        Setiap tugas adalah kesempatan untuk tumbuh dan menunjukkan potensi terbaikmu.
-                        Laksanakan dengan penuh tanggung jawab dan dedikasi!
-                    </p>
-                </div>
-
-                <div class="col-span-12 xl:col-span-5 space-y-6">
-                    @auth
-                        <x-profile.vis-total-penugasan-pegawai :totalpenugasanPegawai="app(\App\Services\DashboardAnalyticsService::class)->summaryPenugasanAnggota(
-                            Auth::user()->id_pegawai,
-                        )" />
-                    @endauth
-                </div>
-            </div>
-        </div>
-    @endif
-
     {{-- ===== SECTION BEST EMPLOYEE ===== --}}
     <div class="mb-8">
         <div class="rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 dark:border-gray-800 dark:bg-gray-900">
@@ -181,8 +238,6 @@
             </div>
         </div>
     </div>
-
-
 
     {{-- ===== SECTION ALL PENILAIAN KARYAWAN ===== --}}
     <div class="w-full">
