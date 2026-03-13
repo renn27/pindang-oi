@@ -646,7 +646,7 @@
                                         x-text="
                                             !jenisSelected
                                                 ? 'Pilih dulu'
-                                                : (butuhDl ? 'Butuh DL' : 'Tidak DL')
+                                                : (butuhDl ? 'Perlu DL' : 'Tidak DL')
                                         "
                                     ></span>
 
@@ -659,13 +659,13 @@
                                 <p
                                     x-show="!jenisSelected"
                                     class="text-xs text-brand-500/70 dark:text-brand-400/70">
-                                    Pilih jenis kegiatan untuk menentukan kebutuhan DL.
+                                    Pilih jenis kegiatan untuk menentukan keperluan DL.
                                 </p>
 
                                 <p
                                     x-show="isLocked && jenisSelected"
                                     class="text-xs text-gray-400 dark:text-gray-500">
-                                    Jenis kegiatan ini otomatis membutuhkan DL dan tidak dapat diubah.
+                                    Jenis kegiatan ini otomatis memerlukan DL dan tidak dapat diubah.
                                 </p>
 
                                 <!-- Hidden -->
@@ -921,8 +921,8 @@
                             const butuhDL = butuhDLInput ? Number(butuhDLInput.value) === 1 : false;
 
                             const butuhDLText = butuhDL
-                                ? 'Butuh Dinas Luar / Surat Tugas'
-                                : 'Tidak Butuh Dinas Luar / Surat Tugas';
+                                ? 'Perlu Dinas Luar / Surat Tugas'
+                                : 'Tidak Perlu Dinas Luar / Surat Tugas';
 
                             const butuhDLBadge = butuhDL
                                 ? `<span class="inline-flex items-center rounded-md bg-green-100 dark:bg-green-900/40 px-2 py-1 text-[11px] font-medium text-green-700 dark:text-green-400">

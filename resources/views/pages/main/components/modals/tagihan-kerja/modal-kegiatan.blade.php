@@ -223,12 +223,25 @@
                     </button>
                 </div>
             </div>
-            
+
         </div>
     </form>
 </x-ui.smart-modal>
 <script>
     function ketuaDropdown() {
+        @php
+            $user = auth()->user();
+            $filteredKetua = $ketuaTims;
+            
+            if ($user && method_exists($user, 'isActiveRole')) {
+                if ($user->isActiveRole('Admin') || $user->isActiveRole('Pimpinan')) {
+                    $filteredKetua = $ketuaTims;
+                } elseif ($user->isActiveRole('Ketua Tim')) {
+                    $filteredKetua = $ketuaTims->filter(fn($p) => $p->id_pegawai == $user->id_pegawai);
+                }
+            }
+        @endphp
+
         return {
             open: false,
             search: '',
@@ -236,10 +249,10 @@
             mode: 'create',
 
             ketuaTims: @js(
-                $ketuaTims->map(fn($p) => [
+                $filteredKetua->map(fn($p) => [
                     'id_pegawai'   => $p->id_pegawai,
                     'nama_pegawai' => $p->nama_pegawai
-                ])
+                ])->values()
             ),
 
             initFromModal(detail) {
@@ -250,9 +263,15 @@
                     this.search     = detail.data.nama_penanggung_jawab;
                     this.open       = false;
                 } else {
-                    this.selectedId = '';
-                    this.search     = '';
-                    this.open       = true;
+                    if (this.ketuaTims.length === 1) {
+                        this.selectedId = this.ketuaTims[0].id_pegawai;
+                        this.search     = this.ketuaTims[0].nama_pegawai;
+                        this.open       = false;
+                    } else {
+                        this.selectedId = '';
+                        this.search     = '';
+                        this.open       = true;
+                    }
                 }
             },
 
