@@ -589,6 +589,17 @@
                             @endforelse
 
                             <!-- Total Row -->
+                            @php
+                                $sumTargetDL = $penugasanButuhDL->sum('target');
+                                $avgRrKirimDL = $sumTargetDL > 0 ? round(($totalKirimButuhDL / $sumTargetDL) * 100, 2) : 0;
+                                $avgRrTerimaDL = $sumTargetDL > 0 ? round(($totalTerimaButuhDL / $sumTargetDL) * 100, 2) : 0;
+                                
+                                $avgRatingKirimDL = $penugasanButuhDL->avg(function($p) { return $p->latestPengiriman?->rating_kirim ?? 0; }) ?? 0;
+                                $bintangKirimDLArray = array_map(function($i) use ($avgRatingKirimDL) { return $i <= round($avgRatingKirimDL); }, range(1, 5));
+                                
+                                $avgRatingTerimaDL = $penugasanButuhDL->avg(function($p) { return $p->latestPenerimaan?->rating_terima ?? 0; }) ?? 0;
+                                $bintangTerimaDLArray = array_map(function($i) use ($avgRatingTerimaDL) { return $i <= round($avgRatingTerimaDL); }, range(1, 5));
+                            @endphp
                             <tr class="bg-gray-50 dark:bg-gray-800 border-t-2 border-gray-200 dark:border-gray-700">
                                 <td colspan="20" class="px-6 py-5">
                                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -642,7 +653,7 @@
                                                     <div>
                                                         <p class="text-xs text-gray-500 dark:text-gray-400">Response Rate</p>
                                                         <p class="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                                                            {{ $penugasan->latestPengiriman?->rr_kirim ?? 0 }}%
+                                                            {{ $avgRrKirimDL }}%
                                                         </p>
                                                     </div>
 
@@ -656,7 +667,7 @@
                                                             @mouseleave="show = false"
                                                             class="relative flex justify-center gap-0.5 cursor-pointer">
 
-                                                            @foreach ($penugasan->bintang_kirim_array as $filled)
+                                                            @foreach ($bintangKirimDLArray as $filled)
                                                                 <span class="{{ $filled ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-500' }}">★</span>
                                                             @endforeach
 
@@ -666,21 +677,13 @@
                                                                 class="absolute z-50 bottom-full mb-2 w-56 rounded-lg bg-gray-900 text-white text-xs shadow-lg px-3 py-2">
 
                                                                 <div class="font-semibold text-yellow-400 mb-1">
-                                                                    ⭐ Rating Pengiriman
+                                                                    ⭐ Rata-rata Rating Pengiriman
                                                                 </div>
 
                                                                 <div class="space-y-1 text-gray-200">
                                                                     <div>
-                                                                        <span class="text-gray-400">Nilai:</span>
-                                                                        {{ $penugasan->latestPengiriman?->rating_kirim ?? 0 }}/5
-                                                                    </div>
-                                                                    <div>
-                                                                        <span class="text-gray-400">Deadline:</span>
-                                                                        {{ optional($penugasan->tanggal_selesai)->translatedFormat('d M Y') ?? '-' }}
-                                                                    </div>
-                                                                    <div>
-                                                                        <span class="text-gray-400">Dikirim:</span>
-                                                                        {{ optional($penugasan->latestPengiriman?->tanggal_pengiriman)->translatedFormat('d M Y') ?? '-' }}
+                                                                        <span class="text-gray-400">Rata-rata Nilai:</span>
+                                                                        {{ number_format($avgRatingKirimDL, 1) }}/5
                                                                     </div>
                                                                 </div>
 
@@ -710,7 +713,7 @@
                                                     <div>
                                                         <p class="text-xs text-gray-500 dark:text-gray-400">Response Rate</p>
                                                         <p class="text-lg font-semibold text-green-600 dark:text-green-400">
-                                                            {{ $penugasan->latestPenerimaan?->rr_terima ?? 0 }}%
+                                                            {{ $avgRrTerimaDL }}%
                                                         </p>
                                                     </div>
 
@@ -725,7 +728,7 @@
                                                             @mouseleave="show = false"
                                                             class="relative flex justify-center gap-0.5 cursor-pointer">
 
-                                                            @foreach ($penugasan->bintang_terima_array as $filled)
+                                                            @foreach ($bintangTerimaDLArray as $filled)
                                                                 <span class="{{ $filled ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-500' }}">★</span>
                                                             @endforeach
 
@@ -735,21 +738,13 @@
                                                                 class="absolute z-50 bottom-full mb-2 w-56 rounded-lg bg-gray-900 text-white text-xs shadow-lg px-3 py-2">
 
                                                                 <div class="font-semibold text-yellow-400 mb-1">
-                                                                    ⭐ Rating Penerimaan
+                                                                    ⭐ Rata-rata Rating Penerimaan
                                                                 </div>
 
                                                                 <div class="space-y-1 text-gray-200">
                                                                     <div>
-                                                                        <span class="text-gray-400">Nilai:</span>
-                                                                        {{ $penugasan->latestPenerimaan?->rating_terima ?? 0 }}/5
-                                                                    </div>
-                                                                    <div>
-                                                                        <span class="text-gray-400">Deadline:</span>
-                                                                        {{ optional($penugasan->tanggal_selesai)->translatedFormat('d M Y') ?? '-' }}
-                                                                    </div>
-                                                                    <div>
-                                                                        <span class="text-gray-400">Diterima:</span>
-                                                                        {{ optional($penugasan->latestPenerimaan?->tanggal_penerimaan)->translatedFormat('d M Y') ?? '-' }}
+                                                                        <span class="text-gray-400">Rata-rata Nilai:</span>
+                                                                        {{ number_format($avgRatingTerimaDL, 1) }}/5
                                                                     </div>
                                                                 </div>
 
@@ -1311,6 +1306,17 @@
                             @endforelse
 
                             <!-- Total Row -->
+                            @php
+                                $sumTargetNonDL = $penugasanTidakButuhDL->sum('target');
+                                $avgRrKirimNonDL = $sumTargetNonDL > 0 ? round(($totalKirimTidakButuhDL / $sumTargetNonDL) * 100, 2) : 0;
+                                $avgRrTerimaNonDL = $sumTargetNonDL > 0 ? round(($totalTerimaTidakButuhDL / $sumTargetNonDL) * 100, 2) : 0;
+
+                                $avgRatingKirimNonDL = $penugasanTidakButuhDL->avg(function($p) { return $p->latestPengiriman?->rating_kirim ?? 0; }) ?? 0;
+                                $bintangKirimNonDLArray = array_map(function($i) use ($avgRatingKirimNonDL) { return $i <= round($avgRatingKirimNonDL); }, range(1, 5));
+
+                                $avgRatingTerimaNonDL = $penugasanTidakButuhDL->avg(function($p) { return $p->latestPenerimaan?->rating_terima ?? 0; }) ?? 0;
+                                $bintangTerimaNonDLArray = array_map(function($i) use ($avgRatingTerimaNonDL) { return $i <= round($avgRatingTerimaNonDL); }, range(1, 5));
+                            @endphp
                             <tr class="bg-gray-50 dark:bg-gray-800 border-t-2 border-gray-200 dark:border-gray-700">
                                 <td colspan="20" class="px-6 py-5">
                                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1364,7 +1370,7 @@
                                                     <div>
                                                         <p class="text-xs text-gray-500 dark:text-gray-400">Response Rate</p>
                                                         <p class="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                                                            {{ $penugasan->latestPengiriman?->rr_kirim ?? 0 }}%
+                                                            {{ $avgRrKirimNonDL }}%
                                                         </p>
                                                     </div>
 
@@ -1378,7 +1384,7 @@
                                                             @mouseleave="show = false"
                                                             class="relative flex justify-center gap-0.5 cursor-pointer">
 
-                                                            @foreach ($penugasan->bintang_kirim_array as $filled)
+                                                            @foreach ($bintangKirimNonDLArray as $filled)
                                                                 <span class="{{ $filled ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-500' }}">★</span>
                                                             @endforeach
 
@@ -1388,21 +1394,13 @@
                                                                 class="absolute z-50 bottom-full mb-2 w-56 rounded-lg bg-gray-900 text-white text-xs shadow-lg px-3 py-2">
 
                                                                 <div class="font-semibold text-yellow-400 mb-1">
-                                                                    ⭐ Rating Pengiriman
+                                                                    ⭐ Rata-rata Rating Pengiriman
                                                                 </div>
 
                                                                 <div class="space-y-1 text-gray-200">
                                                                     <div>
-                                                                        <span class="text-gray-400">Nilai:</span>
-                                                                        {{ $penugasan->latestPengiriman?->rating_kirim ?? 0 }}/5
-                                                                    </div>
-                                                                    <div>
-                                                                        <span class="text-gray-400">Deadline:</span>
-                                                                        {{ optional($penugasan->tanggal_selesai)->translatedFormat('d M Y') ?? '-' }}
-                                                                    </div>
-                                                                    <div>
-                                                                        <span class="text-gray-400">Dikirim:</span>
-                                                                        {{ optional($penugasan->latestPengiriman?->tanggal_pengiriman)->translatedFormat('d M Y') ?? '-' }}
+                                                                        <span class="text-gray-400">Rata-rata Nilai:</span>
+                                                                        {{ number_format($avgRatingKirimNonDL, 1) }}/5
                                                                     </div>
                                                                 </div>
 
@@ -1432,7 +1430,7 @@
                                                     <div>
                                                         <p class="text-xs text-gray-500 dark:text-gray-400">Response Rate</p>
                                                         <p class="text-lg font-semibold text-green-600 dark:text-green-400">
-                                                            {{ $penugasan->latestPenerimaan?->rr_terima ?? 0 }}%
+                                                            {{ $avgRrTerimaNonDL }}%
                                                         </p>
                                                     </div>
 
@@ -1447,7 +1445,7 @@
                                                             @mouseleave="show = false"
                                                             class="relative flex justify-center gap-0.5 cursor-pointer">
 
-                                                            @foreach ($penugasan->bintang_terima_array as $filled)
+                                                            @foreach ($bintangTerimaNonDLArray as $filled)
                                                                 <span class="{{ $filled ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-500' }}">★</span>
                                                             @endforeach
 
@@ -1457,21 +1455,13 @@
                                                                 class="absolute z-50 bottom-full mb-2 w-56 rounded-lg bg-gray-900 text-white text-xs shadow-lg px-3 py-2">
 
                                                                 <div class="font-semibold text-yellow-400 mb-1">
-                                                                    ⭐ Rating Penerimaan
+                                                                    ⭐ Rata-rata Rating Penerimaan
                                                                 </div>
 
                                                                 <div class="space-y-1 text-gray-200">
                                                                     <div>
-                                                                        <span class="text-gray-400">Nilai:</span>
-                                                                        {{ $penugasan->latestPenerimaan?->rating_terima ?? 0 }}/5
-                                                                    </div>
-                                                                    <div>
-                                                                        <span class="text-gray-400">Deadline:</span>
-                                                                        {{ optional($penugasan->tanggal_selesai)->translatedFormat('d M Y') ?? '-' }}
-                                                                    </div>
-                                                                    <div>
-                                                                        <span class="text-gray-400">Diterima:</span>
-                                                                        {{ optional($penugasan->latestPenerimaan?->tanggal_penerimaan)->translatedFormat('d M Y') ?? '-' }}
+                                                                        <span class="text-gray-400">Rata-rata Nilai:</span>
+                                                                        {{ number_format($avgRatingTerimaNonDL, 1) }}/5
                                                                     </div>
                                                                 </div>
 
