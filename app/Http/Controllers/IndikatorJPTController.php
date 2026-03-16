@@ -12,6 +12,10 @@ class IndikatorJPTController extends Controller
     {
         $validatedData = $request->validate([
             'nama_indikator_jpt' => 'required|string|max:255',
+            'satuan' => 'nullable|string|max:100',
+            'target' => 'nullable|integer',
+            'realisasi' => 'nullable|integer',
+            'status' => 'nullable|in:Selesai,Belum Selesai',
         ]);
 
         try {
@@ -20,7 +24,6 @@ class IndikatorJPTController extends Controller
             // Redirect dengan flash message
             return redirect()->route('rencana-indikator-jpt.rencana.index')
                 ->with('success', 'Indikator JPT berhasil ditambahkan!');
-
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Gagal menambahkan Indikator JPT. Silakan coba lagi.')
@@ -32,6 +35,10 @@ class IndikatorJPTController extends Controller
     {
         $validatedData = $request->validate([
             'nama_indikator_jpt' => 'required|string|max:255',
+            'satuan' => 'nullable|string|max:100',
+            'target' => 'nullable|integer',
+            'realisasi' => 'nullable|integer',
+            'status' => 'nullable|in:Selesai,Belum Selesai',
         ]);
 
         // pastikan indikator milik rencana tsb

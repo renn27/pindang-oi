@@ -16,6 +16,10 @@ class IndikatorJPT extends Model
     protected $fillable = [
         'id_rencana_jpt',
         'nama_indikator_jpt',
+        'satuan',
+        'target',
+        'realisasi',
+        'status'
     ];
 
     public function rencanajpt() {

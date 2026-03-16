@@ -29,7 +29,11 @@ class RencanaJPTController extends Controller
             'tahun' => 'required|integer',
             'nama_rencana_jpt' => 'required|string|max:255',
             'ikis' => 'nullable|array',
-            'ikis.*' => 'nullable|string|max:255',
+            'ikis.*.nama_indikator_jpt' => 'nullable|string|max:255',
+            'ikis.*.satuan' => 'nullable|string|max:100',
+            'ikis.*.target' => 'nullable|integer',
+            'ikis.*.realisasi' => 'nullable|integer',
+            'ikis.*.status' => 'nullable|in:Selesai,Belum Selesai',
 
         ]);
 
@@ -48,8 +52,13 @@ class RencanaJPTController extends Controller
                 // 2️⃣ Simpan IKI JPT (jika ada)
                 if (!empty($ikis)) {
                     foreach ($ikis as $iki) {
+
                         $rencana->indikatorjpts()->create([
-                            'nama_indikator_jpt' => $iki,
+                            'nama_indikator_jpt' => $iki['nama_indikator_jpt'] ?? null,
+                            'satuan' => $iki['satuan'] ?? null,
+                            'target' => $iki['target'] ?? null,
+                            'realisasi' => $iki['realisasi'] ?? null,
+                            'status' => $iki['status'] ?? null,
                         ]);
                     }
                 }
@@ -58,7 +67,6 @@ class RencanaJPTController extends Controller
             // Redirect dengan flash message
             return redirect()->route('rencana-indikator-jpt.rencana.index')
                 ->with('success', 'Rencana JPT berhasil ditambahkan!');
-
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Gagal menambahkan Rencana JPT. Silakan coba lagi.')

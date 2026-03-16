@@ -140,24 +140,51 @@
                             dark:border-gray-700 dark:bg-gray-800/50">
                                 <div class="space-y-3">
                                     <template x-for="(iki, index) in ikis" :key="index">
-                                        <div class="flex gap-3 items-center">
-                                            <input type="text" :name="`ikis[${index}]`" x-model="ikis[index]"
-                                                placeholder="Masukkan indikator kinerja individu"
-                                                class="flex-1 h-10 rounded-lg border border-gray-300 px-3 text-sm 
-                                            focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors
-                                            dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:placeholder:text-gray-500">
+                                        <div class="flex flex-col gap-2">
 
-                                            <!-- Remove button -->
-                                            <button type="button" @click="ikis.splice(index,1)" x-show="ikis.length > 1"
-                                                class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg 
-                                            text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors
-                                            dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-red-900/20">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
+                                            <!-- nama indikator -->
+                                            <div class="flex gap-3 items-center">
+                                                <input type="text" :name="`ikis[${index}][nama_indikator_jpt]`"
+                                                    x-model="ikis[index]" placeholder="Masukkan indikator kinerja individu"
+                                                    class="flex-1 h-10 rounded-lg border border-gray-300 px-3 text-sm 
+                focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors
+                dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
+
+                                                <button type="button" @click="ikis.splice(index,1)"
+                                                    x-show="ikis.length > 1"
+                                                    class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg 
+                text-gray-500 hover:text-red-600 hover:bg-red-50
+                dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-red-900/20">
+                                                    ✕
+                                                </button>
+                                            </div>
+
+                                            <!-- input tambahan -->
+                                            <div class="grid grid-cols-4 gap-3">
+
+                                                <input type="text" :name="`ikis[${index}][satuan]`" placeholder="Satuan"
+                                                    class="h-10 rounded-lg border border-gray-300 px-3 text-sm
+                dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
+
+                                                <input type="number" :name="`ikis[${index}][target]`" placeholder="Target"
+                                                    class="h-10 rounded-lg border border-gray-300 px-3 text-sm
+                dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
+
+                                                <input type="number" :name="`ikis[${index}][realisasi]`"
+                                                    placeholder="Realisasi"
+                                                    class="h-10 rounded-lg border border-gray-300 px-3 text-sm
+                dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
+
+                                                <select :name="`ikis[${index}][status]`"
+                                                    class="h-10 rounded-lg border border-gray-300 px-3 text-sm
+                dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                                                    <option value="">Status</option>
+                                                    <option value="Selesai">Selesai</option>
+                                                    <option value="Belum Selesai">Belum Selesai</option>
+                                                </select>
+
+                                            </div>
+
                                         </div>
                                     </template>
                                 </div>
@@ -206,11 +233,15 @@
                 mode        = $event.detail.mode ?? 'create'
                 itemKey      = $event.detail.key ?? null
                 formData = {
-                    id_rencana_jpt: null,
-                    nama_rencana_jpt: '',
-                    nama_indikator_jpt: '',
-                    ...($event.detail.data ?? {})
-                }">
+                id_rencana_jpt: null,
+                nama_rencana_jpt: '',
+                nama_indikator_jpt: '',
+                satuan: '',
+                target: '',
+                realisasi: '',
+                status: '',
+                ...($event.detail.data ?? {})
+            }">
         <!-- HEADER -->
         <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-700">
             <h4 class="text-2xl font-semibold text-gray-800 dark:text-white"
@@ -259,6 +290,52 @@
                         class="md:w-3/4 h-11 rounded-lg border border-gray-300 px-4 text-sm
                             focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
                             dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500">
+                </div>
+
+                <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                    <label class="text-sm font-medium text-gray-700 md:w-1/4 dark:text-gray-300">
+                        Satuan
+                    </label>
+
+                    <input type="text" name="satuan" x-model="formData.satuan" placeholder="Contoh: Persen, Dokumen"
+                        class="md:w-3/4 h-11 rounded-lg border border-gray-300 px-4 text-sm
+        dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                </div>
+
+                <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                    <label class="text-sm font-medium text-gray-700 md:w-1/4 dark:text-gray-300">
+                        Target
+                    </label>
+
+                    <input type="number" name="target" x-model="formData.target" placeholder="Masukkan target"
+                        class="md:w-3/4 h-11 rounded-lg border border-gray-300 px-4 text-sm
+        dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                </div>
+
+                <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                    <label class="text-sm font-medium text-gray-700 md:w-1/4 dark:text-gray-300">
+                        Realisasi
+                    </label>
+
+                    <input type="number" name="realisasi" x-model="formData.realisasi" placeholder="Masukkan realisasi"
+                        class="md:w-3/4 h-11 rounded-lg border border-gray-300 px-4 text-sm
+        dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                </div>
+
+                <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                    <label class="text-sm font-medium text-gray-700 md:w-1/4 dark:text-gray-300">
+                        Status
+                    </label>
+
+                    <select name="status" x-model="formData.status"
+                        class="md:w-3/4 h-11 rounded-lg border border-gray-300 px-4 text-sm
+        dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+
+                        <option value="">Pilih Status</option>
+                        <option value="Selesai">Selesai</option>
+                        <option value="Belum Selesai">Belum Selesai</option>
+
+                    </select>
                 </div>
 
                 <!-- FOOTER -->
@@ -426,6 +503,25 @@
                                                         Nama Indikator</th>
                                                     <th
                                                         class="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-300">
+                                                        Satuan
+                                                    </th>
+
+                                                    <th
+                                                        class="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-300">
+                                                        Target
+                                                    </th>
+
+                                                    <th
+                                                        class="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-300">
+                                                        Realisasi
+                                                    </th>
+
+                                                    <th
+                                                        class="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-300">
+                                                        Status
+                                                    </th>
+                                                    <th
+                                                        class="px-4 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-300">
                                                         Aksi</th>
                                                 </tr>
                                             </thead>
@@ -438,6 +534,34 @@
                                                         <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
                                                             {{ $indikator->nama_indikator_jpt }}
                                                         </td>
+                                                        <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+                                                            {{ $indikator->satuan ?? '-' }}
+                                                        </td>
+
+                                                        <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+                                                            {{ $indikator->target ?? '-' }}
+                                                        </td>
+
+                                                        <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+                                                            {{ $indikator->realisasi ?? '-' }}
+                                                        </td>
+
+                                                        <td class="px-4 py-2 text-sm">
+                                                            @if ($indikator->status == 'Selesai')
+                                                                <span
+                                                                    class="px-2 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded">
+                                                                    Selesai
+                                                                </span>
+                                                            @elseif($indikator->status == 'Belum Selesai')
+                                                                <span
+                                                                    class="px-2 py-1 text-xs font-semibold text-red-700 bg-red-100 rounded">
+                                                                    Belum Selesai
+                                                                </span>
+                                                            @else
+                                                                <span class="text-gray-700 text-xs">-</span>
+                                                            @endif
+                                                        </td>
+
                                                         <td class="px-4 py-2 text-sm">
                                                             <button
                                                                 class="inline-flex items-center text-blue-600 hover:text-blue-800 mr-3 dark:text-blue-400 dark:hover:text-blue-300"
@@ -446,10 +570,14 @@
                                                                     mode: 'edit',
                                                                     key: {{ $indikator->id }},
                                                                     data: {
-                                                                        id_rencana_jpt: '{{ $rencanaJpt->id }}',
-                                                                        nama_rencana_jpt: '{{ $rencanaJpt->nama_rencana_jpt }}',
-                                                                        nama_indikator_jpt: '{{ $indikator->nama_indikator_jpt }}'
-                                                                    }
+                                                                            id_rencana_jpt: '{{ $rencanaJpt->id }}',
+                                                                            nama_rencana_jpt: '{{ $rencanaJpt->nama_rencana_jpt }}',
+                                                                            nama_indikator_jpt: '{{ $indikator->nama_indikator_jpt }}',
+                                                                            satuan: '{{ $indikator->satuan }}',
+                                                                            target: '{{ $indikator->target }}',
+                                                                            realisasi: '{{ $indikator->realisasi }}',
+                                                                            status: '{{ $indikator->status }}'
+                                                                        }
                                                                 })">
                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                                     viewBox="0 0 24 24">
