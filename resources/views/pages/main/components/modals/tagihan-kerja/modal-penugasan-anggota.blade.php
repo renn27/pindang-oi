@@ -5,7 +5,6 @@
 
         mode = $event.detail.mode ?? 'create';
         itemKey = $event.detail.key ?? null;
-        // Ambil data dari dispatch
         formData = $event.detail.data ?? {
             id_sub_kegiatan: '',
             nama_sub_kegiatan: '',
@@ -18,6 +17,8 @@
             butuh_dl: 0,
             tanggal_mulai: '',
             tanggal_selesai: '',
+            min_date: '',
+            max_date: '',
         }">
     <form
         :action="mode === 'edit'
@@ -302,6 +303,10 @@
                         id="tanggal_mulai"
                         name="tanggal_mulai"
                         placeholder="Tanggal Mulai"
+                        ::minDate="formData.min_date"
+                        ::maxDate="formData.max_date"
+                        minBind="formData.min_date"
+                        maxBind="formData.max_date"
                     />
                 </div>
 
@@ -314,6 +319,10 @@
                         id="tanggal_selesai"
                         name="tanggal_selesai"
                         placeholder="Tanggal Selesai"
+                        ::minDate="formData.min_date"
+                        ::maxDate="formData.max_date"
+                        minBind="formData.min_date"
+                        maxBind="formData.max_date"
                     />
                 </div>
 

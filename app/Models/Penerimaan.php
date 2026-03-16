@@ -29,6 +29,8 @@ class Penerimaan extends Model
 
     protected $casts = [
         'tanggal_penerimaan'   => 'date',
+        'rr_terima'            => 'float',
+        'rating_terima'        => 'integer',
     ];
 
     public function penerima() { // pegawai diganti sebagai penerima supaya lebih jelas

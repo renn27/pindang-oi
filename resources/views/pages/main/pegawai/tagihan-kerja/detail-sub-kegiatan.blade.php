@@ -88,7 +88,9 @@
                                 modalId: 'modal-penugasan-anggota',
                                 data: {
                                     id_sub_kegiatan: '{{ $subKegiatan->id_sub_kegiatan }}',
-                                    nama_sub_kegiatan: '{{ $subKegiatan->nama_sub_kegiatan }}'
+                                    nama_sub_kegiatan: '{{ $subKegiatan->nama_sub_kegiatan }}',
+                                    min_date: '{{ $subKegiatan->tanggal_mulai->format('Y-m-d') }}',
+                                    max_date: '{{ $subKegiatan->tanggal_selesai->format('Y-m-d') }}'
                                 }
                             })">
                         <!-- icon -->

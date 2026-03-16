@@ -59,10 +59,10 @@
 
                 <div class="mb-4">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Tanggal Pengiriman
+                        Tanggal Pengirimans 
                     </label>
                     <x-form.date-picker id="tanggal_pengiriman" name="tanggal_pengiriman" placeholder="Tanggal Pengiriman"
-                        defaultDate="{{ now()->format('Y-m-d') }}" readonly="true" />
+                        defaultDate="{{ now()->format('Y-m-d') }}" disabled />
                 </div>
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">

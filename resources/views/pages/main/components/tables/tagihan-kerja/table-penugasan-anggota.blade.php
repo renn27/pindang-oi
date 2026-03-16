@@ -217,6 +217,8 @@
                                                                 tanggal_mulai: @js(optional($penugasan->tanggal_mulai)->format('Y-m-d')),
                                                                 tanggal_selesai: @js(optional($penugasan->tanggal_selesai)->format('Y-m-d')),
                                                                 status: @js($penugasan->status),
+                                                                min_date: @js($subKegiatan->tanggal_mulai->format('Y-m-d')),
+                                                                max_date: @js($subKegiatan->tanggal_selesai->format('Y-m-d'))
                                                             }
                                                         })">
                                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -934,6 +936,8 @@
                                                                 tanggal_mulai: @js(optional($penugasan->tanggal_mulai)->format('Y-m-d')),
                                                                 tanggal_selesai: @js(optional($penugasan->tanggal_selesai)->format('Y-m-d')),
                                                                 status: @js($penugasan->status),
+                                                                min_date: @js($subKegiatan->tanggal_mulai->format('Y-m-d')),
+                                                                max_date: @js($subKegiatan->tanggal_selesai->format('Y-m-d'))
                                                             }
                                                         })">
                                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

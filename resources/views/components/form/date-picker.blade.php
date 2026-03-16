@@ -1,36 +1,65 @@
 @props([
     'id' => 'datepicker-' . uniqid(),
-    'mode' => 'single', // 'single', 'multiple', 'range', 'time'
-    // 'defaultDate' => null,
+    'mode' => 'single', 
     'label' => null,
     'placeholder' => 'Select date',
     'name' => null,
     'dateFormat' => 'Y-m-d',
+    'minBind' => null,
+    'maxBind' => null,
+    'minDate' => null,
+    'maxDate' => null,
 ])
 
 <div x-data="{
         flatpickrInstance: null,
-        value:null,
+        value: null,
+
+        syncLimits() {
+            if (this.flatpickrInstance) {
+                let minD = this.$el.getAttribute('mindate') || this.$el.getAttribute('minDate');
+                let maxD = this.$el.getAttribute('maxdate') || this.$el.getAttribute('maxDate');
+
+                try { this.flatpickrInstance.set('minDate', minD || null); } catch(e) {}
+                try { this.flatpickrInstance.set('maxDate', maxD || null); } catch(e) {}
+            }
+        },
+
         init() {
-            this.$nextTick(() => {
+
+                this.$nextTick(() => {
+                let initialMin = this.$el.getAttribute('mindate') || this.$el.getAttribute('minDate');
+                let initialMax = this.$el.getAttribute('maxdate') || this.$el.getAttribute('maxDate');
+
                 this.flatpickrInstance = flatpickr(this.$refs.dateInput, {
                     mode: '{{ $mode }}',
                     static: true,
                     monthSelectorType: 'static',
                     dateFormat: '{{ $dateFormat }}',
+                    minDate: initialMin || null,
+                    maxDate: initialMax || null,
+                    onOpen: (selectedDates, dateStr, instance) => {
+                        // Dynamically update limits in case the root data changed
+                        let openMin = this.$el.getAttribute('mindate') || this.$el.getAttribute('minDate');
+                        let openMax = this.$el.getAttribute('maxdate') || this.$el.getAttribute('maxDate');
+                        
+                        try { instance.set('minDate', openMin || null); } catch(e) {}
+                        try { instance.set('maxDate', openMax || null); } catch(e) {}
+                    },
                     onChange: (selectedDates, dateStr) => {
-                        this.value = dateStr
+                        this.value = dateStr;
                     }
                 });
 
                 // 🔥 SET DEFAULT VALUE DARI DB
                 if (this.value) {
-                    this.flatpickrInstance.setDate(this.value, true)
+                    this.flatpickrInstance.setDate(this.value, true);
                 }
             });
         },
     }"
     x-init="init()"
+    x-effect="syncLimits()"
     x-modelable="value"
     {{ $attributes }}>
     @if($label)
