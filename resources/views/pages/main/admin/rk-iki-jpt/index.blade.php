@@ -20,16 +20,7 @@
                     class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
                     :class="isOptionSelected && 'text-gray-800'" @change="isOptionSelected = true">
                     <option value="2025" class="text-gray-700 dark:text-gray-300">
-                        2025
-                    </option>
-                    <option value="2024" class="text-gray-700 dark:text-gray-300">
-                        2024
-                    </option>
-                    <option value="2023" class="text-gray-700 dark:text-gray-300">
-                        2023
-                    </option>
-                    <option value="2022" class="text-gray-700 dark:text-gray-300">
-                        2022
+                        2026
                     </option>
                 </select>
                 <span

@@ -17,7 +17,7 @@ class PenugasanPolicy
             || (
                 $pegawai->active_role === 'Ketua Tim'
                 && $pegawai->id_pegawai === $penugasan->subKegiatan->kegiatan->id_penanggung_jawab
-        );
+            );
     }
 
     protected function isAssignedAnggota(Pegawai $pegawai, Penugasan $penugasan): bool
@@ -28,7 +28,7 @@ class PenugasanPolicy
     }
 
     /**
-        * Determine whether the user can view any models.
+     * Determine whether the user can view any models.
      */
     public function viewAny(Pegawai $pegawai): bool
     {
@@ -55,7 +55,7 @@ class PenugasanPolicy
             || (
                 $pegawai->active_role === 'Ketua Tim'
                 && $pegawai->id_pegawai === $subKegiatan->kegiatan->id_penanggung_jawab
-        );
+            );
     }
 
     /**
@@ -86,17 +86,32 @@ class PenugasanPolicy
      */
     public function delete(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        return $this->canManagePenugasan($pegawai, $penugasan);
+        // hanya yang boleh manage (ketua / admin / pimpinan)
+        if (! $this->canManagePenugasan($pegawai, $penugasan)) {
+            return false;
+        }
+
+        // kalau sudah ada pengiriman → tidak boleh hapus
+        if ($penugasan->latestPengiriman) {
+            return false;
+        }
+
+        // kalau sudah diterima → tidak boleh hapus
+        if ($penugasan->latestPenerimaan?->status === 'Diterima') {
+            return false;
+        }
+
+        return true;
     }
 
     // === PENGIRIMAN ===
     public function send(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        if(!$this->isAssignedAnggota($pegawai, $penugasan)) {
+        if (!$this->isAssignedAnggota($pegawai, $penugasan)) {
             return false;
         }
 
-        if($penugasan->latestPenerimaan?->status === 'Diterima') {
+        if ($penugasan->latestPenerimaan?->status === 'Diterima') {
             return false;
         }
 
@@ -107,11 +122,11 @@ class PenugasanPolicy
     // === PENERIMAAN ===
     public function receive(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        if(!$this->canManagePenugasan($pegawai, $penugasan)) {
+        if (!$this->canManagePenugasan($pegawai, $penugasan)) {
             return false;
         }
 
-        if($penugasan->latestPenerimaan?->status === 'Diterima') {
+        if ($penugasan->latestPenerimaan?->status === 'Diterima') {
             return false;
         }
 

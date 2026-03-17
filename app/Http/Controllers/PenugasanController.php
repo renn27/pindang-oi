@@ -191,7 +191,21 @@ class PenugasanController extends Controller
         }
     }
 
-    public function delete() {}
+    public function delete(SubKegiatan $subKegiatan, Penugasan $penugasan)
+    {
+        // 🔥 samakan dengan tombol penerimaan (policy)
+        $this->authorize('delete', $penugasan);
+
+        // 🔒 safety check (opsional tapi bagus)
+        if ($penugasan->id_sub_kegiatan !== $subKegiatan->id_sub_kegiatan) {
+            abort(403);
+        }
+
+        $penugasan->delete();
+
+        return redirect()->back()
+            ->with('success', 'Anggota berhasil dihapus');
+    }
 
     public function update_rk_dl(Request $request, Penugasan $penugasan)
     {
@@ -217,7 +231,7 @@ class PenugasanController extends Controller
             ]);
 
             return redirect()->back()
-            ->with('success', 'Status Dinas Luar berhasil diperbarui.');
+                ->with('success', 'Status Dinas Luar berhasil diperbarui.');
         } catch (\Exception $e) {
             dd($e->getMessage());
 
