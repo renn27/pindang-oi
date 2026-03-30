@@ -87,13 +87,10 @@
                         Tahun <span class="text-red-500">*</span>
                     </label>
                     <select name="tahun" x-model="formData.tahun"
-                        class="w-full h-11 rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 
+                        class="w-full h-11 rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800
                     focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors
                     dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                        <option value="">Pilih Tahun</option>
-                        <option value="2025">2025</option>
                         <option value="2026">2026</option>
-                        <option value="2027">2027</option>
                     </select>
                 </div>
 
@@ -104,7 +101,7 @@
                     </label>
                     <input type="text" x-model="formData.nama_rencana_jpt" name="nama_rencana_jpt"
                         placeholder="Contoh: Pengembangan Sistem Manajemen Kinerja"
-                        class="w-full h-11 rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 
+                        class="w-full h-11 rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800
                     focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors
                     dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
                         required />
@@ -117,7 +114,7 @@
                         <!-- Toggle -->
                         <div class="flex items-center gap-3 mb-4">
                             <input type="checkbox" id="add-iki-toggle" x-model="addIki"
-                                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 
+                                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500
                             dark:border-gray-600 dark:bg-gray-700">
                             <label for="add-iki-toggle" class="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Tambah IKI JPT sekaligus
@@ -127,7 +124,7 @@
                         <!-- List IKI -->
                         <div x-show="addIki" x-transition class="space-y-4">
                             <div
-                                class="rounded-lg border border-gray-200 p-4 bg-gray-50 
+                                class="rounded-lg border border-gray-200 p-4 bg-gray-50
                             dark:border-gray-700 dark:bg-gray-800/50">
                                 <div class="space-y-3">
                                     <template x-for="(iki, index) in ikis" :key="index">
@@ -137,13 +134,13 @@
                                             <div class="flex gap-3 items-center">
                                                 <input type="text" :name="`ikis[${index}][nama_indikator_jpt]`"
                                                     x-model="ikis[index]" placeholder="Masukkan indikator kinerja individu"
-                                                    class="flex-1 h-10 rounded-lg border border-gray-300 px-3 text-sm 
+                                                    class="flex-1 h-10 rounded-lg border border-gray-300 px-3 text-sm
                 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors
                 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
 
                                                 <button type="button" @click="ikis.splice(index,1)"
                                                     x-show="ikis.length > 1"
-                                                    class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg 
+                                                    class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg
                 text-gray-500 hover:text-red-600 hover:bg-red-50
                 dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-red-900/20">
                                                     ✕
@@ -157,11 +154,11 @@
                                                     class="h-10 rounded-lg border border-gray-300 px-3 text-sm
                 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
 
-                                                <input type="number" :name="`ikis[${index}][target]`" placeholder="Target"
+                                                <input type="number" step="0.01" :name="`ikis[${index}][target]`" placeholder="Target"
                                                     class="h-10 rounded-lg border border-gray-300 px-3 text-sm
                 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
 
-                                                <input type="number" :name="`ikis[${index}][realisasi]`"
+                                                <input type="number" step="0.01" :name="`ikis[${index}][realisasi]`"
                                                     placeholder="Realisasi"
                                                     class="h-10 rounded-lg border border-gray-300 px-3 text-sm
                 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
@@ -182,7 +179,7 @@
 
                                 <!-- Add IKI button -->
                                 <button type="button" @click="ikis.push('')"
-                                    class="mt-4 flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 
+                                    class="mt-4 flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700
                                 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -199,13 +196,13 @@
                 <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
                     <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                         <button @click="open = false" type="button"
-                            class="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-gray-300 bg-white 
+                            class="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-gray-300 bg-white
                         text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors
                         dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
                             Batal
                         </button>
                         <button type="submit"
-                            class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-blue-600 
+                            class="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-blue-600
                         text-sm font-medium text-white hover:bg-blue-700 transition-colors
                         dark:bg-blue-600 dark:hover:bg-blue-700">
                             <span x-text="mode === 'create' ? 'Simpan Data' : 'Update Data'"></span>
@@ -249,7 +246,7 @@
         <div class="flex-1 px-6 py-5 dark:bg-gray-900">
             <form method="POST"
                 :action="mode === 'edit'
-                
+
                     ?
                     `{{ url('rencana-indikator-jpt') }}/${formData.id_rencana_jpt}/indikator/${itemKey}` :
                     `{{ url('rencana-indikator-jpt') }}/${formData.id_rencana_jpt}/indikator`"
@@ -298,7 +295,7 @@
                         Target
                     </label>
 
-                    <input type="number" name="target" x-model="formData.target" placeholder="Masukkan target"
+                    <input type="number" step="0.01" name="target" x-model="formData.target" placeholder="Masukkan target"
                         class="md:w-3/4 h-11 rounded-lg border border-gray-300 px-4 text-sm
         dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                 </div>
@@ -308,7 +305,7 @@
                         Realisasi
                     </label>
 
-                    <input type="number" name="realisasi" x-model="formData.realisasi" placeholder="Masukkan realisasi"
+                    <input type="number" step="0.01" name="realisasi" x-model="formData.realisasi" placeholder="Masukkan realisasi"
                         class="md:w-3/4 h-11 rounded-lg border border-gray-300 px-4 text-sm
         dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                 </div>

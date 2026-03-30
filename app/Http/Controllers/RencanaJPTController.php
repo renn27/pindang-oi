@@ -31,8 +31,8 @@ class RencanaJPTController extends Controller
             'ikis' => 'nullable|array',
             'ikis.*.nama_indikator_jpt' => 'nullable|string|max:255',
             'ikis.*.satuan' => 'nullable|string|max:100',
-            'ikis.*.target' => 'nullable|integer',
-            'ikis.*.realisasi' => 'nullable|integer',
+            'ikis.*.target' => 'nullable|numeric|min:0',
+            'ikis.*.realisasi' => 'nullable|numeric|min:0',
             'ikis.*.status' => 'nullable|in:Selesai,Belum Selesai',
 
         ]);

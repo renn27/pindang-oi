@@ -13,8 +13,8 @@ class IndikatorJPTController extends Controller
         $validatedData = $request->validate([
             'nama_indikator_jpt' => 'required|string|max:255',
             'satuan' => 'nullable|string|max:100',
-            'target' => 'nullable|integer',
-            'realisasi' => 'nullable|integer',
+            'target' => 'nullable|numeric|min:0',
+            'realisasi' => 'nullable|numeric|min:0',
             'status' => 'nullable|in:Selesai,Belum Selesai',
         ]);
 
@@ -36,8 +36,8 @@ class IndikatorJPTController extends Controller
         $validatedData = $request->validate([
             'nama_indikator_jpt' => 'required|string|max:255',
             'satuan' => 'nullable|string|max:100',
-            'target' => 'nullable|integer',
-            'realisasi' => 'nullable|integer',
+            'target' => 'nullable|numeric|min:0',
+            'realisasi' => 'nullable|numeric|min:0',
             'status' => 'nullable|in:Selesai,Belum Selesai',
         ]);
 
