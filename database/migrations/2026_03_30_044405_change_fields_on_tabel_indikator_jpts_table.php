@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('indikator_jpts', function (Blueprint $table) {
-            $table->float('target', 10, 2)->nullable()->change();
-            $table->float('realisasi', 10, 2)->nullable()->change();
+            $table->decimal('target', 12, 4)->nullable()->change();
+            $table->decimal('realisasi', 12, 4)->nullable()->change();
         });
     }
 
