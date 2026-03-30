@@ -61,12 +61,12 @@
             <!-- BODY (SCROLL DI SINI) -->
             <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar dark:bg-gray-900">
                 {{-- ====== VALIDATION BANNER ====== --}}
-                <div id="validationBanner"
+                <div id="validationBannerKegiatan"
                     class="hidden rounded-xl border border-red-300 dark:border-red-500/40 bg-red-50 dark:bg-red-500/10 px-4 py-3">
                     <p class="text-sm font-medium text-red-700 dark:text-red-400 mb-1">
                         ⚠ Ada beberapa field yang belum diisi atau tidak valid:
                     </p>
-                    <ul id="validationList" class="list-disc pl-5 space-y-1"></ul>
+                    <ul id="validationListKegiatan" class="list-disc pl-5 space-y-1"></ul>
                 </div>
                 {{-- ====== END VALIDATION BANNER ====== --}}
 
@@ -84,7 +84,7 @@
                 <!-- ID Bidang (yang benar-benar dikirim ke backend) -->
                 <input type="hidden" name="id_bidang" value="{{ $bidang->id_bidang }}">
 
-                {{-- Nama Anggota --}}
+                {{-- Nama Ketua Tim --}}
                 <div x-data="ketuaDropdown()"
                     @open-smart-modal.window="
                         if ($event.detail.modalId !== 'modal-kegiatan') return;
@@ -132,7 +132,7 @@
                                         x-text="pegawai.nama_pegawai"></div>
                                 </button>
                             </template>
-                            <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="ketuaSearchInput">Ketua wajib dipilih dari daftar (pastikan klik nama dari dropdown)</p>
+                            {{-- <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="ketuaSearchInput">Ketua wajib dipilih dari daftar (pastikan klik nama dari dropdown)</p> --}}
                         </div>
                     </div>
                 </div>
@@ -212,9 +212,9 @@
                         Batal
                     </button>
 
-                    <button id="saveAllButton" type="button"
+                    <button id="saveKegiatanButton" type="button"
                         class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
-                        Simpan
+                        Simpan Kegiatan
                     </button>
 
                     {{-- <button type="submit"
@@ -316,7 +316,7 @@
         });
 
         // Sembunyikan banner
-        const banner = document.getElementById('validationBanner');
+        const banner = document.getElementById('validationBannerKegiatan');
         if (banner) banner.classList.add('hidden');
     }
 
@@ -339,7 +339,7 @@
         el.classList.add('section-invalid', 'border-red-400', 'dark:border-red-500/60');
     }
 
-    function validateForm() {
+    function validateFormKegiatan() {
         clearValidation();
         const errors = [];
 
@@ -388,17 +388,17 @@
             );
         }
 
-        // --- 4. Ketua ---
-        const ketuaIdInput = document.querySelector('input[name="id_penanggung_jawab"]');
-        const ketuaSearchInput = document.getElementById('ketuaSearchInput');
-        const ketuaErrorMsg = ketuaSearchInput?.closest('.relative')?.querySelector('.field-error-msg');
-        if (!ketuaIdInput?.value) {
-            addError(
-                'Ketua wajib dipilih dari daftar dropdown (klik nama dari hasil pencarian)',
-                ketuaSearchInput, ketuaSearchInput,
-                ketuaErrorMsg
-            );
-        }
+        // // --- 4. Ketua ---
+        // const ketuaIdInput = document.querySelector('input[name="id_penanggung_jawab"]');
+        // const ketuaSearchInput = document.getElementById('ketuaSearchInput');
+        // const ketuaErrorMsg = ketuaSearchInput?.closest('.relative')?.querySelector('.field-error-msg');
+        // if (!ketuaIdInput?.value) {
+        //     addError(
+        //         'Ketua wajib dipilih dari daftar dropdown (klik nama dari hasil pencarian)',
+        //         ketuaSearchInput, ketuaSearchInput,
+        //         ketuaErrorMsg
+        //     );
+        // }
 
         // --- 5. Nama Kegiatan ---
         const namaRKKegiatan = document.getElementById('nama_rk_kegiatan');
@@ -414,9 +414,9 @@
         return errors;
     }
 
-    function showValidationBanner(errors) {
-        const banner = document.getElementById('validationBanner');
-        const list = document.getElementById('validationList');
+    function showValidationKegiatanBanner(errors) {
+        const banner = document.getElementById('validationBannerKegiatan');
+        const list = document.getElementById('validationListKegiatan');
         if (!banner || !list) return;
 
         list.innerHTML = '';
@@ -443,16 +443,16 @@
         });
     }
 
-    function saveAll(event) {
+    function saveKegiatan(event) {
         if (event) {
             event.preventDefault();
             event.stopPropagation();
         }
 
         // ---- Jalankan validasi ----
-        const errors = validateForm();
+        const errors = validateFormKegiatan();
         if (errors.length > 0) {
-            showValidationBanner(errors);
+            showValidationKegiatanBanner(errors);
             return; // Berhenti — tidak buka modal konfirmasi
         } else {
             confirmSave();
@@ -469,6 +469,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('saveAllButton')?.addEventListener('click', saveAll);
+        document.getElementById('saveKegiatanButton')?.addEventListener('click', saveKegiatan);
     });
 </script>

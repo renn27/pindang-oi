@@ -21,6 +21,7 @@
             max_date: '',
         }">
     <form
+        id="addPenugasanForm"
         :action="mode === 'edit'
             ?
             `/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${itemKey}` :
@@ -45,6 +46,16 @@
 
             <!-- BODY (SCROLL DI SINI) -->
             <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar dark:bg-gray-900">
+                {{-- ====== VALIDATION BANNER ====== --}}
+                <div id="validationBannerPenugasan"
+                    class="hidden rounded-xl border border-red-300 dark:border-red-500/40 bg-red-50 dark:bg-red-500/10 px-4 py-3">
+                    <p class="text-sm font-medium text-red-700 dark:text-red-400 mb-1">
+                        ⚠ Ada beberapa field yang belum diisi atau tidak valid:
+                    </p>
+                    <ul id="validationListPenugasan" class="list-disc pl-5 space-y-1"></ul>
+                </div>
+                {{-- ====== END VALIDATION BANNER ====== --}}
+
                 <!-- Nama Sub Kegiatan (readonly tampilan) -->
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -90,7 +101,7 @@
                                     dark:border-gray-700 dark:bg-gray-800">
                             <template x-if="filteredPegawais.length === 0">
                                 <div class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 italic">
-                                    Pegawai tidak ditemukan
+                                    Nama Pegawai tidak ditemukan
                                 </div>
                             </template>
 
@@ -103,6 +114,7 @@
                                         x-text="pegawai.nama_pegawai"></div>
                                 </button>
                             </template>
+                            {{-- <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="pegawaiSearchInput">Pegawai wajib dipilih dari daftar (pastikan klik nama dari dropdown)</p> --}}
                         </div>
                     </div>
                 </div>
@@ -146,16 +158,19 @@
                             ➕ Lainnya
                         </option>
                     </select>
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="jenis_kegiatan_select">Jenis Kegiatan wajib dipilih dari daftar</p>
 
                     <!-- INPUT JENIS KEGIATAN BARU -->
                     <div x-show="isOther" x-transition>
                         <input
+                            id="jenis_kegiatan_baru"
                             type="text"
                             name="jenis_kegiatan_baru"
                             placeholder="Masukkan jenis kegiatan baru"
                             class="h-11 w-full mb-4 rounded-lg border border-gray-300 px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
                         />
                     </div>
+                    {{-- <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="jenis_kegiatan_baru">Jenis Kegiatan baru wajib diisi jika memilih opsi ini</p> --}}
                 </div>
 
                 <div
@@ -280,18 +295,20 @@
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Target
                     </label>
-                    <input type="number" x-model="formData.target" name="target"
+                    <input type="number" x-model="formData.target" name="target" id="target"
                         placeholder="Misalnya : 200"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="target">Target wajib diisi</p>
                 </div>
 
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Satuan Target
                     </label>
-                    <input type="text" x-model="formData.satuan_target" name="satuan_target"
+                    <input type="text" x-model="formData.satuan_target" name="satuan_target" id="satuan_target"
                         placeholder="Misalnya : Dokumen, Kegiatan, dll"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="satuan_target">Satuan Target wajib diisi</p>
                 </div>
 
                 <div class="mb-4">
@@ -308,6 +325,7 @@
                         minBind="formData.min_date"
                         maxBind="formData.max_date"
                     />
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_mulai">Tanggal mulai wajib dipilih</p>
                 </div>
 
                 <div>
@@ -324,6 +342,7 @@
                         minBind="formData.min_date"
                         maxBind="formData.max_date"
                     />
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_selesai">Tanggal selesai wajib dipilih</p>
                 </div>
 
             </div>
@@ -335,10 +354,15 @@
                         Batal
                     </button>
 
-                    <button type="submit"
+                    <button id="savePenugasanButton" type="button"
+                        class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
+                        Simpan Penugasan
+                    </button>
+
+                    {{-- <button type="submit"
                         class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto dark:bg-brand-600 dark:hover:bg-brand-700">
                         <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
-                    </button>
+                    </button> --}}
                 </div>
             </div>
         </div>
@@ -388,74 +412,205 @@
             }
         }
     }
-</script>
-{{-- <div x-data="{
-    open: false,
-    search: '',
-    selectedId: '',
-    highlightedIndex: -1,
-    pegawais: @js($pegawais),
 
-    init() {
-        // ketika modal edit dibuka
-        if (this.$root.formData?.nama_anggota) {
-            this.search = this.$root.formData.nama_anggota;
-            this.selectedId = this.$root.formData.id_anggota;
-        }
-    },
+    // =============================================
+    // VALIDASI FRONTEND
+    // =============================================
 
-    filtered() {
-        if (this.search.length === 0) return [];
-        return this.pegawais.filter(p =>
-            p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase())
+    function clearValidation() {
+        // Hapus semua border merah dari input
+        document.querySelectorAll('.input-invalid').forEach(el => {
+            el.classList.remove(
+                'input-invalid',
+                'border-red-500', 'dark:border-red-500',
+                'bg-red-50', 'dark:bg-red-500/10'
+            );
+        });
+
+        // Sembunyikan semua pesan error field
+        document.querySelectorAll('.field-error-msg').forEach(el => {
+            el.classList.add('hidden');
+        });
+
+        // Hapus border merah dari section/card
+        document.querySelectorAll('.section-invalid').forEach(el => {
+            el.classList.remove('section-invalid', 'border-red-400', 'dark:border-red-500/60');
+        });
+
+        // Sembunyikan banner
+        const banner = document.getElementById('validationBannerPenugasan');
+        if (banner) banner.classList.add('hidden');
+    }
+
+    function markInvalid(el) {
+        if (!el) return;
+        el.classList.add(
+            'input-invalid',
+            'border-red-500', 'dark:border-red-500',
+            'bg-red-50', 'dark:bg-red-500/10'
         );
-    },
+    }
 
-    selectPegawai(p) {
-        this.search = p.nama_pegawai;
-        this.selectedId = p.id_pegawai;
-        // sinkron ke formData (PENTING)
-        this.$root.formData.nama_anggota = p.nama_pegawai;
-        this.$root.formData.id_anggota = p.id_pegawai;
+    function showFieldError(el) {
+        if (!el) return;
+        el.classList.remove('hidden');
+    }
 
-        this.open = false;
-        this.highlightedIndex = -1;
-    },
+    function markSectionInvalid(el) {
+        if (!el) return;
+        el.classList.add('section-invalid', 'border-red-400', 'dark:border-red-500/60');
+    }
 
-    highlightNext() { if (this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++; },
-    highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
-    selectHighlighted() { if (this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]); }
-}">
-    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-        Nama Anggota
-    </label>
-    <!-- Input search -->
-    <input type="text" x-model="search" class="h-11 w-full mb-4 rounded-lg border border-gray-300 px-4 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
-        placeholder="Ketik untuk cari nama"
-        @focus="open = true"
-        @input="open = true; selectedId = ''" 
-        @keydown.arrow-down.prevent="highlightedIndex++" @keydown.arrow-up.prevent="highlightedIndex--"
-        @keydown.enter.prevent="if(highlightedIndex>=0){ search = pegawais[highlightedIndex].nama_pegawai; selectedId = pegawais[highlightedIndex].id_pegawai; open=false; }">
+    function validateFormPenugasan() {
+        clearValidation();
+        const errors = [];
 
-    <!-- Hidden input -->
-    <input type="hidden" name="id_anggota" :value="selectedId" required>
+        function addError(message, focusEl, inputEl, errorMsgEl) {
+            errors.push({
+                message,
+                focusEl
+            });
+            if (inputEl) markInvalid(inputEl);
+            if (errorMsgEl) showFieldError(errorMsgEl);
+        }
 
-    <!-- Dropdown -->
-    <div x-show="open" x-transition
-        class="absolute z-50 mt-1 w-full mb-4 rounded-lg border border-gray-300 bg-white max-h-60 overflow-y-auto dark:border-gray-700 dark:bg-gray-800">
-        <template
-            x-for="(pegawai, index) in pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase()))"
-            :key="pegawai.id_pegawai">
-            <div @click="search = pegawai.nama_pegawai; selectedId = pegawai.id_pegawai; open = false"
-                :class="{
-                    'bg-blue-100 dark:bg-blue-900/40': highlightedIndex === index,
-                    'hover:bg-gray-100 dark:hover:bg-gray-700': highlightedIndex !== index
-                }"
-                class="cursor-pointer px-4 py-2 text-sm dark:text-gray-300" x-text="pegawai.nama_pegawai"></div>
-        </template>
-        <template
-            x-if="pegawais.filter(p => p.nama_pegawai.toLowerCase().includes(search.toLowerCase())).length === 0">
-            <div class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">Data tidak ditemukan</div>
-        </template>
-    </div>
-</div> --}}
+        // // --- 1. Anggota ---
+        // const AnggotaIdInput = document.querySelector('input[name="id_anggota"]');
+        // const AnggotaSearchInput = document.getElementById('AnggotaSearchInput');
+        // const AnggotaErrorMsg = AnggotaSearchInput?.closest('.relative')?.querySelector('.field-error-msg');
+        // if (!AnggotaIdInput?.value) {
+        //     addError(
+        //         'Anggota wajib dipilih dari daftar dropdown (klik nama dari hasil pencarian)',
+        //         AnggotaSearchInput, AnggotaSearchInput,
+        //         AnggotaErrorMsg
+        //     );
+        // }
+
+        // --- 2. Jenis Kegiatan Pada Penugasan  ---
+        const jenisKegiatanSelect = document.getElementById('jenis_kegiatan_select');
+        const jenisKegiatanSelectErrorMsg = jenisKegiatanSelect?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        if (!jenisKegiatanSelect?.value?.trim()) {
+            addError(
+                'Jenis Kegiatan pada penugasan wajib diisi',
+                jenisKegiatanSelect, jenisKegiatanSelect,
+                jenisKegiatanSelectErrorMsg
+            );
+        }
+
+        // // --- 3. Jenis Kegiatan Pada Penugasan (LAINNYA)  ---
+        // const jenisKegiatanBaru = document.getElementById('jenis_kegiatan_baru');
+        // const jenisKegiatanBaruErrorMsg = jenisKegiatanBaru?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        // if (!jenisKegiatanBaru?.value?.trim()) {
+        //     addError(
+        //         'Jenis Kegiatan Baru wajib diisi jika opsi ini dipilih',
+        //         jenisKegiatanBaru, jenisKegiatanBaru,
+        //         jenisKegiatanBaruErrorMsg
+        //     );
+        // }
+
+       // --- 4. Target Sub Kegiatan ---
+        const targetPenugasan = document.getElementById('target');
+        const targetPenugasanErrorMsg = targetPenugasan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        if (!targetPenugasan?.value?.trim()) {
+            addError(
+                'Target Penugasan wajib diisi',
+                targetPenugasan, targetPenugasan,
+                targetPenugasanErrorMsg
+            );
+        }
+
+        // --- 5. Satuan Target Sub Kegiatan ---
+        const satuanTargetPenugasan = document.getElementById('satuan_target');
+        const satuanTargetPenugasanErrorMsg = satuanTargetPenugasan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        if (!satuanTargetPenugasan?.value?.trim()) {
+            addError(
+                'Satuan Target Penugasan wajib diisi',
+                satuanTargetPenugasan, satuanTargetPenugasan,
+                satuanTargetPenugasanErrorMsg
+            );
+        }
+
+        // --- 6. Tanggal Mulai Sub Kegiatan ---
+        const tanggalMulaiPenugasan = document.getElementById('tanggal_mulai');
+        const tanggalMulaiPenugasanErrorMsg = tanggalMulaiPenugasan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        if (!tanggalMulaiPenugasan?.value?.trim()) {
+            addError(
+                'Tanggal Mulai Penugasan wajib dipilih',
+                tanggalMulaiPenugasan, tanggalMulaiPenugasan,
+                tanggalMulaiPenugasanErrorMsg
+            );
+        }
+
+        // --- 7. Tanggal Selesai Sub Kegiatan ---
+        const tanggalSelesaiPenugasan = document.getElementById('tanggal_selesai');
+        const tanggalSelesaiPenugasanErrorMsg = tanggalSelesaiPenugasan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        if (!tanggalSelesaiPenugasan?.value?.trim()) {
+            addError(
+                'Tanggal Selesai Penugasan wajib dipilih',
+                tanggalSelesaiPenugasan, tanggalSelesaiPenugasan,
+                tanggalSelesaiPenugasanErrorMsg
+            );
+        }
+
+        return errors;
+    }
+
+    function showValidationPenugasanBanner(errors) {
+        const banner = document.getElementById('validationBannerPenugasan');
+        const list = document.getElementById('validationListPenugasan');
+        if (!banner || !list) return;
+
+        list.innerHTML = '';
+        errors.forEach(err => {
+            const li = document.createElement('li');
+            li.textContent = err.message;
+            li.className = 'text-xs text-red-600 dark:text-red-400 cursor-pointer hover:underline';
+            if (err.focusEl) {
+                li.onclick = () => {
+                    err.focusEl.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                    setTimeout(() => err.focusEl.focus(), 300);
+                };
+            }
+            list.appendChild(li);
+        });
+
+        banner.classList.remove('hidden');
+        banner.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+    }
+
+    function savePenugasan(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        // ---- Jalankan validasi ----
+        const errors = validateFormPenugasan();
+        if (errors.length > 0) {
+            showValidationPenugasanBanner(errors);
+            return; // Berhenti — tidak buka modal konfirmasi
+        } else {
+            confirmSave();
+        }
+    }
+
+    function confirmSave() {
+        const form = document.getElementById('addPenugasanForm');
+        if (!form) {
+            alert('Form tidak ditemukan');
+            return;
+        }
+        form.submit();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('savePenugasanButton')?.addEventListener('click', savePenugasan);
+    });
+</script>
+

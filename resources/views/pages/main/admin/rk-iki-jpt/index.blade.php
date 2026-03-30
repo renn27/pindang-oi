@@ -154,11 +154,11 @@
                                                     class="h-10 rounded-lg border border-gray-300 px-3 text-sm
                 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
 
-                                                <input type="number" step="0.0001" :name="`ikis[${index}][target]`" placeholder="Target"
+                                                <input type="number" step="0.00001" :name="`ikis[${index}][target]`" placeholder="Target"
                                                     class="h-10 rounded-lg border border-gray-300 px-3 text-sm
                 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
 
-                                                <input type="number" step="0.0001" :name="`ikis[${index}][realisasi]`"
+                                                <input type="number" step="0.00001" :name="`ikis[${index}][realisasi]`"
                                                     placeholder="Realisasi"
                                                     class="h-10 rounded-lg border border-gray-300 px-3 text-sm
                 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
@@ -295,7 +295,7 @@
                         Target
                     </label>
 
-                    <input type="number" step="0.0001" name="target" x-model="formData.target" placeholder="Masukkan target"
+                    <input type="number" step="0.00001" name="target" x-model="formData.target" placeholder="Masukkan target"
                         class="md:w-3/4 h-11 rounded-lg border border-gray-300 px-4 text-sm
         dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                 </div>
@@ -305,7 +305,7 @@
                         Realisasi
                     </label>
 
-                    <input type="number" step="0.0001" name="realisasi" x-model="formData.realisasi" placeholder="Masukkan realisasi"
+                    <input type="number" step="0.00001" name="realisasi" x-model="formData.realisasi" placeholder="Masukkan realisasi"
                         class="md:w-3/4 h-11 rounded-lg border border-gray-300 px-4 text-sm
         dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                 </div>
