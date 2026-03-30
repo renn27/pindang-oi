@@ -154,7 +154,7 @@ class KegiatanController extends Controller
             $kegiatan->forceDelete();
 
             return redirect()
-                ->route('kegiatan.index', $kegiatan->bidang->slug)
+                ->route('dashboard')
                 ->with('success', 'Kegiatan berhasil dihapus.');
         } catch (\Exception $e) {
             dd($e->getMessage());
