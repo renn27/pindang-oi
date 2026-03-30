@@ -1,5 +1,4 @@
 {{-- Modal Master Kegiatan --}}
-
 <x-ui.smart-modal id="modal-master-kegiatan" class="max-w-4xl"
     x-data="{
             formData: { rk_jpt:'', iki_jpt:'', ikiOptions:[] },
@@ -34,18 +33,6 @@
                 .then(data => formData.ikiOptions = data);
         }
         ">
-
-    {{-- @if (session('success'))
-    <script>
-        alert("{{ session('success') }}");
-    </script>
-    @endif
-
-    @if (session('error'))
-    <script>
-        alert("{{ session('error') }}");
-    </script>
-    @endif --}}
 
     <form id="masterKegiatanForm"
         method="POST"
@@ -239,7 +226,7 @@
 
                                 <template x-if="filtered().length === 0 && search.length > 0">
                                     <div class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
-                                        Data tidak ditemukan
+                                        Nama Ketua tidak ditemukan
                                     </div>
                                 </template>
                             </div>
@@ -285,12 +272,12 @@
                 <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                     <button @click="open = false" type="button"
                         class="flex w-full justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 sm:w-auto">
-                        Close
+                        Tutup
                     </button>
 
                     <button id="saveAllButton" type="button"
                         class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
-                        Save All Changes
+                        Simpan Semua Perubahan
                     </button>
                 </div>
             </div>

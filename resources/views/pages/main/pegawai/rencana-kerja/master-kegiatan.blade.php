@@ -339,6 +339,12 @@
                     tahunInput, tahunInput,
                     tahunInput?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg')
                 );
+            } else if (isNaN(tahunKegiatan?.value?.trim())) {
+                addError(
+                    'Tahun Kegiatan harus berupa angka',
+                    tahunKegiatan, tahunKegiatan,
+                    tahunKegiatan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg')
+                );
             }
 
             // --- 2. RK JPT ---
@@ -450,8 +456,7 @@
                 // --- Minimal 1 anggota per sub kegiatan ---
                 const detailContainer = document.getElementById(`detail-${sectionId}`);
                 const detailItems = detailContainer ?
-                    detailContainer.querySelectorAll('[id*="-detail-"]') :
-                    [];
+                    detailContainer.querySelectorAll('[id*="-detail-"]') : [];
 
                 if (detailItems.length === 0) {
                     addError(
@@ -1214,8 +1219,8 @@
                         ${sections.length > 0
                             ? `<div class="space-y-4">${detailHTML}</div>`
                             : `<div class="text-center py-4">
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Belum ada sub kegiatan yang ditambahkan</p>
-                                   </div>`
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Belum ada sub kegiatan yang ditambahkan</p>
+                                    </div>`
                         }
                     </div>
 

@@ -24,20 +24,6 @@
             search     = formData.nama_penanggung_jawab ?? '';
 
             // ✅ PENTING: tunggu DOM & Alpine sync
-            {{-- $nextTick(async () => {
-                if (formData.rk_jpt) {
-                    const selectedIki = formData.iki_jpt;
-
-                    // reset dulu
-                    formData.iki_jpt = '';
-
-                    await loadIkiByRk(formData.rk_jpt, formData);
-
-                    // set ulang SETELAH options ada
-                    formData.iki_jpt = selectedIki;
-                }
-            }); --}}
-
             $nextTick(async () => {
                 if (formData.rk_jpt) {
                     const selectedIki = formData.iki_jpt;
@@ -51,15 +37,9 @@
                     formData.iki_jpt = selectedIki;
                 }
             });
-
-
-            {{-- $nextTick(() => {
-                if (formData.rk_jpt) {
-                    loadIkiByRk(formData.rk_jpt, formData);
-                }
-            }); --}}
         ">
     <form
+        id="addKegiatanForm"
         :action="mode === 'edit'
             ? `/kegiatan/${itemKey}`
             : '{{ route('kegiatan.store', $bidang->slug) }}'"
@@ -80,6 +60,16 @@
 
             <!-- BODY (SCROLL DI SINI) -->
             <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar dark:bg-gray-900">
+                {{-- ====== VALIDATION BANNER ====== --}}
+                <div id="validationBanner"
+                    class="hidden rounded-xl border border-red-300 dark:border-red-500/40 bg-red-50 dark:bg-red-500/10 px-4 py-3">
+                    <p class="text-sm font-medium text-red-700 dark:text-red-400 mb-1">
+                        ⚠ Ada beberapa field yang belum diisi atau tidak valid:
+                    </p>
+                    <ul id="validationList" class="list-disc pl-5 space-y-1"></ul>
+                </div>
+                {{-- ====== END VALIDATION BANNER ====== --}}
+
                 <!-- Nama Bidang (readonly tampilan) -->
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -129,7 +119,7 @@
                                     dark:border-gray-700 dark:bg-gray-800">
                             <template x-if="filteredPegawais.length === 0">
                                 <div class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 italic">
-                                    Ketua tidak ditemukan
+                                    Nama Ketua tidak ditemukan
                                 </div>
                             </template>
 
@@ -142,6 +132,7 @@
                                         x-text="pegawai.nama_pegawai"></div>
                                 </button>
                             </template>
+                            <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="ketuaSearchInput">Ketua wajib dipilih dari daftar (pastikan klik nama dari dropdown)</p>
                         </div>
                     </div>
                 </div>
@@ -151,8 +142,9 @@
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Tahun Kegiatan
                     </label>
-                    <input type="text" x-model="formData.tahun_kegiatan" name="tahun_kegiatan"
+                    <input type="text" x-model="formData.tahun_kegiatan" name="tahun_kegiatan" id="tahun_kegiatan"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tahun_kegiatan">Tahun wajib diisi</p>
                 </div>
 
                 {{-- Rencana JPT --}}
@@ -173,6 +165,7 @@
                             </option>
                         @endforeach
                     </select>
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="rk_jpt">Rencana JPT wajib dipilih</p>
                 </div>
 
                 {{-- Indikator JPT --}}
@@ -197,15 +190,17 @@
                             </option>
                         </template>
                     </select>
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="iki_jpt">Indikator JPT wajib dipilih</p>
                 </div>
 
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Nama Kegiatan
                     </label>
-                    <input type="text" x-model="formData.nama_rk_kegiatan" name="nama_rk_kegiatan"
+                    <input type="text" x-model="formData.nama_rk_kegiatan" name="nama_rk_kegiatan" id="nama_rk_kegiatan"
                         placeholder="Contoh : SNLIK2026"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="nama_rk_kegiatan">Nama kegiatan wajib diisi</p>
                 </div>
             </div>
 
@@ -217,22 +212,27 @@
                         Batal
                     </button>
 
-                    <button type="submit"
+                    <button id="saveAllButton" type="button"
+                        class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
+                        Simpan
+                    </button>
+
+                    {{-- <button type="submit"
                         class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto dark:bg-brand-600 dark:hover:bg-brand-700">
                         <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
-                    </button>
+                    </button> --}}
                 </div>
             </div>
-
         </div>
     </form>
 </x-ui.smart-modal>
+
 <script>
     function ketuaDropdown() {
         @php
             $user = auth()->user();
             $filteredKetua = $ketuaTims;
-            
+
             if ($user && method_exists($user, 'isActiveRole')) {
                 if ($user->isActiveRole('Admin') || $user->isActiveRole('Pimpinan')) {
                     $filteredKetua = $ketuaTims;
@@ -290,4 +290,185 @@
             }
         }
     }
+
+    // =============================================
+    // VALIDASI FRONTEND
+    // =============================================
+
+    function clearValidation() {
+        // Hapus semua border merah dari input
+        document.querySelectorAll('.input-invalid').forEach(el => {
+            el.classList.remove(
+                'input-invalid',
+                'border-red-500', 'dark:border-red-500',
+                'bg-red-50', 'dark:bg-red-500/10'
+            );
+        });
+
+        // Sembunyikan semua pesan error field
+        document.querySelectorAll('.field-error-msg').forEach(el => {
+            el.classList.add('hidden');
+        });
+
+        // Hapus border merah dari section/card
+        document.querySelectorAll('.section-invalid').forEach(el => {
+            el.classList.remove('section-invalid', 'border-red-400', 'dark:border-red-500/60');
+        });
+
+        // Sembunyikan banner
+        const banner = document.getElementById('validationBanner');
+        if (banner) banner.classList.add('hidden');
+    }
+
+    function markInvalid(el) {
+        if (!el) return;
+        el.classList.add(
+            'input-invalid',
+            'border-red-500', 'dark:border-red-500',
+            'bg-red-50', 'dark:bg-red-500/10'
+        );
+    }
+
+    function showFieldError(el) {
+        if (!el) return;
+        el.classList.remove('hidden');
+    }
+
+    function markSectionInvalid(el) {
+        if (!el) return;
+        el.classList.add('section-invalid', 'border-red-400', 'dark:border-red-500/60');
+    }
+
+    function validateForm() {
+        clearValidation();
+        const errors = [];
+
+        function addError(message, focusEl, inputEl, errorMsgEl) {
+            errors.push({
+                message,
+                focusEl
+            });
+            if (inputEl) markInvalid(inputEl);
+            if (errorMsgEl) showFieldError(errorMsgEl);
+        }
+
+        // --- 1. Tahun ---
+        const tahunKegiatan = document.getElementById('tahun_kegiatan');
+        if (!tahunKegiatan?.value?.trim()) {
+            addError(
+                'Tahun Kegiatan wajib diisi',
+                tahunKegiatan, tahunKegiatan,
+                tahunKegiatan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg')
+            );
+        } else if (isNaN(tahunKegiatan?.value?.trim())) {
+            addError(
+                'Tahun Kegiatan harus berupa angka',
+                tahunKegiatan, tahunKegiatan,
+                tahunKegiatan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg')
+            );
+        }
+
+        // --- 2. RK JPT ---
+        const rkJptSelect = document.getElementById('rk_jpt');
+        if (!rkJptSelect?.value) {
+            addError(
+                'Rencana JPT wajib dipilih',
+                rkJptSelect, rkJptSelect,
+                rkJptSelect?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg')
+            );
+        }
+
+        // --- 3. IKI JPT ---
+        const ikiJptSelect = document.getElementById('iki_jpt');
+        if (!ikiJptSelect?.value) {
+            addError(
+                'Indikator JPT wajib dipilih',
+                ikiJptSelect, ikiJptSelect,
+                ikiJptSelect?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg')
+            );
+        }
+
+        // --- 4. Ketua ---
+        const ketuaIdInput = document.querySelector('input[name="id_penanggung_jawab"]');
+        const ketuaSearchInput = document.getElementById('ketuaSearchInput');
+        const ketuaErrorMsg = ketuaSearchInput?.closest('.relative')?.querySelector('.field-error-msg');
+        if (!ketuaIdInput?.value) {
+            addError(
+                'Ketua wajib dipilih dari daftar dropdown (klik nama dari hasil pencarian)',
+                ketuaSearchInput, ketuaSearchInput,
+                ketuaErrorMsg
+            );
+        }
+
+        // --- 5. Nama Kegiatan ---
+        const namaRKKegiatan = document.getElementById('nama_rk_kegiatan');
+        const namaRKKegiatanErrorMsg = namaRKKegiatan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        if (!namaRKKegiatan?.value?.trim()) {
+            addError(
+                'Nama Kegiatan wajib diisi',
+                namaRKKegiatan, namaRKKegiatan,
+                namaRKKegiatanErrorMsg
+            );
+        }
+
+        return errors;
+    }
+
+    function showValidationBanner(errors) {
+        const banner = document.getElementById('validationBanner');
+        const list = document.getElementById('validationList');
+        if (!banner || !list) return;
+
+        list.innerHTML = '';
+        errors.forEach(err => {
+            const li = document.createElement('li');
+            li.textContent = err.message;
+            li.className = 'text-xs text-red-600 dark:text-red-400 cursor-pointer hover:underline';
+            if (err.focusEl) {
+                li.onclick = () => {
+                    err.focusEl.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                    setTimeout(() => err.focusEl.focus(), 300);
+                };
+            }
+            list.appendChild(li);
+        });
+
+        banner.classList.remove('hidden');
+        banner.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+    }
+
+    function saveAll(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        // ---- Jalankan validasi ----
+        const errors = validateForm();
+        if (errors.length > 0) {
+            showValidationBanner(errors);
+            return; // Berhenti — tidak buka modal konfirmasi
+        } else {
+            confirmSave();
+        }
+    }
+
+    function confirmSave() {
+        const form = document.getElementById('addKegiatanForm');
+        if (!form) {
+            alert('Form tidak ditemukan');
+            return;
+        }
+        form.submit();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('saveAllButton')?.addEventListener('click', saveAll);
+    });
 </script>
