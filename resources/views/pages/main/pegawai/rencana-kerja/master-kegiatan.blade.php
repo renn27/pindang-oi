@@ -339,11 +339,11 @@
                     tahunInput, tahunInput,
                     tahunInput?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg')
                 );
-            } else if (isNaN(tahunKegiatan?.value?.trim())) {
+            } else if (isNaN(tahunInput?.value?.trim())) {
                 addError(
                     'Tahun Kegiatan harus berupa angka',
-                    tahunKegiatan, tahunKegiatan,
-                    tahunKegiatan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg')
+                    tahunInput, tahunInput,
+                    tahunInput?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg')
                 );
             }
 
