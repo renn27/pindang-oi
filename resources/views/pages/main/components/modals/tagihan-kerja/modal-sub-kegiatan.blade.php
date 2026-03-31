@@ -1,26 +1,25 @@
 <x-ui.smart-modal id="modal-sub-kegiatan" class="max-w-2xl"
     @open-smart-modal.window="
-            if ($event.detail.modalId !== 'modal-sub-kegiatan') return;
+        if ($event.detail.modalId !== 'modal-sub-kegiatan') return;
 
-            mode = $event.detail.mode ?? 'create';
-            itemKey = $event.detail.key ?? null;
-            // Ambil data dari dispatch
-            formData = $event.detail.data ?? {
-                id_kegiatan: '',
-                nama_rk_kegiatan: '',
-                nama_sub_kegiatan: '',
-                target: '',
-                satuan_target: '',
-                tanggal_mulai: '',
-                tanggal_selesai: '',
-            }">
+        mode = $event.detail.mode ?? 'create';
+        itemKey = $event.detail.key ?? null;
 
+        formData = $event.detail.data ?? {
+            id_kegiatan: '',
+            nama_rk_kegiatan: '',
+            nama_sub_kegiatan: '',
+            target: '',
+            satuan_target: '',
+            tanggal_mulai: '',
+            tanggal_selesai: '',
+        }">
     <form
-            id="addSubKegiatanForm"
-            :action="mode === 'edit'
-            ?
-            `/kegiatan/${formData.id_kegiatan}/sub-kegiatan/${itemKey}` :
-            `/kegiatan/${formData.id_kegiatan}/sub-kegiatan`"
+        id="addSubKegiatanForm"
+        :action="mode === 'edit'
+        ?
+        `/kegiatan/${formData.id_kegiatan}/sub-kegiatan/${itemKey}` :
+        `/kegiatan/${formData.id_kegiatan}/sub-kegiatan`"
         method="POST" class="grid grid-cols-1 gap-y-5">
 
         @csrf
@@ -65,7 +64,7 @@
 
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Nama Sub Kegiatan
+                        Nama Sub Kegiatan <span class="text-red-500">*</span>
                     </label>
                     <input type="text" name="nama_sub_kegiatan" id="nama_sub_kegiatan" x-model="formData.nama_sub_kegiatan"
                         placeholder="Contoh : Penyiapan Peta"
@@ -75,7 +74,7 @@
 
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Target Sub Kegiatan
+                        Target Sub Kegiatan <span class="text-red-500">*</span>
                     </label>
                     <input type="number" x-model="formData.target" name="target" id="target"
                         placeholder="Misalnya : 200"
@@ -85,17 +84,17 @@
 
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Satuan Target
+                        Satuan Target <span class="text-red-500">*</span>
                     </label>
                     <input type="text" x-model="formData.satuan_target" name="satuan_target" id="satuan_target"
-                        placeholder="Misalnya : Kegiatan"
+                        placeholder="Misalnya : Dokumen"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
                     <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="satuan_target">Satuan target wajib diisi</p>
                 </div>
 
                 <div class="mb-4">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Tanggal Mulai
+                        Tanggal Mulai <span class="text-red-500">*</span>
                     </label>
                     <x-form.date-picker id="tanggal_mulai" x-model="formData.tanggal_mulai" name="tanggal_mulai"
                         placeholder="Pilih Tanggal"/>
@@ -104,7 +103,7 @@
 
                 <div class="mb-4">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Tanggal Selesai
+                        Tanggal Selesai <span class="text-red-500">*</span>
                     </label>
                     <x-form.date-picker id="tanggal_selesai" name="tanggal_selesai" x-model="formData.tanggal_selesai"
                         placeholder="Pilih Tanggal" />
@@ -120,15 +119,15 @@
                         Batal
                     </button>
 
-                    <button id="saveSubKegiatanButton" type="button"
+                    <button x-show="mode === 'create'" id="saveSubKegiatanButton" type="button"
                         class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
                         Simpan Sub Kegiatan
                     </button>
 
-                    {{-- <button type="submit"
+                    <button x-show="mode !== 'create'" type="submit"
                         class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto dark:bg-brand-600 dark:hover:bg-brand-700">
-                        <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
-                    </button> --}}
+                        Ubah Data Sub Kegiatan
+                    </button>
                 </div>
             </div>
         </div>
@@ -296,11 +295,11 @@
             showValidationSubKegiatanBanner(errors);
             return; // Berhenti — tidak buka modal konfirmasi
         } else {
-            confirmSave();
+            confirmSaveSubKegiatan();
         }
     }
 
-    function confirmSave() {
+    function confirmSaveSubKegiatan() {
         const form = document.getElementById('addSubKegiatanForm');
         if (!form) {
             alert('Form tidak ditemukan');

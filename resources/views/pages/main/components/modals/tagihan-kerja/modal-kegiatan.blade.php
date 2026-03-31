@@ -1,43 +1,36 @@
 <x-ui.smart-modal id="modal-kegiatan" class="max-w-2xl"
     @open-smart-modal.window="
-            if ($event.detail.modalId !== 'modal-kegiatan') return;
+        if ($event.detail.modalId !== 'modal-kegiatan') return;
 
-            mode    = $event.detail.mode ?? 'create';
-            itemKey = $event.detail.key ?? null;
+        mode = $event.detail.mode ?? 'create';
+        itemKey = $event.detail.key ?? null;
 
-            const payload = $event.detail.data ?? {
-                id_bidang: {{ $bidang->id_bidang }},
-                nama_bidang: {{ $bidang->nama_bidang }},
-                id_penanggung_jawab: '',
-                nama_penanggung_jawab: '',
-                tahun_kegiatan: '',
-                rk_jpt: '',
-                iki_jpt: '',
-                nama_rk_kegiatan: ''
-            };
+        // Samakan polanya dengan sub-kegiatan: replace total
+        formData = $event.detail.data ?? {
+            id_bidang: '{{ $bidang->id_bidang }}',
+            nama_bidang: '{{ $bidang->nama_bidang }}',
+            id_penanggung_jawab: '',
+            nama_penanggung_jawab: '',
+            tahun_kegiatan: '',
+            rk_jpt: '',
+            iki_jpt: '',
+            nama_rk_kegiatan: '',
+            ikiOptions: [] // Pastikan ini ada agar template x-for tidak error
+        };
 
-            // ✅ PENTING: mutate, jangan replace
-            Object.assign(formData, payload);
+        // Sinkronkan state untuk dropdown autocomplete
+        selectedId = formData.id_penanggung_jawab ?? '';
+        search = formData.nama_penanggung_jawab ?? '';
 
-            // autocomplete pegawai
-            selectedId = formData.id_penanggung_jawab ?? '';
-            search     = formData.nama_penanggung_jawab ?? '';
+        $nextTick(async () => {
+            if (formData.rk_jpt) {
+                const selectedIki = formData.iki_jpt;
+                await loadIkiByRk(formData.rk_jpt, formData);
+                formData.iki_jpt = selectedIki;
+            }
+        });
+    ">
 
-            // ✅ PENTING: tunggu DOM & Alpine sync
-            $nextTick(async () => {
-                if (formData.rk_jpt) {
-                    const selectedIki = formData.iki_jpt;
-
-                    // reset dulu supaya Alpine re-evaluate
-                    formData.iki_jpt = '';
-
-                    await loadIkiByRk(formData.rk_jpt, formData);
-
-                    // set ulang SETELAH options masuk
-                    formData.iki_jpt = selectedIki;
-                }
-            });
-        ">
     <form
         id="addKegiatanForm"
         :action="mode === 'edit'
@@ -92,7 +85,7 @@
                     " class="mb-4">
 
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Nama Ketua
+                        Nama Ketua Tim <span class="text-red-500">*</span>
                     </label>
 
                     <!-- Hidden ID Pegawai (WAJIB buat submit) -->
@@ -140,9 +133,9 @@
                 {{-- Tahun Kegiatan --}}
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Tahun Kegiatan
+                        Tahun Kegiatan <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" x-model="formData.tahun_kegiatan" name="tahun_kegiatan" id="tahun_kegiatan"
+                    <input type="text" x-model="formData.tahun_kegiatan" name="tahun_kegiatan" id="tahun_kegiatan" placeholder="Contoh : 2026"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
                     <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tahun_kegiatan">Tahun wajib diisi</p>
                 </div>
@@ -150,7 +143,7 @@
                 {{-- Rencana JPT --}}
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Rencana JPT
+                        Rencana JPT <span class="text-red-500">*</span>
                     </label>
                     <select id="rk_jpt" name="rk_jpt" x-model="formData.rk_jpt"
                         @change="
@@ -171,7 +164,7 @@
                 {{-- Indikator JPT --}}
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Indikator JPT
+                        Indikator JPT <span class="text-red-500">*</span>
                     </label>
 
                     <select id="iki_jpt" name="iki_jpt" x-model="formData.iki_jpt"
@@ -195,7 +188,7 @@
 
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Nama Kegiatan
+                        Nama Kegiatan <span class="text-red-500">*</span>
                     </label>
                     <input type="text" x-model="formData.nama_rk_kegiatan" name="nama_rk_kegiatan" id="nama_rk_kegiatan"
                         placeholder="Contoh : SNLIK2026"
@@ -212,15 +205,15 @@
                         Batal
                     </button>
 
-                    <button id="saveKegiatanButton" type="button"
+                    <button x-show="mode === 'create'" id="saveKegiatanButton" type="button"
                         class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
                         Simpan Kegiatan
                     </button>
 
-                    {{-- <button type="submit"
+                    <button x-show="mode !== 'create'" type="submit"
                         class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto dark:bg-brand-600 dark:hover:bg-brand-700">
-                        <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
-                    </button> --}}
+                        Ubah Data Kegiatan
+                    </button>
                 </div>
             </div>
         </div>
@@ -455,11 +448,11 @@
             showValidationKegiatanBanner(errors);
             return; // Berhenti — tidak buka modal konfirmasi
         } else {
-            confirmSave();
+            confirmSaveKegiatan();
         }
     }
 
-    function confirmSave() {
+    function confirmSaveKegiatan() {
         const form = document.getElementById('addKegiatanForm');
         if (!form) {
             alert('Form tidak ditemukan');

@@ -1,22 +1,22 @@
 <!-- Modal Tambah Penerimaan -->
 <x-ui.smart-modal id="modal-penerimaan-anggota" class="max-w-2xl"
     @open-smart-modal.window="
-                        if ($event.detail.modalId !== 'modal-penerimaan-anggota') return;
+        if ($event.detail.modalId !== 'modal-penerimaan-anggota') return;
 
-                        mode = $event.detail.mode ?? 'create';
-                        itemKey = $event.detail.key ?? null;
-                        // Ambil data dari dispatch
-                        formData = $event.detail.data ?? {
-                            id_sub_kegiatan: '',
-                            id_penugasan: '',
-                            id_pengiriman: '',
-                            id_penerima: '',
-                            nama_penerima: '',
-                            tanggal_penerimaan: '',
-                            jumlah_diterima: '',
-                            status: '',
-                            catatan: ''
-                        }">
+        mode = $event.detail.mode ?? 'create';
+        itemKey = $event.detail.key ?? null;
+        // Ambil data dari dispatch
+        formData = $event.detail.data ?? {
+            id_sub_kegiatan: '',
+            id_penugasan: '',
+            id_pengiriman: '',
+            id_penerima: '',
+            nama_penerima: '',
+            tanggal_penerimaan: '',
+            jumlah_diterima: '',
+            status: '',
+            catatan: ''
+        }">
     <form
         :action="`/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${formData.id_penugasan}/pengirimans/${formData.id_pengiriman}/penerimaan`"
         method="POST" class="grid grid-cols-1 gap-y-5">
@@ -38,13 +38,23 @@
                 <h6 class="text-sm font-semibold text-gray-600 dark:text-gray-300" x-text="formData.nama_anggota">
                 </h6>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    ID Penugasan:
+                    ID Penugasan :
                     <span class="font-medium dark:text-gray-300" x-text="formData.id_penugasan"></span>
                 </p>
             </div>
 
             <!-- BODY (SCROLL DI SINI) -->
             <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar dark:bg-gray-900">
+
+                {{-- ====== VALIDATION BANNER ====== --}}
+                <div id="validationBannerPenerimaan"
+                    class="hidden rounded-xl border border-red-300 dark:border-red-500/40 bg-red-50 dark:bg-red-500/10 px-4 py-3">
+                    <p class="text-sm font-medium text-red-700 dark:text-red-400 mb-1">
+                        ⚠ Ada beberapa field yang belum diisi atau tidak valid:
+                    </p>
+                    <ul id="validationListPenerimaan" class="list-disc pl-5 space-y-1"></ul>
+                </div>
+                {{-- ====== END VALIDATION BANNER ====== --}}
 
                 <!-- Id Pengiriman (readonly tampilan) -->
                 <div>
@@ -59,24 +69,26 @@
 
                 <div class="mb-4">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Tanggal Penerimaan
+                        Tanggal Penerimaan <span class="text-red-500">*</span>
                     </label>
                     <x-form.date-picker id="tanggal_penerimaan" name="tanggal_penerimaan" placeholder="Tanggal Penerimaan"
                         defaultDate="{{ now()->format('Y-m-d') }}" />
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_penerimaan">Tanggal penerimaan wajib dipilih</p>
                 </div>
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Jumlah Diterima
+                        Jumlah Diterima <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="jumlah_diterima" x-model="formData.jumlah_diterima"
+                    <input type="text" name="jumlah_diterima" id="jumlah_diterima" x-model="formData.jumlah_diterima"
                         placeholder="Masukkan jumlah penerimaan"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="jumlah_diterima">Jumlah diterima wajib diisi</p>
                 </div>
                 <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Status
+                        Status <span class="text-red-500">*</span>
                     </label>
-                    <select name="status" x-model="formData.status"
+                    <select name="status"  id="status" x-model="formData.status"
                         class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10
                                             h-11 w-full mb-4 appearance-none rounded-lg
                                             border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm
@@ -97,6 +109,7 @@
                             Revisi
                         </option>
                     </select>
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="status">Status penerimaan wajib dipilih</p>
 
                     <span
                         class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2
@@ -110,7 +123,7 @@
 
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Catatan
+                        Catatan (opsional)
                     </label>
                     <input type="text" name="catatan" placeholder="Masukkan catatan"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
@@ -125,13 +138,169 @@
                         Batal
                     </button>
 
-                    <button type="submit"
-                        class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto dark:bg-brand-600 dark:hover:bg-brand-700">
-                        <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
+                    <button id="savePenerimaanButton" type="button"
+                        class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
+                        Terima Tugas Anggota Saya
                     </button>
                 </div>
             </div>
         </div>
     </form>
-
 </x-ui.smart-modal>
+
+<script>
+    // =============================================
+    // VALIDASI FRONTEND
+    // =============================================
+
+    function clearValidation() {
+        // Hapus semua border merah dari input
+        document.querySelectorAll('.input-invalid').forEach(el => {
+            el.classList.remove(
+                'input-invalid',
+                'border-red-500', 'dark:border-red-500',
+                'bg-red-50', 'dark:bg-red-500/10'
+            );
+        });
+
+        // Sembunyikan semua pesan error field
+        document.querySelectorAll('.field-error-msg').forEach(el => {
+            el.classList.add('hidden');
+        });
+
+        // Hapus border merah dari section/card
+        document.querySelectorAll('.section-invalid').forEach(el => {
+            el.classList.remove('section-invalid', 'border-red-400', 'dark:border-red-500/60');
+        });
+
+        // Sembunyikan banner
+        const banner = document.getElementById('validationBannerPenerimaan');
+        if (banner) banner.classList.add('hidden');
+    }
+
+    function markInvalid(el) {
+        if (!el) return;
+        el.classList.add(
+            'input-invalid',
+            'border-red-500', 'dark:border-red-500',
+            'bg-red-50', 'dark:bg-red-500/10'
+        );
+    }
+
+    function showFieldError(el) {
+        if (!el) return;
+        el.classList.remove('hidden');
+    }
+
+    function markSectionInvalid(el) {
+        if (!el) return;
+        el.classList.add('section-invalid', 'border-red-400', 'dark:border-red-500/60');
+    }
+
+    function validateFormPenerimaan() {
+        clearValidation();
+        const errors = [];
+
+        function addError(message, focusEl, inputEl, errorMsgEl) {
+            errors.push({
+                message,
+                focusEl
+            });
+            if (inputEl) markInvalid(inputEl);
+            if (errorMsgEl) showFieldError(errorMsgEl);
+        }
+
+        // --- 1. Tanggal Penerimaan ---
+        const tanggalPenerimaan = document.getElementById('tanggal_penerimaan');
+        const tanggalPenerimaanErrorMsg = tanggalPenerimaan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        if (!tanggalPenerimaan?.value?.trim()) {
+            addError(
+                'Tanggal Penerimaan wajib dipilih',
+                tanggalPenerimaan, tanggalPenerimaan,
+                tanggalPenerimaanErrorMsg
+            );
+        }
+
+        // --- 2. Jumlah Diterima ---
+        const jumlahDiterima = document.getElementById('jumlah_diterima');
+        const jumlahDiterimaErrorMsg = jumlahDiterima?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        if (!jumlahDiterima?.value?.trim()) {
+            addError(
+                'Jumlah Diterima wajib diisi',
+                jumlahDiterima, jumlahDiterima,
+                jumlahDiterimaErrorMsg
+            );
+        }
+
+        // --- 3. Status Penerimaan ---
+        const status = document.getElementById('status');
+        const statusErrorMsg = status?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        if (!status?.value?.trim()) {
+            addError(
+                'Status penerimaan wajib dipilih',
+                status, status,
+                statusErrorMsg
+            );
+        }
+
+        return errors;
+    }
+
+    function showValidationPenerimaanBanner(errors) {
+        const banner = document.getElementById('validationBannerPenerimaan');
+        const list = document.getElementById('validationListPenerimaan');
+        if (!banner || !list) return;
+
+        list.innerHTML = '';
+        errors.forEach(err => {
+            const li = document.createElement('li');
+            li.textContent = err.message;
+            li.className = 'text-xs text-red-600 dark:text-red-400 cursor-pointer hover:underline';
+            if (err.focusEl) {
+                li.onclick = () => {
+                    err.focusEl.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                    setTimeout(() => err.focusEl.focus(), 300);
+                };
+            }
+            list.appendChild(li);
+        });
+
+        banner.classList.remove('hidden');
+        banner.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+    }
+
+    function savePenerimaan(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        // ---- Jalankan validasi ----
+        const errors = validateFormPenerimaan();
+        if (errors.length > 0) {
+            showValidationPenerimaanBanner(errors);
+            return; // Berhenti — tidak buka modal konfirmasi
+        } else {
+            confirmSavePenerimaan();
+        }
+    }
+
+    function confirmSavePenerimaan() {
+        const form = document.getElementById('addPenerimaanForm');
+        if (!form) {
+            alert('Form tidak ditemukan');
+            return;
+        }
+        form.submit();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('savePenerimaanButton')?.addEventListener('click', savePenerimaan);
+    });
+</script>

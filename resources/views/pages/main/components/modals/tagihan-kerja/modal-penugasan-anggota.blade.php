@@ -74,7 +74,7 @@
                     " class="mb-4">
 
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Nama Pegawai
+                        Nama Pegawai <span class="text-red-500">*</span>
                     </label>
 
                     <!-- Hidden ID Pegawai (WAJIB buat submit) -->
@@ -121,7 +121,7 @@
 
                 <div x-data="{ isOther: false }">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Jenis Kegiatan
+                        Jenis Kegiatan <span class="text-red-500">*</span>
                     </label>
 
                     <!-- SELECT UI -->
@@ -246,7 +246,7 @@
                     x-effect="syncState()"
                     class="mb-4">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Kebutuhan Dinas Luar (DL)
+                        Kebutuhan Dinas Luar (DL) 
                     </label>
 
                     <div class="flex items-center gap-4">
@@ -293,7 +293,7 @@
 
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Target
+                        Target <span class="text-red-500">*</span>
                     </label>
                     <input type="number" x-model="formData.target" name="target" id="target"
                         placeholder="Misalnya : 200"
@@ -303,7 +303,7 @@
 
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Satuan Target
+                        Satuan Target <span class="text-red-500">*</span>
                     </label>
                     <input type="text" x-model="formData.satuan_target" name="satuan_target" id="satuan_target"
                         placeholder="Misalnya : Dokumen, Kegiatan, dll"
@@ -313,7 +313,7 @@
 
                 <div class="mb-4">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Tanggal Mulai
+                        Tanggal Mulai <span class="text-red-500">*</span>
                     </label>
                     <x-form.date-picker
                         x-model="formData.tanggal_mulai"
@@ -330,7 +330,7 @@
 
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Tanggal Berakhir (Deadline)
+                        Tanggal Berakhir (Deadline) <span class="text-red-500">*</span>
                     </label>
                     <x-form.date-picker
                         x-model="formData.tanggal_selesai"
@@ -354,15 +354,15 @@
                         Batal
                     </button>
 
-                    <button id="savePenugasanButton" type="button"
+                    <button x-show="mode === 'create'" id="savePenugasanButton" type="button"
                         class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
                         Simpan Penugasan
                     </button>
 
-                    {{-- <button type="submit"
+                    <button x-show="mode !== 'create'" type="submit"
                         class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto dark:bg-brand-600 dark:hover:bg-brand-700">
-                        <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
-                    </button> --}}
+                        Ubah Data Penugasan
+                    </button>
                 </div>
             </div>
         </div>
@@ -596,11 +596,11 @@
             showValidationPenugasanBanner(errors);
             return; // Berhenti — tidak buka modal konfirmasi
         } else {
-            confirmSave();
+            confirmSavePenugasan();
         }
     }
 
-    function confirmSave() {
+    function confirmSavePenugasan() {
         const form = document.getElementById('addPenugasanForm');
         if (!form) {
             alert('Form tidak ditemukan');

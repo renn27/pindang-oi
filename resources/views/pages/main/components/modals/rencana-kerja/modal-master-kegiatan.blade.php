@@ -34,7 +34,8 @@
         }
         ">
 
-    <form id="masterKegiatanForm"
+    <form
+        id="masterKegiatanForm"
         method="POST"
         action="{{ route('master-kegiatan.store') }}">
         @csrf

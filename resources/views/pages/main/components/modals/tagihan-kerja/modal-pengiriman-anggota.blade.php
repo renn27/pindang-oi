@@ -15,7 +15,9 @@
                         media_dikirim: '',
                         bukti_dukung: ''
                     }">
-    <form :action="`/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${formData.id_penugasan}/pengirimans`"
+    <form
+        id="addPengirimanForm"
+        :action="`/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${formData.id_penugasan}/pengirimans`"
         method="POST" class="grid grid-cols-1 gap-y-5">
         @csrf
         <div
@@ -34,11 +36,20 @@
 
             <!-- BODY (SCROLL DI SINI) -->
             <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar dark:bg-gray-900">
+                {{-- ====== VALIDATION BANNER ====== --}}
+                <div id="validationBannerPengiriman"
+                    class="hidden rounded-xl border border-red-300 dark:border-red-500/40 bg-red-50 dark:bg-red-500/10 px-4 py-3">
+                    <p class="text-sm font-medium text-red-700 dark:text-red-400 mb-1">
+                        ⚠ Ada beberapa field yang belum diisi atau tidak valid:
+                    </p>
+                    <ul id="validationListPengiriman" class="list-disc pl-5 space-y-1"></ul>
+                </div>
+                {{-- ====== END VALIDATION BANNER ====== --}}
 
                 <!-- Id Penugasan (readonly tampilan) -->
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Id Penugasan
+                        Id Penugasan :
                     </label>
 
                     <input type="text" :value="formData.id_penugasan" disabled
@@ -59,31 +70,35 @@
 
                 <div class="mb-4">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Tanggal Pengirimans 
+                        Tanggal Pengiriman <span class="text-red-500">*</span>
                     </label>
                     <x-form.date-picker id="tanggal_pengiriman" name="tanggal_pengiriman" placeholder="Tanggal Pengiriman"
-                        defaultDate="{{ now()->format('Y-m-d') }}" disabled />
+                        defaultDate="{{ now()->format('Y-m-d') }}" />
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_pengiriman">Tanggal pengiriman wajib dipilih</p>
                 </div>
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Jumlah Dikirim
+                        Jumlah Dikirim <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="jumlah_dikirim" placeholder="Masukkan jumlah pengiriman"
+                    <input type="text" name="jumlah_dikirim" id="jumlah_dikirim" placeholder="Masukkan jumlah pengiriman"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="jumlah_dikirim">Jumlah dikirim wajib diisi</p>
                 </div>
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Media Pengiriman
+                        Media Pengiriman <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="media_pengiriman" placeholder="Masukkan jenis media pengiriman"
+                    <input type="text" name="media_pengiriman" id="media_pengiriman" placeholder="Masukkan jenis media pengiriman"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="media_pengiriman">Media pengiriman wajib diisi</p>
                 </div>
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Bukti Dukung
+                        Bukti Dukung <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="bukti_dukung" placeholder="Masukkan link bukti dukung pengiriman"
+                    <input type="text" name="bukti_dukung" id="bukti_dukung" placeholder="Masukkan link bukti dukung pengiriman"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="bukti_dukung">Bukti dukung wajib disertakan</p>
                 </div>
 
             </div>
@@ -95,9 +110,9 @@
                         Batal
                     </button>
 
-                    <button type="submit"
-                        class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto dark:bg-brand-600 dark:hover:bg-brand-700">
-                        <span x-text="mode === 'create' ? 'Simpan' : 'Update'"></span>
+                    <button id="savePengirimanButton" type="button"
+                        class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
+                        Kirim Tugas Saya
                     </button>
                 </div>
             </div>
@@ -105,3 +120,183 @@
     </form>
 
 </x-ui.smart-modal>
+<script>
+    // =============================================
+    // VALIDASI FRONTEND
+    // =============================================
+
+    function clearValidation() {
+        // Hapus semua border merah dari input
+        document.querySelectorAll('.input-invalid').forEach(el => {
+            el.classList.remove(
+                'input-invalid',
+                'border-red-500', 'dark:border-red-500',
+                'bg-red-50', 'dark:bg-red-500/10'
+            );
+        });
+
+        // Sembunyikan semua pesan error field
+        document.querySelectorAll('.field-error-msg').forEach(el => {
+            el.classList.add('hidden');
+        });
+
+        // Hapus border merah dari section/card
+        document.querySelectorAll('.section-invalid').forEach(el => {
+            el.classList.remove('section-invalid', 'border-red-400', 'dark:border-red-500/60');
+        });
+
+        // Sembunyikan banner
+        const banner = document.getElementById('validationBannerPengiriman');
+        if (banner) banner.classList.add('hidden');
+    }
+
+    function markInvalid(el) {
+        if (!el) return;
+        el.classList.add(
+            'input-invalid',
+            'border-red-500', 'dark:border-red-500',
+            'bg-red-50', 'dark:bg-red-500/10'
+        );
+    }
+
+    function showFieldError(el) {
+        if (!el) return;
+        el.classList.remove('hidden');
+    }
+
+    function markSectionInvalid(el) {
+        if (!el) return;
+        el.classList.add('section-invalid', 'border-red-400', 'dark:border-red-500/60');
+    }
+
+    function validateFormPengiriman() {
+        clearValidation();
+        const errors = [];
+
+        function addError(message, focusEl, inputEl, errorMsgEl) {
+            errors.push({
+                message,
+                focusEl
+            });
+            if (inputEl) markInvalid(inputEl);
+            if (errorMsgEl) showFieldError(errorMsgEl);
+        }
+
+        // --- 1. Tanggal Pengiriman ---
+        const tanggalPengiriman = document.getElementById('tanggal_pengiriman');
+        const tanggalPengirimanErrorMsg = tanggalPengiriman?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        if (!tanggalPengiriman?.value?.trim()) {
+            addError(
+                'Tanggal Pengiriman wajib dipilih',
+                tanggalPengiriman, tanggalPengiriman,
+                tanggalPengirimanErrorMsg
+            );
+        }
+
+        // --- 2. Jumlah Dikirim ---
+        const jumlahDikirim = document.getElementById('jumlah_dikirim');
+        const jumlahDikirimErrorMsg = jumlahDikirim?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        if (!jumlahDikirim?.value?.trim()) {
+            addError(
+                'Jumlah Dikirim wajib diisi',
+                jumlahDikirim, jumlahDikirim,
+                jumlahDikirimErrorMsg
+            );
+        }
+
+        // --- 3. Media Pengiriman ---
+        const mediaPengiriman = document.getElementById('media_pengiriman');
+        const mediaPengirimanErrorMsg = mediaPengiriman?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        if (!mediaPengiriman?.value?.trim()) {
+            addError(
+                'Media Pengiriman wajib diisi',
+                mediaPengiriman, mediaPengiriman,
+                mediaPengirimanErrorMsg
+            );
+        }
+
+        // --- 4. Bukti Dukung ---
+        const buktiDukung = document.getElementById('bukti_dukung');
+        const buktiDukungValue = buktiDukung?.value?.trim();
+        const buktiDukungErrorMsg = buktiDukung?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+
+        // Regex untuk validasi URL
+        const urlPattern = /^(https?:\/\/)?([\w\d-]+\.)+[\w-]+(\/[\w\d-._~:/?#[\]@!$&'()*+,;=]*)?$/i;
+
+        if (!buktiDukungValue) {
+            // Validasi jika kosong
+            addError(
+                'Bukti Dukung wajib disertakan',
+                buktiDukung, buktiDukung,
+                buktiDukungErrorMsg
+            );
+        } else if (!urlPattern.test(buktiDukungValue)) {
+            // Validasi jika format bukan URL
+            addError(
+                'Bukti Dukung harus berupa URL yang valid (contoh: https://drive.google.com/drive/)',
+                buktiDukung, buktiDukung,
+                buktiDukungErrorMsg
+            );
+        }
+
+        return errors;
+    }
+
+    function showValidationPengirimanBanner(errors) {
+        const banner = document.getElementById('validationBannerPengiriman');
+        const list = document.getElementById('validationListPengiriman');
+        if (!banner || !list) return;
+
+        list.innerHTML = '';
+        errors.forEach(err => {
+            const li = document.createElement('li');
+            li.textContent = err.message;
+            li.className = 'text-xs text-red-600 dark:text-red-400 cursor-pointer hover:underline';
+            if (err.focusEl) {
+                li.onclick = () => {
+                    err.focusEl.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                    setTimeout(() => err.focusEl.focus(), 300);
+                };
+            }
+            list.appendChild(li);
+        });
+
+        banner.classList.remove('hidden');
+        banner.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+    }
+
+    function savePengiriman(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        // ---- Jalankan validasi ----
+        const errors = validateFormPengiriman();
+        if (errors.length > 0) {
+            showValidationPengirimanBanner(errors);
+            return; // Berhenti — tidak buka modal konfirmasi
+        } else {
+            confirmSavePengiriman();
+        }
+    }
+
+    function confirmSavePengiriman() {
+        const form = document.getElementById('addPengirimanForm');
+        if (!form) {
+            alert('Form tidak ditemukan');
+            return;
+        }
+        form.submit();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('savePengirimanButton')?.addEventListener('click', savePengiriman);
+    });
+</script>

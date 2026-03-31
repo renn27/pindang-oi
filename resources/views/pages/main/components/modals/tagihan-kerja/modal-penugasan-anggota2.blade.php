@@ -127,7 +127,7 @@
 
                 <div x-data="{ isOther: false }">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
-                        Jenis Kegiatan
+                        Jenis Kegiatan 
                     </label>
 
                     <!-- SELECT UI -->
