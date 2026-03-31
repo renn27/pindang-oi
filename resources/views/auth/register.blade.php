@@ -1,14 +1,14 @@
 <x-guest-layout>
     <div class="min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
         <div class="w-full max-w-3xl bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-            
+
             {{-- Header BPS --}}
             <div class="relative bg-gradient-to-tr from-[#3a4fd9] via-[#465fff] to-[#5a6fff] px-6 py-5">
                 <div class="flex flex-col items-center text-center">
                     <div class="w-full">
                         <img src="/images/logo/logo-dark.svg" alt="Logo BPS"
                             class="mx-auto w-auto max-w-[140px] h-[35px] mb-2" />
-                        <p class="text-xs text-white/90 mt-1 font-medium">Portal Integrasi Data dan Informasi</p>
+                        <p class="text-xs text-white/90 mt-1 font-medium">Portal Integrasi Data dan Informasi Penunjang</p>
                         <h2 class="text-sm font-semibold text-white/95 mt-0.5">Badan Pusat Statistik - Ogan Ilir</h2>
                     </div>
                 </div>
@@ -28,7 +28,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         {{-- Nama Lengkap --}}
                         <div class="space-y-2">
-                            <x-input-label for="name" value="Nama Lengkap" 
+                            <x-input-label for="name" value="Nama Lengkap"
                                 class="font-medium text-gray-700 dark:text-gray-300 text-sm" />
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -39,8 +39,8 @@
                                             clip-rule="evenodd" />
                                     </svg>
                                 </div>
-                                <x-text-input id="name" 
-                                    class="block w-full pl-10 h-11 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors" 
+                                <x-text-input id="name"
+                                    class="block w-full pl-10 h-11 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
                                     type="text"
                                     name="name" :value="old('name')" required placeholder="Masukkan nama lengkap" />
                             </div>
@@ -49,7 +49,7 @@
 
                         {{-- Jabatan --}}
                         <div class="space-y-2">
-                            <x-input-label for="jabatan" value="Jabatan" 
+                            <x-input-label for="jabatan" value="Jabatan"
                                 class="font-medium text-gray-700 dark:text-gray-300 text-sm" />
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -59,8 +59,8 @@
                                             d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
                                     </svg>
                                 </div>
-                                <x-text-input id="jabatan" 
-                                    class="block w-full pl-10 h-11 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors" 
+                                <x-text-input id="jabatan"
+                                    class="block w-full pl-10 h-11 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
                                     type="text"
                                     name="jabatan" :value="old('jabatan')" required placeholder="Masukkan jabatan" />
                             </div>
@@ -79,7 +79,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         {{-- Username --}}
                         <div class="space-y-2">
-                            <x-input-label for="username" value="Username" 
+                            <x-input-label for="username" value="Username"
                                 class="font-medium text-gray-700 dark:text-gray-300 text-sm" />
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -90,8 +90,8 @@
                                             clip-rule="evenodd" />
                                     </svg>
                                 </div>
-                                <x-text-input id="username" 
-                                    class="block w-full pl-10 h-11 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors" 
+                                <x-text-input id="username"
+                                    class="block w-full pl-10 h-11 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
                                     type="text"
                                     name="username" :value="old('username')" required placeholder="Masukkan username" />
                             </div>
@@ -100,7 +100,7 @@
 
                         {{-- Email --}}
                         <div class="space-y-2">
-                            <x-input-label for="email" value="Email" 
+                            <x-input-label for="email" value="Email"
                                 class="font-medium text-gray-700 dark:text-gray-300 text-sm" />
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -111,8 +111,8 @@
                                         <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                                     </svg>
                                 </div>
-                                <x-text-input id="email" 
-                                    class="block w-full pl-10 h-11 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors" 
+                                <x-text-input id="email"
+                                    class="block w-full pl-10 h-11 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
                                     type="email"
                                     name="email" :value="old('email')" required placeholder="nama@bps.go.id" />
                             </div>
@@ -121,7 +121,7 @@
 
                         {{-- Password --}}
                         <div class="space-y-2" x-data="{ showPassword: false }">
-                            <x-input-label for="password" value="Password" 
+                            <x-input-label for="password" value="Password"
                                 class="font-medium text-gray-700 dark:text-gray-300 text-sm" />
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -132,24 +132,24 @@
                                             clip-rule="evenodd" />
                                     </svg>
                                 </div>
-                                <input id="password" 
-                                    class="block w-full pl-10 pr-10 h-11 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors border-gray-300 rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" 
+                                <input id="password"
+                                    class="block w-full pl-10 pr-10 h-11 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors border-gray-300 rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
                                     :type="showPassword ? 'text' : 'password'"
                                     name="password" required autocomplete="new-password"
                                     placeholder="Minimal 8 karakter" />
-                                
+
                                 <!-- Show/Hide Password Toggle -->
-                                <button type="button" 
+                                <button type="button"
                                         @click="showPassword = !showPassword"
                                         class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors">
                                     <svg x-show="!showPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                               d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                               d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
                                     <svg x-show="showPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                               d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.59 6.59m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                                     </svg>
                                 </button>
@@ -171,24 +171,24 @@
                                             clip-rule="evenodd" />
                                     </svg>
                                 </div>
-                                <input id="password_confirmation" 
-                                    class="block w-full pl-10 pr-10 h-11 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors border-gray-300 rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" 
+                                <input id="password_confirmation"
+                                    class="block w-full pl-10 pr-10 h-11 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors border-gray-300 rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
                                     :type="showConfirmPassword ? 'text' : 'password'"
                                     name="password_confirmation" required autocomplete="new-password"
                                     placeholder="Ulangi password" />
-                                
+
                                 <!-- Show/Hide Confirm Password Toggle -->
-                                <button type="button" 
+                                <button type="button"
                                         @click="showConfirmPassword = !showConfirmPassword"
                                         class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors">
                                     <svg x-show="!showConfirmPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                               d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                               d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
                                     <svg x-show="showConfirmPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                               d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.59 6.59m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                                     </svg>
                                 </button>
@@ -217,7 +217,7 @@
                     <div class="flex gap-3">
                         <button type="reset"
                             class="px-5 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300
-                                    bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 
+                                    bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600
                                     transition-colors border border-gray-300 dark:border-gray-600">
                             Reset
                         </button>

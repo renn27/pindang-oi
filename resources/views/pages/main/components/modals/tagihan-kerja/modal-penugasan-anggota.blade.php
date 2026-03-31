@@ -246,7 +246,7 @@
                     x-effect="syncState()"
                     class="mb-4">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Kebutuhan Dinas Luar (DL) 
+                        Kebutuhan Dinas Luar (DL)
                     </label>
 
                     <div class="flex items-center gap-4">
@@ -273,7 +273,7 @@
                             x-text="
                                 !jenisSelected
                                     ? 'Pilih dulu jenis kegiatan'
-                                    : (butuhDl ? 'Butuh DL' : 'Tidak Butuh DL')
+                                    : (butuhDl ? 'Perlu DL' : 'Tidak Perlu DL')
                             "
                         ></span>
                     </div>
