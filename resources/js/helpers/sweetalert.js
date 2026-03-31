@@ -26,13 +26,13 @@ const SwalHelper = {
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Hapus Data</h3>
                     <p class="text-gray-600 dark:text-gray-300 mb-1 font-medium">"${itemName}"</p>
                     <p class="text-sm text-gray-400 dark:text-gray-400 mb-6">Data yang dihapus tidak dapat dikembalikan</p>
-                    
+
                     <div class="flex gap-3 justify-center">
-                        <button type="button" data-action="cancel" 
+                        <button type="button" data-action="cancel"
                             class="px-5 py-2.5 rounded-lg font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-colors">
                             Batal
                         </button>
-                        <button type="button" data-action="confirm" 
+                        <button type="button" data-action="confirm"
                             class="px-5 py-2.5 rounded-lg font-medium bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white transition-colors">
                             Ya, Hapus
                         </button>
@@ -57,7 +57,7 @@ const SwalHelper = {
                 popup.addEventListener('click', (e) => {
                     const target = e.target.closest('button[data-action]');
                     if (!target) return;
-                    
+
                     const action = target.dataset.action;
                     if (action === 'cancel') {
                         Swal.close();
@@ -67,16 +67,15 @@ const SwalHelper = {
                             form.submit();
                         }
                         Swal.close();
-                        this.toast('success', 'Data berhasil dihapus');
                     }
                 });
-                
+
                 // Focus ke tombol batal
                 popup.querySelector('button[data-action="cancel"]')?.focus();
             }
         });
     },
-    
+
     success(message, title = 'Berhasil', duration = 3000) {
         return Swal.fire({
             ...toastConfig,
@@ -296,7 +295,7 @@ style.textContent = `
         margin: 0 !important;
         z-index: 999999 !important;
     }
-    
+
     /* Toast position di kanan atas */
     .swal2-container.swal2-top-end {
         position: fixed !important;
@@ -308,7 +307,7 @@ style.textContent = `
         width: auto !important;
         max-width: 400px !important;
     }
-    
+
     /* Toast container utama */
     .swal2-popup.swal2-toast {
         background: transparent !important;
@@ -323,13 +322,13 @@ style.textContent = `
         min-width: 380px !important;
         max-width: 380px !important;
     }
-    
+
     /* Toast content */
     .swal2-html-container {
         margin: 0 !important;
         padding: 0 !important;
     }
-    
+
     /* Custom container untuk toast content */
     .swal2-popup.swal2-toast > div {
         background: white !important;
@@ -339,27 +338,27 @@ style.textContent = `
         margin: 8px 0 !important;
         overflow: hidden !important;
     }
-    
+
     /* Dark mode untuk toast content */
     .dark .swal2-popup.swal2-toast > div {
         background: #1f2937 !important;
         border-color: #374151 !important;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
     }
-    
+
     /* Hilangkan semua overlay/background blur */
     .swal2-backdrop-show,
     .swal2-no-backdrop {
         background: transparent !important;
     }
-    
+
     /* Progress bar */
     .swal2-timer-progress-bar {
         height: 2px !important;
         background: transparent !important;
         opacity: 0.3 !important;
     }
-    
+
     .swal2-timer-progress-bar::after {
         content: '' !important;
         position: absolute !important;
@@ -370,16 +369,16 @@ style.textContent = `
         background: currentColor !important;
         border-radius: 0 0 8px 8px !important;
     }
-    
+
     /* Animation masuk dari kanan */
     .swal2-popup.swal2-toast.swal2-show {
         animation: slideInRight 0.3s ease-out !important;
     }
-    
+
     .swal2-popup.swal2-toast.swal2-hide {
         animation: slideOutRight 0.3s ease-in !important;
     }
-    
+
     @keyframes slideInRight {
         from {
             opacity: 0;
@@ -390,7 +389,7 @@ style.textContent = `
             transform: translateX(0);
         }
     }
-    
+
     @keyframes slideOutRight {
         from {
             opacity: 1;
@@ -401,7 +400,7 @@ style.textContent = `
             transform: translateX(100%);
         }
     }
-    
+
     /* Responsive */
     @media (max-width: 640px) {
         .swal2-popup.swal2-toast {
@@ -409,30 +408,30 @@ style.textContent = `
             min-width: 320px !important;
             max-width: 320px !important;
         }
-        
+
         .swal2-container.swal2-top-end {
             right: 10px !important;
             top: 15px !important;
         }
     }
-    
+
     /* Loading spinner animation */
     @keyframes spin {
         to {
             transform: rotate(360deg);
         }
     }
-    
+
     .animate-spin {
         animation: spin 1s linear infinite;
     }
-    
+
     /* Hilangkan semua pseudo-elements yang mungkin memberikan background */
     .swal2-popup.swal2-toast::before,
     .swal2-popup.swal2-toast::after {
         display: none !important;
     }
-    
+
     /* Dark mode untuk modal confirm delete */
     .dark .swal2-container .swal2-popup {
         background-color: #1f2937 !important;

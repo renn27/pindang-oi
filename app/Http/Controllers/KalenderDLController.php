@@ -84,7 +84,7 @@ class KalenderDLController extends Controller
             }
 
             return redirect()
-                ->route('kalenderDL.index')
+                ->route('master-kegiatan.index_rk_dl')
                 ->with('success', 'Berhasil memasukkan DL sesuai range tanggal.');
 
         } catch (\Exception $e) {
