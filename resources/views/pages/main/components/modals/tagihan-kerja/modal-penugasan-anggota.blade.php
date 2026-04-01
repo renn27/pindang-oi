@@ -311,38 +311,59 @@
                     <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="satuan_target">Satuan Target wajib diisi</p>
                 </div>
 
-                <div class="mb-4">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Tanggal Mulai <span class="text-red-500">*</span>
-                    </label>
-                    <x-form.date-picker
-                        x-model="formData.tanggal_mulai"
-                        id="tanggal_mulai"
-                        name="tanggal_mulai"
-                        placeholder="Tanggal Mulai"
-                        ::minDate="formData.min_date"
-                        ::maxDate="formData.max_date"
-                        minBind="formData.min_date"
-                        maxBind="formData.max_date"
-                    />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_mulai">Tanggal mulai wajib dipilih</p>
+                <div class="flex flex-row justify-between items-center gap-6">
+                    <div class="flex-1">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Tanggal Mulai <span class="text-red-500">*</span>
+                        </label>
+                        <x-form.date-picker
+                            x-model="formData.tanggal_mulai"
+                            id="tanggal_mulai"
+                            name="tanggal_mulai"
+                            placeholder="Tanggal Mulai"
+                            ::minDate="formData.min_date"
+                            ::maxDate="formData.max_date"
+                            minBind="formData.min_date"
+                            maxBind="formData.max_date"
+                        />
+                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_mulai">Tanggal mulai wajib dipilih</p>
+                    </div>
+
+                    <div class="flex-1">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Tanggal Berakhir (Deadline) <span class="text-red-500">*</span>
+                        </label>
+                        <x-form.date-picker
+                            x-model="formData.tanggal_selesai"
+                            id="tanggal_selesai"
+                            name="tanggal_selesai"
+                            placeholder="Tanggal Selesai"
+                            ::minDate="formData.min_date"
+                            ::maxDate="formData.max_date"
+                            minBind="formData.min_date"
+                            maxBind="formData.max_date"
+                        />
+                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_selesai">Tanggal selesai wajib dipilih</p>
+                    </div>
                 </div>
 
-                <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Tanggal Berakhir (Deadline) <span class="text-red-500">*</span>
-                    </label>
-                    <x-form.date-picker
-                        x-model="formData.tanggal_selesai"
-                        id="tanggal_selesai"
-                        name="tanggal_selesai"
-                        placeholder="Tanggal Selesai"
-                        ::minDate="formData.min_date"
-                        ::maxDate="formData.max_date"
-                        minBind="formData.min_date"
-                        maxBind="formData.max_date"
-                    />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_selesai">Tanggal selesai wajib dipilih</p>
+                <!-- CONTAINER UNTUK SECTION TANGGAL PENUGASAN TAMBAHAN -->
+                <div id="tglPenugasanContainer" class="space-y-6">
+                    <!-- Section akan ditambahkan di sini -->
+                </div>
+
+                <!-- TOMBOL TAMBAH RK ANGGOTA -->
+                <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                    <div class="md:w-1/4"></div>
+                    <div class="md:w-3/4">
+                        <button type="button" @click="tambahTanggalPenugasan()"
+                            class="flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M9 3.75C9.41421 3.75 9.75 4.08579 9.75 4.5V8.25H13.5C13.9142 8.25 14.25 8.58579 14.25 9C14.25 9.41421 13.9142 9.75 13.5 9.75H9.75V13.5C9.75 13.9142 9.41421 14.25 9 14.25C8.58579 14.25 8.25 13.9142 8.25 13.5V9.75H4.5C4.08579 9.75 3.75 9.41421 3.75 9C3.75 8.58579 4.08579 8.25 4.5 8.25H8.25V4.5C8.25 4.08579 8.58579 3.75 9 3.75Z" fill="" />
+                            </svg>
+                            Tambah Tanggal Penugasan
+                        </button>
+                    </div>
                 </div>
 
             </div>
@@ -612,5 +633,84 @@
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('savePenugasanButton')?.addEventListener('click', savePenugasan);
     });
+
+    function tambahTanggalPenugasan() {
+        let tanggalPenugasanCounter = 0;
+        let detailAnggotaCounter = {};
+
+        tanggalPenugasanCounter++;
+        const sectionIndex = tanggalPenugasanCounter;
+        const sectionId = `tgl-penugasan-${sectionIndex}`;
+        detailAnggotaCounter[sectionId] = 0;
+
+        const sectionHTML = `
+            <input type="hidden" name="rk_section_keys[]" value="${sectionId}">
+
+            <div class="flex flex-row justify-between items-center gap-6">
+                <div class="flex-1">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Tanggal Mulai <span class="text-red-500">*</span>
+                    </label>
+                    <x-form.date-picker
+                        x-model="formData.tanggal_mulai"
+                        id="tanggal_mulai"
+                        name="tanggal_mulai"
+                        placeholder="Tanggal Mulai"
+                        ::minDate="formData.min_date"
+                        ::maxDate="formData.max_date"
+                        minBind="formData.min_date"
+                        maxBind="formData.max_date"
+                    />
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_mulai">Tanggal mulai wajib dipilih</p>
+                </div>
+
+                <div class="flex-1">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Tanggal Berakhir (Deadline) <span class="text-red-500">*</span>
+                    </label>
+                    <x-form.date-picker
+                        x-model="formData.tanggal_selesai"
+                        id="tanggal_selesai"
+                        name="tanggal_selesai"
+                        placeholder="Tanggal Selesai"
+                        ::minDate="formData.min_date"
+                        ::maxDate="formData.max_date"
+                        minBind="formData.min_date"
+                        maxBind="formData.max_date"
+                    />
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_selesai">Tanggal selesai wajib dipilih</p>
+                </div>
+
+                <div id="detail-${sectionId}" class="space-y-4"></div>
+            </div>
+        `;
+
+        const container = document.getElementById('tglPenugasanContainer');
+        container.insertAdjacentHTML('beforeend', sectionHTML);
+
+        const sectionElement = document.getElementById(sectionId);
+        if (sectionElement) {
+            const today = new Date().toISOString().split('T')[0];
+            const nextWeek = new Date();
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            const nextWeekFormatted = nextWeek.toISOString().split('T')[0];
+
+            const tanggalMulaiInput = sectionElement.querySelector('input[name="tanggal_mulai[]"]');
+            const tanggalSelesaiInput = sectionElement.querySelector('input[name="tanggal_selesai[]"]');
+            if (tanggalMulaiInput) tanggalMulaiInput.value = today;
+            if (tanggalSelesaiInput) tanggalSelesaiInput.value = nextWeekFormatted;
+        }
+
+        setTimeout(() => {
+            document.getElementById(sectionId)?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
+        }, 100);
+    }
+
+    function hapusTanggalPenugasan(sectionId) {
+        document.getElementById(sectionId)?.remove();
+    }
 </script>
 

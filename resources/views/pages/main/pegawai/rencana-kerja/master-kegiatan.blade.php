@@ -607,81 +607,81 @@
             detailAnggotaCounter[sectionId] = 0;
 
             const sectionHTML = `
-            <div id="${sectionId}" class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
-                <div class="mb-4 flex items-center justify-between">
-                    <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-300">
-                        Sub Kegiatan ${rkAnggotaCounter}
-                    </h5>
-                    <button type="button" onclick="hapusRKAnggota('${sectionId}')"
-                        class="rounded-lg p-1 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-300">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
+                <div id="${sectionId}" class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-300">
+                            Sub Kegiatan ${rkAnggotaCounter}
+                        </h5>
+                        <button type="button" onclick="hapusRKAnggota('${sectionId}')"
+                            class="rounded-lg p-1 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-300">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="rk_section_keys[]" value="${sectionId}">
+
+                    <div class="space-y-4">
+                        <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
+                                Nama Sub Kegiatan
+                            </label>
+                            <input name="rk_anggota[]" type="text" placeholder="Masukkan nama sub kegiatan"
+                                class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                        </div>
+
+                        <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
+                                Target Kegiatan
+                            </label>
+                            <input type="number" name="target[]" placeholder="Misalnya : 200"
+                                class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                        </div>
+
+                        <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
+                                Satuan Target
+                            </label>
+                            <input type="text" name="satuan_target[]" placeholder="Misalnya : Kegiatan, Dokumen, dll"
+                                class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                        </div>
+
+                        <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
+                                Tanggal Mulai
+                            </label>
+                            <div class="md:w-3/4">
+                                <x-form.date-picker name="tanggal_mulai[]" placeholder="Tanggal Mulai" defaultDate="{{ now()->format('Y-m-d') }}" />
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
+                                Tanggal Selesai
+                            </label>
+                            <div class="md:w-3/4">
+                                <x-form.date-picker name="tanggal_selesai[]" placeholder="Tanggal Selesai" defaultDate="{{ now()->format('Y-m-d') }}" />
+                            </div>
+                        </div>
+
+                        <div id="detail-${sectionId}" class="space-y-4"></div>
+
+                        <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                            <div class="md:w-1/4"></div>
+                            <div class="md:w-3/4">
+                                <button type="button" onclick="tambahDetailAnggota('${sectionId}')"
+                                    class="flex items-center gap-2 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 bg-transparent px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <svg class="fill-current" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8 3.5C8.27614 3.5 8.5 3.72386 8.5 4V7.5H12C12.2761 7.5 12.5 7.72386 12.5 8C12.5 8.27614 12.2761 8.5 12 8.5H8.5V12C8.5 12.2761 8.27614 12.5 8 12.5C7.72386 12.5 7.5 12.2761 7.5 12V8.5H4C3.72386 8.5 3.5 8.27614 3.5 8C3.5 7.72386 3.72386 7.5 4 7.5H7.5V4C7.5 3.72386 7.72386 3.5 8 3.5Z" fill=""/>
+                                    </svg>
+                                    Tambah Anggota
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                <input type="hidden" name="rk_section_keys[]" value="${sectionId}">
-
-                <div class="space-y-4">
-                    <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
-                            Nama Sub Kegiatan
-                        </label>
-                        <input name="rk_anggota[]" type="text" placeholder="Masukkan nama sub kegiatan"
-                            class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
-                    </div>
-
-                    <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
-                            Target Kegiatan
-                        </label>
-                        <input type="number" name="target[]" placeholder="Misalnya : 200"
-                            class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
-                    </div>
-
-                    <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
-                            Satuan Target
-                        </label>
-                        <input type="text" name="satuan_target[]" placeholder="Misalnya : Kegiatan, Dokumen, dll"
-                            class="md:w-3/4 h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
-                    </div>
-
-                    <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
-                            Tanggal Mulai
-                        </label>
-                        <div class="md:w-3/4">
-                            <x-form.date-picker name="tanggal_mulai[]" placeholder="Tanggal Mulai" defaultDate="{{ now()->format('Y-m-d') }}" />
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
-                            Tanggal Selesai
-                        </label>
-                        <div class="md:w-3/4">
-                            <x-form.date-picker name="tanggal_selesai[]" placeholder="Tanggal Selesai" defaultDate="{{ now()->format('Y-m-d') }}" />
-                        </div>
-                    </div>
-
-                    <div id="detail-${sectionId}" class="space-y-4"></div>
-
-                    <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                        <div class="md:w-1/4"></div>
-                        <div class="md:w-3/4">
-                            <button type="button" onclick="tambahDetailAnggota('${sectionId}')"
-                                class="flex items-center gap-2 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 bg-transparent px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <svg class="fill-current" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M8 3.5C8.27614 3.5 8.5 3.72386 8.5 4V7.5H12C12.2761 7.5 12.5 7.72386 12.5 8C12.5 8.27614 12.2761 8.5 12 8.5H8.5V12C8.5 12.2761 8.27614 12.5 8 12.5C7.72386 12.5 7.5 12.2761 7.5 12V8.5H4C3.72386 8.5 3.5 8.27614 3.5 8C3.5 7.72386 3.72386 7.5 4 7.5H7.5V4C7.5 3.72386 7.72386 3.5 8 3.5Z" fill=""/>
-                                </svg>
-                                Tambah Anggota
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
+            `;
 
             const container = document.getElementById('rkAnggotaContainer');
             container.insertAdjacentHTML('beforeend', sectionHTML);

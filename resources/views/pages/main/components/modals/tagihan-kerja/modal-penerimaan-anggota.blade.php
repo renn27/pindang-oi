@@ -18,6 +18,7 @@
             catatan: ''
         }">
     <form
+        id="addPenerimaanForm"
         :action="`/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${formData.id_penugasan}/pengirimans/${formData.id_pengiriman}/penerimaan`"
         method="POST" class="grid grid-cols-1 gap-y-5">
         @csrf
