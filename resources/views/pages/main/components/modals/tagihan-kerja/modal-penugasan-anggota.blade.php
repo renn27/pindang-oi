@@ -119,45 +119,67 @@
                     </div>
                 </div>
 
-                <div x-data="{ isOther: false }">
+                <div x-data="{
+                        open: false,
+                        isOther: false,
+                        options: [
+                            @foreach ($jenisKegiatans as $jenis)
+                            { id: '{{ $jenis->id }}', text: '{{ addslashes($jenis->jenis_kegiatan) }} ({{ $jenis->kategori }})', style: '{{ $jenis->kategori === 'Utama' ? 'text-green-700 font-medium dark:text-green-300' : 'text-orange-700 dark:text-orange-300' }}' },
+                            @endforeach
+                            { id: 'LAINNYA', text: '➕ Lainnya', style: 'text-blue-700 font-medium dark:text-blue-300' }
+                        ],
+                        get selectText() {
+                            if (!formData.id_jenis_kegiatan) return '-- Pilih Jenis Kegiatan --';
+                            let opt = this.options.find(o => o.id == formData.id_jenis_kegiatan);
+                            return opt ? opt.text : formData.jenis_kegiatan || '-- Pilih Jenis Kegiatan --';
+                        },
+                        selectJenis(opt) {
+                            formData.id_jenis_kegiatan = opt.id;
+                            this.isOther = (opt.id === 'LAINNYA');
+                            this.open = false;
+
+                            // Triggers native change event if attached directly or you can just let Alpine reactivity handle 'butuh_dl'
+                        }
+                    }"
+                    @open-smart-modal.window="
+                        if ($event.detail.modalId === 'modal-penugasan-anggota' && mode === 'edit') {
+                            isOther = (formData.id_jenis_kegiatan === 'LAINNYA');
+                        }
+                    ">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Jenis Kegiatan <span class="text-red-500">*</span>
                     </label>
 
-                    <!-- SELECT UI -->
-                    <select
-                        id="jenis_kegiatan_select"
-                        name="id_jenis_kegiatan"
-                        x-model="formData.id_jenis_kegiatan"
-                        @change="isOther = ($event.target.value === 'LAINNYA')"
-                        required
-                        class="
-                            h-11 w-full mb-4
-                            rounded-lg border border-gray-300
-                            bg-white
-                            px-4 py-2.5 text-sm
-                            focus:ring-2 focus:ring-primary-500 focus:border-primary-500
-                            dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                        <option value="" class="dark:text-gray-400">-- Pilih Jenis Kegiatan --</option>
+                    <input type="hidden" id="jenis_kegiatan_select" name="id_jenis_kegiatan" x-model="formData.id_jenis_kegiatan">
 
-                        @foreach ($jenisKegiatans as $jenis)
-                            <option
-                                value="{{ $jenis->id }}"
-                                data-text="{{ $jenis->jenis_kegiatan }}"
-                                class="
-                                    @if($jenis->kategori === 'Utama')
-                                        text-green-700 font-medium dark:text-green-300
-                                    @elseif($jenis->kategori === 'Tambahan')
-                                        text-orange-700 dark:text-orange-300
-                                    @endif">
-                                {{ $jenis->jenis_kegiatan }} ({{ $jenis->kategori }})
-                            </option>
-                        @endforeach
+                    <div class="relative mb-4">
+                        <button type="button"
+                                @click="open = !open"
+                                @click.outside="open = false"
+                                class="flex h-11 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800">
+                            <span x-text="selectText"
+                                  class="truncate"
+                                  :class="!formData.id_jenis_kegiatan ? 'text-gray-400 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'">
+                            </span>
+                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </button>
 
-                        <option value="LAINNYA" class="text-blue-700 font-medium dark:text-blue-300">
-                            ➕ Lainnya
-                        </option>
-                    </select>
+                        <div x-show="open"
+                             x-transition
+                             class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                            <template x-for="opt in options" :key="opt.id">
+                                <button type="button"
+                                        @click="selectJenis(opt)"
+                                        class="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                                        :class="opt.style">
+                                    <span x-text="opt.text"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
                     <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="jenis_kegiatan_select">Jenis Kegiatan wajib dipilih dari daftar</p>
 
                     <!-- INPUT JENIS KEGIATAN BARU -->
@@ -170,7 +192,6 @@
                             class="h-11 w-full mb-4 rounded-lg border border-gray-300 px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
                         />
                     </div>
-                    {{-- <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="jenis_kegiatan_baru">Jenis Kegiatan baru wajib diisi jika memilih opsi ini</p> --}}
                 </div>
 
                 <div
