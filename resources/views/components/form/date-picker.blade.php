@@ -33,9 +33,9 @@
 
             this.flatpickrInstance = flatpickr(this.$refs.dateInput, {
                 mode: '{{ $mode }}',
-                position: 'auto center',
+                position: 'auto',
                 monthSelectorType: 'static',
-                dateFormat: '{{ $dateFormat }}',
+                dateFormat: '{{ $dateFormat }}', 
                 minDate: initialMin || null,
                 maxDate: initialMax || null,
                 disableMobile: true,
