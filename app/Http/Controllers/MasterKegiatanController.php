@@ -75,7 +75,7 @@ class MasterKegiatanController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
         $this->authorize('create', Kegiatan::class);
         try {
             $validated = $request->validate([

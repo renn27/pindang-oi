@@ -17,6 +17,15 @@
                         <tr>
                             <td
                                 class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 w-32 dark:bg-gray-800 dark:text-gray-400">
+                                Bidang
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-300">
+                                {{ $subKegiatan->kegiatan->bidang->nama_bidang }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td
+                                class="px-4 py-3 whitespace-nowrap text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 w-32 dark:bg-gray-800 dark:text-gray-400">
                                 Sumber Kegiatan
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-300">

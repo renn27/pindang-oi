@@ -56,6 +56,7 @@ class Penugasan extends Model
     {
         return $this->hasMany(KalenderDL::class, 'id_penugasan');
     }
+
     // END RELATIONS
 
     protected static function booted() {

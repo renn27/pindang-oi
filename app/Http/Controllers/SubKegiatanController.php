@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Kegiatan;
 use App\Models\SubKegiatan;
 use App\Models\Pegawai;
+use App\Models\Penugasan;
 use Carbon\Carbon;
 
 class SubKegiatanController extends Controller
@@ -57,20 +58,19 @@ class SubKegiatanController extends Controller
         $jenisKegiatans = JenisKegiatan::query()
             ->orderByRaw("
                 CASE
-                    WHEN kategori = 'Utama' THEN 1
-                    WHEN kategori = 'Tambahan' THEN 2
-                    ELSE 3
+                WHEN kategori = 'Utama' THEN 1
+                WHEN kategori = 'Tambahan' THEN 2
+                ELSE 3
                 END
-            ")
+                ")
             ->orderBy('jenis_kegiatan', 'asc')
             ->get();
 
-        // 🔒 VALIDASI KEPEMILIKAN (PENTING!// Ambil semua penugasan sekali saja
-        $penugasans = $subKegiatan->penugasans;
+        $penugasans = $subKegiatan->penugasans()->get();
 
         // === FILTER BUTUH DL / TIDAK BUTUH DL ===
-        $penugasanButuhDL = $penugasans->filter(fn ($p) => $p->butuh_dl);
-        $penugasanTidakButuhDL = $penugasans->filter(fn ($p) => ! $p->butuh_dl);
+        $penugasanButuhDL = $penugasans->filter(fn ($row) => $row->butuh_dl);
+        $penugasanTidakButuhDL = $penugasans->filter(fn ($row) => ! $row->butuh_dl);
 
         // Total (SEMUA)
         $totalKirim = $this->hitungTotalKirim($penugasans);
@@ -157,14 +157,14 @@ class SubKegiatanController extends Controller
 
     private function hitungTotalKirim($penugasans)
     {
-        return $penugasans->sum(fn ($p) =>
+        return $penugasans->unique('id_penugasan')->sum(fn ($p) =>
             $p->latestPengiriman?->jumlah_dikirim ?? 0
         );
     }
 
     private function hitungTotalTerima($penugasans)
     {
-        return $penugasans->sum(fn ($p) =>
+        return $penugasans->unique('id_penugasan')->sum(fn ($p) =>
             $p->latestPenerimaan?->jumlah_diterima ?? 0
         );
     }

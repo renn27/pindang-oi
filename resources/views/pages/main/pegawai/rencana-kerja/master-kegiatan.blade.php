@@ -267,9 +267,6 @@
         const app = document.getElementById('app');
         const pegawais = app?.dataset.pegawais ? JSON.parse(app.dataset.pegawais) : [];
 
-        let rkAnggotaCounter = 0;
-        let detailAnggotaCounter = {};
-
         // =============================================
         // VALIDASI FRONTEND
         // =============================================
@@ -600,6 +597,8 @@
         // TAMBAH / HAPUS SUB KEGIATAN
         // =============================================
 
+        let rkAnggotaCounter = 0;
+        let detailAnggotaCounter = {};
         function tambahRKAnggota() {
             rkAnggotaCounter++;
             const sectionIndex = rkAnggotaCounter;

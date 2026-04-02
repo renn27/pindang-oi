@@ -80,7 +80,7 @@
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Jumlah Dikirim <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="jumlah_dikirim" id="jumlah_dikirim" placeholder="Masukkan jumlah pengiriman"
+                    <input type="number" name="jumlah_dikirim" id="jumlah_dikirim" placeholder="Masukkan jumlah pengiriman (hanya angka)"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
                     <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="jumlah_dikirim">Jumlah dikirim wajib diisi</p>
                 </div>
@@ -198,7 +198,13 @@
         const jumlahDikirimErrorMsg = jumlahDikirim?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
         if (!jumlahDikirim?.value?.trim()) {
             addError(
-                'Jumlah Dikirim wajib diisi',
+                'Jumlah Dikirim wajib diisi (hanya angka)',
+                jumlahDikirim, jumlahDikirim,
+                jumlahDikirimErrorMsg
+            );
+        } else if (isNaN(jumlahDikirim.value) || Number(jumlahDikirim.value) <= 0) {
+            addError(
+                'Jumlah Dikirim harus berupa angka lebih besar dari 0',
                 jumlahDikirim, jumlahDikirim,
                 jumlahDikirimErrorMsg
             );

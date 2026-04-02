@@ -2,12 +2,12 @@
     $loginUserId = auth()->user()->id_pegawai;
 
     // Helper untuk mengurutkan: user yang sedang login akan berada di paling atas
-    $penugasanButuhDL = $penugasanButuhDL->sortByDesc(function ($penugasan) use ($loginUserId) {
-        return $penugasan->id_anggota === $loginUserId ? 1 : 0;
+    $penugasanButuhDL = $penugasanButuhDL->sortByDesc(function ($row) use ($loginUserId) {
+        return $row->id_anggota === $loginUserId ? 1 : 0;
     });
 
-    $penugasanTidakButuhDL = $penugasanTidakButuhDL->sortByDesc(function ($penugasan) use ($loginUserId) {
-        return $penugasan->id_anggota === $loginUserId ? 1 : 0;
+    $penugasanTidakButuhDL = $penugasanTidakButuhDL->sortByDesc(function ($row) use ($loginUserId) {
+        return $row->id_anggota === $loginUserId ? 1 : 0;
     });
 @endphp
 
@@ -101,8 +101,9 @@
                         </thead>
 
                         <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                            @forelse ($penugasanButuhDL as $penugasan)
+                            @forelse ($penugasanButuhDL as $row)
                                 @php
+                                    $penugasan = $row;
                                     $isMe = $penugasan->id_anggota === $loginUserId;
                                     $statusClass = $penugasan->statusPenugasan()['class'];
 
@@ -146,7 +147,7 @@
                                             {{ $penugasan->satuan_target ?? '-' }}</div>
                                     </td>
 
-                                    <td class="px-6 py-3 text-sm text-gray-700 dark:text-gray-400 text-center">
+                                    {{-- <td class="px-6 py-3 text-sm text-gray-700 dark:text-gray-400 text-center">
                                         <div class="text-xs text-gray-600 dark:text-gray-400">
                                             {{ $penugasan->tanggal_mulai && $penugasan->tanggal_selesai
                                                 ? ($penugasan->tanggal_mulai->equalTo($penugasan->tanggal_selesai)
@@ -156,6 +157,20 @@
                                                         $penugasan->tanggal_selesai->translatedFormat('D, d M Y'))
                                                 : '-' }}
                                         </div>
+                                    </td> --}}
+
+                                    <td class="px-6 py-3 text-sm text-gray-700 dark:text-gray-400 text-center">
+
+                                        {{-- TANGGAL UTAMA & TAMBAHAN (Satu Baris Setara) --}}
+                                        <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                            {{ $row->tanggal_mulai && $row->tanggal_selesai
+                                                ? ($row->tanggal_mulai->equalTo($row->tanggal_selesai)
+                                                    ? $row->tanggal_mulai->translatedFormat('D, d M Y')
+                                                    : $row->tanggal_mulai->translatedFormat('D, d M Y') . ' - ' .
+                                                    $row->tanggal_selesai->translatedFormat('D, d M Y'))
+                                                : '-' }}
+                                        </div>
+
                                     </td>
 
                                     {{-- BADGE STATUS DL --}}
@@ -201,7 +216,7 @@
                                                 const button = event.currentTarget;
                                                 const rect = button.getBoundingClientRect();
                                                 const dropdownWidth = 192;
-                                        
+
                                                 this.dropdownPosition = {
                                                     x: rect.left - dropdownWidth + 10,
                                                     y: rect.top - 10
@@ -246,8 +261,8 @@
                                                                 target: @js($penugasan->target),
                                                                 satuan_target: @js($penugasan->satuan_target),
                                                                 butuh_dl: @js($penugasan->butuh_dl),
-                                                                tanggal_mulai: @js(optional($penugasan->tanggal_mulai)->format('Y-m-d')),
-                                                                tanggal_selesai: @js(optional($penugasan->tanggal_selesai)->format('Y-m-d')),
+                                                                tanggal_mulai: @js(optional($row->tanggal_mulai)->format('Y-m-d')),
+                                                                tanggal_selesai: @js(optional($row->tanggal_selesai)->format('Y-m-d')),
                                                                 status: @js($penugasan->status),
                                                                 min_date: @js($subKegiatan->tanggal_mulai->format('Y-m-d')),
                                                                 max_date: @js($subKegiatan->tanggal_selesai->format('Y-m-d'))
@@ -313,17 +328,17 @@
                                                             id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                             nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
                                                             historiData: @js(
-    $penugasan->pengirimans->sortByDesc(fn($p) => $p->tanggal_pengiriman)->map(
-        fn($p) => [
-            'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
-            'jumlah_dikirim' => $p->jumlah_dikirim,
-            'media_pengiriman' => $p->media_pengiriman,
-            'bukti_dukung' => $p->bukti_dukung,
-            'status' => $p->penerimaan?->status ?? 'Menunggu Diperiksa',
-            'catatan' => $p->penerimaan?->catatan,
-        ],
-    ),
-)}
+                                                            $penugasan->pengirimans->sortByDesc(fn($p) => $p->tanggal_pengiriman)->map(
+                                                                fn($p) => [
+                                                                    'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
+                                                                    'jumlah_dikirim' => $p->jumlah_dikirim,
+                                                                    'media_pengiriman' => $p->media_pengiriman,
+                                                                    'bukti_dukung' => $p->bukti_dukung,
+                                                                    'status' => $p->penerimaan?->status ?? 'Menunggu Diperiksa',
+                                                                    'catatan' => $p->penerimaan?->catatan,
+                                                                ],
+                                                            ),
+                                                        )}
                                                         })">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
@@ -693,14 +708,15 @@
 
                             <!-- Total Row -->
                             @php
-                                $sumTargetDL = $penugasanButuhDL->sum('target');
+                                $uniquePenugasanButuhDL = $penugasanButuhDL->unique('id_penugasan');
+                                $sumTargetDL = $uniquePenugasanButuhDL->sum('target');
                                 $avgRrKirimDL =
                                     $sumTargetDL > 0 ? round(($totalKirimButuhDL / $sumTargetDL) * 100, 2) : 0;
                                 $avgRrTerimaDL =
                                     $sumTargetDL > 0 ? round(($totalTerimaButuhDL / $sumTargetDL) * 100, 2) : 0;
 
                                 $avgRatingKirimDL =
-                                    $penugasanButuhDL->avg(function ($p) {
+                                    $uniquePenugasanButuhDL->avg(function ($p) {
                                         return $p->latestPengiriman?->rating_kirim ?? 0;
                                     }) ?? 0;
                                 $bintangKirimDLArray = array_map(function ($i) use ($avgRatingKirimDL) {
@@ -708,7 +724,7 @@
                                 }, range(1, 5));
 
                                 $avgRatingTerimaDL =
-                                    $penugasanButuhDL->avg(function ($p) {
+                                    $uniquePenugasanButuhDL->avg(function ($p) {
                                         return $p->latestPenerimaan?->rating_terima ?? 0;
                                     }) ?? 0;
                                 $bintangTerimaDLArray = array_map(function ($i) use ($avgRatingTerimaDL) {
@@ -732,7 +748,7 @@
                                                     <div>
                                                         <p class="text-xs text-gray-500">Target</p>
                                                         <p class="text-xl font-bold text-blue-600">
-                                                            {{ $penugasanButuhDL->sum('target') }}
+                                                            {{ $sumTargetDL }}
                                                         </p>
                                                     </div>
 
@@ -955,8 +971,9 @@
                         </thead>
 
                         <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                            @forelse ($penugasanTidakButuhDL as $penugasan)
+                            @forelse ($penugasanTidakButuhDL as $row)
                                 @php
+                                    $penugasan = $row;
                                     $isMe = $penugasan->id_anggota === $loginUserId;
                                     $statusClass = $penugasan->statusPenugasan()['class'];
 
@@ -1002,12 +1019,11 @@
 
                                     <td class="px-6 py-3 text-sm text-gray-700 dark:text-gray-400 text-center">
                                         <div class="text-xs text-gray-600 dark:text-gray-400">
-                                            {{ $penugasan->tanggal_mulai && $penugasan->tanggal_selesai
-                                                ? ($penugasan->tanggal_mulai->equalTo($penugasan->tanggal_selesai)
-                                                    ? $penugasan->tanggal_mulai->translatedFormat('D, d M Y')
-                                                    : $penugasan->tanggal_mulai->translatedFormat('D, d M Y') .
-                                                        ' - ' .
-                                                        $penugasan->tanggal_selesai->translatedFormat('D, d M Y'))
+                                            {{ $row->tanggal_mulai && $row->tanggal_selesai
+                                                ? ($row->tanggal_mulai->equalTo($row->tanggal_selesai)
+                                                    ? $row->tanggal_mulai->translatedFormat('D, d M Y')
+                                                    : $row->tanggal_mulai->translatedFormat('D, d M Y') . ' - ' .
+                                                        $row->tanggal_selesai->translatedFormat('D, d M Y'))
                                                 : '-' }}
                                         </div>
                                     </td>
@@ -1038,7 +1054,7 @@
                                                 const button = event.currentTarget;
                                                 const rect = button.getBoundingClientRect();
                                                 const dropdownWidth = 192;
-                                        
+
                                                 this.dropdownPosition = {
                                                     x: rect.left - dropdownWidth + 10,
                                                     y: rect.top - 10
@@ -1084,8 +1100,8 @@
                                                                 target: @js($penugasan->target),
                                                                 satuan_target: @js($penugasan->satuan_target),
                                                                 butuh_dl: @js($penugasan->butuh_dl),
-                                                                tanggal_mulai: @js(optional($penugasan->tanggal_mulai)->format('Y-m-d')),
-                                                                tanggal_selesai: @js(optional($penugasan->tanggal_selesai)->format('Y-m-d')),
+                                                                tanggal_mulai: @js(optional($row->tanggal_mulai)->format('Y-m-d')),
+                                                                tanggal_selesai: @js(optional($row->tanggal_selesai)->format('Y-m-d')),
                                                                 status: @js($penugasan->status),
                                                                 min_date: @js($subKegiatan->tanggal_mulai->format('Y-m-d')),
                                                                 max_date: @js($subKegiatan->tanggal_selesai->format('Y-m-d'))
@@ -1533,7 +1549,8 @@
 
                             <!-- Total Row -->
                             @php
-                                $sumTargetNonDL = $penugasanTidakButuhDL->sum('target');
+                                $uniquePenugasanTidakButuhDL = $penugasanTidakButuhDL->unique('id_penugasan');
+                                $sumTargetNonDL = $uniquePenugasanTidakButuhDL->sum('target');
                                 $avgRrKirimNonDL =
                                     $sumTargetNonDL > 0
                                         ? round(($totalKirimTidakButuhDL / $sumTargetNonDL) * 100, 2)
@@ -1544,7 +1561,7 @@
                                         : 0;
 
                                 $avgRatingKirimNonDL =
-                                    $penugasanTidakButuhDL->avg(function ($p) {
+                                    $uniquePenugasanTidakButuhDL->avg(function ($p) {
                                         return $p->latestPengiriman?->rating_kirim ?? 0;
                                     }) ?? 0;
                                 $bintangKirimNonDLArray = array_map(function ($i) use ($avgRatingKirimNonDL) {
@@ -1552,7 +1569,7 @@
                                 }, range(1, 5));
 
                                 $avgRatingTerimaNonDL =
-                                    $penugasanTidakButuhDL->avg(function ($p) {
+                                    $uniquePenugasanTidakButuhDL->avg(function ($p) {
                                         return $p->latestPenerimaan?->rating_terima ?? 0;
                                     }) ?? 0;
                                 $bintangTerimaNonDLArray = array_map(function ($i) use ($avgRatingTerimaNonDL) {
@@ -1576,7 +1593,7 @@
                                                     <div>
                                                         <p class="text-xs text-gray-500">Target</p>
                                                         <p class="text-xl font-bold text-blue-600">
-                                                            {{ $penugasanTidakButuhDL->sum('target') }}
+                                                            {{ $sumTargetNonDL }}
                                                         </p>
                                                     </div>
 
@@ -1722,12 +1739,9 @@
                                                                     border-l-transparent border-r-transparent border-t-gray-900">
                                                                 </div>
                                                             </div>
-
                                                         </div>
                                                     </div>
-
                                                 </div>
-
                                             </div>
                                         </div>
                                     </div>

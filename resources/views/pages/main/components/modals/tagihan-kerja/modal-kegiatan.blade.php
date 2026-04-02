@@ -5,8 +5,8 @@
         mode = $event.detail.mode ?? 'create';
         itemKey = $event.detail.key ?? null;
 
-        // Samakan polanya dengan sub-kegiatan: replace total
-        formData = $event.detail.data ?? {
+        let baseData = $event.detail.data || {};
+        formData = {
             id_bidang: '{{ $bidang->id_bidang }}',
             nama_bidang: '{{ $bidang->nama_bidang }}',
             id_penanggung_jawab: '',
@@ -15,7 +15,8 @@
             rk_jpt: '',
             iki_jpt: '',
             nama_rk_kegiatan: '',
-            ikiOptions: [] // Pastikan ini ada agar template x-for tidak error
+            ikiOptions: [], // Ensure this property ALWAYS exists to track reactivity
+            ...baseData
         };
 
         // Sinkronkan state untuk dropdown autocomplete
@@ -26,7 +27,10 @@
             if (formData.rk_jpt) {
                 const selectedIki = formData.iki_jpt;
                 await loadIkiByRk(formData.rk_jpt, formData);
-                formData.iki_jpt = selectedIki;
+                
+                setTimeout(() => {
+                    formData.iki_jpt = selectedIki;
+                 }, 50);
             }
         });
     ">

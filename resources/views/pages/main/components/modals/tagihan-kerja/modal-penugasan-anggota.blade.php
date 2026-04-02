@@ -347,13 +347,16 @@
                     </div>
                 </div>
 
-                <!-- CONTAINER UNTUK SECTION TANGGAL PENUGASAN TAMBAHAN -->
-                <div id="tglPenugasanContainer" class="space-y-6">
-                    <!-- Section akan ditambahkan di sini -->
+                <div id="tglPenugasanWrapper" class="mt-6 hidden">
+                    <h3 class="text-sm font-semibold text-gray-600 mb-3">
+                        Tanggal Penugasan Tambahan
+                    </h3>
+
+                    <div id="tglPenugasanContainer" class="space-y-4"></div>
                 </div>
 
                 <!-- TOMBOL TAMBAH RK ANGGOTA -->
-                <div class="flex flex-col gap-2 md:flex-row md:items-center">
+                <div class="flex flex-col gap-2 md:flex-row md:items-center mt-4">
                     <div class="md:w-1/4"></div>
                     <div class="md:w-3/4">
                         <button type="button" @click="tambahTanggalPenugasan()"
@@ -634,72 +637,71 @@
         document.getElementById('savePenugasanButton')?.addEventListener('click', savePenugasan);
     });
 
+    let tanggalPenugasanCounter = 0;
+    let detailAnggotaCounter = {};
     function tambahTanggalPenugasan() {
-        let tanggalPenugasanCounter = 0;
-        let detailAnggotaCounter = {};
-
         tanggalPenugasanCounter++;
         const sectionIndex = tanggalPenugasanCounter;
         const sectionId = `tgl-penugasan-${sectionIndex}`;
         detailAnggotaCounter[sectionId] = 0;
 
+        const wrapper = document.getElementById('tglPenugasanWrapper');
+        const container = document.getElementById('tglPenugasanContainer');
+
+        // tampilkan wrapper kalau pertama kali
+        if (wrapper.classList.contains('hidden')) {
+            wrapper.classList.remove('hidden');
+        }
+
         const sectionHTML = `
-            <input type="hidden" name="rk_section_keys[]" value="${sectionId}">
+            <div id="${sectionId}" class="relative border border-gray-200 rounded-lg p-4 bg-white">
+                <button
+                    type="button"
+                    onclick="hapusTanggalPenugasan('${sectionId}')"
+                    class="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition">
+                    ✕
+                </button>
+                <input type="hidden" name="rk_section_keys[]" value="${sectionId}">
 
-            <div class="flex flex-row justify-between items-center gap-6">
-                <div class="flex-1">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Tanggal Mulai <span class="text-red-500">*</span>
-                    </label>
-                    <x-form.date-picker
-                        x-model="formData.tanggal_mulai"
-                        id="tanggal_mulai"
-                        name="tanggal_mulai"
-                        placeholder="Tanggal Mulai"
-                        ::minDate="formData.min_date"
-                        ::maxDate="formData.max_date"
-                        minBind="formData.min_date"
-                        maxBind="formData.max_date"
-                    />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_mulai">Tanggal mulai wajib dipilih</p>
+                <div class="flex flex-row justify-between items-center gap-6">
+                    <div class="flex-1">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Tanggal Mulai <span class="text-red-500">*</span>
+                        </label>
+                        <x-form.date-picker
+                            id="tanggal_mulai_${sectionIndex}"
+                            name="tanggal_mulai_list[]"
+                            placeholder="Tanggal Mulai"
+                            ::minDate="formData.min_date"
+                            ::maxDate="formData.max_date"
+                            minBind="formData.min_date"
+                            maxBind="formData.max_date"
+                        />
+                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_mulai">Tanggal mulai wajib dipilih</p>
+                    </div>
+
+                    <div class="flex-1">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Tanggal Berakhir (Deadline) <span class="text-red-500">*</span>
+                        </label>
+                        <x-form.date-picker
+                            id="tanggal_selesai_${sectionIndex}"
+                            name="tanggal_selesai_list[]"
+                            placeholder="Tanggal Selesai"
+                            ::minDate="formData.min_date"
+                            ::maxDate="formData.max_date"
+                            minBind="formData.min_date"
+                            maxBind="formData.max_date"
+                        />
+                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_selesai">Tanggal selesai wajib dipilih</p>
+                    </div>
                 </div>
-
-                <div class="flex-1">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Tanggal Berakhir (Deadline) <span class="text-red-500">*</span>
-                    </label>
-                    <x-form.date-picker
-                        x-model="formData.tanggal_selesai"
-                        id="tanggal_selesai"
-                        name="tanggal_selesai"
-                        placeholder="Tanggal Selesai"
-                        ::minDate="formData.min_date"
-                        ::maxDate="formData.max_date"
-                        minBind="formData.min_date"
-                        maxBind="formData.max_date"
-                    />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_selesai">Tanggal selesai wajib dipilih</p>
-                </div>
-
                 <div id="detail-${sectionId}" class="space-y-4"></div>
             </div>
         `;
 
-        const container = document.getElementById('tglPenugasanContainer');
+        // const container = document.getElementById('tglPenugasanContainer');
         container.insertAdjacentHTML('beforeend', sectionHTML);
-
-        const sectionElement = document.getElementById(sectionId);
-        if (sectionElement) {
-            const today = new Date().toISOString().split('T')[0];
-            const nextWeek = new Date();
-            nextWeek.setDate(nextWeek.getDate() + 7);
-            const nextWeekFormatted = nextWeek.toISOString().split('T')[0];
-
-            const tanggalMulaiInput = sectionElement.querySelector('input[name="tanggal_mulai[]"]');
-            const tanggalSelesaiInput = sectionElement.querySelector('input[name="tanggal_selesai[]"]');
-            if (tanggalMulaiInput) tanggalMulaiInput.value = today;
-            if (tanggalSelesaiInput) tanggalSelesaiInput.value = nextWeekFormatted;
-        }
 
         setTimeout(() => {
             document.getElementById(sectionId)?.scrollIntoView({
@@ -710,7 +712,16 @@
     }
 
     function hapusTanggalPenugasan(sectionId) {
+        // hapus section
         document.getElementById(sectionId)?.remove();
+
+        const container = document.getElementById('tglPenugasanContainer');
+        const wrapper = document.getElementById('tglPenugasanWrapper');
+
+        // kalau sudah tidak ada item lagi
+        if (!container || container.children.length === 0) {
+            wrapper.classList.add('hidden');
+        }
     }
 </script>
 

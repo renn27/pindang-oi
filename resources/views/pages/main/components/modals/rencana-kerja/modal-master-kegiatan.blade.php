@@ -12,17 +12,19 @@
 
         mode    = $event.detail.mode ?? 'create'
         itemKey  = $event.detail.key ?? null
-        formData = $event.detail.data ??
-                {
-                    id_bidang: '',
-                    nama_bidang: '',
-                    id_penanggung_jawab: '',
-                    nama_penanggung_jawab: '',
-                    tahun_kegiatan: '',
-                    rk_jpt : '',
-                    iki_jpt : '',
-                    nama_rk_kegiatan : '',
-                    ikiOptions: [] };
+        let baseData = $event.detail.data || {};
+        formData = {
+            id_bidang: '',
+            nama_bidang: '',
+            id_penanggung_jawab: '',
+            nama_penanggung_jawab: '',
+            tahun_kegiatan: '',
+            rk_jpt : '',
+            iki_jpt : '',
+            nama_rk_kegiatan : '',
+            ikiOptions: [],
+            ...baseData 
+        };
 
         selectedId = formData.id_penanggung_jawab ?? '';
         search = formData.nama_penanggung_jawab ?? '';
@@ -30,7 +32,13 @@
         if(formData.rk_jpt) {
             fetch(`/rencana-indikator-jpt/${formData.rk_jpt}/indikator`)
                 .then(res => res.json())
-                .then(data => formData.ikiOptions = data);
+                .then(data => {
+                    formData.ikiOptions = data;
+                    const selectedIki = formData.iki_jpt;
+                    setTimeout(() => {
+                        formData.iki_jpt = selectedIki;
+                    }, 50);
+                });
         }
         ">
 

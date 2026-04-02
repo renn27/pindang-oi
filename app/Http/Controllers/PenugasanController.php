@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Penugasan;
-use App\Models\Pegawai;
-use App\Models\SubKegiatan;
 use App\Models\JenisKegiatan;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use App\Models\Pegawai;
+use App\Models\Penugasan;
+use App\Models\SubKegiatan;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class PenugasanController extends Controller
 {
@@ -24,9 +26,15 @@ class PenugasanController extends Controller
             'target' => ['required', 'integer', 'min:1'],
             'satuan_target' => ['required', 'string', 'max:50'],
 
+            'butuh_dl' => ['nullable', 'boolean'],
             'tanggal_mulai' => ['required', 'date'],
             'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
-            'butuh_dl' => ['nullable', 'boolean'],
+
+            // tanggal tambahan (OPSIONAL)
+            'tanggal_mulai_list' => ['nullable', 'array'],
+            'tanggal_mulai_list.*' => ['nullable', 'date'],
+            'tanggal_selesai_list' => ['nullable', 'array'],
+            'tanggal_selesai_list.*' => ['nullable', 'date'],
         ]);
 
         /**
@@ -53,12 +61,7 @@ class PenugasanController extends Controller
 
         unset($validated['jenis_kegiatan_baru']);
 
-        /**
-         * 🔐 SERVER-SIDE DL VALIDATION
-         * (jangan percaya UI sepenuhnya)
-         */
         $jenisKegiatan = JenisKegiatan::find($validated['id_jenis_kegiatan']);
-
         $wajibDl = in_array($jenisKegiatan->jenis_kegiatan, [
             'Perjalanan Dinas',
             'Supervisi',
@@ -68,21 +71,85 @@ class PenugasanController extends Controller
 
         // Ambil input toggle DL (0 / 1)
         $requestButuhDl = (bool) ($validated['butuh_dl'] ?? false);
-
         $butuhDl = $wajibDl || $requestButuhDl;
 
         $validated['butuh_dl'] = $butuhDl;
         $validated['status_dl'] = $butuhDl ? 'Menunggu' : null;
 
-
         // STATUS AWAL PENUGASAN
         $validated['status'] = 'Belum Dikirim';
 
+        // VALIDASI RANGE SUB KEGIATAN
+        $min = $subKegiatan->tanggal_mulai;
+        $max = $subKegiatan->tanggal_selesai;
+
+        // Gabungkan tanggal utama dengan tanggal tambahan (jika ada)
+        $mulaiList = $request->tanggal_mulai_list ?? [];
+        $selesaiList = $request->tanggal_selesai_list ?? [];
+        
+        $allDates = [];
+        
+        // Masukkan tanggal utama
+        $allDates[] = [
+            'mulai' => $validated['tanggal_mulai'],
+            'selesai' => $validated['tanggal_selesai']
+        ];
+
+        // Masukkan tanggal tambahan
+        foreach ($mulaiList as $index => $tglMulai) {
+            $tglSelesai = $selesaiList[$index] ?? null;
+            if ($tglMulai && $tglSelesai) {
+                $allDates[] = [
+                    'mulai' => $tglMulai,
+                    'selesai' => $tglSelesai
+                ];
+            }
+        }
+
+        $validDatesToSave = [];
+        $existingDates = [];
+
+        foreach ($allDates as $tgl) {
+            $tglMulai = $tgl['mulai'];
+            $tglSelesai = $tgl['selesai'];
+            
+            // hindari duplikasi tanggal yang persis sama
+            $dateKey = $tglMulai . '|' . $tglSelesai;
+            if (in_array($dateKey, $existingDates)) continue;
+            $existingDates[] = $dateKey;
+
+            // validasi pasangan
+            if ($tglSelesai < $tglMulai) {
+                throw ValidationException::withMessages([
+                    'tanggal_selesai' => 'Tanggal selesai tidak boleh sebelum tanggal mulai'
+                ]);
+            }
+
+            // validasi range sub kegiatan
+            if ($tglMulai < $min || $tglSelesai > $max) {
+                throw ValidationException::withMessages([
+                    'tanggal_mulai' => 'Tanggal penugasan di luar rentang sub kegiatan'
+                ]);
+            }
+
+            $validDatesToSave[] = [
+                'mulai' => $tglMulai,
+                'selesai' => $tglSelesai
+            ];
+        }
+
+        DB::beginTransaction();
         try {
-            /**
-             * ✅ BUAT PENUGASAN
-             */
-            $subKegiatan->penugasans()->create($validated);
+            foreach ($validDatesToSave as $tgl) {
+                // Set array validasi dengan tanggal masing-masing iterasi
+                $validated['tanggal_mulai'] = $tgl['mulai'];
+                $validated['tanggal_selesai'] = $tgl['selesai'];
+
+                // Create terpisah untuk masing-masing tanggal sesuai request
+                $penugasan = $subKegiatan->penugasans()->create($validated);
+            }
+
+            DB::commit();
 
             // /**
             //  * 🔄 SET ACTIVE ROLE PEGAWAI → ANGGOTA TIM (KONTEKSTUAL)
@@ -102,7 +169,8 @@ class PenugasanController extends Controller
                 ])
                 ->with('success', 'Penugasan kepada anggota berhasil dilakukan.');
         } catch (\Exception $e) {
-            // dd($e->getMessage());
+            DB::rollBack();
+            Log::error('Gagal membuat penugasan: ' . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'Gagal membuat penugasan kepada anggota. Silakan coba lagi.')
                 ->withInput();
@@ -173,8 +241,10 @@ class PenugasanController extends Controller
             $validated['status_dl'] = null;
         }
 
+        $updateData = $validated;
         try {
-            $penugasan->update($validated);
+            // Update data parent (utama)
+            $penugasan->update($updateData);
 
             return redirect()
                 ->route('sub.kegiatan.show', [
@@ -183,7 +253,7 @@ class PenugasanController extends Controller
                 ])
                 ->with('success', 'Data Penugasan kepada anggota berhasil diperbarui.');
         } catch (\Exception $e) {
-            dd($e->getMessage());
+            Log::error('Update error: ' . $e->getMessage());
 
             return redirect()->back()
                 ->with('error', 'Gagal memperbarui data penugasan kepada anggota. Silakan coba lagi.')
@@ -233,7 +303,7 @@ class PenugasanController extends Controller
             return redirect()->back()
                 ->with('success', 'Status Dinas Luar berhasil diperbarui.');
         } catch (\Exception $e) {
-            dd($e->getMessage());
+            Log::error('Update error: ' . $e->getMessage());
 
             return redirect()->back()
                 ->with('error', 'Gagal memperbarui data status Dinas Luar. Silakan coba lagi.')
