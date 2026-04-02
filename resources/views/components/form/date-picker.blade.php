@@ -33,11 +33,12 @@
 
             this.flatpickrInstance = flatpickr(this.$refs.dateInput, {
                 mode: '{{ $mode }}',
-                static: true,
+                position: 'auto center',
                 monthSelectorType: 'static',
                 dateFormat: '{{ $dateFormat }}',
                 minDate: initialMin || null,
                 maxDate: initialMax || null,
+                disableMobile: true,
                 onOpen: (selectedDates, dateStr, instance) => {
                     // Dynamically update limits in case the root data changed
                     let openMin = this.$el.getAttribute('mindate') || this.$el.getAttribute('minDate');
@@ -55,6 +56,16 @@
             if (this.value) {
                 this.flatpickrInstance.setDate(this.value, true);
             }
+
+            // Observer to close Flatpickr if the modal/input hides
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting && this.flatpickrInstance && this.flatpickrInstance.isOpen) {
+                        this.flatpickrInstance.close();
+                    }
+                });
+            });
+            observer.observe(this.$refs.dateInput);
         });
     },
 }" x-init="init()" x-effect="syncLimits()" x-modelable="value" {{ $attributes }}>
