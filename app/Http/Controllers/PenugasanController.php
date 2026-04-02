@@ -79,66 +79,15 @@ class PenugasanController extends Controller
         // STATUS AWAL PENUGASAN
         $validated['status'] = 'Belum Dikirim';
 
-        // VALIDASI RANGE SUB KEGIATAN
-        $min = $subKegiatan->tanggal_mulai;
-        $max = $subKegiatan->tanggal_selesai;
-
-        // Gabungkan tanggal utama dengan tanggal tambahan (jika ada)
-        $mulaiList = $request->tanggal_mulai_list ?? [];
-        $selesaiList = $request->tanggal_selesai_list ?? [];
-        
-        $allDates = [];
-        
-        // Masukkan tanggal utama
-        $allDates[] = [
-            'mulai' => $validated['tanggal_mulai'],
-            'selesai' => $validated['tanggal_selesai']
-        ];
-
-        // Masukkan tanggal tambahan
-        foreach ($mulaiList as $index => $tglMulai) {
-            $tglSelesai = $selesaiList[$index] ?? null;
-            if ($tglMulai && $tglSelesai) {
-                $allDates[] = [
-                    'mulai' => $tglMulai,
-                    'selesai' => $tglSelesai
-                ];
-            }
-        }
-
-        $validDatesToSave = [];
-        $existingDates = [];
-
-        foreach ($allDates as $tgl) {
-            $tglMulai = $tgl['mulai'];
-            $tglSelesai = $tgl['selesai'];
-            
-            // hindari duplikasi tanggal yang persis sama
-            $dateKey = $tglMulai . '|' . $tglSelesai;
-            if (in_array($dateKey, $existingDates)) continue;
-            $existingDates[] = $dateKey;
-
-            // validasi pasangan
-            if ($tglSelesai < $tglMulai) {
-                throw ValidationException::withMessages([
-                    'tanggal_selesai' => 'Tanggal selesai tidak boleh sebelum tanggal mulai'
-                ]);
-            }
-
-            // validasi range sub kegiatan
-            if ($tglMulai < $min || $tglSelesai > $max) {
-                throw ValidationException::withMessages([
-                    'tanggal_mulai' => 'Tanggal penugasan di luar rentang sub kegiatan'
-                ]);
-            }
-
-            $validDatesToSave[] = [
-                'mulai' => $tglMulai,
-                'selesai' => $tglSelesai
-            ];
-        }
+        $validDatesToSave = $this->extractAndValidateDates(
+            $request,
+            $validated,
+            $subKegiatan->tanggal_mulai,
+            $subKegiatan->tanggal_selesai
+        );
 
         DB::beginTransaction();
+        
         try {
             foreach ($validDatesToSave as $tgl) {
                 // Set array validasi dengan tanggal masing-masing iterasi
@@ -169,8 +118,9 @@ class PenugasanController extends Controller
                 ])
                 ->with('success', 'Penugasan kepada anggota berhasil dilakukan.');
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Gagal membuat penugasan: ' . $e->getMessage());
+            dd($e->getMessage());
+            // DB::rollBack();
+            // Log::error('Gagal membuat penugasan: ' . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'Gagal membuat penugasan kepada anggota. Silakan coba lagi.')
                 ->withInput();
@@ -257,37 +207,24 @@ class PenugasanController extends Controller
             $penugasan->update($updateData);
 
             // Jika ada tanggal tambahan, buat row baru
-            $mulaiList = $request->tanggal_mulai_list ?? [];
-            $selesaiList = $request->tanggal_selesai_list ?? [];
+            $validDatesToSave = $this->extractAndValidateDates(
+                $request,
+                $validated,
+                $subKegiatan->tanggal_mulai,
+                $subKegiatan->tanggal_selesai,
+                true // skip main date extraction because updateData already handles main date update
+            );
 
-            foreach ($mulaiList as $index => $tglMulai) {
-                $tglSelesai = $selesaiList[$index] ?? null;
-                if ($tglMulai && $tglSelesai) {
-                    
-                    // Validasi range sub kegiatan
-                    $min = $subKegiatan->tanggal_mulai;
-                    $max = $subKegiatan->tanggal_selesai;
-
-                    if ($tglMulai < $min || $tglSelesai > $max) {
-                        throw ValidationException::withMessages([
-                            'tanggal_mulai_list.' . $index => 'Tanggal penugasan di luar rentang sub kegiatan'
-                        ]);
-                    }
-
-                    if ($tglSelesai < $tglMulai) {
-                        throw ValidationException::withMessages([
-                            'tanggal_selesai_list.' . $index => 'Tanggal selesai tidak boleh sebelum tanggal mulai'
-                        ]);
-                    }
-
+            foreach ($validDatesToSave as $tgl) {
+                if (!empty($tgl['mulai']) || !empty($tgl['selesai'])) {
                     Penugasan::create([
                         'id_anggota' => $validated['id_anggota'],
                         'id_sub_kegiatan' => $penugasan->id_sub_kegiatan,
                         'id_jenis_kegiatan' => $validated['id_jenis_kegiatan'],
                         'target' => $validated['target'],
                         'satuan_target' => $validated['satuan_target'],
-                        'tanggal_mulai' => $tglMulai,
-                        'tanggal_selesai' => $tglSelesai,
+                        'tanggal_mulai' => $tgl['mulai'],
+                        'tanggal_selesai' => $tgl['selesai'],
                         'status' => $penugasan->status,
                         'status_dl' => $validated['status_dl'] ?? null,
                         'butuh_dl' => $validated['butuh_dl'],
@@ -361,5 +298,64 @@ class PenugasanController extends Controller
                 ->with('error', 'Gagal memperbarui data status Dinas Luar. Silakan coba lagi.')
                 ->withInput();
         }
+    }
+
+    /**
+     * Helper to extract flat dates array from main and additional dates,
+     * and validate them against SubKegiatan bounds.
+     */
+    private function extractAndValidateDates(Request $request, array $validated, $subKegiatanMulai, $subKegiatanSelesai, $skipMain = false): array
+    {
+        $allDates = [];
+
+        if (!$skipMain) {
+            $allDates[] = [
+                'mulai' => $validated['tanggal_mulai'] ?? null,
+                'selesai' => $validated['tanggal_selesai'] ?? null
+            ];
+        }
+
+        $mulaiList = $request->tanggal_mulai_list ?? [];
+        $selesaiList = $request->tanggal_selesai_list ?? [];
+        foreach ($mulaiList as $index => $tglMulai) {
+            $tglSelesai = $selesaiList[$index] ?? null;
+            if ($tglMulai && $tglSelesai) {
+                $allDates[] = ['mulai' => $tglMulai, 'selesai' => $tglSelesai];
+            }
+        }
+
+        $min = $subKegiatanMulai ? \Carbon\Carbon::parse((string)$subKegiatanMulai)->startOfDay() : null;
+        $max = $subKegiatanSelesai ? \Carbon\Carbon::parse((string)$subKegiatanSelesai)->startOfDay() : null;
+        
+        $validDatesToSave = [];
+        $existing = [];
+
+        foreach ($allDates as $tgl) {
+            $m = $tgl['mulai'];
+            $s = $tgl['selesai'];
+
+            if (empty($m) && empty($s)) {
+                $validDatesToSave[] = ['mulai' => null, 'selesai' => null];
+                continue;
+            }
+
+            // Hindari duplikat
+            $key = $m . '|' . $s;
+            if (in_array($key, $existing)) continue;
+            $existing[] = $key;
+
+            $cm = \Carbon\Carbon::parse($m)->startOfDay();
+            $cs = \Carbon\Carbon::parse($s)->startOfDay();
+
+            if ($cs->lt($cm) || ($min && $cm->lt($min)) || ($max && $cs->gt($max))) {
+                throw ValidationException::withMessages([
+                    'tanggal_mulai' => 'Tanggal penugasan tidak valid atau di luar rentang sub kegiatan.'
+                ]);
+            }
+            
+            $validDatesToSave[] = ['mulai' => $m, 'selesai' => $s];
+        }
+
+        return $validDatesToSave;
     }
 }
