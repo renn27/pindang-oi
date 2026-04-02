@@ -119,6 +119,11 @@ class PenugasanPolicy
         return true;
     }
 
+    public function cancelSend(Pegawai $pegawai, Penugasan $penugasan): bool
+    {
+        return $this->isAssignedAnggota($pegawai, $penugasan);
+    }
+
     // === PENERIMAAN ===
     public function receive(Pegawai $pegawai, Penugasan $penugasan): bool
     {

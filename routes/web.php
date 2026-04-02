@@ -97,6 +97,9 @@ Route::middleware('auth')->group(function () {
     });
     // END KEGIATAN & SUB KEGIATAN BY KETUA TIM
 
+    // CRUD PENGIRIMAN BY ANGGOTA TIM (DESTROY KELUAR DARI SCOPE AGAR CLEAN)
+    Route::delete('pengirimans/{pengiriman:id_pengiriman}', [PengirimanController::class, 'destroy'])->name('pengiriman.delete');
+
     // CRUD PENUGASAN  BY KETUA TIM
     Route::prefix('sub-kegiatan/{subKegiatan:id_sub_kegiatan}')->group(function () {
         // CRUD PENUGASAN BY KETUA TIM
@@ -108,6 +111,7 @@ Route::middleware('auth')->group(function () {
             // CRUD PENGIRIMAN BY ANGGOTA TIM
             Route::prefix('{penugasan:id_penugasan}/pengirimans')->group(function () {
                 Route::post('/', [PengirimanController::class, 'store'])->name('pengiriman.store')->middleware('can:send,penugasan'); // create pengiriman
+
 
                 Route::prefix('{pengirimans:id_pengiriman}/penerimaan')->middleware('can:receive,penugasan')->group(function () {
                     Route::post('/', [PenerimaanController::class, 'store'])->name('penerimaan.store'); // create penerimaan

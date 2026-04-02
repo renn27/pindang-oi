@@ -327,9 +327,11 @@
                                                         data: {
                                                             id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                             nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                            id_anggota: '{{ $penugasan->id_anggota }}',
                                                             historiData: @js(
                                                             $penugasan->pengirimans->sortByDesc(fn($p) => $p->tanggal_pengiriman)->map(
                                                                 fn($p) => [
+                                                                    'id_pengiriman' => $p->id_pengiriman,
                                                                     'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
                                                                     'jumlah_dikirim' => $p->jumlah_dikirim,
                                                                     'media_pengiriman' => $p->media_pengiriman,
@@ -337,7 +339,7 @@
                                                                     'status' => $p->penerimaan?->status ?? 'Menunggu Diperiksa',
                                                                     'catatan' => $p->penerimaan?->catatan,
                                                                 ],
-                                                            ),
+                                                            )->values(),
                                                         )}
                                                         })">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -1164,11 +1166,14 @@
                                                     @click="$dispatch('open-smart-modal', {
                                                         modalId: 'modal-histori-pengiriman',
                                                         data: {
+                                                            id_sub_kegiatan: '{{ $subKegiatan->id_sub_kegiatan }}',
                                                             id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                             nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                            id_anggota: '{{ $penugasan->id_anggota }}',
                                                             historiData: @js(
     $penugasan->pengirimans->sortByDesc(fn($p) => $p->tanggal_pengiriman)->map(
         fn($p) => [
+            'id_pengiriman' => $p->id_pengiriman,
             'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
             'jumlah_dikirim' => $p->jumlah_dikirim,
             'media_pengiriman' => $p->media_pengiriman,
@@ -1176,7 +1181,7 @@
             'status' => $p->penerimaan?->status ?? 'Menunggu Diperiksa',
             'catatan' => $p->penerimaan?->catatan,
         ],
-    ),
+    )->values(),
 )}
                                                         })">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"

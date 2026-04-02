@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Penugasan;
 use App\Models\SubKegiatan;
+use App\Models\Pengiriman;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -116,6 +117,42 @@ class PengirimanController extends Controller
                 ->back()
                 ->with('error', 'Gagal mengirimkan hasil kerja. Silakan coba lagi.')
                 ->withInput();
+        }
+    }
+
+    public function destroy(Request $request, Pengiriman $pengiriman)
+    {
+        $penugasan = $pengiriman->penugasan;
+        $this->authorize('cancelSend', $penugasan);
+
+        // Pastikan pengiriman ini bukan pengiriman yang sudah memiliki penerimaan
+        if ($pengiriman->penerimaan) {
+            return redirect()->back()->with('error', 'Data pengiriman tidak bisa dibatalkan karena sudah ditanggapi oleh Ketua Tim.');
+        }
+
+        try {
+            DB::transaction(function () use ($penugasan, $pengiriman) {
+                $pengiriman->delete();
+
+                // Cek jika tidak ada pengiriman lagi, kembalikan status penugasan
+                $remainingCount = $penugasan->pengirimans()->count();
+                if ($remainingCount === 0) {
+                    $penugasan->update(['status' => 'Belum Dikirim']);
+                }
+            });
+
+            return redirect()
+                ->route('sub.kegiatan.show', [
+                    'kegiatan'    => $penugasan->subKegiatan->kegiatan->id_kegiatan,
+                    'subKegiatan' => $penugasan->subKegiatan->id_sub_kegiatan,
+                ])
+                ->with('success', 'Pengiriman kerja berhasil dibatalkan.');
+                
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Cancel pengiriman error: ' . $e->getMessage());
+            return redirect()
+                ->back()
+                ->with('error', 'Gagal membatalkan pengiriman. Silakan coba lagi.');
         }
     }
 

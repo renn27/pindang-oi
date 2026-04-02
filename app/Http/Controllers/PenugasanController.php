@@ -192,6 +192,12 @@ class PenugasanController extends Controller
             'tanggal_mulai' => ['nullable', 'date'],
             'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
             'butuh_dl' => ['nullable', 'boolean'],
+
+            // tanggal tambahan (OPSIONAL)
+            'tanggal_mulai_list' => ['nullable', 'array'],
+            'tanggal_mulai_list.*' => ['nullable', 'date'],
+            'tanggal_selesai_list' => ['nullable', 'array'],
+            'tanggal_selesai_list.*' => ['nullable', 'date'],
         ]);
 
         /**
@@ -242,9 +248,54 @@ class PenugasanController extends Controller
         }
 
         $updateData = $validated;
+        unset($updateData['tanggal_mulai_list']);
+        unset($updateData['tanggal_selesai_list']);
+
+        DB::beginTransaction();
         try {
             // Update data parent (utama)
             $penugasan->update($updateData);
+
+            // Jika ada tanggal tambahan, buat row baru
+            $mulaiList = $request->tanggal_mulai_list ?? [];
+            $selesaiList = $request->tanggal_selesai_list ?? [];
+
+            foreach ($mulaiList as $index => $tglMulai) {
+                $tglSelesai = $selesaiList[$index] ?? null;
+                if ($tglMulai && $tglSelesai) {
+                    
+                    // Validasi range sub kegiatan
+                    $min = $subKegiatan->tanggal_mulai;
+                    $max = $subKegiatan->tanggal_selesai;
+
+                    if ($tglMulai < $min || $tglSelesai > $max) {
+                        throw ValidationException::withMessages([
+                            'tanggal_mulai_list.' . $index => 'Tanggal penugasan di luar rentang sub kegiatan'
+                        ]);
+                    }
+
+                    if ($tglSelesai < $tglMulai) {
+                        throw ValidationException::withMessages([
+                            'tanggal_selesai_list.' . $index => 'Tanggal selesai tidak boleh sebelum tanggal mulai'
+                        ]);
+                    }
+
+                    Penugasan::create([
+                        'id_anggota' => $validated['id_anggota'],
+                        'id_sub_kegiatan' => $penugasan->id_sub_kegiatan,
+                        'id_jenis_kegiatan' => $validated['id_jenis_kegiatan'],
+                        'target' => $validated['target'],
+                        'satuan_target' => $validated['satuan_target'],
+                        'tanggal_mulai' => $tglMulai,
+                        'tanggal_selesai' => $tglSelesai,
+                        'status' => $penugasan->status,
+                        'status_dl' => $validated['status_dl'] ?? null,
+                        'butuh_dl' => $validated['butuh_dl'],
+                    ]);
+                }
+            }
+
+            DB::commit();
 
             return redirect()
                 ->route('sub.kegiatan.show', [
@@ -253,6 +304,7 @@ class PenugasanController extends Controller
                 ])
                 ->with('success', 'Data Penugasan kepada anggota berhasil diperbarui.');
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Update error: ' . $e->getMessage());
 
             return redirect()->back()

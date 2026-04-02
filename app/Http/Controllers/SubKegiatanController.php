@@ -66,7 +66,7 @@ class SubKegiatanController extends Controller
             ->orderBy('jenis_kegiatan', 'asc')
             ->get();
 
-        $penugasans = $subKegiatan->penugasans()->get();
+        $penugasans = $subKegiatan->penugasans()->orderBy('tanggal_mulai', 'asc')->get();
 
         // === FILTER BUTUH DL / TIDAK BUTUH DL ===
         $penugasanButuhDL = $penugasans->filter(fn ($row) => $row->butuh_dl);
