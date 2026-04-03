@@ -1,4 +1,4 @@
-{{-- Modal Master Kegiatan --}}
+﻿{{-- Modal Master Kegiatan --}}
 <x-ui.smart-modal id="modal-master-kegiatan" class="max-w-4xl"
     x-data="{
             formData: { rk_jpt:'', iki_jpt:'', ikiOptions:[] },
@@ -86,7 +86,6 @@
                         <div class="md:w-3/4">
                             <input type="text" name="tahun_kegiatan" id="tahunInput" value="{{ now()->format('Y') }}"
                                 class="h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
-                            <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tahunInput">Tahun wajib diisi</p>
                         </div>
                     </div>
 
@@ -116,7 +115,6 @@
                                 </option>
                                 @endforeach
                             </select>
-                            <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="rk_jpt">Rencana JPT wajib dipilih</p>
                         </div>
                     </div>
 
@@ -136,7 +134,6 @@
                                     </option>
                                 </template>
                             </select>
-                            <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="iki_jpt">Indikator JPT wajib dipilih</p>
                         </div>
                     </div>
 
@@ -239,7 +236,6 @@
                                     </div>
                                 </template>
                             </div>
-                            <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="ketuaSearchInput">Ketua wajib dipilih dari daftar (pastikan klik nama dari dropdown)</p>
                         </div>
                     </div>
 
@@ -251,7 +247,6 @@
                         <div class="md:w-3/4">
                             <input type="text" placeholder="Tulis Nama Kegiatan" name="nama_rk_kegiatan" id="rkKetua"
                                 class="h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
-                            <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="rkKetua">Nama kegiatan wajib diisi</p>
                         </div>
                     </div>
 

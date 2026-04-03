@@ -1,4 +1,4 @@
-@extends('layouts.dashboard')
+﻿@extends('layouts.dashboard')
 
 @section('content')
     <x-common.page-breadcrumb pageTitle="{{ $title }}" />
@@ -115,7 +115,6 @@
                         <input type="text" x-model="formData.nama_kegiatan" name="nama_kegiatan" id="nama_kegiatan"
                             placeholder="Masukkan Nama Kegiatan"
                             class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="nama_kegiatan">Nama kegiatan wajib diisi</p>
                     </div>
 
                     <!-- Waktu Mulai -->
@@ -125,7 +124,6 @@
                         </label>
                         <x-form.date-picker id="tanggal_mulai" x-model="formData.tanggal_mulai" name="tanggal_mulai"
                             placeholder="Pilih Tanggal" />
-                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_mulai">Waktu mulai wajib dipilih</p>
                     </div>
 
                     <!-- Waktu Selesai -->
@@ -135,7 +133,6 @@
                         </label>
                         <x-form.date-picker id="tanggal_selesai" name="tanggal_selesai" x-model="formData.tanggal_selesai"
                             placeholder="Pilih Tanggal" />
-                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_selesai">Waktu selesai wajib dipilih</p>
                     </div>
 
                     <!-- Rencana JPT -->
@@ -157,7 +154,6 @@
                                 </option>
                             @endforeach
                         </select>
-                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="id_rencana_jpt">Rencana JPT wajib dipilih</p>
                     </div>
 
                     <!-- Indikator JPT -->
@@ -171,8 +167,6 @@
         class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
         <option value="">-- Harap pilih RK JPT dulu --</option>
     </select>
-    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden"
-        data-for="id_indikator_jpt">Indikator JPT wajib dipilih</p>
 </div>
 
                     <!-- Link Bukti -->
@@ -183,7 +177,6 @@
                         <input type="url" x-model="formData.link_bukti" name="link_bukti" id="link_bukti"
                             placeholder="https://example.com/bukti"
                             class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="link_bukti">Link bukti harus berupa URL yang valid</p>
                     </div>
 
                     <!-- Status -->
@@ -196,7 +189,6 @@
                             <option value="Selesai" class="dark:text-gray-300">Selesai</option>
                             <option value="Belum Selesai" class="dark:text-gray-300">Belum Selesai</option>
                         </select>
-                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="status">Status wajib dipilih</p>
                     </div>
                 </div>
 

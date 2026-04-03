@@ -15,24 +15,13 @@
             rk_jpt: '',
             iki_jpt: '',
             nama_rk_kegiatan: '',
-            ikiOptions: [], // Ensure this property ALWAYS exists to track reactivity
+            _pendingIndikatorId: '', // For holding IKI value on edit load
             ...baseData
         };
 
         // Sinkronkan state untuk dropdown autocomplete
         selectedId = formData.id_penanggung_jawab ?? '';
         search = formData.nama_penanggung_jawab ?? '';
-
-        $nextTick(async () => {
-            if (formData.rk_jpt) {
-                const selectedIki = formData.iki_jpt;
-                await loadIkiByRk(formData.rk_jpt, formData);
-                
-                setTimeout(() => {
-                    formData.iki_jpt = selectedIki;
-                 }, 50);
-            }
-        });
     ">
 
     <form
@@ -129,7 +118,7 @@
                                         x-text="pegawai.nama_pegawai"></div>
                                 </button>
                             </template>
-                            {{-- <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="ketuaSearchInput">Ketua wajib dipilih dari daftar (pastikan klik nama dari dropdown)</p> --}}
+                            {{-- --}}
                         </div>
                     </div>
                 </div>
@@ -141,7 +130,6 @@
                     </label>
                     <input type="text" x-model="formData.tahun_kegiatan" name="tahun_kegiatan" id="tahun_kegiatan" placeholder="Contoh : 2026"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tahun_kegiatan">Tahun wajib diisi</p>
                 </div>
 
                 {{-- Rencana JPT --}}
@@ -152,7 +140,8 @@
                     <select id="rk_jpt" name="rk_jpt" x-model="formData.rk_jpt"
                         @change="
                             formData.iki_jpt = '';
-                            loadIkiByRk(formData.rk_jpt, formData)
+                            formData._pendingIndikatorId = '';
+                            loadIkiByRkForKegiatan(formData.rk_jpt, formData)
                             "
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                         <option value="" class="dark:text-gray-400">-- Pilih RK JPT --</option>
@@ -162,7 +151,6 @@
                             </option>
                         @endforeach
                     </select>
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="rk_jpt">Rencana JPT wajib dipilih</p>
                 </div>
 
                 {{-- Indikator JPT --}}
@@ -170,24 +158,12 @@
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Indikator JPT <span class="text-red-500">*</span>
                     </label>
-
-                    <select id="iki_jpt" name="iki_jpt" x-model="formData.iki_jpt"
+                    <input type="hidden" name="iki_jpt" id="iki_jpt_hidden">
+                    <select id="iki_jpt"
+                        @change="document.getElementById('iki_jpt_hidden').value = $event.target.value; formData.iki_jpt = $event.target.value;"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-
-                        <!-- OPTION DINAMIS -->
-                        <option value=""
-                            x-text="formData.rk_jpt
-                                    ? '-- Pilih IKI JPT --'
-                                    : '-- Harap pilih RK JPT dulu --'"
-                            class="dark:text-gray-400">
-                        </option>
-
-                        <template x-for="iki in formData.ikiOptions" :key="iki.id">
-                            <option :value="iki.id" x-text="iki.nama_indikator_jpt" class="dark:text-gray-300">
-                            </option>
-                        </template>
+                        <option value="">-- Harap pilih RK JPT dulu --</option>
                     </select>
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="iki_jpt">Indikator JPT wajib dipilih</p>
                 </div>
 
                 <div>
@@ -197,7 +173,6 @@
                     <input type="text" x-model="formData.nama_rk_kegiatan" name="nama_rk_kegiatan" id="nama_rk_kegiatan"
                         placeholder="Contoh : SNLIK2026"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="nama_rk_kegiatan">Nama kegiatan wajib diisi</p>
                 </div>
             </div>
 
@@ -377,11 +352,11 @@
 
         // --- 3. IKI JPT ---
         const ikiJptSelect = document.getElementById('iki_jpt');
-        if (!ikiJptSelect?.value) {
+        const ikiJptHidden = document.getElementById('iki_jpt_hidden');
+        if (!ikiJptSelect?.value || !ikiJptHidden?.value) {
             addError(
                 'Indikator JPT wajib dipilih',
-                ikiJptSelect, ikiJptSelect,
-                ikiJptSelect?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg')
+                ikiJptSelect, ikiJptSelect
             );
         }
 
@@ -467,5 +442,92 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('saveKegiatanButton')?.addEventListener('click', saveKegiatan);
+        
+        // Listen event open modal for pre-loading IKI and validation sync
+        window.addEventListener('open-smart-modal', function(e) {
+            const detail = e.detail;
+            if (detail.modalId !== 'modal-kegiatan' || detail.mode !== 'edit') return;
+            if (!detail.data?.rk_jpt) return;
+
+            // Simpan pending data
+            window._kegiatanEditPending = {
+                rkId: String(detail.data.rk_jpt),
+                indikatorId: String(detail.data.iki_jpt || '')
+            };
+
+            const checkAndLoad = (attempt) => {
+                const selectEl = document.getElementById('iki_jpt');
+                if (!selectEl) {
+                    if (attempt < 20) requestAnimationFrame(() => checkAndLoad(attempt + 1));
+                    return;
+                }
+
+                const modalEl = document.getElementById('modal-kegiatan');
+                const isVisible = modalEl && getComputedStyle(modalEl).display !== 'none';
+
+                if (isVisible && window._kegiatanEditPending) {
+                    const { rkId, indikatorId } = window._kegiatanEditPending;
+                    window._kegiatanEditPending = null;
+                    // Trigger load IKI manually using global formData object mapped to modal (handled by alpine, so we just call global function)
+                    loadIkiByRkForKegiatan(rkId, { _pendingIndikatorId: indikatorId });
+                } else if (attempt < 30) {
+                    requestAnimationFrame(() => checkAndLoad(attempt + 1));
+                }
+            };
+
+            requestAnimationFrame(() => checkAndLoad(0));
+        });
     });
+
+    // =============================================
+    // FUNGSI LOAD IKI BERDASARKAN RK
+    // =============================================
+    async function loadIkiByRkForKegiatan(rkId, formDataObj) {
+        const selectEl = document.getElementById('iki_jpt');
+        const hiddenEl = document.getElementById('iki_jpt_hidden');
+
+        if (!rkId) {
+            if (selectEl) {
+                selectEl.innerHTML = '<option value="">-- Harap pilih RK JPT dulu --</option>';
+            }
+            if (hiddenEl) hiddenEl.value = '';
+            // Reset global window variable if mapped
+            if (typeof formData !== 'undefined') formData.iki_jpt = '';
+            return;
+        }
+
+        if (selectEl) {
+            selectEl.innerHTML = '<option value="">Memuat...</option>';
+            selectEl.disabled = true;
+        }
+
+        try {
+            const response = await fetch(`/rencana-indikator-jpt/${rkId}/indikator`);
+            const data = await response.json();
+
+            if (!selectEl) return;
+
+            const pending = formDataObj._pendingIndikatorId ? String(formDataObj._pendingIndikatorId) : '';
+            formDataObj._pendingIndikatorId = '';
+
+            let html = '<option value="">-- Pilih IKI JPT --</option>';
+            data.forEach(iki => {
+                const selected = String(iki.id) === pending ? 'selected' : '';
+                html += `<option value="${iki.id}" ${selected}>${iki.nama_indikator_jpt}</option>`;
+            });
+
+            selectEl.innerHTML = html;
+            selectEl.disabled = false;
+
+            if (hiddenEl) hiddenEl.value = selectEl.value;
+            if (typeof formData !== 'undefined') formData.iki_jpt = selectEl.value;
+
+        } catch (error) {
+            console.error('Error loading IKI:', error);
+            if (selectEl) {
+                selectEl.innerHTML = '<option value="">Gagal memuat data</option>';
+                selectEl.disabled = false;
+            }
+        }
+    }
 </script>

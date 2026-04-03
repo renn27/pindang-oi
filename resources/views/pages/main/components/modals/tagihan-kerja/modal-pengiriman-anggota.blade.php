@@ -1,4 +1,4 @@
-<!-- Modal Tambah Pengiriman -->
+﻿<!-- Modal Tambah Pengiriman -->
 <x-ui.smart-modal id="modal-pengiriman-anggota" class="max-w-2xl"
     @open-smart-modal.window="
                     if ($event.detail.modalId !== 'modal-pengiriman-anggota') return;
@@ -74,7 +74,6 @@
                     </label>
                     <x-form.date-picker id="tanggal_pengiriman" name="tanggal_pengiriman" placeholder="Tanggal Pengiriman"
                         defaultDate="{{ now()->format('Y-m-d') }}" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_pengiriman">Tanggal pengiriman wajib dipilih</p>
                 </div>
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -82,7 +81,6 @@
                     </label>
                     <input type="number" name="jumlah_dikirim" id="jumlah_dikirim" placeholder="Masukkan jumlah pengiriman (hanya angka)"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="jumlah_dikirim">Jumlah dikirim wajib diisi</p>
                 </div>
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -90,7 +88,6 @@
                     </label>
                     <input type="text" name="media_pengiriman" id="media_pengiriman" placeholder="Masukkan jenis media pengiriman"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="media_pengiriman">Media pengiriman wajib diisi</p>
                 </div>
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -98,7 +95,6 @@
                     </label>
                     <input type="text" name="bukti_dukung" id="bukti_dukung" placeholder="Masukkan link bukti dukung pengiriman"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="bukti_dukung">Bukti dukung wajib disertakan</p>
                 </div>
 
             </div>

@@ -1,4 +1,4 @@
-@extends('layouts.dashboard')
+﻿@extends('layouts.dashboard')
 
 @section('content')
     <x-common.page-breadcrumb pageTitle="Master Kegiatan" />

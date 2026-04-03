@@ -108,7 +108,7 @@
                                         x-text="pegawai.nama_pegawai"></div>
                                 </button>
                             </template>
-                            {{-- <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="pegawaiSearchInput">Pegawai wajib dipilih dari daftar (pastikan klik nama dari dropdown)</p> --}}
+                            {{-- --}}
                         </div>
                     </div>
                 </div>
@@ -294,8 +294,6 @@
                     <input type="number" x-model="formData.target" name="target" id="target"
                         placeholder="Misalnya : 200"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="target">
-                        Target wajib diisi</p>
                 </div>
 
                 <div>
@@ -305,8 +303,6 @@
                     <input type="text" x-model="formData.satuan_target" name="satuan_target" id="satuan_target"
                         placeholder="Misalnya : Dokumen, Kegiatan, dll"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden"
-                        data-for="satuan_target">Satuan Target wajib diisi</p>
                 </div>
 
                 <div class="flex flex-row justify-between items-center gap-6">
@@ -317,8 +313,6 @@
                         <x-form.date-picker x-model="formData.tanggal_mulai" id="tanggal_mulai" name="tanggal_mulai"
                             placeholder="Tanggal Mulai" ::minDate="formData.min_date" ::maxDate="formData.max_date"
                             minBind="formData.min_date" maxBind="formData.max_date" />
-                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden"
-                            data-for="tanggal_mulai">Tanggal mulai wajib dipilih</p>
                     </div>
 
                     <div class="flex-1">
@@ -328,8 +322,6 @@
                         <x-form.date-picker x-model="formData.tanggal_selesai" id="tanggal_selesai"
                             name="tanggal_selesai" placeholder="Tanggal Selesai" ::minDate="formData.min_date" ::maxDate="formData.max_date"
                             minBind="formData.min_date" maxBind="formData.max_date" />
-                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden"
-                            data-for="tanggal_selesai">Tanggal selesai wajib dipilih</p>
                     </div>
                 </div>
 
@@ -569,6 +561,12 @@
                 tanggalSelesaiPenugasan, tanggalSelesaiPenugasan,
                 tanggalSelesaiPenugasanErrorMsg
             );
+        } else if (tanggalMulaiPenugasan?.value && tanggalSelesaiPenugasan.value < tanggalMulaiPenugasan.value) {
+            addError(
+                'Tanggal Selesai harus sesudah atau sama dengan Tanggal Mulai',
+                tanggalSelesaiPenugasan, tanggalSelesaiPenugasan,
+                tanggalSelesaiPenugasanErrorMsg
+            );
         }
 
         return errors;
@@ -673,7 +671,6 @@
                             minBind="formData.min_date"
                             maxBind="formData.max_date"
                         />
-                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_mulai">Tanggal mulai wajib dipilih</p>
                     </div>
 
                     <div class="flex-1">
@@ -689,7 +686,6 @@
                             minBind="formData.min_date"
                             maxBind="formData.max_date"
                         />
-                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_selesai">Tanggal selesai wajib dipilih</p>
                     </div>
                 </div>
                 <div id="detail-${sectionId}" class="space-y-4"></div>

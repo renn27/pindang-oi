@@ -5,15 +5,18 @@
         mode = $event.detail.mode ?? 'create';
         itemKey = $event.detail.key ?? null;
 
-        formData = $event.detail.data ?? {
+        let baseData = $event.detail.data || {};
+        formData = {
             id_kegiatan: '',
             nama_rk_kegiatan: '',
+            id_sub_kegiatan: '',
             nama_sub_kegiatan: '',
             target: '',
             satuan_target: '',
             tanggal_mulai: '',
             tanggal_selesai: '',
-        }">
+            ...baseData
+        };">
     <form
         id="addSubKegiatanForm"
         :action="mode === 'edit'
@@ -69,7 +72,6 @@
                     <input type="text" name="nama_sub_kegiatan" id="nama_sub_kegiatan" x-model="formData.nama_sub_kegiatan"
                         placeholder="Contoh : Penyiapan Peta"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="nama_sub_kegiatan">Sub kegiatan wajib diisi</p>
                 </div>
 
                 <div>
@@ -79,7 +81,6 @@
                     <input type="number" x-model="formData.target" name="target" id="target"
                         placeholder="Misalnya : 200"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="target">Target wajib diisi</p>
                 </div>
 
                 <div>
@@ -89,7 +90,6 @@
                     <input type="text" x-model="formData.satuan_target" name="satuan_target" id="satuan_target"
                         placeholder="Misalnya : Dokumen"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="satuan_target">Satuan target wajib diisi</p>
                 </div>
 
                 <div class="mb-4">
@@ -98,7 +98,6 @@
                     </label>
                     <x-form.date-picker id="tanggal_mulai" x-model="formData.tanggal_mulai" name="tanggal_mulai"
                         placeholder="Pilih Tanggal"/>
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_mulai">Tanggal mulai wajib dipilih</p>
                 </div>
 
                 <div class="mb-4">
@@ -107,7 +106,6 @@
                     </label>
                     <x-form.date-picker id="tanggal_selesai" name="tanggal_selesai" x-model="formData.tanggal_selesai"
                         placeholder="Pilih Tanggal" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_selesai">Tanggal selesai wajib dipilih</p>
                 </div>
             </div>
 
@@ -246,6 +244,12 @@
         if (!tanggalSelesaiSubKegiatan?.value?.trim()) {
             addError(
                 'Tanggal Selesai Sub Kegiatan wajib dipilih',
+                tanggalSelesaiSubKegiatan, tanggalSelesaiSubKegiatan,
+                tanggalSelesaiSubKegiatanErrorMsg
+            );
+        } else if (tanggalMulaiSubKegiatan?.value && tanggalSelesaiSubKegiatan.value < tanggalMulaiSubKegiatan.value) {
+            addError(
+                'Tanggal Selesai harus sesudah atau sama dengan Tanggal Mulai',
                 tanggalSelesaiSubKegiatan, tanggalSelesaiSubKegiatan,
                 tanggalSelesaiSubKegiatanErrorMsg
             );

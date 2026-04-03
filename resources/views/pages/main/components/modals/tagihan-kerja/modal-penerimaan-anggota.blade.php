@@ -1,4 +1,4 @@
-<!-- Modal Tambah Penerimaan -->
+﻿<!-- Modal Tambah Penerimaan -->
 <x-ui.smart-modal id="modal-penerimaan-anggota" class="max-w-2xl"
     @open-smart-modal.window="
         if ($event.detail.modalId !== 'modal-penerimaan-anggota') return;
@@ -74,7 +74,6 @@
                     </label>
                     <x-form.date-picker id="tanggal_penerimaan" name="tanggal_penerimaan" placeholder="Tanggal Penerimaan"
                         defaultDate="{{ now()->format('Y-m-d') }}" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_penerimaan">Tanggal penerimaan wajib dipilih</p>
                 </div>
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -83,7 +82,6 @@
                     <input type="text" name="jumlah_diterima" id="jumlah_diterima" x-model="formData.jumlah_diterima"
                         placeholder="Masukkan jumlah penerimaan"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="jumlah_diterima">Jumlah diterima wajib diisi</p>
                 </div>
                 <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -110,7 +108,6 @@
                             Revisi
                         </option>
                     </select>
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="status">Status penerimaan wajib dipilih</p>
 
                     <span
                         class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2
