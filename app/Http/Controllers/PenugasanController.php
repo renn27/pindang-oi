@@ -27,6 +27,7 @@ class PenugasanController extends Controller
             'satuan_target' => ['required', 'string', 'max:50'],
 
             'butuh_dl' => ['nullable', 'boolean'],
+            'butuh_translok' => ['nullable', 'boolean'],
             'tanggal_mulai' => ['required', 'date'],
             'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
 
@@ -70,11 +71,47 @@ class PenugasanController extends Controller
         ]);
 
         // Ambil input toggle DL (0 / 1)
+        // $requestButuhDl = (bool) ($validated['butuh_dl'] ?? false);
+        // $butuhDl = $wajibDl || $requestButuhDl;
+
+        // $validated['butuh_dl'] = $butuhDl;
+        // $validated['status_dl'] = $butuhDl ? 'Menunggu' : null;
+
+        // // Ambil input toggle Translok (0 / 1)
+        // $requestButuhTranslok = (bool) ($validated['butuh_translok'] ?? false);
+        // $butuhTranslok = $wajibDl || $requestButuhTranslok;
+
+        // $validated['butuh_translok'] = $butuhTranslok;
+        // $validated['status_translok'] = $butuhTranslok ? 'Menunggu' : null;
+
         $requestButuhDl = (bool) ($validated['butuh_dl'] ?? false);
-        $butuhDl = $wajibDl || $requestButuhDl;
+        $requestButuhTranslok = (bool) ($validated['butuh_translok'] ?? false);
+
+        // DEFAULT: semua false
+        $butuhDl = false;
+        $butuhTranslok = false;
+
+        if ($wajibDl) {
+            // Untuk 4 jenis kegiatan → wajib pilih salah satu
+            if ($requestButuhDl) {
+                $butuhDl = true;
+            } elseif ($requestButuhTranslok) {
+                $butuhTranslok = true;
+            } else {
+                // fallback (kalau user gak pilih apa2)
+                $butuhDl = true; // default ke DL (sesuai UI kamu)
+            }
+        } else {
+            // selain 4 jenis → tidak boleh keduanya
+            $butuhDl = false;
+            $butuhTranslok = false;
+        }
 
         $validated['butuh_dl'] = $butuhDl;
         $validated['status_dl'] = $butuhDl ? 'Menunggu' : null;
+
+        $validated['butuh_translok'] = $butuhTranslok;
+        $validated['status_translok'] = $butuhTranslok ? 'Menunggu' : null;
 
         // STATUS AWAL PENUGASAN
         $validated['status'] = 'Belum Dikirim';
@@ -87,7 +124,7 @@ class PenugasanController extends Controller
         );
 
         DB::beginTransaction();
-        
+
         try {
             foreach ($validDatesToSave as $tgl) {
                 // Set array validasi dengan tanggal masing-masing iterasi
@@ -118,7 +155,7 @@ class PenugasanController extends Controller
                 ])
                 ->with('success', 'Penugasan kepada anggota berhasil dilakukan.');
         } catch (\Exception $e) {
-            dd($e->getMessage());
+            // dd($e->getMessage());
             // DB::rollBack();
             // Log::error('Gagal membuat penugasan: ' . $e->getMessage());
             return redirect()->back()
@@ -142,6 +179,7 @@ class PenugasanController extends Controller
             'tanggal_mulai' => ['nullable', 'date'],
             'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
             'butuh_dl' => ['nullable', 'boolean'],
+            'butuh_translok' => ['nullable', 'boolean'],
 
             // tanggal tambahan (OPSIONAL)
             'tanggal_mulai_list' => ['nullable', 'array'],
@@ -182,20 +220,48 @@ class PenugasanController extends Controller
             'Pendataan',
         ]);
 
+        // $requestButuhDl = (bool) ($validated['butuh_dl'] ?? false);
+        // $requestButuhTranslok = (bool) ($validated['butuh_translok'] ?? false);
+
+        // // FINAL DECISION
+        // $validated['butuh_dl'] = $wajibDl || $requestButuhDl;
+        // $validated['butuh_translok'] = $wajibDl || $requestButuhTranslok;
+
         $requestButuhDl = (bool) ($validated['butuh_dl'] ?? false);
+        $requestButuhTranslok = (bool) ($validated['butuh_translok'] ?? false);
 
-        // FINAL DECISION
-        $butuhDl = $wajibDl || $requestButuhDl;
+        // DEFAULT
+        $butuhDl = false;
+        $butuhTranslok = false;
 
-        $validated['butuh_dl'] = $butuhDl;
-
-        if ($butuhDl) {
-            if ($penugasan->status_dl === null) {
-                $validated['status_dl'] = 'Menunggu';
+        if ($wajibDl) {
+            // hanya boleh pilih salah satu
+            if ($requestButuhDl) {
+                $butuhDl = true;
+            } elseif ($requestButuhTranslok) {
+                $butuhTranslok = true;
+            } else {
+                // fallback kalau kosong (biar aman)
+                $butuhDl = true;
             }
         } else {
-            $validated['status_dl'] = null;
+            // selain 4 jenis → tidak boleh keduanya
+            $butuhDl = false;
+            $butuhTranslok = false;
         }
+
+        $validated['butuh_dl'] = $butuhDl;
+        $validated['butuh_translok'] = $butuhTranslok;
+
+        // HANDLE STATUS DL
+        $validated['status_dl'] = $validated['butuh_dl']
+            ? ($penugasan->status_dl ?? 'Menunggu')
+            : null;
+
+        // HANDLE STATUS TRANSLOK
+        $validated['status_translok'] = $validated['butuh_translok']
+            ? ($penugasan->status_translok ?? 'Menunggu')
+            : null;
 
         $updateData = $validated;
         unset($updateData['tanggal_mulai_list']);
@@ -228,6 +294,7 @@ class PenugasanController extends Controller
                         'status' => $penugasan->status,
                         'status_dl' => $validated['status_dl'] ?? null,
                         'butuh_dl' => $validated['butuh_dl'],
+                        'butuh_translok' => $validated['butuh_translok'],
                     ]);
                 }
             }
@@ -300,6 +367,40 @@ class PenugasanController extends Controller
         }
     }
 
+    public function update_rk_translok(Request $request, Penugasan $penugasan)
+    {
+        // dd($request->all());
+        $validated = $request->validate([
+            'status_translok' => ['required', 'in:Menunggu,ACC,Ditolak'],
+        ]);
+
+        // Cek role aktif
+        $role = $request->user()->active_role;
+
+        if ($role === 'Pimpinan' && !in_array($request->status_translok, ['ACC', 'Ditolak'])) {
+            return redirect()->back()->with('error', 'Pimpinan hanya boleh menyetujui atau menolak.');
+        }
+
+        if ($role === 'Ketua Tim' && $request->status_translok !== 'Menunggu') {
+            return redirect()->back()->with('error', 'Ketua Tim hanya boleh mengajukan kembali.');
+        }
+
+        try {
+            $penugasan->update([
+                'status_translok' => $validated['status_translok'],
+            ]);
+
+            return redirect()->back()
+                ->with('success', 'Status Translok berhasil diperbarui.');
+        } catch (\Exception $e) {
+            Log::error('Update error: ' . $e->getMessage());
+
+            return redirect()->back()
+                ->with('error', 'Gagal memperbarui data status Translok. Silakan coba lagi.')
+                ->withInput();
+        }
+    }
+
     /**
      * Helper to extract flat dates array from main and additional dates,
      * and validate them against SubKegiatan bounds.
@@ -324,9 +425,9 @@ class PenugasanController extends Controller
             }
         }
 
-        $min = $subKegiatanMulai ? \Carbon\Carbon::parse((string)$subKegiatanMulai)->startOfDay() : null;
-        $max = $subKegiatanSelesai ? \Carbon\Carbon::parse((string)$subKegiatanSelesai)->startOfDay() : null;
-        
+        $min = $subKegiatanMulai ? \Carbon\Carbon::parse((string) $subKegiatanMulai)->startOfDay() : null;
+        $max = $subKegiatanSelesai ? \Carbon\Carbon::parse((string) $subKegiatanSelesai)->startOfDay() : null;
+
         $validDatesToSave = [];
         $existing = [];
 
@@ -341,7 +442,8 @@ class PenugasanController extends Controller
 
             // Hindari duplikat
             $key = $m . '|' . $s;
-            if (in_array($key, $existing)) continue;
+            if (in_array($key, $existing))
+                continue;
             $existing[] = $key;
 
             $cm = \Carbon\Carbon::parse($m)->startOfDay();
@@ -352,7 +454,7 @@ class PenugasanController extends Controller
                     'tanggal_mulai' => 'Tanggal penugasan tidak valid atau di luar rentang sub kegiatan.'
                 ]);
             }
-            
+
             $validDatesToSave[] = ['mulai' => $m, 'selesai' => $s];
         }
 

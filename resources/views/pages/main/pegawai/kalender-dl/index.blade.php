@@ -126,18 +126,26 @@
                                 {{-- Grid --}}
                                 @foreach ($dates as $date)
                                     @php
-                                        $hasDL = $pegawai->kalenderDLs->contains(function ($dl) use ($date) {
+                                        $kalenderItem = $pegawai->kalenderDls->first(function ($dl) use ($date) {
                                             return $dl->tanggal_dl === $date->toDateString();
                                         });
+
+                                        $isTranslok = false;
+                                        $isDL = false;
+
+                                        if ($kalenderItem && $kalenderItem->penugasan) {
+                                            $isTranslok = $kalenderItem->penugasan->butuh_translok;
+                                            $isDL = $kalenderItem->penugasan->butuh_dl;
+                                        }
                                     @endphp
 
                                     <td class="border-b dark:border-gray-700 p-0.5 text-center">
-                                        @if ($hasDL)
+                                        @if ($isDL)
                                             <div class="mx-auto h-4 w-4 lg:h-3.5 lg:w-3.5 rounded bg-blue-700"></div>
+                                        @elseif ($isTranslok)
+                                            <div class="mx-auto h-4 w-4 lg:h-3.5 lg:w-3.5 rounded bg-teal-500"></div>
                                         @else
-                                            <div
-                                                class="mx-auto h-4 w-4 lg:h-3.5 lg:w-3.5 rounded bg-gray-100 dark:bg-gray-700">
-                                            </div>
+                                            <div class="mx-auto h-4 w-4 lg:h-3.5 lg:w-3.5 rounded bg-gray-100 dark:bg-gray-700"></div>
                                         @endif
                                     </td>
                                 @endforeach
@@ -155,6 +163,10 @@
             <div class="flex items-center gap-2">
                 <div class="h-4 w-4 rounded bg-blue-700"></div>
                 <span>Dinas Luar</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="h-4 w-4 rounded bg-teal-500"></div>
+                <span>Translok</span>
             </div>
         </div>
 

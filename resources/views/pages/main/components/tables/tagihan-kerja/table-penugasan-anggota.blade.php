@@ -2,11 +2,11 @@
     $loginUserId = auth()->user()->id_pegawai;
 
     // Helper untuk mengurutkan: user yang sedang login akan berada di paling atas
-    $penugasanButuhDL = $penugasanButuhDL->sortByDesc(function ($row) use ($loginUserId) {
+    $penugasanButuhDLAtauTranslok = $penugasanButuhDLAtauTranslok->sortByDesc(function ($row) use ($loginUserId) {
         return $row->id_anggota === $loginUserId ? 1 : 0;
     });
 
-    $penugasanTidakButuhDL = $penugasanTidakButuhDL->sortByDesc(function ($row) use ($loginUserId) {
+    $penugasanTidakButuhDLAtauTranslok = $penugasanTidakButuhDLAtauTranslok->sortByDesc(function ($row) use ($loginUserId) {
         return $row->id_anggota === $loginUserId ? 1 : 0;
     });
 @endphp
@@ -46,7 +46,7 @@
         </h3>
         <span
             class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-            {{ $penugasanButuhDL->count() }} Penugasan
+            {{ $penugasanButuhDLAtauTranslok->count() }} Penugasan
         </span>
     </div>
     <div class="flex items-center gap-3 mb-3">
@@ -101,7 +101,7 @@
                         </thead>
 
                         <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                            @forelse ($penugasanButuhDL as $row)
+                            @forelse ($penugasanButuhDLAtauTranslok as $row)
                                 @php
                                     $penugasan = $row;
                                     $isMe = $penugasan->id_anggota === $loginUserId;
@@ -135,6 +135,15 @@
 
                                     <td class="px-6 py-3 text-sm text-gray-800 dark:text-gray-300">
                                         <div class="font-medium">{{ $penugasan->anggota->nama_pegawai ?? '-' }}</div>
+                                        @if($penugasan->butuh_dl == 1 && $penugasan->butuh_translok == 0)
+                                            <span class="mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+                                                Dinas Luar
+                                            </span>
+                                        @elseif($penugasan->butuh_dl == 0 && $penugasan->butuh_translok == 1)
+                                            <span class="mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400 border border-teal-200 dark:border-teal-800">
+                                                Translok
+                                            </span>
+                                        @endif
                                     </td>
 
                                     <td class="px-6 py-3 text-sm text-gray-700 dark:text-gray-400">
@@ -261,6 +270,7 @@
                                                                 target: @js($penugasan->target),
                                                                 satuan_target: @js($penugasan->satuan_target),
                                                                 butuh_dl: @js($penugasan->butuh_dl),
+                                                                butuh_translok: @js($penugasan->butuh_translok),
                                                                 tanggal_mulai: @js(optional($row->tanggal_mulai)->format('Y-m-d')),
                                                                 tanggal_selesai: @js(optional($row->tanggal_selesai)->format('Y-m-d')),
                                                                 status: @js($penugasan->status),
@@ -710,12 +720,12 @@
 
                             <!-- Total Row -->
                             @php
-                                $uniquePenugasanButuhDL = $penugasanButuhDL->unique('id_penugasan');
+                                $uniquePenugasanButuhDL = $penugasanButuhDLAtauTranslok->unique('id_penugasan');
                                 $sumTargetDL = $uniquePenugasanButuhDL->sum('target');
                                 $avgRrKirimDL =
-                                    $sumTargetDL > 0 ? round(($totalKirimButuhDL / $sumTargetDL) * 100, 2) : 0;
+                                    $sumTargetDL > 0 ? round(($totalKirimButuhDLAtauTranslok / $sumTargetDL) * 100, 2) : 0;
                                 $avgRrTerimaDL =
-                                    $sumTargetDL > 0 ? round(($totalTerimaButuhDL / $sumTargetDL) * 100, 2) : 0;
+                                    $sumTargetDL > 0 ? round(($totalTerimaButuhDLAtauTranslok / $sumTargetDL) * 100, 2) : 0;
 
                                 $avgRatingKirimDL =
                                     $uniquePenugasanButuhDL->avg(function ($p) {
@@ -757,14 +767,14 @@
                                                     <div>
                                                         <p class="text-xs text-gray-500">Pengiriman</p>
                                                         <p class="text-xl font-bold text-blue-600">
-                                                            {{ $totalKirimButuhDL }}
+                                                            {{ $totalKirimButuhDLAtauTranslok }}
                                                         </p>
                                                     </div>
 
                                                     <div>
                                                         <p class="text-xs text-gray-500">Penerimaan</p>
                                                         <p class="text-xl font-bold text-green-600">
-                                                            {{ $totalTerimaButuhDL }}
+                                                            {{ $totalTerimaButuhDLAtauTranslok }}
                                                         </p>
                                                     </div>
 
@@ -922,7 +932,7 @@
         </h3>
         <span
             class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-            {{ $penugasanTidakButuhDL->count() }} Penugasan
+            {{ $penugasanTidakButuhDLAtauTranslok->count() }} Penugasan
         </span>
     </div>
     <div class="flex items-center gap-3 mb-3">
@@ -973,7 +983,7 @@
                         </thead>
 
                         <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                            @forelse ($penugasanTidakButuhDL as $row)
+                            @forelse ($penugasanTidakButuhDLAtauTranslok as $row)
                                 @php
                                     $penugasan = $row;
                                     $isMe = $penugasan->id_anggota === $loginUserId;
@@ -1102,6 +1112,7 @@
                                                                 target: @js($penugasan->target),
                                                                 satuan_target: @js($penugasan->satuan_target),
                                                                 butuh_dl: @js($penugasan->butuh_dl),
+                                                                butuh_translok: @js($penugasan->butuh_translok),
                                                                 tanggal_mulai: @js(optional($row->tanggal_mulai)->format('Y-m-d')),
                                                                 tanggal_selesai: @js(optional($row->tanggal_selesai)->format('Y-m-d')),
                                                                 status: @js($penugasan->status),
@@ -1554,15 +1565,15 @@
 
                             <!-- Total Row -->
                             @php
-                                $uniquePenugasanTidakButuhDL = $penugasanTidakButuhDL->unique('id_penugasan');
+                                $uniquePenugasanTidakButuhDL = $penugasanTidakButuhDLAtauTranslok->unique('id_penugasan');
                                 $sumTargetNonDL = $uniquePenugasanTidakButuhDL->sum('target');
                                 $avgRrKirimNonDL =
                                     $sumTargetNonDL > 0
-                                        ? round(($totalKirimTidakButuhDL / $sumTargetNonDL) * 100, 2)
+                                        ? round(($totalKirimTidakButuhDLAtauTranslok / $sumTargetNonDL) * 100, 2)
                                         : 0;
                                 $avgRrTerimaNonDL =
                                     $sumTargetNonDL > 0
-                                        ? round(($totalTerimaTidakButuhDL / $sumTargetNonDL) * 100, 2)
+                                        ? round(($totalTerimaTidakButuhDLAtauTranslok / $sumTargetNonDL) * 100, 2)
                                         : 0;
 
                                 $avgRatingKirimNonDL =
@@ -1605,14 +1616,14 @@
                                                     <div>
                                                         <p class="text-xs text-gray-500">Pengiriman</p>
                                                         <p class="text-xl font-bold text-blue-600">
-                                                            {{ $totalKirimTidakButuhDL }}
+                                                            {{ $totalKirimTidakButuhDLAtauTranslok }}
                                                         </p>
                                                     </div>
 
                                                     <div>
                                                         <p class="text-xs text-gray-500">Penerimaan</p>
                                                         <p class="text-xl font-bold text-green-600">
-                                                            {{ $totalTerimaTidakButuhDL }}
+                                                            {{ $totalTerimaTidakButuhDLAtauTranslok }}
                                                         </p>
                                                     </div>
 
@@ -1759,3 +1770,5 @@
         </div>
     </div>
 </div>
+
+

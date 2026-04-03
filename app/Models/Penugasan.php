@@ -28,6 +28,8 @@ class Penugasan extends Model
         'status',
         'butuh_dl',
         'status_dl',
+        'butuh_translok',
+        'status_translok',
     ];
 
     protected $casts = [

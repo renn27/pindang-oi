@@ -43,7 +43,7 @@ class MenuHelper
                 'icon' => 'kalender',
                 'name' => 'Kalender',
                 'subItems' => [
-                    ['name' => 'Kalender DL', 'path' => '/kalender-dl'],
+                    ['name' => 'Kalender DL / Translok', 'path' => '/kalender-dl'],
                     ['name' => 'Kalender Kegiatan', 'path' => '/kalender-kegiatan'],
                 ],
             ],

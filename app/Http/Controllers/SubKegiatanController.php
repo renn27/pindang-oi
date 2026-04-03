@@ -69,34 +69,34 @@ class SubKegiatanController extends Controller
         $penugasans = $subKegiatan->penugasans()->orderBy('tanggal_mulai', 'asc')->get();
 
         // === FILTER BUTUH DL / TIDAK BUTUH DL ===
-        $penugasanButuhDL = $penugasans->filter(fn ($row) => $row->butuh_dl);
-        $penugasanTidakButuhDL = $penugasans->filter(fn ($row) => ! $row->butuh_dl);
+        $penugasanButuhDLAtauTranslok = $penugasans->filter(fn ($row) => $row->butuh_dl || $row->butuh_translok);
+        $penugasanTidakButuhDLAtauTranslok = $penugasans->filter(fn ($row) => ! $row->butuh_dl && ! $row->butuh_translok);
 
         // Total (SEMUA)
         $totalKirim = $this->hitungTotalKirim($penugasans);
         $totalTerima = $this->hitungTotalTerima($penugasans);
 
-        // Total BUTUH DL
-        $totalKirimButuhDL = $this->hitungTotalKirim($penugasanButuhDL);
-        $totalTerimaButuhDL = $this->hitungTotalTerima($penugasanButuhDL);
+        // Total BUTUH DL ATAU TRANSLOK
+        $totalKirimButuhDLAtauTranslok = $this->hitungTotalKirim($penugasanButuhDLAtauTranslok);
+        $totalTerimaButuhDLAtauTranslok = $this->hitungTotalTerima($penugasanButuhDLAtauTranslok);
 
         // Total TIDAK BUTUH DL
-        $totalKirimTidakButuhDL = $this->hitungTotalKirim($penugasanTidakButuhDL);
-        $totalTerimaTidakButuhDL = $this->hitungTotalTerima($penugasanTidakButuhDL);
+        $totalKirimTidakButuhDLAtauTranslok = $this->hitungTotalKirim($penugasanTidakButuhDLAtauTranslok);
+        $totalTerimaTidakButuhDLAtauTranslok = $this->hitungTotalTerima($penugasanTidakButuhDLAtauTranslok);
 
         return view('pages.main.pegawai.tagihan-kerja.detail-sub-kegiatan', [
             'kegiatan' => $kegiatan,
             'subKegiatan' => $subKegiatan,
             'pegawais' => $pegawais,
             'jenisKegiatans' => $jenisKegiatans,
-            'penugasanButuhDL' => $penugasanButuhDL,
-            'penugasanTidakButuhDL' => $penugasanTidakButuhDL,
+            'penugasanButuhDLAtauTranslok' => $penugasanButuhDLAtauTranslok,
+            'penugasanTidakButuhDLAtauTranslok' => $penugasanTidakButuhDLAtauTranslok,
             'totalKirim' => $totalKirim,
             'totalKirimTerima' => $totalTerima,
-            'totalKirimButuhDL' => $totalKirimButuhDL,
-            'totalTerimaButuhDL' => $totalTerimaButuhDL,
-            'totalKirimTidakButuhDL' => $totalKirimTidakButuhDL,
-            'totalTerimaTidakButuhDL' => $totalTerimaTidakButuhDL,
+            'totalKirimButuhDLAtauTranslok' => $totalKirimButuhDLAtauTranslok,
+            'totalTerimaButuhDLAtauTranslok' => $totalTerimaButuhDLAtauTranslok,
+            'totalKirimTidakButuhDLAtauTranslok' => $totalKirimTidakButuhDLAtauTranslok,
+            'totalTerimaTidakButuhDLAtauTranslok' => $totalTerimaTidakButuhDLAtauTranslok,
         ]);
     }
 

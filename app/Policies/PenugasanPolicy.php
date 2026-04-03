@@ -146,8 +146,22 @@ class PenugasanPolicy
         }
 
         // 2️⃣ Penugasan memang butuh DL
-        // (baik karena wajib DL atau toggle manual)
         if (! $penugasan->butuh_dl) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function acceptTranslok(Pegawai $pegawai, Penugasan $penugasan): bool
+    {
+        // 1️⃣ Hanya pimpinan
+        if ($pegawai->active_role !== 'Pimpinan') {
+            return false;
+        }
+
+        // 2️⃣ Penugasan memang butuh Translok
+        if (! $penugasan->butuh_translok) {
             return false;
         }
 

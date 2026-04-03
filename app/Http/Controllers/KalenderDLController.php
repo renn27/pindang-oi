@@ -32,7 +32,7 @@ class KalenderDLController extends Controller
                 $q->whereBetween('tanggal_dl', [
                     $start->toDateString(),
                     $end->toDateString()
-                ]);
+                ])->with('penugasan');
             }])
             ->withCount(['kalenderDls as total_dl_bulan_ini' => function ($q) use ($start, $end) {
                 $q->whereBetween('tanggal_dl', [

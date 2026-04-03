@@ -15,13 +15,13 @@
             target: '',
             satuan_target: '',
             butuh_dl: 0,
+            butuh_translok: 0,
             tanggal_mulai: '',
             tanggal_selesai: '',
             min_date: '',
             max_date: '',
         }">
-    <form
-        id="addPenugasanForm"
+    <form id="addPenugasanForm"
         :action="mode === 'edit'
             ?
             `/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${itemKey}` :
@@ -32,7 +32,8 @@
             @method('PUT')
         </template>
 
-        <div class="relative flex h-[90vh] w-full max-w-[800px] flex-col overflow-hidden
+        <div
+            class="relative flex h-[90vh] w-full max-w-[800px] flex-col overflow-hidden
                 rounded-3xl bg-white dark:bg-gray-900 dark:border dark:border-gray-800">
 
             <!-- HEADER (FIXED) -->
@@ -71,7 +72,8 @@
                     @open-smart-modal.window="
                         if ($event.detail.modalId !== 'modal-penugasan-anggota') return;
                         initFromModal($event.detail);
-                    " class="mb-4">
+                    "
+                    class="mb-4">
 
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Nama Pegawai <span class="text-red-500">*</span>
@@ -82,20 +84,13 @@
 
                     <!-- Input Visible -->
                     <div class="relative">
-                        <input
-                            type="text"
-                            x-model="search"
-                            @click="mode === 'create' && (open = true)"
-                            @input="mode === 'create' && (open = true)"
-                            @keydown.escape="open = false"
-                            :readonly="mode === 'edit'"
-                            placeholder="Pilih pegawai..."
+                        <input type="text" x-model="search" @click="mode === 'create' && (open = true)"
+                            @input="mode === 'create' && (open = true)" @keydown.escape="open = false"
+                            :readonly="mode === 'edit'" placeholder="Pilih pegawai..."
                             class="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors">
 
                         <!-- Dropdown -->
-                        <div x-show="open && mode === 'create'"
-                            x-transition
-                            @click.outside="open = false"
+                        <div x-show="open && mode === 'create'" x-transition @click.outside="open = false"
                             class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto
                                     rounded-lg border border-gray-200 bg-white shadow-lg
                                     dark:border-gray-700 dark:bg-gray-800">
@@ -106,9 +101,8 @@
                             </template>
 
                             <template x-for="pegawai in filteredPegawais" :key="pegawai.id_pegawai">
-                                <button type="button"
-                                        @click="selectPegawai(pegawai)"
-                                        class="flex w-full items-center px-4 py-3 text-left text-sm
+                                <button type="button" @click="selectPegawai(pegawai)"
+                                    class="flex w-full items-center px-4 py-3 text-left text-sm
                                             hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
                                     <div class="font-medium text-gray-800 dark:text-gray-200"
                                         x-text="pegawai.nama_pegawai"></div>
@@ -119,197 +113,178 @@
                     </div>
                 </div>
 
+                {{-- Toggle Gabungan untuk DL dan Translok --}}
                 <div x-data="{
-                        open: false,
-                        isOther: false,
-                        options: [
-                            @foreach ($jenisKegiatans as $jenis)
-                            { id: '{{ $jenis->id }}', text: '{{ addslashes($jenis->jenis_kegiatan) }} ({{ $jenis->kategori }})', style: '{{ $jenis->kategori === 'Utama' ? 'text-green-700 font-medium dark:text-green-300' : 'text-orange-700 dark:text-orange-300' }}' },
-                            @endforeach
-                            { id: 'LAINNYA', text: '➕ Lainnya', style: 'text-blue-700 font-medium dark:text-blue-300' }
-                        ],
-                        get selectText() {
-                            if (!formData.id_jenis_kegiatan) return '-- Pilih Jenis Kegiatan --';
-                            let opt = this.options.find(o => o.id == formData.id_jenis_kegiatan);
-                            return opt ? opt.text : formData.jenis_kegiatan || '-- Pilih Jenis Kegiatan --';
-                        },
-                        selectJenis(opt) {
-                            formData.id_jenis_kegiatan = opt.id;
+                    open: false,
+                    isOther: false,
+                    options: [
+                        @foreach ($jenisKegiatans as $jenis)
+                            {
+                                id: '{{ $jenis->id }}',
+                                text: '{{ addslashes($jenis->jenis_kegiatan) }} ({{ $jenis->kategori }})',
+                                style: '{{ $jenis->kategori === 'Utama' ? 'text-green-700 font-medium dark:text-green-300' : 'text-orange-700 dark:text-orange-300' }}'
+                            },
+                        @endforeach
+                        {
+                            id: 'LAINNYA',
+                            text: '➕ Lainnya',
+                            style: 'text-blue-700 font-medium dark:text-blue-300' }
+                    ],
+                    get selectText() {
+                        if (!formData.id_jenis_kegiatan) return '-- Pilih Jenis Kegiatan --';
+                        let opt = this.options.find(o => o.id == formData.id_jenis_kegiatan);
+                        return opt ? opt.text : formData.jenis_kegiatan || '-- Pilih Jenis Kegiatan --';
+                    },
+                    selectJenis(opt) {
+                        formData.id_jenis_kegiatan = opt.id;
                             this.isOther = (opt.id === 'LAINNYA');
                             this.open = false;
-
-                            // Triggers native change event if attached directly or you can just let Alpine reactivity handle 'butuh_dl'
                         }
                     }"
                     @open-smart-modal.window="
                         if ($event.detail.modalId === 'modal-penugasan-anggota' && mode === 'edit') {
                             isOther = (formData.id_jenis_kegiatan === 'LAINNYA');
-                        }
-                    ">
+                        }">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Jenis Kegiatan <span class="text-red-500">*</span>
                     </label>
 
-                    <input type="hidden" id="jenis_kegiatan_select" name="id_jenis_kegiatan" x-model="formData.id_jenis_kegiatan">
+                    <input type="hidden" id="jenis_kegiatan_select" name="id_jenis_kegiatan"
+                        x-model="formData.id_jenis_kegiatan">
 
                     <div class="relative mb-4">
-                        <button type="button"
-                                @click="open = !open"
-                                @click.outside="open = false"
-                                class="flex h-11 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800">
-                            <span x-text="selectText"
-                                  class="truncate"
-                                  :class="!formData.id_jenis_kegiatan ? 'text-gray-400 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'">
+                        <button type="button" @click="open = !open" @click.outside="open = false"
+                            class="flex h-11 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800">
+                            <span x-text="selectText" class="truncate"
+                                :class="!formData.id_jenis_kegiatan ? 'text-gray-400' : 'text-gray-800 dark:text-gray-200'">
                             </span>
-                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <path stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                             </svg>
                         </button>
 
-                        <div x-show="open"
-                             x-transition
-                             class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                        <div x-show="open" x-transition
+                            class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border bg-white shadow-lg dark:bg-gray-800">
                             <template x-for="opt in options" :key="opt.id">
-                                <button type="button"
-                                        @click="selectJenis(opt)"
-                                        class="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0"
-                                        :class="opt.style">
+                                <button type="button" @click="selectJenis(opt)"
+                                    class="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 border-b last:border-0"
+                                    :class="opt.style">
                                     <span x-text="opt.text"></span>
                                 </button>
                             </template>
                         </div>
                     </div>
 
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="jenis_kegiatan_select">Jenis Kegiatan wajib dipilih dari daftar</p>
+                    <p class="text-xs text-red-600 mt-1 hidden" data-for="jenis_kegiatan_select">
+                        Jenis Kegiatan wajib dipilih
+                    </p>
 
                     <!-- INPUT JENIS KEGIATAN BARU -->
                     <div x-show="isOther" x-transition>
-                        <input
-                            id="jenis_kegiatan_baru"
-                            type="text"
-                            name="jenis_kegiatan_baru"
-                            placeholder="Masukkan jenis kegiatan baru"
-                            class="h-11 w-full mb-4 rounded-lg border border-gray-300 px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
-                        />
+                        <input type="text" name="jenis_kegiatan_baru" placeholder="Masukkan jenis kegiatan baru"
+                            class="h-11 w-full mb-4 rounded-lg border px-4 text-sm dark:bg-gray-800">
                     </div>
                 </div>
 
-                <div
-                    x-data="{
+                <!-- TOGGLE DL / TRANSLOK -->
+                <div x-data="{
                         butuhDl: false,
-                        isLocked: true,
+                        butuhTranslok: false,
 
-                        wajibJenis: [3,4,5,6],
+                        wajibJenis: [3, 4, 5, 6],
 
                         get jenisId() {
                             return Number(formData?.id_jenis_kegiatan || 0)
                         },
 
-                        get isLainnya() {
-                            return formData?.id_jenis_kegiatan === 'LAINNYA'
-                        },
-
-                        get jenisSelected() {
-                            return this.jenisId > 0 || this.isLainnya
+                        get showToggle() {
+                            return this.wajibJenis.includes(this.jenisId)
                         },
 
                         syncState() {
-                            const isWajib = this.wajibJenis.includes(this.jenisId)
-                            const fromDB = Boolean(Number(formData?.butuh_dl ?? 0))
+                            const dlDB = Boolean(Number(formData?.butuh_dl ?? 0))
+                            const translokDB = Boolean(Number(formData?.butuh_translok ?? 0))
 
-                            // ================= CREATE =================
-                            if (mode === 'create') {
-
-                                if (this.isLainnya) {
-                                    this.butuhDl = false
-                                    this.isLocked = false
-                                    return
-                                }
-
-                                if (!this.jenisSelected) {
-                                    this.butuhDl = false
-                                    this.isLocked = true
-                                } else if (isWajib) {
-                                    this.butuhDl = true
-                                    this.isLocked = true
-                                } else {
-                                    this.butuhDl = false
-                                    this.isLocked = false
-                                }
-
-                                return
-                            }
-
-                            // ================= EDIT =================
-                            if (this.isLainnya) {
-                                this.butuhDl = fromDB
-                                this.isLocked = false
-                                return
-                            }
-
-                            if (!this.jenisSelected) {
+                            if (!this.showToggle) {
                                 this.butuhDl = false
-                                this.isLocked = true
+                                this.butuhTranslok = false
                                 return
                             }
 
-                            if (isWajib) {
-                                // 🔒 Wajib DL → selalu ON & locked
+                            if (mode === 'create') {
                                 this.butuhDl = true
-                                this.isLocked = true
+                                this.butuhTranslok = false
                             } else {
-                                // ✅ OPSIONAL → ambil dari DB
-                                this.butuhDl = fromDB
-                                this.isLocked = false
+                                this.butuhDl = dlDB
+                                this.butuhTranslok = translokDB
                             }
+                        },
+
+                        toggleDL() {
+                            this.butuhDl = true
+                            this.butuhTranslok = false
+                        },
+
+                        toggleTranslok() {
+                            this.butuhTranslok = true
+                            this.butuhDl = false
                         }
-                    }"
-                    x-effect="syncState()"
-                    class="mb-4">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Kebutuhan Dinas Luar (DL)
+                    }" x-init="
+                        syncState();
+
+                        // 🔥 Watch perubahan jenis kegiatan
+                        $watch(() => formData.id_jenis_kegiatan, () => {
+                            syncState();
+                        });
+
+                        // 🔥 Watch ketika modal edit inject data
+                        $watch(() => formData.butuh_dl, () => syncState());
+                        $watch(() => formData.butuh_translok, () => syncState());" x-show="showToggle"
+                        x-transition class="mb-4">
+                    <label class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        Pilih Salah Satu
                     </label>
 
-                    <div class="flex items-center gap-4">
-                        <!-- Toggle UI -->
-                        <button
-                            type="button"
-                            @click="if (!isLocked) butuhDl = !butuhDl"
-                            :class="{
-                                'bg-brand-500 dark:bg-brand-600': butuhDl,
-                                'bg-gray-300 dark:bg-gray-600': !butuhDl,
-                                'cursor-not-allowed opacity-70': isLocked
-                            }"
-                            class="relative inline-flex h-7 w-14 items-center rounded-full"
-                        >
-                            <span
-                                :class="butuhDl ? 'translate-x-7' : 'translate-x-1'"
-                                class="inline-block h-5 w-5 bg-white dark:bg-gray-300 rounded-full transition"
-                            ></span>
-                        </button>
+                    <div class="flex gap-6">
 
-                        <span
-                            class="text-sm font-medium"
-                            :class="butuhDl ? 'text-brand-600 dark:text-brand-400' : 'text-gray-500 dark:text-gray-400'"
-                            x-text="
-                                !jenisSelected
-                                    ? 'Pilih dulu jenis kegiatan'
-                                    : (butuhDl ? 'Perlu DL' : 'Tidak Perlu DL')
-                            "
-                        ></span>
+                        <!-- DL -->
+                        <div class="flex items-center gap-3">
+                            <button type="button" @click="toggleDL()" :class="butuhDl ? 'bg-blue-500' : 'bg-gray-300'"
+                                class="relative inline-flex h-7 w-14 items-center rounded-full transition">
+                                <span :class="butuhDl ? 'translate-x-7' : 'translate-x-1'"
+                                    class="inline-block h-5 w-5 bg-white rounded-full transition">
+                                </span>
+                            </button>
+
+                            <span class="text-sm font-medium" :class="butuhDl ? 'text-blue-600' : 'text-gray-500'">
+                                DL
+                            </span>
+                        </div>
+
+                        <!-- TRANSLOK -->
+                        <div class="flex items-center gap-3">
+                            <button type="button" @click="toggleTranslok()"
+                                :class="butuhTranslok ? 'bg-teal-500' : 'bg-gray-300'"
+                                class="relative inline-flex h-7 w-14 items-center rounded-full transition">
+                                <span :class="butuhTranslok ? 'translate-x-7' : 'translate-x-1'"
+                                    class="inline-block h-5 w-5 bg-white rounded-full transition">
+                                </span>
+                            </button>
+
+                            <span class="text-sm font-medium"
+                                :class="butuhTranslok ? 'text-teal-600' : 'text-gray-500'">
+                                Translok
+                            </span>
+                        </div>
+
                     </div>
 
-                    <!-- Helper text -->
-                    <p x-show="!jenisSelected" class="mt-1 text-xs font-medium text-brand-500/80 dark:text-brand-400">
-                        Pilih jenis kegiatan untuk menentukan kebutuhan DL.
+                    <p class="mt-2 text-xs text-gray-500">
+                        Pilih salah satu: DL atau Translok.
                     </p>
 
-                    <p x-show="isLocked && jenisSelected" class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        Jenis kegiatan ini otomatis membutuhkan DL dan tidak dapat diubah.
-                    </p>
-
-                    <!-- Hidden input -->
                     <input type="hidden" name="butuh_dl" :value="butuhDl ? 1 : 0">
+                    <input type="hidden" name="butuh_translok" :value="butuhTranslok ? 1 : 0">
                 </div>
 
                 <div>
@@ -319,7 +294,8 @@
                     <input type="number" x-model="formData.target" name="target" id="target"
                         placeholder="Misalnya : 200"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="target">Target wajib diisi</p>
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="target">
+                        Target wajib diisi</p>
                 </div>
 
                 <div>
@@ -329,7 +305,8 @@
                     <input type="text" x-model="formData.satuan_target" name="satuan_target" id="satuan_target"
                         placeholder="Misalnya : Dokumen, Kegiatan, dll"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="satuan_target">Satuan Target wajib diisi</p>
+                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden"
+                        data-for="satuan_target">Satuan Target wajib diisi</p>
                 </div>
 
                 <div class="flex flex-row justify-between items-center gap-6">
@@ -337,34 +314,22 @@
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                             Tanggal Mulai <span class="text-red-500">*</span>
                         </label>
-                        <x-form.date-picker
-                            x-model="formData.tanggal_mulai"
-                            id="tanggal_mulai"
-                            name="tanggal_mulai"
-                            placeholder="Tanggal Mulai"
-                            ::minDate="formData.min_date"
-                            ::maxDate="formData.max_date"
-                            minBind="formData.min_date"
-                            maxBind="formData.max_date"
-                        />
-                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_mulai">Tanggal mulai wajib dipilih</p>
+                        <x-form.date-picker x-model="formData.tanggal_mulai" id="tanggal_mulai" name="tanggal_mulai"
+                            placeholder="Tanggal Mulai" ::minDate="formData.min_date" ::maxDate="formData.max_date"
+                            minBind="formData.min_date" maxBind="formData.max_date" />
+                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden"
+                            data-for="tanggal_mulai">Tanggal mulai wajib dipilih</p>
                     </div>
 
                     <div class="flex-1">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                             Tanggal Berakhir (Deadline) <span class="text-red-500">*</span>
                         </label>
-                        <x-form.date-picker
-                            x-model="formData.tanggal_selesai"
-                            id="tanggal_selesai"
-                            name="tanggal_selesai"
-                            placeholder="Tanggal Selesai"
-                            ::minDate="formData.min_date"
-                            ::maxDate="formData.max_date"
-                            minBind="formData.min_date"
-                            maxBind="formData.max_date"
-                        />
-                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tanggal_selesai">Tanggal selesai wajib dipilih</p>
+                        <x-form.date-picker x-model="formData.tanggal_selesai" id="tanggal_selesai"
+                            name="tanggal_selesai" placeholder="Tanggal Selesai" ::minDate="formData.min_date" ::maxDate="formData.max_date"
+                            minBind="formData.min_date" maxBind="formData.max_date" />
+                        <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden"
+                            data-for="tanggal_selesai">Tanggal selesai wajib dipilih</p>
                     </div>
                 </div>
 
@@ -382,8 +347,11 @@
                     <div class="md:w-3/4">
                         <button type="button" @click="tambahTanggalPenugasan()"
                             class="flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                            <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M9 3.75C9.41421 3.75 9.75 4.08579 9.75 4.5V8.25H13.5C13.9142 8.25 14.25 8.58579 14.25 9C14.25 9.41421 13.9142 9.75 13.5 9.75H9.75V13.5C9.75 13.9142 9.41421 14.25 9 14.25C8.58579 14.25 8.25 13.9142 8.25 13.5V9.75H4.5C4.08579 9.75 3.75 9.41421 3.75 9C3.75 8.58579 4.08579 8.25 4.5 8.25H8.25V4.5C8.25 4.08579 8.58579 3.75 9 3.75Z" fill="" />
+                            <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18"
+                                fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M9 3.75C9.41421 3.75 9.75 4.08579 9.75 4.5V8.25H13.5C13.9142 8.25 14.25 8.58579 14.25 9C14.25 9.41421 13.9142 9.75 13.5 9.75H9.75V13.5C9.75 13.9142 9.41421 14.25 9 14.25C8.58579 14.25 8.25 13.9142 8.25 13.5V9.75H4.5C4.08579 9.75 3.75 9.41421 3.75 9C3.75 8.58579 4.08579 8.25 4.5 8.25H8.25V4.5C8.25 4.08579 8.58579 3.75 9 3.75Z"
+                                    fill="" />
                             </svg>
                             Tambah Tanggal Penugasan
                         </button>
@@ -422,23 +390,25 @@
             mode: 'create',
 
             pegawais: @js(
-                $pegawais->map(fn($p) => [
-                    'id_pegawai'   => $p->id_pegawai,
-                    'nama_pegawai' => $p->nama_pegawai
-                ])
-            ),
+    $pegawais->map(
+        fn($p) => [
+            'id_pegawai' => $p->id_pegawai,
+            'nama_pegawai' => $p->nama_pegawai,
+        ],
+    ),
+),
 
             initFromModal(detail) {
                 this.mode = detail.mode ?? 'create';
 
                 if (this.mode === 'edit') {
                     this.selectedId = detail.data.id_anggota;
-                    this.search     = detail.data.nama_anggota;
-                    this.open       = false;
+                    this.search = detail.data.nama_anggota;
+                    this.open = false;
                 } else {
                     this.selectedId = '';
-                    this.search     = '';
-                    this.open       = true;
+                    this.search = '';
+                    this.open = true;
                 }
             },
 
@@ -452,8 +422,8 @@
 
             selectPegawai(p) {
                 this.selectedId = p.id_pegawai;
-                this.search     = p.nama_pegawai;
-                this.open       = false;
+                this.search = p.nama_pegawai;
+                this.open = false;
             }
         }
     }
@@ -533,7 +503,8 @@
 
         // --- 2. Jenis Kegiatan Pada Penugasan  ---
         const jenisKegiatanSelect = document.getElementById('jenis_kegiatan_select');
-        const jenisKegiatanSelectErrorMsg = jenisKegiatanSelect?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        const jenisKegiatanSelectErrorMsg = jenisKegiatanSelect?.closest('.md\\:w-3\\/4')?.querySelector(
+            '.field-error-msg');
         if (!jenisKegiatanSelect?.value?.trim()) {
             addError(
                 'Jenis Kegiatan pada penugasan wajib diisi',
@@ -553,7 +524,7 @@
         //     );
         // }
 
-       // --- 4. Target Sub Kegiatan ---
+        // --- 4. Target Sub Kegiatan ---
         const targetPenugasan = document.getElementById('target');
         const targetPenugasanErrorMsg = targetPenugasan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
         if (!targetPenugasan?.value?.trim()) {
@@ -566,7 +537,8 @@
 
         // --- 5. Satuan Target Sub Kegiatan ---
         const satuanTargetPenugasan = document.getElementById('satuan_target');
-        const satuanTargetPenugasanErrorMsg = satuanTargetPenugasan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        const satuanTargetPenugasanErrorMsg = satuanTargetPenugasan?.closest('.md\\:w-3\\/4')?.querySelector(
+            '.field-error-msg');
         if (!satuanTargetPenugasan?.value?.trim()) {
             addError(
                 'Satuan Target Penugasan wajib diisi',
@@ -577,7 +549,8 @@
 
         // --- 6. Tanggal Mulai Sub Kegiatan ---
         const tanggalMulaiPenugasan = document.getElementById('tanggal_mulai');
-        const tanggalMulaiPenugasanErrorMsg = tanggalMulaiPenugasan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        const tanggalMulaiPenugasanErrorMsg = tanggalMulaiPenugasan?.closest('.md\\:w-3\\/4')?.querySelector(
+            '.field-error-msg');
         if (!tanggalMulaiPenugasan?.value?.trim()) {
             addError(
                 'Tanggal Mulai Penugasan wajib dipilih',
@@ -588,7 +561,8 @@
 
         // --- 7. Tanggal Selesai Sub Kegiatan ---
         const tanggalSelesaiPenugasan = document.getElementById('tanggal_selesai');
-        const tanggalSelesaiPenugasanErrorMsg = tanggalSelesaiPenugasan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        const tanggalSelesaiPenugasanErrorMsg = tanggalSelesaiPenugasan?.closest('.md\\:w-3\\/4')?.querySelector(
+            '.field-error-msg');
         if (!tanggalSelesaiPenugasan?.value?.trim()) {
             addError(
                 'Tanggal Selesai Penugasan wajib dipilih',
@@ -660,6 +634,7 @@
 
     let tanggalPenugasanCounter = 0;
     let detailAnggotaCounter = {};
+
     function tambahTanggalPenugasan() {
         tanggalPenugasanCounter++;
         const sectionIndex = tanggalPenugasanCounter;
@@ -745,4 +720,3 @@
         }
     }
 </script>
-

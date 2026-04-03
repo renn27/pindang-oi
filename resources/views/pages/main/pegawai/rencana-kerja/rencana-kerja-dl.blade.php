@@ -6,6 +6,97 @@
     <div id="app" data-pegawais='@json($pegawais)'></div>
 
     <x-ui.smart-modal
+        id="modal-verifikasi-translok"
+        class="max-w-md"
+        @open-smart-modal.window="
+            if ($event.detail.modalId !== 'modal-verifikasi-translok') return;
+
+            itemKey = $event.detail.key ?? null;
+
+            Object.assign(formData, $event.detail.data ?? {});
+        ">
+        <form
+            :action="`/penugasan/${itemKey}/rencana-kerja-translok`"
+            method="POST"
+            class="grid grid-cols-1 gap-y-4">
+            @csrf
+            @method('PUT')
+
+            <div class="rounded-3xl bg-white dark:bg-gray-800">
+
+                <!-- HEADER -->
+                <div class="border-b dark:border-gray-700 px-6 py-4">
+                    <h4 class="text-lg font-semibold text-gray-800 dark:text-white">
+                        Verifikasi Translok
+                    </h4>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Review singkat sebelum mengambil keputusan
+                    </p>
+                </div>
+
+                <!-- BODY -->
+                <div class="px-6 py-5 space-y-3 text-sm text-gray-700 dark:text-gray-400">
+                    <div>
+                        <span class="font-medium text-gray-800 dark:text-gray-300">Nama Pegawai:</span><br>
+                        <span x-text="formData.nama_pegawai"></span>
+                    </div>
+
+                    <div>
+                        <span class="font-medium text-gray-800 dark:text-gray-300">Jenis Kegiatan:</span><br>
+                        <span x-text="formData.jenis_kegiatan"></span>
+                    </div>
+
+                    <div>
+                        <span class="font-medium text-gray-800 dark:text-gray-300">Waktu Pelaksanaan:</span><br>
+                        <span x-text="formData.tanggal_mulai"></span>
+                        –
+                        <span x-text="formData.tanggal_selesai"></span>
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="border-t dark:border-gray-700 px-6 py-4 flex justify-end gap-2">
+                    <button
+                        type="button"
+                        @click="open = false"
+                        class="rounded-lg border dark:border-gray-600 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        Batal
+                    </button>
+
+                    @if (Auth::user()->active_role === 'Pimpinan')
+                        <button
+                            type="submit"
+                            name="status_translok"
+                            value="Ditolak"
+                            class="rounded-lg bg-red-600 hover:bg-red-700 px-4 py-2 text-sm text-white">
+                            Tolak
+                        </button>
+
+                        <button
+                            type="submit"
+                            name="status_translok"
+                            value="ACC"
+                            class="rounded-lg bg-teal-600 hover:bg-teal-700 px-4 py-2 text-sm text-white">
+                            Setujui
+                        </button>
+                    @endif
+
+                    @if (Auth::user()->active_role === 'Ketua Tim')
+                        <button
+                            type="submit"
+                            name="status_translok"
+                            value="Menunggu"
+                            class="rounded-lg bg-orange-600 hover:bg-orange-700 px-4 py-2 text-sm text-white">
+                            Ajukan Kembali
+                        </button>
+                    @endif
+                </div>
+
+            </div>
+        </form>
+    </x-ui.smart-modal>
+
+    <x-ui.smart-modal
         id="modal-verifikasi-dl"
         class="max-w-md"
         @open-smart-modal.window="
@@ -49,7 +140,7 @@
                     <div>
                         <span class="font-medium text-gray-800 dark:text-gray-300">Waktu Pelaksanaan:</span><br>
                         <span x-text="formData.tanggal_mulai"></span>
-                        –
+                        â€“
                         <span x-text="formData.tanggal_selesai"></span>
                     </div>
                 </div>
@@ -235,7 +326,7 @@
                                                 </th>
                                                 <th
                                                     class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border border-gray-200 dark:border-gray-700">
-                                                    Status DL
+                                                    Status DL / Translok
                                                 </th>
                                             </tr>
                                         </thead>
@@ -309,128 +400,155 @@
                                                                 {{ $penugasan->tanggal_mulai?->translatedFormat('d M Y') ?? '-' }} - {{ $penugasan->tanggal_selesai?->translatedFormat('d M Y') ?? '-' }}
                                                             </td>
 
-                                                            <td class="px-4 py-3 text-sm align-top border border-gray-200 dark:border-gray-700">
-                                                                <div class="flex items-center just gap-2">
-                                                                    <div class="justify-self-start">
-                                                                        {{-- BADGE STATUS --}}
-                                                                        @if ($penugasan->status_dl === 'Menunggu')
-                                                                            <span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/30 px-2.5 py-1
-                                                                                text-xs font-medium text-yellow-800 dark:text-yellow-400">
-                                                                                Menunggu
-                                                                            </span>
-                                                                        @elseif ($penugasan->status_dl === 'ACC')
-                                                                            <span class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2.5 py-1
-                                                                                text-xs font-medium text-green-800 dark:text-green-400">
-                                                                                Diterima
-                                                                            </span>
-                                                                        @elseif ($penugasan->status_dl === 'Ditolak')
-                                                                            <div class="flex items-center gap-2">
-                                                                                <span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900/30 px-2.5 py-1
-                                                                                    text-xs font-medium text-red-800 dark:text-red-400">
-                                                                                    Ditolak
-                                                                                </span>
-
-                                                                                @if (Auth::user()->active_role === 'Ketua Tim')
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        title="Ajukan Kembali"
-                                                                                        @click="$dispatch('open-smart-modal', {
-                                                                                            modalId: 'modal-verifikasi-dl',
-                                                                                            key: @js($penugasan->id_penugasan),
-                                                                                            data: {
-                                                                                                nama_pegawai: @js($penugasan->anggota->nama_pegawai),
-                                                                                                jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
-                                                                                                tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')),
-                                                                                                tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')),
-                                                                                            }
-                                                                                        })"
-                                                                                        class="flex items-center px-2 py-1 text-[8px] font-medium
-                                                                                            bg-gray-200/80 dark:bg-gray-700 text-gray-700 dark:text-gray-300
-                                                                                            hover:bg-blue-200 dark:hover:bg-blue-800/30 hover:text-blue-700 dark:hover:text-blue-400
-                                                                                            whitespace-nowrap border-b border-gray-200 dark:border-gray-600">
-                                                                                        <!-- ICON AJUKAN ULANG -->
-                                                                                        <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                            <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                                                                d="M4 4v6h6M20 20v-6h-6M5 19a9 9 0 0014-7M19 5a9 9 0 00-14 7"/>
-                                                                                        </svg>
-                                                                                        Ajukan Kembali
-                                                                                    </button>
-                                                                                @endif
-                                                                            </div>
-                                                                        @endif
-
-                                                                    </div>
-
-                                                                    @can('acceptDL', $penugasan)
-                                                                        {{-- ================= ACC ================= --}}
-                                                                        @if ($penugasan->status_dl === 'ACC')
-
-                                                                            {{-- SUDAH MASUK KALENDER --}}
-                                                                            @if ($penugasan->sudahMasukKalenderDL())
-                                                                                <span
-                                                                                    class="items-center px-2 py-1 text-[8px] cursor-not-allowed font-medium bg-green-100/50 dark:bg-green-900/20 text-green-600/50 dark:text-green-500/50 flex whitespace-nowrap border-b border-green-200 dark:border-green-800">
-                                                                                    <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                        <path stroke-width="2" d="M9 12l2 2 4-4"/>
-                                                                                        <path stroke-width="2" d="M12 22a10 10 0 100-20 10 10 0 000 20z"/>
-                                                                                    </svg>
-                                                                                    Sudah masuk kalender
-                                                                                </span>
-
-                                                                            {{-- BELUM MASUK KALENDER --}}
-                                                                            @else
-                                                                                <form action="{{ route('kalenderDL.store') }}" method="POST" class="inline">
-                                                                                    @csrf
-                                                                                    <input type="hidden" name="id_pegawai" value="{{ $penugasan->id_anggota }}">
-                                                                                    <input type="hidden" name="id_penugasan" value="{{ $penugasan->id_penugasan }}">
-                                                                                    <input type="hidden" name="tanggal_mulai" value="{{ $penugasan->tanggal_mulai }}">
-                                                                                    <input type="hidden" name="tanggal_selesai" value="{{ $penugasan->tanggal_selesai }}">
-
-                                                                                    <button type="submit"
-                                                                                        class="items-center px-2 py-1 text-[8px] font-medium bg-gray-100/80 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-200 dark:hover:bg-blue-800/30 flex whitespace-nowrap border-b border-gray-200 dark:border-gray-600">
-                                                                                        <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                            <path stroke-width="2" d="M12 4v16m8-8H4"/>
-                                                                                        </svg>
-                                                                                        Masukkan Kalender DL
-                                                                                    </button>
-                                                                                </form>
+                                                            <td class="px-4 py-3 text-sm align-top border border-gray-200 dark:border-gray-700 space-y-4">
+                                                                {{-- DARI SINI ADALAH BLOK UNTUK DL --}}
+                                                                @if($penugasan->butuh_dl)
+                                                                    <div class="flex items-center gap-2">
+                                                                        <div class="justify-self-start font-medium text-[10px] text-gray-500 w-12 border-t border-gray-100 dark:border-gray-700 pt-1 mt-1">DL:</div>
+                                                                        <div class="justify-self-start">
+                                                                            {{-- BADGE STATUS DL --}}
+                                                                            @if ($penugasan->status_dl === 'Menunggu')
+                                                                                <span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/30 px-2.5 py-1 text-xs font-medium text-yellow-800 dark:text-yellow-400">Menunggu</span>
+                                                                            @elseif ($penugasan->status_dl === 'ACC')
+                                                                                <span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-2.5 py-1 text-xs font-medium text-blue-800 dark:text-blue-400">Diterima</span>
+                                                                            @elseif ($penugasan->status_dl === 'Ditolak')
+                                                                                <div class="flex items-center gap-2">
+                                                                                    <span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900/30 px-2.5 py-1 text-xs font-medium text-red-800 dark:text-red-400">Ditolak</span>
+                                                                                    @if (Auth::user()->active_role === 'Ketua Tim')
+                                                                                        <button type="button" title="Ajukan Kembali"
+                                                                                            @click="$dispatch('open-smart-modal', {
+                                                                                                modalId: 'modal-verifikasi-dl',
+                                                                                                key: @js($penugasan->id_penugasan),
+                                                                                                data: {
+                                                                                                    nama_pegawai: @js($penugasan->anggota->nama_pegawai),
+                                                                                                    jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
+                                                                                                    tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')),
+                                                                                                    tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')),
+                                                                                                }
+                                                                                            })"
+                                                                                            class="flex items-center px-2 py-1 text-[8px] font-medium bg-gray-200/80 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-200 dark:hover:bg-blue-800/30 hover:text-blue-700 dark:hover:text-blue-400 whitespace-nowrap border-b border-gray-200 dark:border-gray-600">
+                                                                                            <span class="mr-1">↻</span> Ajukan Kembali
+                                                                                        </button>
+                                                                                    @endif
+                                                                                </div>
                                                                             @endif
+                                                                        </div>
 
-                                                                        {{-- ================= DITOLAK ================= --}}
-                                                                        @elseif ($penugasan->status_dl === 'Ditolak')
-                                                                            <span
-                                                                                class="items-center px-2 py-1 text-[8px] font-medium cursor-not-allowed bg-red-100/50 dark:bg-red-900/20 text-red-600/50 dark:text-red-500/50 flex whitespace-nowrap border-b border-red-200 dark:border-red-800">
-                                                                                <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                    <path stroke-width="2" d="M12 9v4m0 4h.01"/>
-                                                                                    <path stroke-width="2"
-                                                                                        d="M10.29 3.86l-7.4 12.84A1 1 0 003.76 18h16.48a1 1 0 00.87-1.3l-7.4-12.84a1 1 0 00-1.72 0z"/>
-                                                                                </svg>
-                                                                                Tunggu Perubahan
-                                                                            </span>
+                                                                        @can('acceptDL', $penugasan)
+                                                                            @if ($penugasan->status_dl === 'ACC')
+                                                                                @if ($penugasan->sudahMasukKalenderDL())
+                                                                                    <span class="items-center px-2 py-1 text-[8px] cursor-not-allowed font-medium bg-blue-100/50 dark:bg-blue-900/20 text-blue-600/50 dark:text-blue-500/50 flex whitespace-nowrap border-b border-blue-200 dark:border-blue-800">
+                                                                                        ✓ Sudah masuk kalender
+                                                                                    </span>
+                                                                                @else
+                                                                                    <form action="{{ route('kalenderDL.store') }}" method="POST" class="inline">
+                                                                                        @csrf
+                                                                                        <input type="hidden" name="id_pegawai" value="{{ $penugasan->id_anggota }}">
+                                                                                        <input type="hidden" name="id_penugasan" value="{{ $penugasan->id_penugasan }}">
+                                                                                        <input type="hidden" name="tanggal_mulai" value="{{ $penugasan->tanggal_mulai }}">
+                                                                                        <input type="hidden" name="tanggal_selesai" value="{{ $penugasan->tanggal_selesai }}">
+                                                                                        <button type="submit" class="items-center px-2 py-1 text-[8px] font-medium bg-gray-100/80 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-200 dark:hover:bg-blue-800/30 flex whitespace-nowrap border-b border-gray-200 dark:border-gray-600">
+                                                                                            Masukkan Kalender DL
+                                                                                        </button>
+                                                                                    </form>
+                                                                                @endif
+                                                                            @elseif ($penugasan->status_dl === 'Ditolak')
+                                                                                <span class="items-center px-2 py-1 text-[8px] font-medium cursor-not-allowed bg-red-100/50 dark:bg-red-900/20 text-red-600/50 dark:text-red-500/50 flex whitespace-nowrap border-b border-red-200 dark:border-red-800">
+                                                                                    Tunggu Perubahan
+                                                                                </span>
+                                                                            @else
+                                                                                <button type="button" @click="$dispatch('open-smart-modal', {
+                                                                                        modalId: 'modal-verifikasi-dl',
+                                                                                        key: @js($penugasan->id_penugasan),
+                                                                                        data: {
+                                                                                            nama_pegawai: @js($penugasan->anggota->nama_pegawai),
+                                                                                            jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
+                                                                                            tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')),
+                                                                                            tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')),
+                                                                                        }
+                                                                                    })"
+                                                                                    class="items-center px-2 py-1 text-[8px] font-medium bg-gray-100/80 dark:bg-gray-700 text-gray-700 dark:text-gray-300 flex whitespace-nowrap border-b border-gray-200 dark:border-gray-600 hover:bg-orange-200 dark:hover:bg-orange-800/30">
+                                                                                    ✓ Verifikasi
+                                                                                </button>
+                                                                            @endif
+                                                                        @endcan
+                                                                    </div>
+                                                                @endif
 
-                                                                        {{-- ================= MENUNGGU / VERIFIKASI ================= --}}
-                                                                        @else
-                                                                            <button
-                                                                                type="button"
-                                                                                @click="$dispatch('open-smart-modal', {
-                                                                                    modalId: 'modal-verifikasi-dl',
-                                                                                    key: @js($penugasan->id_penugasan),
-                                                                                    data: {
-                                                                                        nama_pegawai: @js($penugasan->anggota->nama_pegawai),
-                                                                                        jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
-                                                                                        tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')),
-                                                                                        tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')),
-                                                                                    }
-                                                                                })"
-                                                                                class="items-center px-2 py-1 text-[8px] font-medium bg-gray-100/80 dark:bg-gray-700 text-gray-700 dark:text-gray-300 flex whitespace-nowrap border-b border-gray-200 dark:border-gray-600 hover:bg-orange-200 dark:hover:bg-orange-800/30">
-                                                                                <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                    <path stroke-width="2" d="M12 8v4l3 3"/>
-                                                                                    <path stroke-width="2" d="M12 22a10 10 0 100-20 10 10 0 000 20z"/>
-                                                                                </svg>
-                                                                                Verifikasi
-                                                                            </button>
-                                                                        @endif
-                                                                    @endcan
-                                                                </div>
+                                                                {{-- DARI SINI ADALAH BLOK UNTUK TRANSLOK --}}
+                                                                @if($penugasan->butuh_translok)
+                                                                    <div class="flex items-center gap-2">
+                                                                        <div class="justify-self-start font-medium text-[10px] text-gray-500 w-12 border-t border-gray-100 dark:border-gray-700 pt-1 mt-1">Translok:</div>
+                                                                        <div class="justify-self-start">
+                                                                            {{-- BADGE STATUS TRANSLOK --}}
+                                                                            @if ($penugasan->status_translok === 'Menunggu')
+                                                                                <span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/30 px-2.5 py-1 text-xs font-medium text-yellow-800 dark:text-yellow-400">Menunggu</span>
+                                                                            @elseif ($penugasan->status_translok === 'ACC')
+                                                                                <span class="inline-flex items-center rounded-full bg-teal-100 dark:bg-teal-900/30 px-2.5 py-1 text-xs font-medium text-teal-800 dark:text-teal-400">Diterima</span>
+                                                                            @elseif ($penugasan->status_translok === 'Ditolak')
+                                                                                <div class="flex items-center gap-2">
+                                                                                    <span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900/30 px-2.5 py-1 text-xs font-medium text-red-800 dark:text-red-400">Ditolak</span>
+                                                                                    @if (Auth::user()->active_role === 'Ketua Tim')
+                                                                                        <button type="button" title="Ajukan Kembali"
+                                                                                            @click="$dispatch('open-smart-modal', {
+                                                                                                modalId: 'modal-verifikasi-translok',
+                                                                                                key: @js($penugasan->id_penugasan),
+                                                                                                data: {
+                                                                                                    nama_pegawai: @js($penugasan->anggota->nama_pegawai),
+                                                                                                    jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
+                                                                                                    tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')),
+                                                                                                    tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')),
+                                                                                                }
+                                                                                            })"
+                                                                                            class="flex items-center px-2 py-1 text-[8px] font-medium bg-gray-200/80 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-teal-200 dark:hover:bg-teal-800/30 hover:text-teal-700 dark:hover:text-teal-400 whitespace-nowrap border-b border-gray-200 dark:border-gray-600">
+                                                                                            <span class="mr-1">↻</span> Ajukan Kembali
+                                                                                        </button>
+                                                                                    @endif
+                                                                                </div>
+                                                                            @endif
+                                                                        </div>
+
+                                                                        @can('acceptTranslok', $penugasan)
+                                                                            @if ($penugasan->status_translok === 'ACC')
+                                                                                @if ($penugasan->sudahMasukKalenderDL())
+                                                                                    <span class="items-center px-2 py-1 text-[8px] cursor-not-allowed font-medium bg-teal-100/50 dark:bg-teal-900/20 text-teal-600/50 dark:text-teal-500/50 flex whitespace-nowrap border-b border-teal-200 dark:border-teal-800">
+                                                                                        ✓ Sudah masuk kalender
+                                                                                    </span>
+                                                                                @else
+                                                                                    <form action="{{ route('kalenderDL.store') }}" method="POST" class="inline">
+                                                                                        @csrf
+                                                                                        <input type="hidden" name="id_pegawai" value="{{ $penugasan->id_anggota }}">
+                                                                                        <input type="hidden" name="id_penugasan" value="{{ $penugasan->id_penugasan }}">
+                                                                                        <input type="hidden" name="tanggal_mulai" value="{{ $penugasan->tanggal_mulai }}">
+                                                                                        <input type="hidden" name="tanggal_selesai" value="{{ $penugasan->tanggal_selesai }}">
+                                                                                        <!-- NOTE: Kita buat tombol generic "Masukkan Kalender" -->
+                                                                                        <button type="submit" class="items-center px-2 py-1 text-[8px] font-medium bg-gray-100/80 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-teal-200 dark:hover:bg-teal-800/30 flex whitespace-nowrap border-b border-gray-200 dark:border-gray-600">
+                                                                                            Masukkan Kalender Translok
+                                                                                        </button>
+                                                                                    </form>
+                                                                                @endif
+                                                                            @elseif ($penugasan->status_translok === 'Ditolak')
+                                                                                <span class="items-center px-2 py-1 text-[8px] font-medium cursor-not-allowed bg-red-100/50 dark:bg-red-900/20 text-red-600/50 dark:text-red-500/50 flex whitespace-nowrap border-b border-red-200 dark:border-red-800">
+                                                                                    Tunggu Perubahan
+                                                                                </span>
+                                                                            @else
+                                                                                <button type="button" @click="$dispatch('open-smart-modal', {
+                                                                                        modalId: 'modal-verifikasi-translok',
+                                                                                        key: @js($penugasan->id_penugasan),
+                                                                                        data: {
+                                                                                            nama_pegawai: @js($penugasan->anggota->nama_pegawai),
+                                                                                            jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
+                                                                                            tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')),
+                                                                                            tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')),
+                                                                                        }
+                                                                                    })"
+                                                                                    class="items-center px-2 py-1 text-[8px] font-medium bg-gray-100/80 dark:bg-gray-700 text-gray-700 dark:text-gray-300 flex whitespace-nowrap border-b border-gray-200 dark:border-gray-600 hover:bg-orange-200 dark:hover:bg-orange-800/30">
+                                                                                    ✓ Verifikasi
+                                                                                </button>
+                                                                            @endif
+                                                                        @endcan
+                                                                    </div>
+                                                                @endif
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -472,3 +590,4 @@
         </x-common.component-card>
     </div>
 @endsection
+

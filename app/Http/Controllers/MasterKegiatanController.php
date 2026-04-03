@@ -24,7 +24,7 @@ class MasterKegiatanController extends Controller
     {
         // Data referensi untuk dropdown modal
         $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
-        $rkJpts   = RencanaJPT::orderBy('nama_rencana_jpt')->get(['id', 'nama_rencana_jpt']);
+        $rkJpts = RencanaJPT::orderBy('nama_rencana_jpt')->get(['id', 'nama_rencana_jpt']);
         $jenisKegiatans = JenisKegiatan::query()
             ->orderByRaw("
                 CASE
@@ -64,12 +64,12 @@ class MasterKegiatanController extends Controller
         ])->orderBy('nama_bidang')->get();
 
         return view('pages.main.pegawai.rencana-kerja.master-kegiatan', [
-            'title'         => "Master Kegiatan",
-            'bidangs'       => $bidangs,
-            'pegawais'      => $pegawais,
-            'rkJpts'        => $rkJpts,
+            'title' => "Master Kegiatan",
+            'bidangs' => $bidangs,
+            'pegawais' => $pegawais,
+            'rkJpts' => $rkJpts,
             'jenisKegiatans' => $jenisKegiatans,
-            'ketuaTims'     => $ketuaTims
+            'ketuaTims' => $ketuaTims
         ]);
     }
 
@@ -122,12 +122,12 @@ class MasterKegiatanController extends Controller
 
                 // 1️⃣ SIMPAN KEGIATAN (PARENT)
                 $kegiatan = Kegiatan::create([
-                    'id_bidang'            => $request->id_bidang,
-                    'nama_rk_kegiatan'     => $request->nama_rk_kegiatan,
-                    'rk_jpt'               => $request->rk_jpt,
-                    'iki_jpt'              => $request->iki_jpt,
-                    'id_penanggung_jawab'  => $request->id_penanggung_jawab,
-                    'tahun_kegiatan'       => $request->tahun_kegiatan,
+                    'id_bidang' => $request->id_bidang,
+                    'nama_rk_kegiatan' => $request->nama_rk_kegiatan,
+                    'rk_jpt' => $request->rk_jpt,
+                    'iki_jpt' => $request->iki_jpt,
+                    'id_penanggung_jawab' => $request->id_penanggung_jawab,
+                    'tahun_kegiatan' => $request->tahun_kegiatan,
                 ]);
 
                 $rkAnggotas = $request->rk_anggota ?? [];
@@ -136,28 +136,30 @@ class MasterKegiatanController extends Controller
 
                     $subKegiatan = $kegiatan->subKegiatans()->create([
                         'nama_sub_kegiatan' => $rkAnggota,
-                        'target'            => $request->target[$index] ?? null,
-                        'satuan_target'     => $request->satuan_target[$index] ?? null,
-                        'tanggal_mulai'     => $request->tanggal_mulai[$index] ?? null,
-                        'tanggal_selesai'   => $request->tanggal_selesai[$index] ?? null,
-                        'status'            => 'Berjalan', // ✅ DEFAULT
+                        'target' => $request->target[$index] ?? null,
+                        'satuan_target' => $request->satuan_target[$index] ?? null,
+                        'tanggal_mulai' => $request->tanggal_mulai[$index] ?? null,
+                        'tanggal_selesai' => $request->tanggal_selesai[$index] ?? null,
+                        'status' => 'Berjalan', // ✅ DEFAULT
                     ]);
 
                     // Ambil key section (rk-anggota-1, dst)
                     $sectionKey = $request->rk_section_keys[$index] ?? null;
 
-                    if (!$sectionKey) continue;
+                    if (!$sectionKey)
+                        continue;
 
-                    $anggotaIds     = $request->detail_id_anggota[$sectionKey] ?? [];
+                    $anggotaIds = $request->detail_id_anggota[$sectionKey] ?? [];
                     $jenisKegiatans = $request->detail_id_jenis_kegiatan[$sectionKey] ?? [];
-                    $butuhDlInputs  = $request->detail_butuh_dl[$sectionKey] ?? [];
-                    $targets        = $request->detail_target[$sectionKey] ?? [];
-                    $satuanTargets  = $request->detail_satuan_target[$sectionKey] ?? [];
-                    $tglMulais      = $request->detail_tanggal_mulai[$sectionKey] ?? [];
-                    $tglSelesais    = $request->detail_tanggal_selesai[$sectionKey] ?? [];
+                    $butuhDlInputs = $request->detail_butuh_dl[$sectionKey] ?? [];
+                    $targets = $request->detail_target[$sectionKey] ?? [];
+                    $satuanTargets = $request->detail_satuan_target[$sectionKey] ?? [];
+                    $tglMulais = $request->detail_tanggal_mulai[$sectionKey] ?? [];
+                    $tglSelesais = $request->detail_tanggal_selesai[$sectionKey] ?? [];
 
                     foreach ($anggotaIds as $i => $idAnggota) {
-                        if (!$idAnggota) continue;
+                        if (!$idAnggota)
+                            continue;
 
                         $idJenisKegiatan = $jenisKegiatans[$i] ?? null;
 
@@ -172,7 +174,7 @@ class MasterKegiatanController extends Controller
 
                             $jenis = JenisKegiatan::create([
                                 'jenis_kegiatan' => $namaBaru,
-                                'kategori'       => 'Tambahan',
+                                'kategori' => 'Tambahan',
                             ]);
 
                             $idJenisKegiatan = $jenis->id;
@@ -200,15 +202,15 @@ class MasterKegiatanController extends Controller
                         $butuhDlFinal = $wajibDl || $requestButuhDl;
 
                         $subKegiatan->penugasans()->create([
-                            'id_anggota'      => $idAnggota,
+                            'id_anggota' => $idAnggota,
                             'id_jenis_kegiatan' => $idJenisKegiatan,
-                            'target'          => $targets[$i] ?? null,
-                            'satuan_target'   => $satuanTargets[$i] ?? null,
-                            'tanggal_mulai'   => $tglMulais[$i] ?? null,
+                            'target' => $targets[$i] ?? null,
+                            'satuan_target' => $satuanTargets[$i] ?? null,
+                            'tanggal_mulai' => $tglMulais[$i] ?? null,
                             'tanggal_selesai' => $tglSelesais[$i] ?? null,
-                            'butuh_dl'        => $butuhDlFinal,
-                            'status_dl'       => $butuhDlFinal ? 'Menunggu' : null,
-                            'status'          => 'Belum Dikirim', // ✅ DEFAULT
+                            'butuh_dl' => $butuhDlFinal,
+                            'status_dl' => $butuhDlFinal ? 'Menunggu' : null,
+                            'status' => 'Belum Dikirim', // ✅ DEFAULT
                         ]);
                     }
                 }
@@ -272,67 +274,79 @@ class MasterKegiatanController extends Controller
                     $q->where('id_penanggung_jawab', $pegawai->id_pegawai);
                 })
                 ->whereHas('subKegiatans.penugasans', function ($q) {
-                    $q->where('butuh_dl', true);
+                    $q->where(function ($query) {
+                        $query->where('butuh_dl', true)->orWhere('butuh_translok', true);
+                    });
                 });
         })
-        ->with([
-            'kegiatans' => function ($kegiatanQuery) use ($pegawai, $activeRole) {
+            ->with([
+                'kegiatans' => function ($kegiatanQuery) use ($pegawai, $activeRole) {
 
-                $kegiatanQuery
-                    ->when($activeRole === 'Ketua Tim', function ($q) use ($pegawai) {
-                        $q->where('id_penanggung_jawab', $pegawai->id_pegawai);
-                    })
-                    ->whereHas('subKegiatans.penugasans', function ($q) {
-                        $q->where('butuh_dl', true);
-                    })
-                    ->with([
-                        'subKegiatans' => function ($subQuery) {
+                    $kegiatanQuery
+                        ->when($activeRole === 'Ketua Tim', function ($q) use ($pegawai) {
+                            $q->where('id_penanggung_jawab', $pegawai->id_pegawai);
+                        })
+                        ->whereHas('subKegiatans.penugasans', function ($q) {
+                            $q->where(function ($query) {
+                                $query->where('butuh_dl', true)->orWhere('butuh_translok', true);
+                            });
+                        })
+                        ->with([
+                            'subKegiatans' => function ($subQuery) {
 
-                            $subQuery->whereHas('penugasans', function ($q) {
-                                $q->where('butuh_dl', true);
-                            })
-                            ->with([
-                                'penugasans' => function ($penugasanQuery) {
-                                    $penugasanQuery
-                                        ->where('butuh_dl', true)
-                                        ->with(['anggota', 'jenisKegiatan']);
-                                }
-                            ]);
-                        },
-                        'rencanaJpt',
-                        'indikatorJpt',
-                        'penanggungJawab'
-                    ]);
-            }
-        ])
-        ->orderBy('nama_bidang')
-        ->get();
+                                $subQuery->whereHas('penugasans', function ($q) {
+                                    $q->where(function ($query) {
+                                        $query->where('butuh_dl', true)->orWhere('butuh_translok', true);
+                                    });
+                                })
+                                    ->with([
+                                        'penugasans' => function ($penugasanQuery) {
+                                            $penugasanQuery
+                                                ->where(function ($query) {
+                                                    $query->where('butuh_dl', true)->orWhere('butuh_translok', true);
+                                                })
+                                                ->with(['anggota', 'jenisKegiatan']);
+                                        }
+                                    ]);
+                            },
+                            'rencanaJpt',
+                            'indikatorJpt',
+                            'penanggungJawab'
+                        ]);
+                }
+            ])
+            ->orderBy('nama_bidang')
+            ->get();
 
-        // 🔹 Hitung jumlah "Menunggu" dan "Ditolak" untuk tiap bidang
-        $bidangs->each(function($bidang) {
-            $bidang->menungguCount = $bidang->kegiatans->sum(function($kegiatan) {
-                return $kegiatan->subKegiatans->sum(function($sub) {
-                    return $sub->penugasans->where('status_dl', 'Menunggu')->count();
+        // 🔹 Hitung jumlah "Menunggu" dan "Ditolak" untuk tiap bidang (Status DL ATAU Translok)
+        $bidangs->each(function ($bidang) {
+            $bidang->menungguCount = $bidang->kegiatans->sum(function ($kegiatan) {
+                return $kegiatan->subKegiatans->sum(function ($sub) {
+                    return $sub->penugasans->filter(function ($p) {
+                        return $p->status_dl === 'Menunggu' || $p->status_translok === 'Menunggu';
+                    })->count();
                 });
             });
 
-            $bidang->ditolakCount = $bidang->kegiatans->sum(function($kegiatan) {
-                return $kegiatan->subKegiatans->sum(function($sub) {
-                    return $sub->penugasans->where('status_dl', 'Ditolak')->count();
+            $bidang->ditolakCount = $bidang->kegiatans->sum(function ($kegiatan) {
+                return $kegiatan->subKegiatans->sum(function ($sub) {
+                    return $sub->penugasans->filter(function ($p) {
+                        return $p->status_dl === 'Ditolak' || $p->status_translok === 'Ditolak';
+                    })->count();
                 });
             });
         });
 
         $allPenugasans = $bidangs
-            ->flatMap(fn ($bidang) => $bidang->kegiatans)
-            ->flatMap(fn ($kegiatan) => $kegiatan->subKegiatans)
-            ->flatMap(fn ($sub) => $sub->penugasans);
+            ->flatMap(fn($bidang) => $bidang->kegiatans)
+            ->flatMap(fn($kegiatan) => $kegiatan->subKegiatans)
+            ->flatMap(fn($sub) => $sub->penugasans);
 
         return view('pages.main.pegawai.rencana-kerja.rencana-kerja-dl', [
-            'title'         => "Rencana Kerja Perlu DL",
-            'bidangs'       => $bidangs,
-            'pegawais'      => $pegawais,
-            'ketuaTims'     => $ketuaTims,
+            'title' => "Rencana Kerja Perlu DL",
+            'bidangs' => $bidangs,
+            'pegawais' => $pegawais,
+            'ketuaTims' => $ketuaTims,
             'allPenugasans' => $allPenugasans,
         ]);
     }

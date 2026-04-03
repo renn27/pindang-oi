@@ -129,6 +129,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/rencana-kerja-dl', [MasterKegiatanController::class, 'index_rk_dl'])->name('master-kegiatan.index_rk_dl');
     Route::put('/penugasan/{penugasan:id_penugasan}/rencana-kerja-dl', [PenugasanController::class, 'update_rk_dl'])->name('penugasan.update_rk_dl');
+    Route::put('/penugasan/{penugasan:id_penugasan}/rencana-kerja-translok', [PenugasanController::class, 'update_rk_translok'])->name('penugasan.update_rk_translok');
     // END ROUTE MASTER KEGIATAN
 
     // ROUTE KALENDER DL
