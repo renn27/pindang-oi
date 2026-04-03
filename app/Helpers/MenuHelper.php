@@ -32,6 +32,8 @@ class MenuHelper
                 'name' => 'Pimpinan',
                 'subItems' => [
                     ['name' => 'RK & IKI Pimpinan', 'path' => '/rencana-indikator-jpt/rencana'],
+                    ['name' => 'Agenda Pimpinan', 'path' => '/agenda-pimpinan'],
+
                 ],
             ],
             [

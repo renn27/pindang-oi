@@ -85,20 +85,37 @@
     <!-- Container untuk Card Kegiatan -->
     <div class="space-y-6">
         @foreach ($kegiatans as $kegiatan)
-            <!-- CARD PER KEGIATAN -->
-            <div class="rounded-2xl border border-gray-200 bg-white overflow-hidden dark:border-gray-800 dark:bg-gray-900">
-                <!-- HEADER CARD -->
+            <!-- CARD PER KEGIATAN dengan Accordion -->
+            <div x-data="{ openSubKegiatan: false }" class="rounded-2xl border border-gray-200 bg-white overflow-hidden dark:border-gray-800 dark:bg-gray-900">
+                <!-- HEADER CARD (Sebagai Tombol Accordion) -->
                 <div class="bg-white px-6 py-4 border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
-                                {{ $kegiatan->nama_rk_kegiatan }}
-                            </h3>
-
-                            <p class="text-sm text-gray-600 mt-1 dark:text-gray-300">
-                                Ketua: {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
-                            </p>
+                        <div class="flex-1">
+                            <!-- Tombol Accordion untuk Nama Kegiatan -->
+                            <button 
+                                @click="openSubKegiatan = !openSubKegiatan"
+                                class="flex items-center gap-3 w-full sm:w-auto text-left group">
+                                <!-- Icon Chevron -->
+                                <svg 
+                                    class="w-5 h-5 text-gray-500 transition-transform duration-200"
+                                    :class="{ 'rotate-90': openSubKegiatan }"
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                                
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                        {{ $kegiatan->nama_rk_kegiatan }}
+                                    </h3>
+                                    <p class="text-sm text-gray-600 mt-1 dark:text-gray-300">
+                                        Ketua: {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
+                                    </p>
+                                </div>
+                            </button>
                         </div>
+                        
                         <!-- ACTION BUTTON -->
                         <div class="flex flex-wrap gap-2">
                             @can('update', $kegiatan)
@@ -109,7 +126,7 @@
                                         shadow-theme-xs hover:bg-yellow-50 hover:text-yellow-700
                                         hover:border-yellow-300 transition-all duration-200
                                         dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-yellow-900/30 dark:hover:text-yellow-400"
-                                    @click="$dispatch('open-smart-modal', {
+                                    @click.stop="$dispatch('open-smart-modal', {
                                             modalId: 'modal-kegiatan',
                                             mode: 'edit',
                                             key: '{{ $kegiatan->id_kegiatan }}',
@@ -145,7 +162,7 @@
                                             'delete-kegiatan-{{ $kegiatan->id_kegiatan }}',
                                             '{{ $kegiatan->nama_rk_kegiatan }}'
                                         )"
-                                                                            class="flex items-center gap-2 rounded-full border border-gray-300
+                                        class="flex items-center gap-2 rounded-full border border-gray-300
                                         bg-white px-4 py-3 text-sm font-medium text-gray-700
                                         shadow-theme-xs hover:bg-red-50 hover:text-red-700
                                         hover:border-red-300 transition-all duration-200
@@ -167,7 +184,7 @@
                                     shadow-theme-xs hover:bg-green-50 hover:text-green-700
                                     hover:border-green-300 transition-all duration-200
                                     dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-green-900/30 dark:hover:text-green-400"
-                                    @click="$dispatch('open-smart-modal', {
+                                    @click.stop="$dispatch('open-smart-modal', {
                                         modalId: 'modal-sub-kegiatan',
                                         data: {
                                             id_kegiatan: '{{ $kegiatan->id_kegiatan }}',
@@ -183,11 +200,17 @@
                         </div>
                     </div>
                 </div>
-                {{-- Tabel Sub Kegiatan --}}
-                @include('pages.main.components.tables.tagihan-kerja.table-sub-kegiatan')
+                
+                <!-- ACCORDION CONTENT: Tabel Sub Kegiatan -->
+                <div 
+                    x-show="openSubKegiatan"
+                    x-collapse
+                    x-cloak
+                    class="transition-all duration-300">
+                    @include('pages.main.components.tables.tagihan-kerja.table-sub-kegiatan')
+                </div>
             </div>
         @endforeach
-
     </div>
 
     {{-- MODAL KEGIATAN --}}
@@ -198,6 +221,13 @@
 
     {{-- MODAL SUB KEGIATAN --}}
     @include('pages.main.components.modals.tagihan-kerja.modal-sub-kegiatan')
+
+    <style>
+        /* Untuk menghilangkan flash content sebelum Alpine.js diinisialisasi */
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
 
     <script>
         async function loadIkiByRk(rkId, formData) {
@@ -217,25 +247,5 @@
                 formData.ikiOptions = [];
             }
         }
-        // function loadIkiByRk(rkId, formData) {
-        //     const selectedIki = formData.iki_jpt;
-
-        //     if (!rkId) {
-        //         formData.ikiOptions = [];
-        //         formData.iki_jpt = '';
-        //         return;
-        //     }
-
-        //     fetch(`/rencana-indikator-jpt/${rkId}/indikator`)
-        //         .then(res => res.json())
-        //         .then(data => {
-        //             formData.ikiOptions = data;
-
-        //             // 🔥 pastikan value dipilih SETELAH option ada
-        //             if (selectedIki) {
-        //                 formData.iki_jpt = selectedIki;
-        //             }
-        //         });
-        // }
     </script>
 @endsection

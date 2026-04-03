@@ -17,6 +17,8 @@ use App\Http\Controllers\PenugasanController;
 use App\Http\Controllers\RencanaJPTController;
 use App\Http\Controllers\SubKegiatanController;
 use App\Http\Controllers\PegawaiRoleController;
+use App\Http\Controllers\AgendaPimpinanController;
+
 use Illuminate\Support\Facades\Auth;
 
 // ROUTE DASHBOARD VISUALISASI DATA
@@ -68,6 +70,15 @@ Route::middleware('auth')->group(function () {
         });
     });
     // END RK IKI JPT BY PIMPINAN
+
+    // CRUD AGENDA PIMPINAN BY PIMPINAN
+    Route::prefix('agenda-pimpinan')->group(function () {
+        Route::get('/', [AgendaPimpinanController::class, 'index'])->name('agenda.index');
+        Route::post('/', [AgendaPimpinanController::class, 'store'])->name('agenda.store');
+        Route::put('/{agenda}', [AgendaPimpinanController::class, 'update'])->name('agenda.update');
+        Route::delete('/{agenda}', [AgendaPimpinanController::class, 'delete'])->name('agenda.delete');
+    });
+    // END AGENDA PIMPINAN BY PIMPINAN
 
     // CRUD BIDANG KERJA BY ADMIN
     Route::prefix('bidang-kerja')->group(function () {
@@ -153,8 +164,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/kegiatan/export-mph-all', [MasterKegiatanController::class, 'exportMphAll'])
         ->name('kegiatan.export-mph-all');
-
-
 });
 
 require __DIR__ . '/auth.php';
