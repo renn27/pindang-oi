@@ -112,6 +112,10 @@ class MasterKegiatanController extends Controller
                 'detail_butuh_dl.*' => ['array'],
                 'detail_butuh_dl.*.*' => ['nullable', 'boolean'],
 
+                'detail_butuh_translok' => ['nullable', 'array'],
+                'detail_butuh_translok.*' => ['array'],
+                'detail_butuh_translok.*.*' => ['nullable', 'boolean'],
+
                 'detail_target' => ['array'],
                 'detail_satuan_target' => ['array'],
                 'detail_tanggal_mulai' => ['array'],
@@ -152,6 +156,7 @@ class MasterKegiatanController extends Controller
                     $anggotaIds = $request->detail_id_anggota[$sectionKey] ?? [];
                     $jenisKegiatans = $request->detail_id_jenis_kegiatan[$sectionKey] ?? [];
                     $butuhDlInputs = $request->detail_butuh_dl[$sectionKey] ?? [];
+                    $butuhTranslokInputs = $request->detail_butuh_translok[$sectionKey] ?? [];
                     $targets = $request->detail_target[$sectionKey] ?? [];
                     $satuanTargets = $request->detail_satuan_target[$sectionKey] ?? [];
                     $tglMulais = $request->detail_tanggal_mulai[$sectionKey] ?? [];
@@ -198,8 +203,21 @@ class MasterKegiatanController extends Controller
                         ]);
 
                         $requestButuhDl = (bool) ($butuhDlInputs[$i] ?? false);
+                        $requestButuhTranslok = (bool) ($butuhTranslokInputs[$i] ?? false);
 
-                        $butuhDlFinal = $wajibDl || $requestButuhDl;
+                        $butuhDlFinal = false;
+                        $butuhTranslokFinal = false;
+
+                        if ($wajibDl) {
+                            // Untuk 4 jenis kegiatan → wajib pilih salah satu
+                            if ($requestButuhDl) {
+                                $butuhDlFinal = true;
+                            } elseif ($requestButuhTranslok) {
+                                $butuhTranslokFinal = true;
+                            } else {
+                                $butuhDlFinal = true; // fallback
+                            }
+                        }
 
                         $subKegiatan->penugasans()->create([
                             'id_anggota' => $idAnggota,
@@ -210,6 +228,8 @@ class MasterKegiatanController extends Controller
                             'tanggal_selesai' => $tglSelesais[$i] ?? null,
                             'butuh_dl' => $butuhDlFinal,
                             'status_dl' => $butuhDlFinal ? 'Menunggu' : null,
+                            'butuh_translok' => $butuhTranslokFinal,
+                            'status_translok' => $butuhTranslokFinal ? 'Menunggu' : null,
                             'status' => 'Belum Dikirim', // ✅ DEFAULT
                         ]);
                     }

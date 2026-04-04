@@ -1,4 +1,4 @@
-﻿@extends('layouts.dashboard')
+@extends('layouts.dashboard')
 
 @section('content')
     <x-common.page-breadcrumb pageTitle="Master Kegiatan" />
@@ -817,18 +817,37 @@
                             idJenisKegiatan: '',
                             isOther: false,
                             butuhDl: false,
-                            isLocked: true,
+                            butuhTranslok: false,
                             wajibJenis: [3,4,5,6],
+                            
                             get jenisId() { return Number(this.idJenisKegiatan || 0) },
+                            get showToggle() { return this.wajibJenis.includes(this.jenisId) },
                             get isLainnya() { return this.idJenisKegiatan === 'LAINNYA' },
                             get jenisSelected() { return this.jenisId > 0 || this.isLainnya },
+                            
                             syncState() {
-                                const isWajib = this.wajibJenis.includes(this.jenisId);
                                 this.isOther = this.idJenisKegiatan === 'LAINNYA';
-                                if (this.isLainnya) { this.butuhDl = false; this.isLocked = false; return; }
-                                if (!this.jenisSelected) { this.butuhDl = false; this.isLocked = true; return; }
-                                if (isWajib) { this.butuhDl = true; this.isLocked = true; }
-                                else { this.butuhDl = false; this.isLocked = false; }
+                                
+                                if (!this.showToggle) {
+                                    this.butuhDl = false;
+                                    this.butuhTranslok = false;
+                                    return;
+                                }
+
+                                if (!this.butuhDl && !this.butuhTranslok) {
+                                    this.butuhDl = true;
+                                    this.butuhTranslok = false;
+                                }
+                            },
+
+                            toggleDL() {
+                                this.butuhDl = true;
+                                this.butuhTranslok = false;
+                            },
+
+                            toggleTranslok() {
+                                this.butuhTranslok = true;
+                                this.butuhDl = false;
                             }
                         }"
                         x-effect="syncState()"
@@ -839,7 +858,7 @@
                                 Jenis Kegiatan
                             </label>
 
-                            <div class="md:col-span-2 space-y-2">
+                            <div class="md:col-span-3 space-y-2">
                                 <select
                                     name="detail_id_jenis_kegiatan[${sectionId}][]"
                                     x-model="idJenisKegiatan"
@@ -863,39 +882,51 @@
                                         placeholder="Masukkan jenis kegiatan baru"
                                         class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 px-3 py-2 text-xs focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 transition" />
                                 </div>
-                            </div>
+                                
+                                <!-- TOGGLE DL / TRANSLOK -->
+                                <div x-show="showToggle" x-transition class="pt-2">
+                                    <label class="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                        Pilih Salah Satu
+                                    </label>
 
-                            <div class="md:col-span-1 flex md:justify-end items-center gap-3 pt-2">
-                                <button
-                                    type="button"
-                                    @click="if (!isLocked) butuhDl = !butuhDl"
-                                    :class="{
-                                        'bg-brand-500 dark:bg-brand-600 shadow-sm': butuhDl,
-                                        'bg-gray-200 dark:bg-gray-700 shadow-sm': !butuhDl,
-                                        'cursor-not-allowed opacity-60': isLocked
-                                    }"
-                                    class="relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-200">
-                                    <span
-                                        :class="butuhDl ? 'translate-x-7' : 'translate-x-1'"
-                                        class="inline-block h-5 w-5 bg-white dark:bg-gray-300 rounded-full shadow-sm transition-all duration-200">
-                                    </span>
-                                </button>
-                                <span
-                                    class="text-xs font-medium transition-colors duration-200 whitespace-nowrap"
-                                    :class="butuhDl ? 'text-brand-600 dark:text-brand-400' : 'text-gray-500 dark:text-gray-400'"
-                                    x-text="!jenisSelected ? 'Pilih dulu' : (butuhDl ? 'Perlu DL' : 'Tidak DL')">
-                                </span>
+                                    <div class="flex gap-6">
+                                        <!-- DL -->
+                                        <div class="flex items-center gap-3">
+                                            <button type="button" @click="toggleDL()" :class="butuhDl ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-700'"
+                                                class="relative inline-flex h-6 w-12 items-center rounded-full transition">
+                                                <span :class="butuhDl ? 'translate-x-[26px]' : 'translate-x-1'"
+                                                    class="inline-block h-4 w-4 bg-white rounded-full transition">
+                                                </span>
+                                            </button>
+                                            <span class="text-xs font-medium" :class="butuhDl ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'">
+                                                DL
+                                            </span>
+                                        </div>
+
+                                        <!-- TRANSLOK -->
+                                        <div class="flex items-center gap-3">
+                                            <button type="button" @click="toggleTranslok()" :class="butuhTranslok ? 'bg-teal-500' : 'bg-gray-300 dark:bg-gray-700'"
+                                                class="relative inline-flex h-6 w-12 items-center rounded-full transition">
+                                                <span :class="butuhTranslok ? 'translate-x-[26px]' : 'translate-x-1'"
+                                                    class="inline-block h-4 w-4 bg-white rounded-full transition">
+                                                </span>
+                                            </button>
+                                            <span class="text-xs font-medium" :class="butuhTranslok ? 'text-teal-600 dark:text-teal-400' : 'text-gray-500 dark:text-gray-400'">
+                                                Translok
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <p class="mt-2 text-[11px] text-gray-500 dark:text-gray-400">
+                                        Pilih salah satu: DL atau Translok.
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
                         <div class="mt-2 md:ml-[25%]">
-                            <p x-show="!jenisSelected" class="text-xs text-brand-500/70 dark:text-brand-400/70">
-                                Pilih jenis kegiatan untuk menentukan keperluan DL.
-                            </p>
-                            <p x-show="isLocked && jenisSelected" class="text-xs text-gray-400 dark:text-gray-500">
-                                Jenis kegiatan ini otomatis memerlukan DL dan tidak dapat diubah.
-                            </p>
                             <input type="hidden" name="detail_butuh_dl[${sectionId}][]" :value="butuhDl ? 1 : 0">
+                            <input type="hidden" name="detail_butuh_translok[${sectionId}][]" :value="butuhTranslok ? 1 : 0">
                         </div>
                     </div>
 
@@ -1111,11 +1142,17 @@
 
                             const butuhDLInput = detail.querySelector('input[name*="detail_butuh_dl"]');
                             const butuhDL = butuhDLInput ? Number(butuhDLInput.value) === 1 : false;
-                            const butuhDLText = butuhDL ? 'Perlu Dinas Luar / Surat Tugas' :
-                                'Tidak Perlu Dinas Luar / Surat Tugas';
-                            const butuhDLBadge = butuhDL ?
-                                `<span class="inline-flex items-center rounded-md bg-green-100 dark:bg-green-900/40 px-2 py-1 text-[11px] font-medium text-green-700 dark:text-green-400">✓ ${butuhDLText}</span>` :
-                                `<span class="inline-flex items-center rounded-md bg-orange-100 dark:bg-orange-900/40 px-2 py-1 text-[11px] font-medium text-orange-700 dark:text-orange-400">✕ ${butuhDLText}</span>`;
+
+                            const butuhTranslokInput = detail.querySelector('input[name*="detail_butuh_translok"]');
+                            const butuhTranslok = butuhTranslokInput ? Number(butuhTranslokInput.value) === 1 : false;
+
+                            let butuhDLBadge = `<span class="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-900/40 px-2 py-1 text-[11px] font-medium text-gray-600 dark:text-gray-400">Tidak Perlu DL / Translok</span>`;
+                            
+                            if (butuhDL) {
+                                butuhDLBadge = `<span class="inline-flex items-center rounded-md bg-blue-100 dark:bg-blue-900/40 px-2 py-1 text-[11px] font-medium text-blue-700 dark:text-blue-400">✓ Perlu Dinas Luar</span>`;
+                            } else if (butuhTranslok) {
+                                butuhDLBadge = `<span class="inline-flex items-center rounded-md bg-teal-100 dark:bg-teal-900/40 px-2 py-1 text-[11px] font-medium text-teal-700 dark:text-teal-400">✓ Perlu Translok</span>`;
+                            }
 
                             const detailTanggalMulaiInput = detail.querySelector(
                                 `input[name="detail_tanggal_mulai[${sectionId}][]"]`);
