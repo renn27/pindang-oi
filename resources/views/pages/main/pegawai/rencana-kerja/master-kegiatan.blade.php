@@ -606,7 +606,7 @@
             detailAnggotaCounter[sectionId] = 0;
 
             const sectionHTML = `
-                <div id="${sectionId}" class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
+                <div id="${sectionId}" x-data="{ min_date: '', max_date: '' }" class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4">
                     <div class="mb-4 flex items-center justify-between">
                         <h5 class="text-sm font-semibold text-gray-800 dark:text-gray-300">
                             Sub Kegiatan ${rkAnggotaCounter}
@@ -651,7 +651,7 @@
                                 Tanggal Mulai
                             </label>
                             <div class="md:w-3/4">
-                                <x-form.date-picker name="tanggal_mulai[]" placeholder="Tanggal Mulai" defaultDate="{{ now()->format('Y-m-d') }}" />
+                                <x-form.date-picker x-model="min_date" name="tanggal_mulai[]" placeholder="Tanggal Mulai" />
                             </div>
                         </div>
 
@@ -660,7 +660,7 @@
                                 Tanggal Selesai
                             </label>
                             <div class="md:w-3/4">
-                                <x-form.date-picker name="tanggal_selesai[]" placeholder="Tanggal Selesai" defaultDate="{{ now()->format('Y-m-d') }}" />
+                                <x-form.date-picker x-model="max_date" name="tanggal_selesai[]" placeholder="Tanggal Selesai" />
                             </div>
                         </div>
 
@@ -687,15 +687,7 @@
 
             const sectionElement = document.getElementById(sectionId);
             if (sectionElement) {
-                const today = new Date().toISOString().split('T')[0];
-                const nextWeek = new Date();
-                nextWeek.setDate(nextWeek.getDate() + 7);
-                const nextWeekFormatted = nextWeek.toISOString().split('T')[0];
-
-                const tanggalMulaiInput = sectionElement.querySelector('input[name="tanggal_mulai[]"]');
-                const tanggalSelesaiInput = sectionElement.querySelector('input[name="tanggal_selesai[]"]');
-                if (tanggalMulaiInput) tanggalMulaiInput.value = today;
-                if (tanggalSelesaiInput) tanggalSelesaiInput.value = nextWeekFormatted;
+                // Default values removed intentionally per requirement to show placeholder
             }
 
             setTimeout(() => {
@@ -819,6 +811,36 @@
                             butuhDl: false,
                             butuhTranslok: false,
                             wajibJenis: [3,4,5,6],
+                            open: false,
+                            highlightedIndex: -1,
+                            options: [
+                                @foreach ($jenisKegiatans as $jenis)
+                                    {
+                                        id: '{{ $jenis->id }}',
+                                        text: '{{ addslashes($jenis->jenis_kegiatan) }} ({{ $jenis->kategori }})',
+                                        style: '{{ $jenis->kategori === 'Utama' ? 'text-green-700 font-medium dark:text-green-300' : 'text-orange-700 dark:text-orange-300' }}'
+                                    },
+                                @endforeach
+                                {
+                                    id: 'LAINNYA',
+                                    text: '➕ Lainnya',
+                                    style: 'text-blue-700 font-medium dark:text-blue-300' 
+                                }
+                            ],
+                            get selectText() {
+                                if (!this.idJenisKegiatan) return '-- Pilih Jenis Kegiatan --';
+                                let opt = this.options.find(o => o.id == this.idJenisKegiatan);
+                                return opt ? opt.text : '-- Pilih Jenis Kegiatan --';
+                            },
+                            selectJenis(opt) {
+                                this.idJenisKegiatan = opt.id;
+                                this.isOther = (opt.id === 'LAINNYA');
+                                this.open = false;
+                                this.highlightedIndex = -1;
+                            },
+                            highlightNext() { if (this.highlightedIndex < this.options.length - 1) this.highlightedIndex++; },
+                            highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
+                            selectHighlighted() { if (this.highlightedIndex >= 0) this.selectJenis(this.options[this.highlightedIndex]); },
                             
                             get jenisId() { return Number(this.idJenisKegiatan || 0) },
                             get showToggle() { return this.wajibJenis.includes(this.jenisId) },
@@ -859,21 +881,27 @@
                             </label>
 
                             <div class="md:col-span-3 space-y-2">
-                                <select
-                                    name="detail_id_jenis_kegiatan[${sectionId}][]"
-                                    x-model="idJenisKegiatan"
-                                    @change="isOther = (idJenisKegiatan === 'LAINNYA')"
-                                    required
-                                    class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 px-3 py-2 text-xs focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 transition">
-                                    <option value="">-- Pilih Jenis Kegiatan --</option>
-                                    @foreach ($jenisKegiatans as $jenis)
-                                        <option value="{{ $jenis->id }}"
-                                            class="@if ($jenis->kategori === 'Utama') text-green-700 dark:text-green-400 font-medium @elseif($jenis->kategori === 'Tambahan') text-orange-700 dark:text-orange-400 @endif">
-                                            {{ $jenis->jenis_kegiatan }} ({{ $jenis->kategori }})
-                                        </option>
-                                    @endforeach
-                                    <option value="LAINNYA">➕ Lainnya</option>
-                                </select>
+                                <input type="hidden" name="detail_id_jenis_kegiatan[${sectionId}][]" x-model="idJenisKegiatan">
+                                <div class="relative"
+                                    @keydown.arrow-down.prevent="if(!open) open = true; else highlightNext()"
+                                    @keydown.arrow-up.prevent="highlightPrev()"
+                                    @keydown.enter.prevent="if(open) selectHighlighted(); else open = true"
+                                    @keydown.escape="open = false">
+                                    <button type="button" @click="open = !open" @click.outside="open = false"
+                                        class="flex h-10 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-700">
+                                        <span x-text="selectText" class="truncate" :class="!idJenisKegiatan ? 'text-gray-400' : 'text-gray-800 dark:text-gray-300'"></span>
+                                        <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24"><path stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg>
+                                    </button>
+                                    <div x-show="open" x-transition class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border bg-white shadow-lg dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                                        <template x-for="(opt, index) in options" :key="opt.id">
+                                            <button type="button" @click="selectJenis(opt)"
+                                                class="w-full px-3 py-2 text-left text-xs hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                                                :class="[opt.style, highlightedIndex === index ? 'bg-gray-50 dark:bg-gray-700' : '']">
+                                                <span x-text="opt.text"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
 
                                 <div x-show="isOther">
                                     <input
@@ -954,10 +982,12 @@
                             Tanggal Mulai
                         </label>
                         <div class="md:w-3/4">
-                            <x-form.date-picker
+                                <x-form.date-picker
                                 name="detail_tanggal_mulai[${sectionId}][]"
                                 placeholder="Tanggal Mulai"
-                                defaultDate="{{ now()->format('Y-m-d') }}" />
+                                ::mindate="min_date"
+                                ::maxdate="max_date"
+                                inputClass="h-10 px-3 py-2 text-xs" />
                         </div>
                     </div>
 
@@ -970,7 +1000,9 @@
                             <x-form.date-picker
                                 name="detail_tanggal_selesai[${sectionId}][]"
                                 placeholder="Tanggal Selesai"
-                                defaultDate="{{ now()->format('Y-m-d') }}" />
+                                ::mindate="min_date"
+                                ::maxdate="max_date"
+                                inputClass="h-10 px-3 py-2 text-xs" />
                         </div>
                     </div>
                 </div>
@@ -984,15 +1016,7 @@
 
                 const detailElement = document.getElementById(detailId);
                 if (detailElement) {
-                    const today = new Date().toISOString().split('T')[0];
-                    const nextWeek = new Date();
-                    nextWeek.setDate(nextWeek.getDate() + 7);
-                    const nextWeekFormatted = nextWeek.toISOString().split('T')[0];
-
-                    const tMulai = detailElement.querySelector(`input[name="detail_tanggal_mulai[${sectionId}][]"]`);
-                    const tSelesai = detailElement.querySelector(`input[name="detail_tanggal_selesai[${sectionId}][]"]`);
-                    if (tMulai) tMulai.value = today;
-                    if (tSelesai) tSelesai.value = nextWeekFormatted;
+                    // Default values removed intentionally per requirement to show placeholder
                 }
             }
         }

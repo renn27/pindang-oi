@@ -15,9 +15,21 @@
             rk_jpt: '',
             iki_jpt: '',
             nama_rk_kegiatan: '',
-            _pendingIndikatorId: '', // For holding IKI value on edit load
+            ikiOptions: [],
             ...baseData
         };
+
+        if(formData.rk_jpt) {
+            fetch(`/rencana-indikator-jpt/${formData.rk_jpt}/indikator`)
+                .then(res => res.json())
+                .then(data => {
+                    formData.ikiOptions = data;
+                    const selectedIki = formData.iki_jpt;
+                    setTimeout(() => {
+                        formData.iki_jpt = selectedIki;
+                    }, 50);
+                });
+        }
 
         // Sinkronkan state untuk dropdown autocomplete
         selectedId = formData.id_penanggung_jawab ?? '';
@@ -133,37 +145,103 @@
                 </div>
 
                 {{-- Rencana JPT --}}
-                <div>
+                <div x-data="{
+                    open: false,
+                    highlightedIndex: -1,
+                    options: [
+                        @foreach ($rkJpts as $rk)
+                        { id: '{{ $rk->id }}', text: '{{ addslashes($rk->nama_rencana_jpt) }}' },
+                        @endforeach
+                    ],
+                    get selectText() {
+                        if (!formData.rk_jpt) return '-- Pilih RK JPT --';
+                        let opt = this.options.find(o => o.id == formData.rk_jpt);
+                        return opt ? opt.text : '-- Pilih RK JPT --';
+                    },
+                    selectRk(opt) {
+                        formData.rk_jpt = opt.id;
+                        formData.iki_jpt = '';
+                        formData.ikiOptions = [];
+                        if(formData.rk_jpt){
+                            fetch(`/rencana-indikator-jpt/${formData.rk_jpt}/indikator`)
+                                .then(res => res.json())
+                                .then(data => formData.ikiOptions = data);
+                        }
+                        this.open = false;
+                        this.highlightedIndex = -1;
+                    },
+                    highlightNext() { if (this.highlightedIndex < this.options.length - 1) this.highlightedIndex++; },
+                    highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
+                    selectHighlighted() { if (this.highlightedIndex >= 0) this.selectRk(this.options[this.highlightedIndex]); }
+                }">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Rencana JPT <span class="text-red-500">*</span>
                     </label>
-                    <select id="rk_jpt" name="rk_jpt" x-model="formData.rk_jpt"
-                        @change="
-                            formData.iki_jpt = '';
-                            formData._pendingIndikatorId = '';
-                            loadIkiByRkForKegiatan(formData.rk_jpt, formData)
-                            "
-                        class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                        <option value="" class="dark:text-gray-400">-- Pilih RK JPT --</option>
-                        @foreach ($rkJpts as $rk)
-                            <option value="{{ $rk->id }}" class="dark:text-gray-300">
-                                {{ $rk->nama_rencana_jpt }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <input type="hidden" id="rk_jpt" name="rk_jpt" x-model="formData.rk_jpt">
+                    <div class="relative mb-4"
+                        @keydown.arrow-down.prevent="if(!open) open = true; else highlightNext()"
+                        @keydown.arrow-up.prevent="highlightPrev()"
+                        @keydown.enter.prevent="if(open) selectHighlighted(); else open = true"
+                        @keydown.escape="open = false">
+                        <button type="button" @click="open = !open" @click.outside="open = false"
+                            class="flex h-11 w-full items-center justify-between rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                            <span x-text="selectText" class="truncate" :class="!formData.rk_jpt ? 'text-gray-400' : 'text-gray-800 dark:text-gray-300'"></span>
+                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"><path stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg>
+                        </button>
+                        <div x-show="open" x-transition class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border bg-white shadow-lg dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                            <template x-for="(opt, index) in options" :key="opt.id">
+                                <button type="button" @click="selectRk(opt)"
+                                    class="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                                    :class="highlightedIndex === index ? 'bg-gray-50 dark:bg-gray-700' : ''">
+                                    <span x-text="opt.text" class="text-gray-800 dark:text-gray-300"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- Indikator JPT --}}
-                <div>
+                <div x-data="{
+                    open: false,
+                    highlightedIndex: -1,
+                    get selectText() {
+                        if (!formData.iki_jpt) return formData.rk_jpt ? '-- Pilih IKI JPT --' : '-- Harap pilih RK JPT dulu --';
+                        let opt = formData.ikiOptions.find(o => o.id == formData.iki_jpt);
+                        return opt ? opt.nama_indikator_jpt : '-- Pilih IKI JPT --';
+                    },
+                    selectIki(opt) {
+                        formData.iki_jpt = opt.id;
+                        this.open = false;
+                        this.highlightedIndex = -1;
+                    },
+                    highlightNext() { if (this.highlightedIndex < formData.ikiOptions.length - 1) this.highlightedIndex++; },
+                    highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
+                    selectHighlighted() { if (this.highlightedIndex >= 0) this.selectIki(formData.ikiOptions[this.highlightedIndex]); }
+                }">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Indikator JPT <span class="text-red-500">*</span>
                     </label>
-                    <input type="hidden" name="iki_jpt" id="iki_jpt_hidden">
-                    <select id="iki_jpt"
-                        @change="document.getElementById('iki_jpt_hidden').value = $event.target.value; formData.iki_jpt = $event.target.value;"
-                        class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                        <option value="">-- Harap pilih RK JPT dulu --</option>
-                    </select>
+                    <input type="hidden" id="iki_jpt" name="iki_jpt" x-model="formData.iki_jpt">
+                    <div class="relative mb-4"
+                        @keydown.arrow-down.prevent="if(!open) open = true; else highlightNext()"
+                        @keydown.arrow-up.prevent="highlightPrev()"
+                        @keydown.enter.prevent="if(open) selectHighlighted(); else open = true"
+                        @keydown.escape="open = false">
+                        <button type="button" @click="if(formData.ikiOptions.length > 0) open = !open" @click.outside="open = false"
+                            class="flex h-11 w-full items-center justify-between rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                            <span x-text="selectText" class="truncate" :class="!formData.iki_jpt ? 'text-gray-400' : 'text-gray-800 dark:text-gray-300'"></span>
+                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"><path stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg>
+                        </button>
+                        <div x-show="open" x-transition class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border bg-white shadow-lg dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                            <template x-for="(opt, index) in formData.ikiOptions" :key="opt.id">
+                                <button type="button" @click="selectIki(opt)"
+                                    class="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                                    :class="highlightedIndex === index ? 'bg-gray-50 dark:bg-gray-700' : ''">
+                                    <span x-text="opt.nama_indikator_jpt" class="text-gray-800 dark:text-gray-300"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
                 </div>
 
                 <div>
@@ -443,91 +521,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('saveKegiatanButton')?.addEventListener('click', saveKegiatan);
         
-        // Listen event open modal for pre-loading IKI and validation sync
-        window.addEventListener('open-smart-modal', function(e) {
-            const detail = e.detail;
-            if (detail.modalId !== 'modal-kegiatan' || detail.mode !== 'edit') return;
-            if (!detail.data?.rk_jpt) return;
+        // Initialization successful
 
-            // Simpan pending data
-            window._kegiatanEditPending = {
-                rkId: String(detail.data.rk_jpt),
-                indikatorId: String(detail.data.iki_jpt || '')
-            };
-
-            const checkAndLoad = (attempt) => {
-                const selectEl = document.getElementById('iki_jpt');
-                if (!selectEl) {
-                    if (attempt < 20) requestAnimationFrame(() => checkAndLoad(attempt + 1));
-                    return;
-                }
-
-                const modalEl = document.getElementById('modal-kegiatan');
-                const isVisible = modalEl && getComputedStyle(modalEl).display !== 'none';
-
-                if (isVisible && window._kegiatanEditPending) {
-                    const { rkId, indikatorId } = window._kegiatanEditPending;
-                    window._kegiatanEditPending = null;
-                    // Trigger load IKI manually using global formData object mapped to modal (handled by alpine, so we just call global function)
-                    loadIkiByRkForKegiatan(rkId, { _pendingIndikatorId: indikatorId });
-                } else if (attempt < 30) {
-                    requestAnimationFrame(() => checkAndLoad(attempt + 1));
-                }
-            };
-
-            requestAnimationFrame(() => checkAndLoad(0));
-        });
-    });
-
-    // =============================================
-    // FUNGSI LOAD IKI BERDASARKAN RK
-    // =============================================
-    async function loadIkiByRkForKegiatan(rkId, formDataObj) {
-        const selectEl = document.getElementById('iki_jpt');
-        const hiddenEl = document.getElementById('iki_jpt_hidden');
-
-        if (!rkId) {
-            if (selectEl) {
-                selectEl.innerHTML = '<option value="">-- Harap pilih RK JPT dulu --</option>';
-            }
-            if (hiddenEl) hiddenEl.value = '';
-            // Reset global window variable if mapped
-            if (typeof formData !== 'undefined') formData.iki_jpt = '';
-            return;
-        }
-
-        if (selectEl) {
-            selectEl.innerHTML = '<option value="">Memuat...</option>';
-            selectEl.disabled = true;
-        }
-
-        try {
-            const response = await fetch(`/rencana-indikator-jpt/${rkId}/indikator`);
-            const data = await response.json();
-
-            if (!selectEl) return;
-
-            const pending = formDataObj._pendingIndikatorId ? String(formDataObj._pendingIndikatorId) : '';
-            formDataObj._pendingIndikatorId = '';
-
-            let html = '<option value="">-- Pilih IKI JPT --</option>';
-            data.forEach(iki => {
-                const selected = String(iki.id) === pending ? 'selected' : '';
-                html += `<option value="${iki.id}" ${selected}>${iki.nama_indikator_jpt}</option>`;
-            });
-
-            selectEl.innerHTML = html;
-            selectEl.disabled = false;
-
-            if (hiddenEl) hiddenEl.value = selectEl.value;
-            if (typeof formData !== 'undefined') formData.iki_jpt = selectEl.value;
-
-        } catch (error) {
-            console.error('Error loading IKI:', error);
-            if (selectEl) {
-                selectEl.innerHTML = '<option value="">Gagal memuat data</option>';
-                selectEl.disabled = false;
-            }
-        }
-    }
 </script>

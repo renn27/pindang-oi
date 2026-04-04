@@ -117,6 +117,7 @@
                 <div x-data="{
                     open: false,
                     isOther: false,
+                    highlightedIndex: -1,
                     options: [
                         @foreach ($jenisKegiatans as $jenis)
                             {
@@ -137,10 +138,14 @@
                     },
                     selectJenis(opt) {
                         formData.id_jenis_kegiatan = opt.id;
-                            this.isOther = (opt.id === 'LAINNYA');
-                            this.open = false;
-                        }
-                    }"
+                        this.isOther = (opt.id === 'LAINNYA');
+                        this.open = false;
+                        this.highlightedIndex = -1;
+                    },
+                    highlightNext() { if (this.highlightedIndex < this.options.length - 1) this.highlightedIndex++; },
+                    highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
+                    selectHighlighted() { if (this.highlightedIndex >= 0) this.selectJenis(this.options[this.highlightedIndex]); }
+                }"
                     @open-smart-modal.window="
                         if ($event.detail.modalId === 'modal-penugasan-anggota' && mode === 'edit') {
                             isOther = (formData.id_jenis_kegiatan === 'LAINNYA');
@@ -152,7 +157,11 @@
                     <input type="hidden" id="jenis_kegiatan_select" name="id_jenis_kegiatan"
                         x-model="formData.id_jenis_kegiatan">
 
-                    <div class="relative mb-4">
+                    <div class="relative mb-4"
+                        @keydown.arrow-down.prevent="if(!open) open = true; else highlightNext()"
+                        @keydown.arrow-up.prevent="highlightPrev()"
+                        @keydown.enter.prevent="if(open) selectHighlighted(); else open = true"
+                        @keydown.escape="open = false">
                         <button type="button" @click="open = !open" @click.outside="open = false"
                             class="flex h-11 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800">
                             <span x-text="selectText" class="truncate"
@@ -164,11 +173,11 @@
                         </button>
 
                         <div x-show="open" x-transition
-                            class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border bg-white shadow-lg dark:bg-gray-800">
-                            <template x-for="opt in options" :key="opt.id">
+                            class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border bg-white shadow-lg dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                            <template x-for="(opt, index) in options" :key="opt.id">
                                 <button type="button" @click="selectJenis(opt)"
-                                    class="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 border-b last:border-0"
-                                    :class="opt.style">
+                                    class="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                                    :class="[opt.style, highlightedIndex === index ? 'bg-gray-50 dark:bg-gray-700' : '']">
                                     <span x-text="opt.text"></span>
                                 </button>
                             </template>

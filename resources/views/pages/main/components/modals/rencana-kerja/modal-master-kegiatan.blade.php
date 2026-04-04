@@ -1,4 +1,4 @@
-﻿{{-- Modal Master Kegiatan --}}
+{{-- Modal Master Kegiatan --}}
 <x-ui.smart-modal id="modal-master-kegiatan" class="max-w-4xl"
     x-data="{
             formData: { rk_jpt:'', iki_jpt:'', ikiOptions:[] },
@@ -94,27 +94,56 @@
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                             Rencana JPT
                         </label>
-                        <div class="md:w-3/4">
-                            <select
-                                id="rk_jpt"
-                                name="rk_jpt"
-                                x-model="formData.rk_jpt"
-                                @change="
-                                    formData.iki_jpt = '';
-                                    formData.ikiOptions = [];
-                                    if(formData.rk_jpt){
-                                        fetch(`/rencana-indikator-jpt/${formData.rk_jpt}/indikator`)
-                                            .then(res => res.json())
-                                            .then(data => formData.ikiOptions = data);
-                                }"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10">
-                                <option value="">-- Pilih RK JPT --</option>
+                        <div class="md:w-3/4" x-data="{
+                            open: false,
+                            highlightedIndex: -1,
+                            options: [
                                 @foreach ($rkJpts as $rk)
-                                <option value="{{ $rk->id }}">
-                                    {{ $rk->nama_rencana_jpt }}
-                                </option>
+                                { id: '{{ $rk->id }}', text: '{{ addslashes($rk->nama_rencana_jpt) }}' },
                                 @endforeach
-                            </select>
+                            ],
+                            get selectText() {
+                                if (!formData.rk_jpt) return '-- Pilih RK JPT --';
+                                let opt = this.options.find(o => o.id == formData.rk_jpt);
+                                return opt ? opt.text : '-- Pilih RK JPT --';
+                            },
+                            selectRk(opt) {
+                                formData.rk_jpt = opt.id;
+                                formData.iki_jpt = '';
+                                formData.ikiOptions = [];
+                                if(formData.rk_jpt){
+                                    fetch(`/rencana-indikator-jpt/${formData.rk_jpt}/indikator`)
+                                        .then(res => res.json())
+                                        .then(data => formData.ikiOptions = data);
+                                }
+                                this.open = false;
+                                this.highlightedIndex = -1;
+                            },
+                            highlightNext() { if (this.highlightedIndex < this.options.length - 1) this.highlightedIndex++; },
+                            highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
+                            selectHighlighted() { if (this.highlightedIndex >= 0) this.selectRk(this.options[this.highlightedIndex]); }
+                        }">
+                            <input type="hidden" id="rk_jpt" name="rk_jpt" x-model="formData.rk_jpt">
+                            <div class="relative"
+                                @keydown.arrow-down.prevent="if(!open) open = true; else highlightNext()"
+                                @keydown.arrow-up.prevent="highlightPrev()"
+                                @keydown.enter.prevent="if(open) selectHighlighted(); else open = true"
+                                @keydown.escape="open = false">
+                                <button type="button" @click="open = !open" @click.outside="open = false"
+                                    class="flex h-11 w-full items-center justify-between rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-600 dark:bg-gray-700">
+                                    <span x-text="selectText" class="truncate" :class="!formData.rk_jpt ? 'text-gray-400' : 'text-gray-800 dark:text-gray-300'"></span>
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"><path stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg>
+                                </button>
+                                <div x-show="open" x-transition class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border bg-white shadow-lg dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                                    <template x-for="(opt, index) in options" :key="opt.id">
+                                        <button type="button" @click="selectRk(opt)"
+                                            class="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                                            :class="highlightedIndex === index ? 'bg-gray-50 dark:bg-gray-700' : ''">
+                                            <span x-text="opt.text" class="text-gray-800 dark:text-gray-300"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -123,17 +152,44 @@
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                             Indikator JPT
                         </label>
-                        <div class="md:w-3/4">
-                            <select id="iki_jpt" name="iki_jpt" x-model="formData.iki_jpt"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10">
-                                <option value=""
-                                    x-text="formData.rk_jpt ? '-- Pilih IKI JPT --' : '-- Harap pilih RK JPT dulu --'">
-                                </option>
-                                <template x-for="iki in formData.ikiOptions" :key="iki.id">
-                                    <option :value="iki.id" x-text="iki.nama_indikator_jpt" :selected="formData.iki_jpt == iki.id">
-                                    </option>
-                                </template>
-                            </select>
+                        <div class="md:w-3/4" x-data="{
+                            open: false,
+                            highlightedIndex: -1,
+                            get selectText() {
+                                if (!formData.iki_jpt) return formData.rk_jpt ? '-- Pilih IKI JPT --' : '-- Harap pilih RK JPT dulu --';
+                                let opt = formData.ikiOptions.find(o => o.id == formData.iki_jpt);
+                                return opt ? opt.nama_indikator_jpt : '-- Pilih IKI JPT --';
+                            },
+                            selectIki(opt) {
+                                formData.iki_jpt = opt.id;
+                                this.open = false;
+                                this.highlightedIndex = -1;
+                            },
+                            highlightNext() { if (this.highlightedIndex < formData.ikiOptions.length - 1) this.highlightedIndex++; },
+                            highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
+                            selectHighlighted() { if (this.highlightedIndex >= 0) this.selectIki(formData.ikiOptions[this.highlightedIndex]); }
+                        }">
+                            <input type="hidden" id="iki_jpt" name="iki_jpt" x-model="formData.iki_jpt">
+                            <div class="relative"
+                                @keydown.arrow-down.prevent="if(!open) open = true; else highlightNext()"
+                                @keydown.arrow-up.prevent="highlightPrev()"
+                                @keydown.enter.prevent="if(open) selectHighlighted(); else open = true"
+                                @keydown.escape="open = false">
+                                <button type="button" @click="if(formData.ikiOptions.length > 0) open = !open" @click.outside="open = false"
+                                    class="flex h-11 w-full items-center justify-between rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-600 dark:bg-gray-700">
+                                    <span x-text="selectText" class="truncate" :class="!formData.iki_jpt ? 'text-gray-400' : 'text-gray-800 dark:text-gray-300'"></span>
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"><path stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg>
+                                </button>
+                                <div x-show="open" x-transition class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border bg-white shadow-lg dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                                    <template x-for="(opt, index) in formData.ikiOptions" :key="opt.id">
+                                        <button type="button" @click="selectIki(opt)"
+                                            class="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                                            :class="highlightedIndex === index ? 'bg-gray-50 dark:bg-gray-700' : ''">
+                                            <span x-text="opt.nama_indikator_jpt" class="text-gray-800 dark:text-gray-300"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

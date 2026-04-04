@@ -9,6 +9,7 @@
     'maxBind' => null,
     'minDate' => null,
     'maxDate' => null,
+    'inputClass' => 'h-11 px-4 py-2.5 text-sm',
 ])
 
 <div x-data="{
@@ -78,7 +79,7 @@
     <div class="relative custom-datepicker">
         <input x-ref="dateInput" type="text" :value="value" @input="value = $event.target.value"
             id="{{ $id }}" name="{{ $name }}" placeholder="{{ $placeholder }}"
-            class="h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-hidden focus:ring-3 bg-transparent text-gray-800 dark:text-gray-300 border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-brand-300 dark:focus:border-brand-500 focus:ring-brand-500/20"
+            class="{{ $inputClass }} w-full rounded-lg border appearance-none shadow-theme-xs placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-hidden focus:ring-3 bg-transparent text-gray-800 dark:text-gray-300 border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-brand-300 dark:focus:border-brand-500 focus:ring-brand-500/20"
             autocomplete="off" />
         <span class="absolute text-gray-500 dark:text-gray-400 -translate-y-1/2 pointer-events-none right-3 top-1/2">
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none"
