@@ -7,7 +7,7 @@ use Illuminate\View\Component;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 
-class VisTotalPenugasanPegawai extends Component
+class VisTotalKegiatanKetua extends Component
 {
     public array $totalkegiatanKetua;
 
@@ -34,6 +34,6 @@ class VisTotalPenugasanPegawai extends Component
      */
     public function render(): View
     {
-        return view('components.profile.vis-total-penugasan-pegawai');
+        return view('components.profile.vis-total-kegiatan-ketua');
     }
 }

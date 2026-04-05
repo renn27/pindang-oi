@@ -223,29 +223,94 @@
     @include('pages.main.components.modals.tagihan-kerja.modal-sub-kegiatan')
 
     <style>
-        /* Untuk menghilangkan flash content sebelum Alpine.js diinisialisasi */
         [x-cloak] {
             display: none !important;
         }
     </style>
 
     <script>
+        // =============================================
+        // FUNGSI LOAD IKI BERDASARKAN RK (untuk modal kegiatan)
+        // =============================================
         async function loadIkiByRk(rkId, formData) {
+            const selectEl = document.getElementById('iki_jpt');
+            const hiddenEl = document.getElementById('iki_jpt_hidden');
+
             if (!rkId) {
-                formData.ikiOptions = [];
-                formData.iki_jpt = '';
+                if (selectEl) selectEl.innerHTML = '<option value="">-- Harap pilih RK JPT dulu --</option>';
+                if (hiddenEl) hiddenEl.value = '';
                 return;
             }
 
+            if (selectEl) {
+                selectEl.innerHTML = '<option value="">Memuat...</option>';
+                selectEl.disabled = true;
+            }
+
             try {
-                const res  = await fetch(`/rencana-indikator-jpt/${rkId}/indikator`);
+                const res = await fetch(`/rencana-indikator-jpt/${rkId}/indikator`);
                 const data = await res.json();
 
-                formData.ikiOptions = data;
+                if (!selectEl) return;
+
+                const pending = formData._pendingIndikatorId ? String(formData._pendingIndikatorId) : '';
+                if (formData._pendingIndikatorId !== undefined) formData._pendingIndikatorId = '';
+
+                let html = '<option value="">-- Pilih IKI JPT --</option>';
+                data.forEach(iki => {
+                    const selected = String(iki.id) === pending ? 'selected' : '';
+                    html += `<option value="${iki.id}" ${selected}>${iki.nama_indikator_jpt}</option>`;
+                });
+
+                selectEl.innerHTML = html;
+                selectEl.disabled = false;
+
+                if (hiddenEl) hiddenEl.value = selectEl.value;
+
             } catch (error) {
                 console.error('Gagal load IKI JPT:', error);
-                formData.ikiOptions = [];
+                if (selectEl) {
+                    selectEl.innerHTML = '<option value="">Gagal memuat data</option>';
+                    selectEl.disabled = false;
+                }
             }
         }
+
+        // =============================================
+        // LISTENER EDIT MODAL KEGIATAN
+        // =============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            window.addEventListener('open-smart-modal', function(e) {
+                const detail = e.detail;
+                if (detail.modalId !== 'modal-kegiatan' || detail.mode !== 'edit') return;
+                if (!detail.data?.rk_jpt) return;
+
+                window._kegiatanEditPending = {
+                    rkId: String(detail.data.rk_jpt),
+                    indikatorId: String(detail.data.iki_jpt || '')
+                };
+
+                const checkAndLoad = (attempt) => {
+                    const selectEl = document.getElementById('iki_jpt');
+                    if (!selectEl) {
+                        if (attempt < 20) requestAnimationFrame(() => checkAndLoad(attempt + 1));
+                        return;
+                    }
+
+                    const modalEl = document.getElementById('modal-kegiatan');
+                    const isVisible = modalEl && getComputedStyle(modalEl).display !== 'none';
+
+                    if (isVisible && window._kegiatanEditPending) {
+                        const { rkId, indikatorId } = window._kegiatanEditPending;
+                        window._kegiatanEditPending = null;
+                        loadIkiByRk(rkId, { _pendingIndikatorId: indikatorId });
+                    } else if (attempt < 30) {
+                        requestAnimationFrame(() => checkAndLoad(attempt + 1));
+                    }
+                };
+
+                requestAnimationFrame(() => checkAndLoad(0));
+            });
+        });
     </script>
 @endsection

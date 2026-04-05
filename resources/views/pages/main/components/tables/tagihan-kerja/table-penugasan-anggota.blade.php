@@ -302,6 +302,7 @@
                                                                     id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
                                                                     id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                                     nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                                    tanggal_mulai: '{{ optional($penugasan->tanggal_mulai)->format('Y-m-d') }}',
                                                                 }
                                                             })" @endif>
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -376,6 +377,7 @@
                                                                     id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                                     id_pengiriman: '{{ $penugasan->latestPengiriman?->id_pengiriman }}',
                                                                     nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                                    tanggal_mulai: '{{ optional($penugasan->tanggal_mulai)->format('Y-m-d') }}',
                                                                 }
                                                             })" @endif>
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -1144,6 +1146,7 @@
                                                                     id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
                                                                     id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                                     nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                                    tanggal_mulai: '{{ optional($penugasan->tanggal_mulai)->format('Y-m-d') }}',
                                                                 }
                                                             })" @endif>
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -1219,6 +1222,7 @@
                                                                     id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                                     id_pengiriman: '{{ $penugasan->latestPengiriman?->id_pengiriman }}',
                                                                     nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                                    tanggal_mulai: '{{ optional($penugasan->tanggal_mulai)->format('Y-m-d') }}',
                                                                 }
                                                             })" @endif>
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"

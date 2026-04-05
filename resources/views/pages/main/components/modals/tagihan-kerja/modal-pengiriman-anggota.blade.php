@@ -15,8 +15,7 @@
                         media_dikirim: '',
                         bukti_dukung: ''
                     }">
-    <form
-        id="addPengirimanForm"
+    <form id="addPengirimanForm"
         :action="`/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${formData.id_penugasan}/pengirimans`"
         method="POST" class="grid grid-cols-1 gap-y-5">
         @csrf
@@ -68,32 +67,64 @@
                                         cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
                 </div>
 
+                {{-- lock tanggal setelah 31 maret --}}
                 <div class="mb-4">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Tanggal Pengiriman <span class="text-red-500">*</span>
                     </label>
-                    <x-form.date-picker id="tanggal_pengiriman" name="tanggal_pengiriman" placeholder="Tanggal Pengiriman"
-                        defaultDate="{{ now()->format('Y-m-d') }}" />
+
+                    <!-- Wrapper dengan Alpine untuk handle lock -->
+                    <div x-data="{
+                        get isLocked() {
+                            if (!formData.tanggal_mulai) return false;
+                            return new Date(formData.tanggal_mulai) >= new Date('2026-04-01');
+                        }
+                    }">
+                        <!-- Input LOCKED: tanggal hari ini, tidak bisa diubah -->
+                        <template x-if="isLocked">
+                            <input type="text" name="tanggal_pengiriman" id="tanggal_pengiriman"
+                                :value="'{{ now()->format('Y-m-d') }}'" readonly
+                                class="h-11 w-full rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm
+                       text-gray-600 cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400" />
+                        </template>
+
+                        <!-- Input BEBAS: pakai date-picker biasa -->
+                        <template x-if="!isLocked">
+                            <div>
+                                <x-form.date-picker id="tanggal_pengiriman" name="tanggal_pengiriman"
+                                    placeholder="Tanggal Pengiriman" defaultDate="{{ now()->format('Y-m-d') }}" />
+                            </div>
+                        </template>
+
+                        <!-- Badge info kalau locked -->
+                        <p x-show="isLocked" class="mt-1.5 text-xs text-amber-600 dark:text-amber-400">
+                            ⚠ Tanggal pengiriman dikunci ke hari ini karena penugasan dimulai setelah 31 Maret 2026.
+                        </p>
+                    </div>
                 </div>
+
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Jumlah Dikirim <span class="text-red-500">*</span>
                     </label>
-                    <input type="number" name="jumlah_dikirim" id="jumlah_dikirim" placeholder="Masukkan jumlah pengiriman (hanya angka)"
+                    <input type="number" name="jumlah_dikirim" id="jumlah_dikirim"
+                        placeholder="Masukkan jumlah pengiriman (hanya angka)"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
                 </div>
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Media Pengiriman <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="media_pengiriman" id="media_pengiriman" placeholder="Masukkan jenis media pengiriman"
+                    <input type="text" name="media_pengiriman" id="media_pengiriman"
+                        placeholder="Masukkan jenis media pengiriman"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
                 </div>
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Bukti Dukung <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="bukti_dukung" id="bukti_dukung" placeholder="Masukkan link bukti dukung pengiriman"
+                    <input type="text" name="bukti_dukung" id="bukti_dukung"
+                        placeholder="Masukkan link bukti dukung pengiriman"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
                 </div>
 
@@ -180,7 +211,8 @@
 
         // --- 1. Tanggal Pengiriman ---
         const tanggalPengiriman = document.getElementById('tanggal_pengiriman');
-        const tanggalPengirimanErrorMsg = tanggalPengiriman?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        const tanggalPengirimanErrorMsg = tanggalPengiriman?.closest('.md\\:w-3\\/4')?.querySelector(
+        '.field-error-msg');
         if (!tanggalPengiriman?.value?.trim()) {
             addError(
                 'Tanggal Pengiriman wajib dipilih',
