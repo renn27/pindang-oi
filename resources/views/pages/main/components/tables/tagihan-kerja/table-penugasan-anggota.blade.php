@@ -6,7 +6,9 @@
         return $row->id_anggota === $loginUserId ? 1 : 0;
     });
 
-    $penugasanTidakButuhDLAtauTranslok = $penugasanTidakButuhDLAtauTranslok->sortByDesc(function ($row) use ($loginUserId) {
+    $penugasanTidakButuhDLAtauTranslok = $penugasanTidakButuhDLAtauTranslok->sortByDesc(function ($row) use (
+        $loginUserId,
+    ) {
         return $row->id_anggota === $loginUserId ? 1 : 0;
     });
 @endphp
@@ -135,12 +137,14 @@
 
                                     <td class="px-6 py-3 text-sm text-gray-800 dark:text-gray-300">
                                         <div class="font-medium">{{ $penugasan->anggota->nama_pegawai ?? '-' }}</div>
-                                        @if($penugasan->butuh_dl == 1 && $penugasan->butuh_translok == 0)
-                                            <span class="mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+                                        @if ($penugasan->butuh_dl == 1 && $penugasan->butuh_translok == 0)
+                                            <span
+                                                class="mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
                                                 Dinas Luar
                                             </span>
                                         @elseif($penugasan->butuh_dl == 0 && $penugasan->butuh_translok == 1)
-                                            <span class="mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400 border border-teal-200 dark:border-teal-800">
+                                            <span
+                                                class="mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400 border border-teal-200 dark:border-teal-800">
                                                 Translok
                                             </span>
                                         @endif
@@ -175,8 +179,9 @@
                                             {{ $row->tanggal_mulai && $row->tanggal_selesai
                                                 ? ($row->tanggal_mulai->equalTo($row->tanggal_selesai)
                                                     ? $row->tanggal_mulai->translatedFormat('D, d M Y')
-                                                    : $row->tanggal_mulai->translatedFormat('D, d M Y') . ' - ' .
-                                                    $row->tanggal_selesai->translatedFormat('D, d M Y'))
+                                                    : $row->tanggal_mulai->translatedFormat('D, d M Y') .
+                                                        ' - ' .
+                                                        $row->tanggal_selesai->translatedFormat('D, d M Y'))
                                                 : '-' }}
                                         </div>
 
@@ -225,7 +230,7 @@
                                                 const button = event.currentTarget;
                                                 const rect = button.getBoundingClientRect();
                                                 const dropdownWidth = 192;
-
+                                        
                                                 this.dropdownPosition = {
                                                     x: rect.left - dropdownWidth + 10,
                                                     y: rect.top - 10
@@ -340,18 +345,21 @@
                                                             nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
                                                             id_anggota: '{{ $penugasan->id_anggota }}',
                                                             historiData: @js(
-                                                            $penugasan->pengirimans->sortByDesc(fn($p) => $p->tanggal_pengiriman)->map(
-                                                                fn($p) => [
-                                                                    'id_pengiriman' => $p->id_pengiriman,
-                                                                    'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
-                                                                    'jumlah_dikirim' => $p->jumlah_dikirim,
-                                                                    'media_pengiriman' => $p->media_pengiriman,
-                                                                    'bukti_dukung' => $p->bukti_dukung,
-                                                                    'status' => $p->penerimaan?->status ?? 'Menunggu Diperiksa',
-                                                                    'catatan' => $p->penerimaan?->catatan,
-                                                                ],
-                                                            )->values(),
-                                                        )}
+    $penugasan->pengirimans
+        ->sortByDesc(fn($p) => $p->tanggal_pengiriman)
+        ->map(
+            fn($p) => [
+                'id_pengiriman' => $p->id_pengiriman,
+                'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
+                'jumlah_dikirim' => $p->jumlah_dikirim,
+                'media_pengiriman' => $p->media_pengiriman,
+                'bukti_dukung' => $p->bukti_dukung,
+                'status' => $p->penerimaan?->status ?? 'Menunggu Diperiksa',
+                'catatan' => $p->penerimaan?->catatan,
+            ],
+        )
+        ->values(),
+)}
                                                         })">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
@@ -405,16 +413,25 @@
                                                     </div>
                                                 @endcan
 
-                                                <button
-                                                    class="w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-gray-700 hover:text-green-600 dark:hover:text-green-400 flex items-center gap-2"
-                                                    @click="closeDropdown()">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                    Jadikan CKP
-                                                </button>
+                                                <button type="button"
+    @if(!$penugasan->ckp)
+        @click="$dispatch('open-ckp-modal', {
+            modalId: 'modal-ckp',
+            id_penugasan: '{{ $penugasan->id_penugasan }}',
+            nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+            uraian: 'Melaksanakan {{ $penugasan->jenisKegiatan->jenis_kegiatan }} pada {{ $penugasan->subKegiatan->nama_sub_kegiatan }}',
+            satuan: '{{ $penugasan->satuan_target }}',
+            target_kuantitas: {{ $penugasan->target }}
+        })"
+    @endif
+    class="w-full text-left px-4 py-3 text-sm flex items-center gap-2
+    {{ $penugasan->ckp ? 'text-gray-400 cursor-not-allowed bg-gray-50 dark:bg-gray-800' : 'text-green-600 hover:bg-green-50' }}"
+    {{ $penugasan->ckp ? 'disabled' : '' }}>
+    <svg class="w-4 h-4" fill="none" stroke="currentColor">
+        <path stroke-width="2" d="M5 13l4 4L19 7" />
+    </svg>
+    {{ $penugasan->ckp ? 'Sudah jadi CKP' : 'Jadikan CKP' }}
+</button>
 
                                                 {{-- Delete --}}
                                                 @can('delete', $penugasan)
@@ -725,9 +742,13 @@
                                 $uniquePenugasanButuhDL = $penugasanButuhDLAtauTranslok->unique('id_penugasan');
                                 $sumTargetDL = $uniquePenugasanButuhDL->sum('target');
                                 $avgRrKirimDL =
-                                    $sumTargetDL > 0 ? round(($totalKirimButuhDLAtauTranslok / $sumTargetDL) * 100, 2) : 0;
+                                    $sumTargetDL > 0
+                                        ? round(($totalKirimButuhDLAtauTranslok / $sumTargetDL) * 100, 2)
+                                        : 0;
                                 $avgRrTerimaDL =
-                                    $sumTargetDL > 0 ? round(($totalTerimaButuhDLAtauTranslok / $sumTargetDL) * 100, 2) : 0;
+                                    $sumTargetDL > 0
+                                        ? round(($totalTerimaButuhDLAtauTranslok / $sumTargetDL) * 100, 2)
+                                        : 0;
 
                                 $avgRatingKirimDL =
                                     $uniquePenugasanButuhDL->avg(function ($p) {
@@ -1036,7 +1057,8 @@
                                             {{ $row->tanggal_mulai && $row->tanggal_selesai
                                                 ? ($row->tanggal_mulai->equalTo($row->tanggal_selesai)
                                                     ? $row->tanggal_mulai->translatedFormat('D, d M Y')
-                                                    : $row->tanggal_mulai->translatedFormat('D, d M Y') . ' - ' .
+                                                    : $row->tanggal_mulai->translatedFormat('D, d M Y') .
+                                                        ' - ' .
                                                         $row->tanggal_selesai->translatedFormat('D, d M Y'))
                                                 : '-' }}
                                         </div>
@@ -1068,7 +1090,7 @@
                                                 const button = event.currentTarget;
                                                 const rect = button.getBoundingClientRect();
                                                 const dropdownWidth = 192;
-
+                                        
                                                 this.dropdownPosition = {
                                                     x: rect.left - dropdownWidth + 10,
                                                     y: rect.top - 10
@@ -1185,17 +1207,20 @@
                                                             nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
                                                             id_anggota: '{{ $penugasan->id_anggota }}',
                                                             historiData: @js(
-    $penugasan->pengirimans->sortByDesc(fn($p) => $p->tanggal_pengiriman)->map(
-        fn($p) => [
-            'id_pengiriman' => $p->id_pengiriman,
-            'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
-            'jumlah_dikirim' => $p->jumlah_dikirim,
-            'media_pengiriman' => $p->media_pengiriman,
-            'bukti_dukung' => $p->bukti_dukung,
-            'status' => $p->penerimaan?->status ?? 'Menunggu Diperiksa',
-            'catatan' => $p->penerimaan?->catatan,
-        ],
-    )->values(),
+    $penugasan->pengirimans
+        ->sortByDesc(fn($p) => $p->tanggal_pengiriman)
+        ->map(
+            fn($p) => [
+                'id_pengiriman' => $p->id_pengiriman,
+                'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
+                'jumlah_dikirim' => $p->jumlah_dikirim,
+                'media_pengiriman' => $p->media_pengiriman,
+                'bukti_dukung' => $p->bukti_dukung,
+                'status' => $p->penerimaan?->status ?? 'Menunggu Diperiksa',
+                'catatan' => $p->penerimaan?->catatan,
+            ],
+        )
+        ->values(),
 )}
                                                         })">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -1250,16 +1275,25 @@
                                                     </div>
                                                 @endcan
 
-                                                <button
-                                                    class="w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-gray-700 hover:text-green-600 dark:hover:text-green-400 flex items-center gap-2"
-                                                    @click="closeDropdown()">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                    Jadikan CKP
-                                                </button>
+                                                <button type="button"
+    @if(!$penugasan->ckp)
+        @click="$dispatch('open-ckp-modal', {
+            modalId: 'modal-ckp',
+            id_penugasan: '{{ $penugasan->id_penugasan }}',
+            nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+            uraian: 'Melaksanakan {{ $penugasan->jenisKegiatan->jenis_kegiatan }} pada {{ $penugasan->subKegiatan->nama_sub_kegiatan }}',
+            satuan: '{{ $penugasan->satuan_target }}',
+            target_kuantitas: {{ $penugasan->target }}
+        })"
+    @endif
+    class="w-full text-left px-4 py-3 text-sm flex items-center gap-2
+    {{ $penugasan->ckp ? 'text-gray-400 cursor-not-allowed bg-gray-50 dark:bg-gray-800' : 'text-green-600 hover:bg-green-50' }}"
+    {{ $penugasan->ckp ? 'disabled' : '' }}>
+    <svg class="w-4 h-4" fill="none" stroke="currentColor">
+        <path stroke-width="2" d="M5 13l4 4L19 7" />
+    </svg>
+    {{ $penugasan->ckp ? 'Sudah jadi CKP' : 'Jadikan CKP' }}
+</button>
 
                                                 {{-- Delete --}}
                                                 @can('delete', $penugasan)
@@ -1569,7 +1603,9 @@
 
                             <!-- Total Row -->
                             @php
-                                $uniquePenugasanTidakButuhDL = $penugasanTidakButuhDLAtauTranslok->unique('id_penugasan');
+                                $uniquePenugasanTidakButuhDL = $penugasanTidakButuhDLAtauTranslok->unique(
+                                    'id_penugasan',
+                                );
                                 $sumTargetNonDL = $uniquePenugasanTidakButuhDL->sum('target');
                                 $avgRrKirimNonDL =
                                     $sumTargetNonDL > 0
@@ -1773,6 +1809,180 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal CKP Konfirmasi -->
+<div x-data="ckpModal()"
+    @open-ckp-modal.window="
+        if ($event.detail.modalId !== 'modal-ckp') return;
+        
+        ckpData.id_penugasan = $event.detail.id_penugasan;
+        ckpData.nama_anggota = $event.detail.nama_anggota;
+        ckpData.uraian = $event.detail.uraian;
+        ckpData.satuan = $event.detail.satuan;
+        ckpData.target_kuantitas = $event.detail.target_kuantitas;
+        ckpData.keterangan = $event.detail.keterangan || '';
+        
+        showCkpModal = true;
+    ">
+
+    <div x-show="showCkpModal" 
+         x-cloak 
+         x-transition.opacity 
+         class="fixed inset-0 z-[100000] overflow-y-auto"
+         style="display: none;">
+
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-gray-900/50 dark:bg-gray-950/80 transition-opacity" 
+             @click="showCkpModal = false"></div>
+
+        <!-- Modal Content -->
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative w-full max-w-2xl bg-white dark:bg-gray-900 rounded-2xl shadow-2xl"
+                 @click.away="showCkpModal = false">
+
+                <!-- HEADER -->
+                <div class="shrink-0 border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+                    <h4 class="text-xl font-semibold text-gray-800 dark:text-white">
+                        Konfirmasi Jadikan CKP
+                    </h4>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Konfirmasi dan lengkapi data CKP dari penugasan ini
+                    </p>
+                </div>
+
+                <!-- BODY (SCROLL AREA) -->
+                <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar dark:bg-gray-900 max-h-[70vh]">
+                    <form :action="`{{ url('ckp/from-penugasan') }}/${ckpData.id_penugasan}`" 
+                          method="POST" 
+                          id="ckpForm">
+                        @csrf
+
+                        <!-- Informasi Penugasan (Readonly Card) -->
+                        <div class="mb-6 rounded-xl border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
+                            <div class="flex items-center gap-2 mb-3">
+                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                    Informasi Penugasan
+                                </h4>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="text-gray-500 dark:text-gray-400">Anggota:</span>
+                                    <span class="ml-2 font-medium text-gray-900 dark:text-white" 
+                                          x-text="ckpData.nama_anggota"></span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500 dark:text-gray-400">Satuan:</span>
+                                    <span class="ml-2 font-medium text-gray-900 dark:text-white" 
+                                          x-text="ckpData.satuan"></span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500 dark:text-gray-400">Target Kuantitas:</span>
+                                    <span class="ml-2 font-medium text-gray-900 dark:text-white" 
+                                          x-text="ckpData.target_kuantitas"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form CKP (Editable) -->
+                        <div class="space-y-5">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                    Data CKP
+                                </h4>
+                                <span class="text-xs text-gray-400">(bisa diedit)</span>
+                            </div>
+
+                            <!-- Uraian Kegiatan -->
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Uraian Kegiatan <span class="text-red-500">*</span>
+                                </label>
+                                <textarea name="uraian" 
+                                          x-model="ckpData.uraian" 
+                                          rows="3" 
+                                          required
+                                          class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 
+                                                 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors
+                                                 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300
+                                                 placeholder:text-gray-400 dark:placeholder:text-gray-500"></textarea>
+                            </div>
+
+                            <!-- Keterangan -->
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Keterangan
+                                </label>
+                                <textarea name="keterangan" 
+                                          x-model="ckpData.keterangan" 
+                                          rows="2"
+                                          class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 
+                                                 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors
+                                                 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300
+                                                 placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                                          placeholder="Isi keterangan jika diperlukan..."></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="shrink-0 border-t border-gray-200 px-6 py-4 dark:border-gray-700">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                        <button type="button" 
+                                @click="showCkpModal = false"
+                                class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto 
+                                       dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
+                            Batal
+                        </button>
+                        <button type="button" 
+                                @click="submitCkpForm()"
+                                class="flex w-full justify-center rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 sm:w-auto 
+                                       dark:bg-green-600 dark:hover:bg-green-700">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Simpan ke CKP
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>
 
 
+
+
+</div>
+
+<script>
+    function ckpModal() {
+        return {
+            showCkpModal: false,
+            ckpData: {
+                id_penugasan: null,
+                nama_anggota: '',
+                uraian: '',
+                satuan: '',
+                target_kuantitas: 0,
+                keterangan: ''
+            },
+            
+            submitCkpForm() {
+                const form = document.getElementById('ckpForm');
+                if (form) {
+                    this.showCkpModal = false;
+                    form.submit();
+                }
+            }
+        }
+    }
+</script>

@@ -59,23 +59,28 @@ class Pegawai extends Authenticatable
     //         ->contains($this->id_pegawai);
     // }
 
-    public function kegiatanYangDipimpin() {
+    public function kegiatanYangDipimpin()
+    {
         return $this->hasMany(Kegiatan::class, 'id_penanggung_jawab', 'id_pegawai');
     }
 
-    public function penugasanSebagaiAnggota() {
+    public function penugasanSebagaiAnggota()
+    {
         return $this->hasMany(Penugasan::class, 'id_anggota', 'id_pegawai');
     }
 
-    public function penerimaanSebagaiPenerima() {
+    public function penerimaanSebagaiPenerima()
+    {
         return $this->hasMany(Penerimaan::class, 'id_penerima', 'id_pegawai');
     }
 
-    public function kalenderDls() {
+    public function kalenderDls()
+    {
         return $this->hasMany(KalenderDL::class, 'id_pegawai', 'id_pegawai');
     }
 
-    public function roles() {
+    public function roles()
+    {
         return $this->belongsToMany(Role::class, 'pegawai_role', 'pegawai_id', 'role_id');
     }
 
@@ -116,11 +121,19 @@ class Pegawai extends Authenticatable
         return $this->active_role;
     }
 
-    public function getAuthIdentifierName() {
+    public function getAuthIdentifierName()
+    {
         return 'id_pegawai';
     }
 
-    public function getAuthIdentifier() {
+    public function getAuthIdentifier()
+    {
         return $this->{$this->getAuthIdentifierName()};
+    }
+
+    // relasi ke tabel ckp
+    public function ckps()
+    {
+        return $this->hasMany(CkpPegawai::class, 'id_pegawai', 'id_pegawai');
     }
 }

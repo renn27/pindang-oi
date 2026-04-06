@@ -18,6 +18,8 @@ use App\Http\Controllers\RencanaJPTController;
 use App\Http\Controllers\SubKegiatanController;
 use App\Http\Controllers\PegawaiRoleController;
 use App\Http\Controllers\AgendaPimpinanController;
+use App\Http\Controllers\CkpPegawaiController;
+
 
 use Illuminate\Support\Facades\Auth;
 
@@ -164,6 +166,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/kegiatan/export-mph-all', [MasterKegiatanController::class, 'exportMphAll'])
         ->name('kegiatan.export-mph-all');
+    
+    // route CKP
+    Route::post('/ckp/from-penugasan/{id}', [CkpPegawaiController::class, 'storeFromPenugasan'])
+    ->name('ckp.from.penugasan');
 });
 
 require __DIR__ . '/auth.php';

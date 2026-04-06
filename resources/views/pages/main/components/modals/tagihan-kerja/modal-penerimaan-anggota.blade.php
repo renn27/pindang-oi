@@ -17,8 +17,7 @@
             status: '',
             catatan: ''
         }">
-    <form
-        id="addPenerimaanForm"
+    <form id="addPenerimaanForm"
         :action="`/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${formData.id_penugasan}/pengirimans/${formData.id_pengiriman}/penerimaan`"
         method="POST" class="grid grid-cols-1 gap-y-5">
         @csrf
@@ -68,13 +67,38 @@
                                             cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
                 </div>
 
+                {{-- lock tanggal setelah 31 maret --}}
                 <div class="mb-4">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Tanggal Penerimaan <span class="text-red-500">*</span>
                     </label>
-                    <x-form.date-picker id="tanggal_penerimaan" name="tanggal_penerimaan" placeholder="Tanggal Penerimaan"
-                        defaultDate="{{ now()->format('Y-m-d') }}" />
+
+                    <div x-data="{
+                        get isLocked() {
+                            if (!formData.tanggal_mulai) return false;
+                            return new Date(formData.tanggal_mulai) >= new Date('2026-04-01');
+                        }
+                    }">
+                        <template x-if="isLocked">
+                            <input type="text" name="tanggal_penerimaan" id="tanggal_penerimaan"
+                                :value="'{{ now()->format('Y-m-d') }}'" readonly
+                                class="h-11 w-full rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm
+                       text-gray-600 cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400" />
+                        </template>
+
+                        <template x-if="!isLocked">
+                            <div>
+                                <x-form.date-picker id="tanggal_penerimaan" name="tanggal_penerimaan"
+                                    placeholder="Tanggal Penerimaan" defaultDate="{{ now()->format('Y-m-d') }}" />
+                            </div>
+                        </template>
+
+                        <p x-show="isLocked" class="mt-1.5 text-xs text-amber-600 dark:text-amber-400">
+                            ⚠ Tanggal penerimaan dikunci ke hari ini karena penugasan dimulai setelah 31 Maret 2026.
+                        </p>
+                    </div>
                 </div>
+
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Jumlah Diterima <span class="text-red-500">*</span>
@@ -87,14 +111,13 @@
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Status <span class="text-red-500">*</span>
                     </label>
-                    <select name="status"  id="status" x-model="formData.status"
+                    <select name="status" id="status" x-model="formData.status"
                         class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10
                                             h-11 w-full mb-4 appearance-none rounded-lg
                                             border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm
                                             placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
                                             dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
-                        :class="isOptionSelected && 'text-gray-800'"
-                        @change="isOptionSelected = true">
+                        :class="isOptionSelected && 'text-gray-800'" @change="isOptionSelected = true">
                         <!-- Placeholder -->
                         <option value="" disabled selected class="text-gray-400 dark:text-gray-500">
                             -- Pilih Status --
@@ -210,7 +233,8 @@
 
         // --- 1. Tanggal Penerimaan ---
         const tanggalPenerimaan = document.getElementById('tanggal_penerimaan');
-        const tanggalPenerimaanErrorMsg = tanggalPenerimaan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        const tanggalPenerimaanErrorMsg = tanggalPenerimaan?.closest('.md\\:w-3\\/4')?.querySelector(
+        '.field-error-msg');
         if (!tanggalPenerimaan?.value?.trim()) {
             addError(
                 'Tanggal Penerimaan wajib dipilih',

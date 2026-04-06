@@ -38,19 +38,23 @@ class Penugasan extends Model
     ];
 
     // RELATIONS
-    public function anggota() { // pegawai diganti sebagai anggota supaya lebih jelas
+    public function anggota()
+    { // pegawai diganti sebagai anggota supaya lebih jelas
         return $this->belongsTo(Pegawai::class, 'id_anggota', 'id_pegawai');
     }
 
-    public function subKegiatan() {
+    public function subKegiatan()
+    {
         return $this->belongsTo(SubKegiatan::class, 'id_sub_kegiatan', 'id_sub_kegiatan');
     }
 
-    public function jenisKegiatan() {
+    public function jenisKegiatan()
+    {
         return $this->belongsTo(JenisKegiatan::class, 'id_jenis_kegiatan');
     }
 
-    public function pengirimans() {
+    public function pengirimans()
+    {
         return $this->hasMany(Pengiriman::class, 'id_penugasan', 'id_penugasan');
     }
 
@@ -61,7 +65,8 @@ class Penugasan extends Model
 
     // END RELATIONS
 
-    protected static function booted() {
+    protected static function booted()
+    {
         static::created(function ($penugasan) {
             $pegawai = Pegawai::find($penugasan->id_anggota);
 
@@ -73,7 +78,8 @@ class Penugasan extends Model
         });
     }
 
-    public function latestPengiriman() {
+    public function latestPengiriman()
+    {
         return $this->hasOne(Pengiriman::class, 'id_penugasan', 'id_penugasan')
             ->latestOfMany('tanggal_pengiriman');
     }
@@ -83,7 +89,7 @@ class Penugasan extends Model
         $filled = $this->latestPengiriman?->rating_kirim ?? 0;
 
         return array_map(
-            fn ($i) => $i <= $filled,
+            fn($i) => $i <= $filled,
             range(1, 5)
         );
     }
@@ -93,12 +99,13 @@ class Penugasan extends Model
         $filled = $this->latestPenerimaan?->rating_terima ?? 0;
 
         return array_map(
-            fn ($i) => $i <= $filled,
+            fn($i) => $i <= $filled,
             range(1, 5)
         );
     }
 
-    public function latestPenerimaan() {
+    public function latestPenerimaan()
+    {
         return $this->hasOneThrough(
             Penerimaan::class,   // model akhir
             Pengiriman::class,   // model perantara
@@ -247,7 +254,7 @@ class Penugasan extends Model
 
         // ⚠️ Sedang diperiksa (kapan pun, termasuk lewat deadline)
         if ($latestPengiriman && (! $latestPenerimaan ||
-                $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman)) {
+            $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman)) {
             // Telat tapi masih diperiksa
             if ($today->gt($selesai)) {
                 return 'danger|Penerimaan sudah lewat batas waktu, tapi belum diterima ketua tim';
@@ -402,5 +409,11 @@ class Penugasan extends Model
             'label' => 'Belum Ada',
             'class' => 'bg-gray-100 text-gray-500',
         ];
+    }
+
+    // relasi ke tabel ckp
+    public function ckp()
+    {
+        return $this->hasOne(CkpPegawai::class, 'id_penugasan', 'id_penugasan');
     }
 }
