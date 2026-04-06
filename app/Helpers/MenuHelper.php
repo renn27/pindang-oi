@@ -39,7 +39,15 @@ class MenuHelper
             [
                 'icon' => 'tagihan-kerja',
                 'name' => 'Tagihan Kerja',
-                'subItems' => Bidang::getNavItems(),
+                'subItems' => array_merge(
+                    [
+                        [
+                            'name' => 'CKP',
+                            'path' => '/ckp-pegawai',
+                        ]
+                    ],
+                    Bidang::getNavItems()
+                ),
             ],
             [
                 'icon' => 'kalender',
@@ -55,7 +63,7 @@ class MenuHelper
                 'subItems' => [
                     ['name' => 'Rencana Kerja Per Fungsi', 'path' => '/master-kegiatan'],
                     ['name' => 'Rencana Kerja Perlu DL', 'path' => '/rencana-kerja-dl'],
-                    ],
+                ],
             ],
         ];
 

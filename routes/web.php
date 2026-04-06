@@ -168,8 +168,12 @@ Route::middleware('auth')->group(function () {
         ->name('kegiatan.export-mph-all');
     
     // route CKP
+    Route::get('ckp-pegawai/export', [CkpPegawaiController::class, 'exportExcel'])->name('ckp.pegawai.export');
     Route::post('/ckp/from-penugasan/{id}', [CkpPegawaiController::class, 'storeFromPenugasan'])
     ->name('ckp.from.penugasan');
+    // Route untuk halaman CKP pegawai
+    Route::get('/ckp-pegawai', [CkpPegawaiController::class, 'index'])->name('ckp.pegawai.index');
+    Route::put('/ckp-pegawai/{id}', [CkpPegawaiController::class, 'update'])->name('ckp.pegawai.update');
 });
 
 require __DIR__ . '/auth.php';

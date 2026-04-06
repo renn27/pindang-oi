@@ -63,6 +63,10 @@ class Penugasan extends Model
         return $this->hasMany(KalenderDL::class, 'id_penugasan');
     }
 
+    public function ckp()
+    {
+        return $this->hasOne(CkpPegawai::class, 'id_penugasan', 'id_penugasan');
+    }
     // END RELATIONS
 
     protected static function booted()
@@ -412,8 +416,5 @@ class Penugasan extends Model
     }
 
     // relasi ke tabel ckp
-    public function ckp()
-    {
-        return $this->hasOne(CkpPegawai::class, 'id_penugasan', 'id_penugasan');
-    }
+    
 }
