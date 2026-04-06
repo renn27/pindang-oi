@@ -1,20 +1,21 @@
 ﻿<!-- Modal Tambah Pengiriman -->
 <x-ui.smart-modal id="modal-pengiriman-anggota" class="max-w-2xl"
     @open-smart-modal.window="
-                    if ($event.detail.modalId !== 'modal-pengiriman-anggota') return;
+        if ($event.detail.modalId !== 'modal-pengiriman-anggota') return;
 
-                    mode = $event.detail.mode ?? 'create';
-                    itemKey = $event.detail.key ?? null;
-                    // Ambil data dari dispatch
-                    formData = $event.detail.data ?? {
-                        id_sub_kegiatan: '',
-                        id_penugasan: '',
-                        nama_anggota: ''
-                        tanggal_pengiriman: '',
-                        jumlah_dikirim: '',
-                        media_dikirim: '',
-                        bukti_dukung: ''
-                    }">
+        mode = $event.detail.mode ?? 'create';
+        itemKey = $event.detail.key ?? null;
+        // Ambil data dari dispatch
+        formData = $event.detail.data ?? {
+            id_sub_kegiatan: '',
+            id_penugasan: '',
+            nama_anggota: '',
+            target_penugasan: '',
+            tanggal_pengiriman: '',
+            jumlah_dikirim: '',
+            media_dikirim: '',
+            bukti_dukung: ''
+        }">
     <form id="addPengirimanForm"
         :action="`/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${formData.id_penugasan}/pengirimans`"
         method="POST" class="grid grid-cols-1 gap-y-5">
@@ -54,7 +55,11 @@
                     <input type="text" :value="formData.id_penugasan" disabled
                         class="w-full mb-4 h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800
                                         cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+
+                    {{-- Hidden input untuk mendapatkan value target penugasan untuk dibandingkan dengan jumlah dikirim di validasi frontend --}}
+                    <input type="hidden" id="target_penugasan" :value="formData.target_penugasan">
                 </div>
+
 
                 <!-- Nama Anggota (readonly tampilan) -->
                 <div>
@@ -224,6 +229,10 @@
         // --- 2. Jumlah Dikirim ---
         const jumlahDikirim = document.getElementById('jumlah_dikirim');
         const jumlahDikirimErrorMsg = jumlahDikirim?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+
+        // ambil dari hidden input target_penugasan
+        const targetPenugasan = Number(document.getElementById('target_penugasan')?.value || 0);
+
         if (!jumlahDikirim?.value?.trim()) {
             addError(
                 'Jumlah Dikirim wajib diisi (hanya angka)',
@@ -236,6 +245,17 @@
                 jumlahDikirim, jumlahDikirim,
                 jumlahDikirimErrorMsg
             );
+        } else {
+            const jumlah = Number(jumlahDikirim.value);
+
+            if (targetPenugasan > 0 && jumlah > targetPenugasan) {
+                addError(
+                    `Jumlah Dikirim tidak boleh melebihi target penugasan sebanyak ${targetPenugasan}`,
+                    jumlahDikirim,
+                    jumlahDikirim,
+                    jumlahDikirimErrorMsg
+                );
+            }
         }
 
         // --- 3. Media Pengiriman ---

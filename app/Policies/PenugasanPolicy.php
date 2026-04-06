@@ -153,6 +153,23 @@ class PenugasanPolicy
         return true;
     }
 
+    public function setAsCKP(Pegawai $pegawai, Penugasan $penugasan): bool
+    {
+        // Validasi dasar
+        if (
+            $pegawai->active_role !== 'Anggota Tim' ||
+            $penugasan->id_anggota !== $pegawai->id_pegawai ||
+            $penugasan->status !== 'Sudah Dikirim'
+        ) {
+            return false;
+        }
+
+        // Validasi penerimaan (harus ada yang "Diterima")
+        return $penugasan->pengirimans()
+            ->whereHas('penerimaan', fn ($q) => $q->where('status', 'Diterima'))
+            ->exists();
+    }
+
     public function acceptTranslok(Pegawai $pegawai, Penugasan $penugasan): bool
     {
         // 1️⃣ Hanya pimpinan

@@ -137,6 +137,11 @@ class Penugasan extends Model
         return $this->kalenderDLs()->exists();
     }
 
+    public function sudahJadiCKP()
+    {
+        return $this->ckp()->exists();
+    }
+
     public function isStarted(): bool
     {
         return now()->gte($this->tanggal_mulai->copy()->startOfDay());
@@ -416,5 +421,5 @@ class Penugasan extends Model
     }
 
     // relasi ke tabel ckp
-    
+
 }

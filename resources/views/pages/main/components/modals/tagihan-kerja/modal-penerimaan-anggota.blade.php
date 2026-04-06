@@ -10,6 +10,7 @@
             id_sub_kegiatan: '',
             id_penugasan: '',
             id_pengiriman: '',
+            jumlah_pengiriman: '',
             id_penerima: '',
             nama_penerima: '',
             tanggal_penerimaan: '',
@@ -63,8 +64,10 @@
                     </label>
 
                     <input type="text" :value="formData.id_pengiriman" disabled
-                        class="w-full mb-4 h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800
-                                            cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                        class="w-full mb-4 h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800 cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+
+                    {{-- Hidden input untuk mendapatkan value jumlah pengiriman untuk dibandingkan dengan jumlah diterima di validasi frontend --}}
+                    <input type="hidden" id="jumlah_pengiriman" :value="formData.jumlah_pengiriman">
                 </div>
 
                 {{-- lock tanggal setelah 31 maret --}}
@@ -83,7 +86,7 @@
                             <input type="text" name="tanggal_penerimaan" id="tanggal_penerimaan"
                                 :value="'{{ now()->format('Y-m-d') }}'" readonly
                                 class="h-11 w-full rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm
-                       text-gray-600 cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400" />
+                        text-gray-600 cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400" />
                         </template>
 
                         <template x-if="!isLocked">
@@ -243,15 +246,68 @@
             );
         }
 
+        // --- 2. Jumlah Dikirim ---
+        // const jumlahDikirim = document.getElementById('jumlah_dikirim');
+        // const jumlahDikirimErrorMsg = jumlahDikirim?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+
+        // // ambil dari hidden input (AMAN)
+        // const targetPenugasan = Number(document.getElementById('target_penugasan')?.value || 0);
+
+        // if (!jumlahDikirim?.value?.trim()) {
+        //     addError(
+        //         'Jumlah Dikirim wajib diisi (hanya angka)',
+        //         jumlahDikirim, jumlahDikirim,
+        //         jumlahDikirimErrorMsg
+        //     );
+        // } else if (isNaN(jumlahDikirim.value) || Number(jumlahDikirim.value) <= 0) {
+        //     addError(
+        //         'Jumlah Dikirim harus berupa angka lebih besar dari 0',
+        //         jumlahDikirim, jumlahDikirim,
+        //         jumlahDikirimErrorMsg
+        //     );
+        // } else {
+        //     const jumlah = Number(jumlahDikirim.value);
+
+        //     if (targetPenugasan > 0 && jumlah > targetPenugasan) {
+        //         addError(
+        //             `Jumlah Dikirim tidak boleh melebihi target penugasan sebanyak ${targetPenugasan}`,
+        //             jumlahDikirim,
+        //             jumlahDikirim,
+        //             jumlahDikirimErrorMsg
+        //         );
+        //     }
+        // }
+
         // --- 2. Jumlah Diterima ---
         const jumlahDiterima = document.getElementById('jumlah_diterima');
         const jumlahDiterimaErrorMsg = jumlahDiterima?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+
+        // ambil dari hidden input jumlah_pengiriman
+        const jumlahPengiriman = Number(document.getElementById('jumlah_pengiriman')?.value || 0);
+
         if (!jumlahDiterima?.value?.trim()) {
             addError(
-                'Jumlah Diterima wajib diisi',
+                'Jumlah Diterima wajib diisi (hanya angka)',
                 jumlahDiterima, jumlahDiterima,
                 jumlahDiterimaErrorMsg
             );
+        } else if (isNaN(jumlahDiterima.value) || Number(jumlahDiterima.value) <= 0) {
+            addError(
+                'Jumlah Diterima harus berupa angka lebih besar dari 0',
+                jumlahDiterima, jumlahDiterima,
+                jumlahDiterimaErrorMsg
+            );
+        } else {
+            const jumlah = Number(jumlahDiterima.value);
+
+            if (jumlahPengiriman > 0 && jumlah > jumlahPengiriman) {
+                addError(
+                    `Jumlah Diterima tidak boleh melebihi jumlah dikirim sebanyak ${jumlahPengiriman}`,
+                    jumlahDiterima,
+                    jumlahDiterima,
+                    jumlahDiterimaErrorMsg
+                );
+            }
         }
 
         // --- 3. Status Penerimaan ---

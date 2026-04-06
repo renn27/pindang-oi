@@ -39,12 +39,4 @@ class Pengiriman extends Model
     public function penerimaan() {
         return $this->hasOne(Penerimaan::class, 'id_pengiriman', 'id_pengiriman');
     }
-
-    // Nanti
-    // public function getBuktiDukungUrlAttribute() {
-    //     if ($this->bukti_dukung) {
-    //         return asset('storage/' . $this->bukti_dukung);
-    //     }
-    //     return null;
-    // }
 }
