@@ -482,14 +482,16 @@
                     }
 
                     // Jenis kegiatan
-                    const jenisSelect = detail.querySelector('select[name*="detail_id_jenis_kegiatan"]');
-                    if (!jenisSelect?.value) {
+                    const jenisInput = detail.querySelector('input[name*="detail_id_jenis_kegiatan"]');
+                    const jenisFocusEl = jenisInput ? jenisInput.nextElementSibling?.querySelector('button') || jenisInput : null;
+
+                    if (!jenisInput?.value) {
                         addError(
                             `Sub Kegiatan ${sectionNum} › Anggota ${anggotaNum}: Jenis kegiatan wajib dipilih`,
-                            jenisSelect, jenisSelect, null
+                            jenisFocusEl, jenisFocusEl, null
                         );
                         detailHasError = true;
-                    } else if (jenisSelect.value === 'LAINNYA') {
+                    } else if (jenisInput.value === 'LAINNYA') {
                         const jenisBaruInput = detail.querySelector(
                             'input[name*="detail_jenis_kegiatan_baru"]');
                         if (!jenisBaruInput?.value?.trim()) {
@@ -1149,18 +1151,18 @@
                                 'input[name*="detail_satuan_target"]');
                             const satuanTarget = satuanTargetInput ? satuanTargetInput.value : '';
 
-                            const jenisSelect = detail.querySelector(
-                                'select[name*="detail_id_jenis_kegiatan"]');
+                            const jenisInput = detail.querySelector(
+                                'input[name*="detail_id_jenis_kegiatan"]');
                             const jenisBaruInput = detail.querySelector(
                                 'input[name*="detail_jenis_kegiatan_baru"]');
                             let jenisKegiatan = '-';
-                            if (jenisSelect) {
-                                if (jenisSelect.value === 'LAINNYA') {
+                            if (jenisInput) {
+                                if (jenisInput.value === 'LAINNYA') {
                                     jenisKegiatan = jenisBaruInput && jenisBaruInput.value ? jenisBaruInput
                                         .value : '-';
                                 } else {
-                                    const selectedOption = jenisSelect.options[jenisSelect.selectedIndex];
-                                    jenisKegiatan = selectedOption ? selectedOption.text : '-';
+                                    const jenisSpan = jenisInput.nextElementSibling?.querySelector('button span.truncate');
+                                    jenisKegiatan = jenisSpan ? jenisSpan.innerText : '-';
                                 }
                             }
 
