@@ -909,7 +909,7 @@
                             </label>
 
                             <div class="md:col-span-3 space-y-2">
-                                <input type="hidden" name="id_jenis_kegiatan" x-model="idJenisKegiatan">
+                                <input type="hidden" name="detail_id_jenis_kegiatan[${sectionId}][]" x-model="idJenisKegiatan">
 
                                 <div class="relative"
                                     @keydown.arrow-down.prevent="if(!open) open = true; else highlightNext()"
@@ -977,7 +977,7 @@
                                 <div x-show="isOther">
                                     <input
                                         type="text"
-                                        name="jenis_kegiatan_baru"
+                                        name="detail_jenis_kegiatan_baru[${sectionId}][]"
                                         placeholder="Masukkan jenis kegiatan baru"
                                         class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 px-3 py-2 text-xs focus:ring-2 focus:ring-brand-500/20 transition" />
                                 </div>
@@ -1023,8 +1023,8 @@
                             </div>
                         </div>
 
-                        <input type="hidden" name="butuh_dl" :value="butuhDl ? 1 : 0">
-                        <input type="hidden" name="butuh_translok" :value="butuhTranslok ? 1 : 0">
+                        <input type="hidden" name="detail_butuh_dl[${sectionId}][]" :value="butuhDl ? 1 : 0">
+                        <input type="hidden" name="detail_butuh_translok[${sectionId}][]" :value="butuhTranslok ? 1 : 0">
                     </div>
 
                     <!-- Target Anggota -->
