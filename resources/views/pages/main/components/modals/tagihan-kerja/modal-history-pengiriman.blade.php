@@ -6,6 +6,8 @@
         formData = $event.detail.data ?? {
             nama_anggota: '',
             id_penugasan: '',
+            id_anggota: '',
+            active_role: '',
             historiData: []
         };">
     <div
@@ -28,7 +30,7 @@
             <template x-if="formData.historiData.length === 0">
                 <div
                     class="rounded-xl border border-dashed border-gray-300 p-6 text-center text-sm
-                                        text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                    text-gray-500 dark:border-gray-700 dark:text-gray-400">
                     Belum ada histori pengiriman
                 </div>
             </template>
@@ -42,6 +44,7 @@
                         <div>
                             <p class="text-sm font-medium text-gray-800 dark:text-white">
                                 Pengiriman ke-<span x-text="Number(index) + 1"></span>
+                                 <p x-text="formData.active_role"> cddd</p>
                             </p>
                             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400" x-text="item.tanggal_pengiriman">
                             </p>
@@ -100,7 +103,12 @@
 
                     </div>
 
-                    <template x-if="item.status === 'Menunggu Diperiksa' && formData.id_anggota === '{{ auth()->user()->id_pegawai }}'">
+
+
+                    <template x-if="item.status === 'Menunggu Diperiksa' && formData.id_anggota === '{{ auth()->user()->id_pegawai }}' ">
+                        {{-- @can('cancelSend', $penugasan)
+
+                        @endcan --}}
                         <div class="mt-4 border-t border-gray-100 dark:border-gray-700 pt-4 flex justify-end">
                             <form :id="'delete-pengiriman-' + item.id_pengiriman" :action="`/pengirimans/${item.id_pengiriman}`" method="POST">
                                 @csrf

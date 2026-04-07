@@ -805,7 +805,6 @@
                         </div>
                     </div>
 
-                    <!-- Jenis Kegiatan -->
                     <div
                         x-data="{
                             idJenisKegiatan: '',
@@ -813,45 +812,72 @@
                             butuhDl: false,
                             butuhTranslok: false,
                             wajibJenis: [3,4,5,6],
+
                             open: false,
                             highlightedIndex: -1,
+                            search: '',
+
                             options: [
                                 @foreach ($jenisKegiatans as $jenis)
                                     {
                                         id: '{{ $jenis->id }}',
                                         text: '{{ addslashes($jenis->jenis_kegiatan) }} ({{ $jenis->kategori }})',
-                                        style: '{{ $jenis->kategori === 'Utama' ? 'text-green-700 font-medium dark:text-green-300' : 'text-orange-700 dark:text-orange-300' }}'
+                                        style: '{{ $jenis->kategori === 'Utama'
+                                            ? 'text-green-700 font-medium dark:text-green-300'
+                                            : 'text-orange-700 dark:text-orange-300' }}'
                                     },
                                 @endforeach
                                 {
                                     id: 'LAINNYA',
                                     text: '➕ Lainnya',
-                                    style: 'text-blue-700 font-medium dark:text-blue-300' 
+                                    style: 'text-blue-700 font-medium dark:text-blue-300'
                                 }
                             ],
+
+                            get filteredOptions() {
+                                if (!this.search) return this.options;
+                                return this.options.filter(o =>
+                                    o.text.toLowerCase().includes(this.search.toLowerCase())
+                                );
+                            },
+
                             get selectText() {
                                 if (!this.idJenisKegiatan) return '-- Pilih Jenis Kegiatan --';
                                 let opt = this.options.find(o => o.id == this.idJenisKegiatan);
                                 return opt ? opt.text : '-- Pilih Jenis Kegiatan --';
                             },
+
                             selectJenis(opt) {
                                 this.idJenisKegiatan = opt.id;
                                 this.isOther = (opt.id === 'LAINNYA');
                                 this.open = false;
+                                this.search = '';
                                 this.highlightedIndex = -1;
                             },
-                            highlightNext() { if (this.highlightedIndex < this.options.length - 1) this.highlightedIndex++; },
-                            highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
-                            selectHighlighted() { if (this.highlightedIndex >= 0) this.selectJenis(this.options[this.highlightedIndex]); },
-                            
+
+                            highlightNext() {
+                                if (this.highlightedIndex < this.filteredOptions.length - 1)
+                                    this.highlightedIndex++;
+                            },
+
+                            highlightPrev() {
+                                if (this.highlightedIndex > 0)
+                                    this.highlightedIndex--;
+                            },
+
+                            selectHighlighted() {
+                                if (this.highlightedIndex >= 0)
+                                    this.selectJenis(this.filteredOptions[this.highlightedIndex]);
+                            },
+
                             get jenisId() { return Number(this.idJenisKegiatan || 0) },
                             get showToggle() { return this.wajibJenis.includes(this.jenisId) },
                             get isLainnya() { return this.idJenisKegiatan === 'LAINNYA' },
                             get jenisSelected() { return this.jenisId > 0 || this.isLainnya },
-                            
+
                             syncState() {
                                 this.isOther = this.idJenisKegiatan === 'LAINNYA';
-                                
+
                                 if (!this.showToggle) {
                                     this.butuhDl = false;
                                     this.butuhTranslok = false;
@@ -883,65 +909,108 @@
                             </label>
 
                             <div class="md:col-span-3 space-y-2">
-                                <input type="hidden" name="detail_id_jenis_kegiatan[${sectionId}][]" x-model="idJenisKegiatan">
+                                <input type="hidden" name="id_jenis_kegiatan" x-model="idJenisKegiatan">
+
                                 <div class="relative"
                                     @keydown.arrow-down.prevent="if(!open) open = true; else highlightNext()"
                                     @keydown.arrow-up.prevent="highlightPrev()"
                                     @keydown.enter.prevent="if(open) selectHighlighted(); else open = true"
                                     @keydown.escape="open = false">
-                                    <button type="button" @click="open = !open" @click.outside="open = false"
+
+                                    <!-- BUTTON -->
+                                    <button type="button"
+                                        @click="
+                                            open = !open;
+                                            if(open){
+                                                search = '';
+                                                highlightedIndex = -1;
+                                            }
+                                        "
+                                        @click.outside="open = false"
                                         class="flex h-10 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:ring-2 focus:ring-brand-500/20 dark:border-gray-600 dark:bg-gray-700">
-                                        <span x-text="selectText" class="truncate" :class="!idJenisKegiatan ? 'text-gray-400' : 'text-gray-800 dark:text-gray-300'"></span>
-                                        <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24"><path stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg>
+
+                                        <span x-text="selectText"
+                                            class="truncate"
+                                            :class="!idJenisKegiatan ? 'text-gray-400' : 'text-gray-800 dark:text-gray-300'">
+                                        </span>
+
+                                        <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                            <path stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                                        </svg>
                                     </button>
-                                    <div x-show="open" x-transition class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border bg-white shadow-lg dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                                        <template x-for="(opt, index) in options" :key="opt.id">
-                                            <button type="button" @click="selectJenis(opt)"
-                                                class="w-full px-3 py-2 text-left text-xs hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0"
-                                                :class="[opt.style, highlightedIndex === index ? 'bg-gray-50 dark:bg-gray-700' : '']">
-                                                <span x-text="opt.text"></span>
-                                            </button>
-                                        </template>
+
+                                    <!-- DROPDOWN -->
+                                    <div x-show="open" x-transition
+                                        class="absolute z-50 mt-1 max-h-56 w-full overflow-hidden rounded-lg border bg-white shadow-lg dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+
+                                        <!-- SEARCH (TANPA MERUBAH STYLE UTAMA) -->
+                                        <div class="p-2 border-b border-gray-100 dark:border-gray-700">
+                                            <input type="text"
+                                                x-model="search"
+                                                placeholder="Cari..."
+                                                class="w-full px-2 py-1 text-xs rounded border dark:bg-gray-700 dark:border-gray-600"
+                                                @input="highlightedIndex = -1">
+                                        </div>
+
+                                        <!-- LIST -->
+                                        <div class="max-h-44 overflow-y-auto">
+                                            <template x-for="(opt, index) in filteredOptions" :key="opt.id">
+                                                <button type="button"
+                                                    @click="selectJenis(opt)"
+                                                    class="w-full px-3 py-2 text-left text-xs hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                                                    :class="[opt.style, highlightedIndex === index ? 'bg-gray-50 dark:bg-gray-700' : '']">
+
+                                                    <span x-text="opt.text"></span>
+                                                </button>
+                                            </template>
+
+                                            <!-- EMPTY -->
+                                            <div x-show="filteredOptions.length === 0"
+                                                class="px-3 py-2 text-xs text-gray-500 text-center">
+                                                Tidak ditemukan
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
+                                <!-- INPUT LAINNYA -->
                                 <div x-show="isOther">
                                     <input
                                         type="text"
-                                        name="detail_jenis_kegiatan_baru[${sectionId}][]"
+                                        name="jenis_kegiatan_baru"
                                         placeholder="Masukkan jenis kegiatan baru"
-                                        class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 px-3 py-2 text-xs focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 transition" />
+                                        class="h-10 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 px-3 py-2 text-xs focus:ring-2 focus:ring-brand-500/20 transition" />
                                 </div>
-                                
-                                <!-- TOGGLE DL / TRANSLOK -->
+
+                                <!-- TOGGLE DL / TRANSLOK (TIDAK DIUBAH) -->
                                 <div x-show="showToggle" x-transition class="pt-2">
                                     <label class="mb-2 block text-xs font-medium text-gray-700 dark:text-gray-300">
                                         Pilih Salah Satu
                                     </label>
 
                                     <div class="flex gap-6">
-                                        <!-- DL -->
                                         <div class="flex items-center gap-3">
-                                            <button type="button" @click="toggleDL()" :class="butuhDl ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-700'"
+                                            <button type="button" @click="toggleDL()"
+                                                :class="butuhDl ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-700'"
                                                 class="relative inline-flex h-6 w-12 items-center rounded-full transition">
                                                 <span :class="butuhDl ? 'translate-x-[26px]' : 'translate-x-1'"
-                                                    class="inline-block h-4 w-4 bg-white rounded-full transition">
-                                                </span>
+                                                    class="inline-block h-4 w-4 bg-white rounded-full transition"></span>
                                             </button>
-                                            <span class="text-xs font-medium" :class="butuhDl ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'">
+                                            <span class="text-xs font-medium"
+                                                :class="butuhDl ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'">
                                                 DL
                                             </span>
                                         </div>
 
-                                        <!-- TRANSLOK -->
                                         <div class="flex items-center gap-3">
-                                            <button type="button" @click="toggleTranslok()" :class="butuhTranslok ? 'bg-teal-500' : 'bg-gray-300 dark:bg-gray-700'"
+                                            <button type="button" @click="toggleTranslok()"
+                                                :class="butuhTranslok ? 'bg-teal-500' : 'bg-gray-300 dark:bg-gray-700'"
                                                 class="relative inline-flex h-6 w-12 items-center rounded-full transition">
                                                 <span :class="butuhTranslok ? 'translate-x-[26px]' : 'translate-x-1'"
-                                                    class="inline-block h-4 w-4 bg-white rounded-full transition">
-                                                </span>
+                                                    class="inline-block h-4 w-4 bg-white rounded-full transition"></span>
                                             </button>
-                                            <span class="text-xs font-medium" :class="butuhTranslok ? 'text-teal-600 dark:text-teal-400' : 'text-gray-500 dark:text-gray-400'">
+                                            <span class="text-xs font-medium"
+                                                :class="butuhTranslok ? 'text-teal-600 dark:text-teal-400' : 'text-gray-500 dark:text-gray-400'">
                                                 Translok
                                             </span>
                                         </div>
@@ -954,10 +1023,8 @@
                             </div>
                         </div>
 
-                        <div class="mt-2 md:ml-[25%]">
-                            <input type="hidden" name="detail_butuh_dl[${sectionId}][]" :value="butuhDl ? 1 : 0">
-                            <input type="hidden" name="detail_butuh_translok[${sectionId}][]" :value="butuhTranslok ? 1 : 0">
-                        </div>
+                        <input type="hidden" name="butuh_dl" :value="butuhDl ? 1 : 0">
+                        <input type="hidden" name="butuh_translok" :value="butuhTranslok ? 1 : 0">
                     </div>
 
                     <!-- Target Anggota -->
@@ -1173,7 +1240,7 @@
                             const butuhTranslok = butuhTranslokInput ? Number(butuhTranslokInput.value) === 1 : false;
 
                             let butuhDLBadge = `<span class="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-900/40 px-2 py-1 text-[11px] font-medium text-gray-600 dark:text-gray-400">Tidak Perlu DL / Translok</span>`;
-                            
+
                             if (butuhDL) {
                                 butuhDLBadge = `<span class="inline-flex items-center rounded-md bg-blue-100 dark:bg-blue-900/40 px-2 py-1 text-[11px] font-medium text-blue-700 dark:text-blue-400">✓ Perlu Dinas Luar</span>`;
                             } else if (butuhTranslok) {

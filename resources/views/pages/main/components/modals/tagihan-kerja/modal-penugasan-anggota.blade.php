@@ -114,38 +114,38 @@
                 </div>
 
                 {{-- Toggle Gabungan untuk DL dan Translok --}}
-                <div x-data="{
-                    open: false,
-                    isOther: false,
-                    highlightedIndex: -1,
-                    options: [
-                        @foreach ($jenisKegiatans as $jenis)
+                {{-- <div x-data="{
+                        open: false,
+                        isOther: false,
+                        highlightedIndex: -1,
+                        options: [
+                            @foreach ($jenisKegiatans as $jenis)
+                                {
+                                    id: '{{ $jenis->id }}',
+                                    text: '{{ addslashes($jenis->jenis_kegiatan) }} ({{ $jenis->kategori }})',
+                                    style: '{{ $jenis->kategori === 'Utama' ? 'text-green-700 font-medium dark:text-green-300' : 'text-orange-700 dark:text-orange-300' }}'
+                                },
+                            @endforeach
                             {
-                                id: '{{ $jenis->id }}',
-                                text: '{{ addslashes($jenis->jenis_kegiatan) }} ({{ $jenis->kategori }})',
-                                style: '{{ $jenis->kategori === 'Utama' ? 'text-green-700 font-medium dark:text-green-300' : 'text-orange-700 dark:text-orange-300' }}'
-                            },
-                        @endforeach
-                        {
-                            id: 'LAINNYA',
-                            text: '➕ Lainnya',
-                            style: 'text-blue-700 font-medium dark:text-blue-300' }
-                    ],
-                    get selectText() {
-                        if (!formData.id_jenis_kegiatan) return '-- Pilih Jenis Kegiatan --';
-                        let opt = this.options.find(o => o.id == formData.id_jenis_kegiatan);
-                        return opt ? opt.text : formData.jenis_kegiatan || '-- Pilih Jenis Kegiatan --';
-                    },
-                    selectJenis(opt) {
-                        formData.id_jenis_kegiatan = opt.id;
-                        this.isOther = (opt.id === 'LAINNYA');
-                        this.open = false;
-                        this.highlightedIndex = -1;
-                    },
-                    highlightNext() { if (this.highlightedIndex < this.options.length - 1) this.highlightedIndex++; },
-                    highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
-                    selectHighlighted() { if (this.highlightedIndex >= 0) this.selectJenis(this.options[this.highlightedIndex]); }
-                }"
+                                id: 'LAINNYA',
+                                text: '➕ Lainnya',
+                                style: 'text-blue-700 font-medium dark:text-blue-300' }
+                        ],
+                        get selectText() {
+                            if (!formData.id_jenis_kegiatan) return '-- Pilih Jenis Kegiatan --';
+                            let opt = this.options.find(o => o.id == formData.id_jenis_kegiatan);
+                            return opt ? opt.text : formData.jenis_kegiatan || '-- Pilih Jenis Kegiatan --';
+                        },
+                        selectJenis(opt) {
+                            formData.id_jenis_kegiatan = opt.id;
+                            this.isOther = (opt.id === 'LAINNYA');
+                            this.open = false;
+                            this.highlightedIndex = -1;
+                        },
+                        highlightNext() { if (this.highlightedIndex < this.options.length - 1) this.highlightedIndex++; },
+                        highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
+                        selectHighlighted() { if (this.highlightedIndex >= 0) this.selectJenis(this.options[this.highlightedIndex]); }
+                    }"
                     @open-smart-modal.window="
                         if ($event.detail.modalId === 'modal-penugasan-anggota' && mode === 'edit') {
                             isOther = (formData.id_jenis_kegiatan === 'LAINNYA');
@@ -181,6 +181,146 @@
                                     <span x-text="opt.text"></span>
                                 </button>
                             </template>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-red-600 mt-1 hidden" data-for="jenis_kegiatan_select">
+                        Jenis Kegiatan wajib dipilih
+                    </p>
+
+                    <!-- INPUT JENIS KEGIATAN BARU -->
+                    <div x-show="isOther" x-transition>
+                        <input type="text" name="jenis_kegiatan_baru" placeholder="Masukkan jenis kegiatan baru"
+                            class="h-11 w-full mb-4 rounded-lg border px-4 text-sm dark:bg-gray-800">
+                    </div>
+                </div> --}}
+
+                {{-- Toggle Gabungan untuk DL dan Translok --}}
+                <div x-data="{
+                        open: false,
+                        isOther: false,
+                        highlightedIndex: -1,
+                        search: '',
+
+                        options: [
+                            @foreach ($jenisKegiatans as $jenis)
+                                {
+                                    id: '{{ $jenis->id }}',
+                                    text: '{{ addslashes($jenis->jenis_kegiatan) }} ({{ $jenis->kategori }})',
+                                    style: '{{ $jenis->kategori === 'Utama' ? 'text-green-700 font-medium dark:text-green-300' : 'text-orange-700 dark:text-orange-300' }}'
+                                },
+                            @endforeach
+                            {
+                                id: 'LAINNYA',
+                                text: '➕ Lainnya',
+                                style: 'text-blue-700 font-medium dark:text-blue-300'
+                            }
+                        ],
+
+                        get filteredOptions() {
+                            if (!this.search) return this.options;
+                            return this.options.filter(o =>
+                                o.text.toLowerCase().includes(this.search.toLowerCase())
+                            );
+                        },
+
+                        get selectText() {
+                            if (!formData.id_jenis_kegiatan) return '-- Pilih Jenis Kegiatan --';
+                            let opt = this.options.find(o => o.id == formData.id_jenis_kegiatan);
+                            return opt ? opt.text : formData.jenis_kegiatan || '-- Pilih Jenis Kegiatan --';
+                        },
+
+                        selectJenis(opt) {
+                            formData.id_jenis_kegiatan = opt.id;
+                            this.isOther = (opt.id === 'LAINNYA');
+                            this.open = false;
+                            this.search = '';
+                            this.highlightedIndex = -1;
+                        },
+
+                        highlightNext() {
+                            if (this.highlightedIndex < this.filteredOptions.length - 1) this.highlightedIndex++;
+                        },
+
+                        highlightPrev() {
+                            if (this.highlightedIndex > 0) this.highlightedIndex--;
+                        },
+
+                        selectHighlighted() {
+                            if (this.highlightedIndex >= 0) {
+                                this.selectJenis(this.filteredOptions[this.highlightedIndex]);
+                            }
+                        }
+                    }"
+                    @open-smart-modal.window="
+                        if ($event.detail.modalId === 'modal-penugasan-anggota' && mode === 'edit') {
+                            isOther = (formData.id_jenis_kegiatan === 'LAINNYA');
+                        }">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Jenis Kegiatan <span class="text-red-500">*</span>
+                    </label>
+
+                    <input type="hidden" id="jenis_kegiatan_select" name="id_jenis_kegiatan"
+                        x-model="formData.id_jenis_kegiatan">
+
+                    <div class="relative mb-4"
+                        @keydown.arrow-down.prevent="if(!open) open = true; else highlightNext()"
+                        @keydown.arrow-up.prevent="highlightPrev()"
+                        @keydown.enter.prevent="if(open) selectHighlighted(); else open = true"
+                        @keydown.escape="open = false">
+
+                        <!-- BUTTON -->
+                        <button type="button"
+                            @click="
+                                open = !open;
+                                if(open){
+                                    search = '';
+                                    highlightedIndex = -1;
+                                }
+                            "
+                            @click.outside="open = false"
+                            class="flex h-11 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800">
+
+                            <span x-text="selectText" class="truncate"
+                                :class="!formData.id_jenis_kegiatan ? 'text-gray-400' : 'text-gray-800 dark:text-gray-200'">
+                            </span>
+
+                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <path stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                        </button>
+
+                        <!-- DROPDOWN -->
+                        <div x-show="open" x-transition
+                            class="absolute z-50 mt-1 w-full rounded-lg border bg-white shadow-lg dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+
+                            <!-- SEARCH -->
+                            <div class="p-2 border-b border-gray-100 dark:border-gray-700">
+                                <input type="text"
+                                    x-model="search"
+                                    placeholder="Cari jenis kegiatan..."
+                                    class="w-full px-3 py-2 text-sm rounded-md border focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
+                                    @input="highlightedIndex = -1">
+                            </div>
+
+                            <!-- LIST -->
+                            <div class="max-h-48 overflow-y-auto">
+                                <template x-for="(opt, index) in filteredOptions" :key="opt.id">
+                                    <button type="button"
+                                        @click="selectJenis(opt)"
+                                        class="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                                        :class="[opt.style, highlightedIndex === index ? 'bg-gray-50 dark:bg-gray-700' : '']">
+
+                                        <span x-text="opt.text"></span>
+                                    </button>
+                                </template>
+
+                                <!-- EMPTY STATE -->
+                                <div x-show="filteredOptions.length === 0"
+                                    class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 text-center">
+                                    Tidak ditemukan
+                                </div>
+                            </div>
                         </div>
                     </div>
 

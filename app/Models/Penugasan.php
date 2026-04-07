@@ -418,7 +418,4 @@ class Penugasan extends Model
             'class' => 'bg-gray-100 text-gray-500',
         ];
     }
-
-    // relasi ke tabel ckp
-
 }
