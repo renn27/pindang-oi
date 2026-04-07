@@ -24,6 +24,7 @@ class MenuHelper
                 'name' => 'Admin',
                 'subItems' => [
                     ['name' => 'Bidang Kerja', 'path' => '/bidang-kerja'],
+                    ['name' => 'Jenis Kegiatan', 'path' => '/jenis-kegiatan'],
                     ['name' => 'Kelola Role Pegawai', 'path' => '/role-pegawai'],
                 ],
             ],

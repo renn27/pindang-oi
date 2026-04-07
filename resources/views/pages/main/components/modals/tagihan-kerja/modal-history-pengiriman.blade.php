@@ -1,13 +1,13 @@
 <!-- Modal Histori Pengiriman Anggota -->
 <x-ui.smart-modal id="modal-histori-pengiriman" class="max-w-2xl"
     @open-smart-modal.window="
-                    if ($event.detail.modalId !== 'modal-histori-pengiriman') return;
+        if ($event.detail.modalId !== 'modal-histori-pengiriman') return;
 
-                    formData = $event.detail.data ?? {
-                        nama_anggota: '',
-                        id_penugasan: '',
-                        historiData: []
-                    };">
+        formData = $event.detail.data ?? {
+            nama_anggota: '',
+            id_penugasan: '',
+            historiData: []
+        };">
     <div
         class="relative flex h-[90vh] w-full max-w-[800px] flex-col overflow-hidden rounded-3xl bg-white dark:bg-gray-900 dark:border dark:border-gray-800">
 
@@ -99,7 +99,7 @@
                         </div>
 
                     </div>
-                    
+
                     <template x-if="item.status === 'Menunggu Diperiksa' && formData.id_anggota === '{{ auth()->user()->id_pegawai }}'">
                         <div class="mt-4 border-t border-gray-100 dark:border-gray-700 pt-4 flex justify-end">
                             <form :id="'delete-pengiriman-' + item.id_pengiriman" :action="`/pengirimans/${item.id_pengiriman}`" method="POST">

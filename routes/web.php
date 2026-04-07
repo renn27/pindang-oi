@@ -19,6 +19,7 @@ use App\Http\Controllers\SubKegiatanController;
 use App\Http\Controllers\PegawaiRoleController;
 use App\Http\Controllers\AgendaPimpinanController;
 use App\Http\Controllers\CkpPegawaiController;
+use App\Http\Controllers\JenisKegiatanController;
 
 
 use Illuminate\Support\Facades\Auth;
@@ -81,6 +82,24 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{agenda}', [AgendaPimpinanController::class, 'delete'])->name('agenda.delete');
     });
     // END AGENDA PIMPINAN BY PIMPINAN
+
+    // CRUD JENIS KEGIATAN BY ADMIN
+    Route::prefix('agenda-pimpinan')->group(function () {
+        Route::get('/', [AgendaPimpinanController::class, 'index'])->name('agenda.index');
+        Route::post('/', [AgendaPimpinanController::class, 'store'])->name('agenda.store');
+        Route::put('/{agenda}', [AgendaPimpinanController::class, 'update'])->name('agenda.update');
+        Route::delete('/{agenda}', [AgendaPimpinanController::class, 'delete'])->name('agenda.delete');
+    });
+    // END AGENDA PIMPINAN BY PIMPINAN
+
+    // CRUD JENIS KEGIATAN BY ADMIN
+    Route::prefix('jenis-kegiatan')->group(function () {
+        Route::get('/', [JenisKegiatanController::class, 'index'])->name('jenis-kegiatan.index');
+        Route::post('/', [JenisKegiatanController::class, 'store'])->name('jenis-kegiatan.store');
+        Route::put('/{jenisKegiatan}', [JenisKegiatanController::class, 'update'])->name('jenis-kegiatan.update');
+        Route::delete('/{jenisKegiatan}', [JenisKegiatanController::class, 'delete'])->name('jenis-kegiatan.delete');
+    });
+    // END JENIS KEGIATAN BY ADMIN
 
     // CRUD BIDANG KERJA BY ADMIN
     Route::prefix('bidang-kerja')->group(function () {
@@ -166,7 +185,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/kegiatan/export-mph-all', [MasterKegiatanController::class, 'exportMphAll'])
         ->name('kegiatan.export-mph-all');
-    
+
     // route CKP
     Route::get('ckp-pegawai/export', [CkpPegawaiController::class, 'exportExcel'])->name('ckp.pegawai.export');
     Route::post('/ckp/from-penugasan/{id}', [CkpPegawaiController::class, 'storeFromPenugasan'])

@@ -35,10 +35,10 @@
                     <!-- Sub-row 1 -->
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
                         <td
-                            class="pl-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300 text-center">
+                            class="pl-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-300 text-center">
                             {{ $index + 1 }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-400">
+                        <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-400">
                             <a href="{{ route('sub.kegiatan.show', [
                                 'kegiatan' => $kegiatan->id_kegiatan,
                                 'subKegiatan' => $subKegiatan->id_sub_kegiatan,

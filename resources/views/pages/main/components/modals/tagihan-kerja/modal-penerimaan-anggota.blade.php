@@ -116,10 +116,10 @@
                     </label>
                     <select name="status" id="status" x-model="formData.status"
                         class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10
-                                            h-11 w-full mb-4 appearance-none rounded-lg
-                                            border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm
-                                            placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
-                                            dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
+                        h-11 w-full mb-4 appearance-none rounded-lg
+                        border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm
+                        placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
+                        dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
                         :class="isOptionSelected && 'text-gray-800'" @change="isOptionSelected = true">
                         <!-- Placeholder -->
                         <option value="" disabled selected class="text-gray-400 dark:text-gray-500">
@@ -245,38 +245,6 @@
                 tanggalPenerimaanErrorMsg
             );
         }
-
-        // --- 2. Jumlah Dikirim ---
-        // const jumlahDikirim = document.getElementById('jumlah_dikirim');
-        // const jumlahDikirimErrorMsg = jumlahDikirim?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
-
-        // // ambil dari hidden input (AMAN)
-        // const targetPenugasan = Number(document.getElementById('target_penugasan')?.value || 0);
-
-        // if (!jumlahDikirim?.value?.trim()) {
-        //     addError(
-        //         'Jumlah Dikirim wajib diisi (hanya angka)',
-        //         jumlahDikirim, jumlahDikirim,
-        //         jumlahDikirimErrorMsg
-        //     );
-        // } else if (isNaN(jumlahDikirim.value) || Number(jumlahDikirim.value) <= 0) {
-        //     addError(
-        //         'Jumlah Dikirim harus berupa angka lebih besar dari 0',
-        //         jumlahDikirim, jumlahDikirim,
-        //         jumlahDikirimErrorMsg
-        //     );
-        // } else {
-        //     const jumlah = Number(jumlahDikirim.value);
-
-        //     if (targetPenugasan > 0 && jumlah > targetPenugasan) {
-        //         addError(
-        //             `Jumlah Dikirim tidak boleh melebihi target penugasan sebanyak ${targetPenugasan}`,
-        //             jumlahDikirim,
-        //             jumlahDikirim,
-        //             jumlahDikirimErrorMsg
-        //         );
-        //     }
-        // }
 
         // --- 2. Jumlah Diterima ---
         const jumlahDiterima = document.getElementById('jumlah_diterima');

@@ -185,7 +185,6 @@ class PenugasanPolicy
         return true;
     }
 
-
     /**
      * Determine whether the user can restore the model.
      */

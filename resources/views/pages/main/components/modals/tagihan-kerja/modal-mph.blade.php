@@ -215,9 +215,8 @@
                                                             <div class="text-sm text-gray-600 dark:text-gray-300">
                                                                 <span class="font-medium">Jenis Kegiatan</span>
                                                             </div>
-                                                            <span
-                                                                class="mt-1 inline-block rounded-full bg-gray-100 px-2.5 py-0.5 text-xs dark:bg-gray-700 dark:text-gray-300">
-                                                                {{ $penugasan->jenisKegiatan->jenis_kegiatan }}
+                                                            <span class="mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium {{$penugasan->jenisKegiatan ? 'bg-teal-100 text-teal-600 dark:bg-teal-500/10 dark:text-teal-400' : 'bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-400' }}">
+                                                                {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? 'Tidak ada jenis kegiatannya' }}
                                                             </span>
                                                         </div>
 

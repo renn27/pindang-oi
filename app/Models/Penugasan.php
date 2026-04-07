@@ -85,7 +85,7 @@ class Penugasan extends Model
     public function latestPengiriman()
     {
         return $this->hasOne(Pengiriman::class, 'id_penugasan', 'id_penugasan')
-            ->latestOfMany('tanggal_pengiriman');
+            ->latestOfMany('created_at');
     }
 
     public function getBintangKirimArrayAttribute(): array
@@ -108,6 +108,10 @@ class Penugasan extends Model
         );
     }
 
+    // public function latestPenerimaan()
+    // {
+    //     return $this->latestPengiriman?->penerimaan;
+    // }
     public function latestPenerimaan()
     {
         return $this->hasOneThrough(
@@ -117,7 +121,7 @@ class Penugasan extends Model
             'id_pengiriman',     // FK di Penerimaan ke Pengiriman
             'id_penugasan',      // local key di Penugasan
             'id_pengiriman'      // local key di Pengiriman
-        )->latestOfMany('tanggal_penerimaan');
+        )->latestOfMany('created_at');
     }
 
     public function isDinasLuar()
@@ -135,11 +139,6 @@ class Penugasan extends Model
     public function sudahMasukKalenderDL()
     {
         return $this->kalenderDLs()->exists();
-    }
-
-    public function sudahJadiCKP()
-    {
-        return $this->ckp()->exists();
     }
 
     public function isStarted(): bool

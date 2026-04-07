@@ -330,7 +330,7 @@
                                                             id_anggota: '{{ $penugasan->id_anggota }}',
                                                             historiData: @js(
                                                             $penugasan->pengirimans
-                                                                ->sortByDesc(fn($p) => $p->tanggal_pengiriman)
+                                                                ->sortBy(fn($p) => $p->created_at)
                                                                 ->map(
                                                                     fn($p) => [
                                                                         'id_pengiriman' => $p->id_pengiriman,
@@ -1125,8 +1125,8 @@
                                                                 nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
                                                                 id_anggota: @js($penugasan->id_anggota),
                                                                 nama_anggota: @js($penugasan->anggota?->nama_pegawai),
-                                                                id_jenis_kegiatan: @js($penugasan->jenisKegiatan->id),
-                                                                jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
+                                                                id_jenis_kegiatan: @js($penugasan->jenisKegiatan?->id),
+                                                                jenis_kegiatan: @js($penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Jenis Kegiatan Terhapus'),
                                                                 target: @js($penugasan->target),
                                                                 satuan_target: @js($penugasan->satuan_target),
                                                                 butuh_dl: @js($penugasan->butuh_dl),
@@ -1203,7 +1203,7 @@
                                                             id_anggota: '{{ $penugasan->id_anggota }}',
                                                             historiData: @js(
                                                             $penugasan->pengirimans
-                                                                ->sortByDesc(fn($p) => $p->tanggal_pengiriman)
+                                                                ->sortBy(fn($p) => $p->created_at)
                                                                 ->map(
                                                                     fn($p) => [
                                                                         'id_pengiriman' => $p->id_pengiriman,
