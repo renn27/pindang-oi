@@ -131,4 +131,28 @@
     {{-- Modal Histori Pengiriman --}}
     @include('pages.main.components.modals.tagihan-kerja.modal-history-pengiriman')
 
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.location.hash) {
+                const id = window.location.hash.substring(1);
+                const targetRow = document.getElementById(id);
+                
+                if (targetRow) {
+                    // Scroll smoothly to center
+                    targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Highlight the row temporarily
+                    targetRow.classList.add('!bg-yellow-100', 'dark:!bg-yellow-900/50', 'transition-colors', 'duration-1000');
+                    
+                    // Remove highlight after 3 seconds
+                    setTimeout(() => {
+                        targetRow.classList.remove('!bg-yellow-100', 'dark:!bg-yellow-900/50');
+                    }, 3000);
+                }
+            }
+        });
+    </script>
+    @endpush
+
 @endsection

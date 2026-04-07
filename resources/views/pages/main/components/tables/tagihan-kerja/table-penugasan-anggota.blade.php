@@ -132,7 +132,7 @@
                                     $ckpClass = $isCkp ? 'ckp-completed-row' : '';
                                 @endphp
                                 <!-- Row Utama -->
-                                <tr class="border-l-4 {{ $borderColor }} {{ $isMe ? 'bg-blue-50/50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800' }} {{ $ckpClass }}">
+                                <tr id="penugasan-{{ $penugasan->id_penugasan }}" class="border-l-4 {{ $borderColor }} {{ $isMe ? 'bg-blue-50/50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800' }} {{ $ckpClass }}">
                                     <td
                                         class="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300 text-center">
                                         {{ $loop->iteration }}
@@ -1026,7 +1026,7 @@
                                     $ckpClass = $isCkp ? 'ckp-completed-row' : '';
                                 @endphp
                                 <!-- Row Utama -->
-                                <tr class="border-l-4 {{ $borderColor }} {{ $isMe ? 'bg-blue-50/50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800' }} {{ $ckpClass }}">
+                                <tr id="penugasan-{{ $penugasan->id_penugasan }}" class="border-l-4 {{ $borderColor }} {{ $isMe ? 'bg-blue-50/50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800' }} {{ $ckpClass }}">
                                     <td
                                         class="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300 text-center">
                                         {{ $loop->iteration }}

@@ -158,7 +158,9 @@
                             {{ $jenisKegiatan->kategori }}
                         </td>
                         <td class="px-4 py-3 text-sm font-medium text-teal-500 dark:text-gray-300">
-                            {{ $jenisKegiatan->penugasans->count() ?? 0 }} Penugasan
+                            <a href="{{ route('jenis-kegiatan.detail', $jenisKegiatan->id) }}" class="hover:underline hover:text-teal-600 dark:hover:text-teal-400 transition-colors duration-200">
+                                {{ $jenisKegiatan->penugasans->count() ?? 0 }} Penugasan
+                            </a>
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-center">
                             <div class="relative inline-block group">

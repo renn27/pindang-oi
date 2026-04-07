@@ -16,6 +16,22 @@ class JenisKegiatanController extends Controller
         ]);
     }
 
+    public function detail(JenisKegiatan $jenisKegiatan)
+    {
+        if (!in_array(auth()->user()->active_role, ['Admin', 'Pimpinan'])) {
+            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        }
+
+        $jenisKegiatan->load(['penugasans' => function ($query) {
+            $query->latest();
+        }, 'penugasans.anggota', 'penugasans.subKegiatan.kegiatan']);
+
+        return view('pages.main.admin.jenis-kegiatan.detail', [
+            'title' => 'Detail Penugasan: ' . $jenisKegiatan->jenis_kegiatan,
+            'jenisKegiatan' => $jenisKegiatan,
+        ]);
+    }
+
     public function store(Request $request) {
         $validatedData = $request->validate([
             'jenis_kegiatan' => 'required|string|max:255',

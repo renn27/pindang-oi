@@ -96,6 +96,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('jenis-kegiatan')->group(function () {
         Route::get('/', [JenisKegiatanController::class, 'index'])->name('jenis-kegiatan.index');
         Route::post('/', [JenisKegiatanController::class, 'store'])->name('jenis-kegiatan.store');
+        Route::get('/{jenisKegiatan}/detail', [JenisKegiatanController::class, 'detail'])->name('jenis-kegiatan.detail');
         Route::put('/{jenisKegiatan}', [JenisKegiatanController::class, 'update'])->name('jenis-kegiatan.update');
         Route::delete('/{jenisKegiatan}', [JenisKegiatanController::class, 'delete'])->name('jenis-kegiatan.delete');
     });
