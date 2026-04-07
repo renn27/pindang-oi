@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -23,13 +24,18 @@ class CkpPegawai extends Model
         'kode_butir_kegiatan',
         'angka_kredit',
         'keterangan',
+        'realisasi',
+        'persentase_realisasi',
+        'tingkat_kualitas',
     ];
 
-    public function pegawai() {
+    public function pegawai()
+    {
         return $this->belongsTo(Pegawai::class, 'id_pegawai', 'id_pegawai');
     }
 
-    public function penugasan() {
+    public function penugasan()
+    {
         return $this->belongsTo(Penugasan::class, 'id_penugasan', 'id_penugasan');
     }
 }

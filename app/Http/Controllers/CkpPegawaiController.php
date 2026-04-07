@@ -72,13 +72,26 @@ class CkpPegawaiController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        $penugasan = Penugasan::with(['jenisKegiatan', 'subKegiatan', 'ckp'])
-            ->findOrFail($id);
+        $penugasan = Penugasan::with([
+            'jenisKegiatan',
+            'subKegiatan',
+            'ckp',
+            'latestPengiriman'
+        ])->findOrFail($id);
 
         if ($penugasan->ckp) {
-            return redirect()->route('ckp.pegawai.index')
-                ->with('warning', 'Penugasan ini sudah masuk CKP');
+            return redirect()->back()->with('warning', 'Penugasan ini sudah masuk CKP');
         }
+
+        if (!$penugasan->latestPengiriman) {
+            return back()->with('error', 'Belum ada pengiriman');
+        }
+
+        $latestPengiriman = $penugasan->latestPengiriman;
+
+        $realisasi = $latestPengiriman?->jumlah_dikirim ?? 0;
+        $persentase = $latestPengiriman?->rr_kirim ?? 0;
+        $kualitas = $latestPengiriman?->rating_kirim ?? 0;
 
         CkpPegawai::create([
             'id_pegawai'        => $penugasan->id_anggota,
@@ -90,9 +103,12 @@ class CkpPegawaiController extends Controller
             'kode_butir_kegiatan' => null,
             'angka_kredit'      => null,
             'keterangan'        => $request->keterangan,
+            'realisasi' => $realisasi,
+            'persentase_realisasi' => $persentase,
+            'tingkat_kualitas' => $kualitas,
         ]);
 
-       return redirect()->back()
+        return redirect()->back()
             ->with('success', 'Berhasil dijadikan CKP');
     }
 
