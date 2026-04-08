@@ -141,6 +141,7 @@
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-16 dark:text-gray-400">No.</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Jenis Kegiatan</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Kategori</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Perlu DL/Translok</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Jumlah Penugasannya</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-32 dark:text-gray-400">Aksi</th>
                 </tr>
@@ -157,6 +158,8 @@
                         <td class="px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-300">
                             {{ $jenisKegiatan->kategori }}
                         </td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-300">
+                            {{ $jenisKegiatan->butuh_dl_atau_translok ? 'Ya' : 'Tidak' }}
                         <td class="px-4 py-3 text-sm font-medium text-teal-500 dark:text-gray-300">
                             <a href="{{ route('jenis-kegiatan.detail', $jenisKegiatan->id) }}" class="hover:underline hover:text-teal-600 dark:hover:text-teal-400 transition-colors duration-200">
                                 {{ $jenisKegiatan->penugasans->count() ?? 0 }} Penugasan

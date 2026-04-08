@@ -124,16 +124,21 @@ class Penugasan extends Model
         )->latestOfMany('created_at');
     }
 
+    // public function isDinasLuar()
+    // {
+    //     $jenisKegiatan = [
+    //         'Pengawasan',
+    //         'Pendataan',
+    //         'Supervisi',
+    //         'Perjalanan Dinas',
+    //     ];
+
+    //     return in_array($this->jenisKegiatan->jenis_kegiatan, $jenisKegiatan);
+    // }
+
     public function isDinasLuar()
     {
-        $jenisKegiatan = [
-            'Pengawasan',
-            'Pendataan',
-            'Supervisi',
-            'Perjalanan Dinas',
-        ];
-
-        return in_array($this->jenisKegiatan->jenis_kegiatan, $jenisKegiatan);
+        return $this->jenisKegiatan?->butuh_dl_atau_translok == 1;
     }
 
     public function sudahMasukKalenderDL()

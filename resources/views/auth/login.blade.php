@@ -101,7 +101,7 @@
                 </div>
 
                 <!-- Register Link -->
-                <div class="pt-5 border-t border-gray-200 dark:border-gray-700">
+                {{-- <div class="pt-5 border-t border-gray-200 dark:border-gray-700">
                     <p class="text-center text-sm text-gray-600 dark:text-gray-400">
                         Belum memiliki akun?
                         <a href="{{ route('register') }}"
@@ -109,7 +109,7 @@
                             Daftar di sini
                         </a>
                     </p>
-                </div>
+                </div> --}}
             </form>
 
             {{-- Footer --}}

@@ -70,20 +70,6 @@ class PenugasanController extends Controller
             'Pendataan',
         ]);
 
-        // Ambil input toggle DL (0 / 1)
-        // $requestButuhDl = (bool) ($validated['butuh_dl'] ?? false);
-        // $butuhDl = $wajibDl || $requestButuhDl;
-
-        // $validated['butuh_dl'] = $butuhDl;
-        // $validated['status_dl'] = $butuhDl ? 'Menunggu' : null;
-
-        // // Ambil input toggle Translok (0 / 1)
-        // $requestButuhTranslok = (bool) ($validated['butuh_translok'] ?? false);
-        // $butuhTranslok = $wajibDl || $requestButuhTranslok;
-
-        // $validated['butuh_translok'] = $butuhTranslok;
-        // $validated['status_translok'] = $butuhTranslok ? 'Menunggu' : null;
-
         $requestButuhDl = (bool) ($validated['butuh_dl'] ?? false);
         $requestButuhTranslok = (bool) ($validated['butuh_translok'] ?? false);
 
@@ -219,13 +205,6 @@ class PenugasanController extends Controller
             'Pengawasan',
             'Pendataan',
         ]);
-
-        // $requestButuhDl = (bool) ($validated['butuh_dl'] ?? false);
-        // $requestButuhTranslok = (bool) ($validated['butuh_translok'] ?? false);
-
-        // // FINAL DECISION
-        // $validated['butuh_dl'] = $wajibDl || $requestButuhDl;
-        // $validated['butuh_translok'] = $wajibDl || $requestButuhTranslok;
 
         $requestButuhDl = (bool) ($validated['butuh_dl'] ?? false);
         $requestButuhTranslok = (bool) ($validated['butuh_translok'] ?? false);
