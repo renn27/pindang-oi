@@ -130,8 +130,10 @@ Route::middleware('auth')->group(function () {
     });
     // END KEGIATAN & SUB KEGIATAN BY KETUA TIM
 
-    // CRUD PENGIRIMAN BY ANGGOTA TIM (DESTROY KELUAR DARI SCOPE AGAR CLEAN)
+    // HAPUS PENGIRIMAN BY ANGGOTA TIM (DESTROY KELUAR DARI SCOPE AGAR CLEAN)
     Route::delete('pengirimans/{pengiriman:id_pengiriman}', [PengirimanController::class, 'destroy'])->name('pengiriman.delete');
+
+    Route::post('/penugasan/check-duplicate-dates', [PenugasanController::class, 'checkDuplicateDates'])->name('penugasan.check-duplicate-dates');
 
     // CRUD PENUGASAN  BY KETUA TIM
     Route::prefix('sub-kegiatan/{subKegiatan:id_sub_kegiatan}')->group(function () {

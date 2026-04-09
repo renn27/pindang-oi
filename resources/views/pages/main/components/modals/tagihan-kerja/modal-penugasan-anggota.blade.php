@@ -758,7 +758,7 @@
                         Batal
                     </button>
 
-                    <button x-show="mode === 'create'" id="savePenugasanButton" type="button"
+                    <button x-show="mode === 'create'" type="submit"
                         class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
                         Simpan Penugasan
                     </button>
@@ -1003,7 +1003,7 @@
         });
     }
 
-    function savePenugasan(event) {
+    async function savePenugasan(event) {
         if (event) {
             event.preventDefault();
             event.stopPropagation();
@@ -1014,22 +1014,112 @@
         if (errors.length > 0) {
             showValidationPenugasanBanner(errors);
             return; // Berhenti — tidak buka modal konfirmasi
-        } else {
-            confirmSavePenugasan();
         }
-    }
 
-    function confirmSavePenugasan() {
+        // ---- CEK DUPLIKASI DL/TRANSLOK KE SERVER ----
         const form = document.getElementById('addPenugasanForm');
-        if (!form) {
-            alert('Form tidak ditemukan');
-            return;
+        const formDataObj = new FormData(form);
+
+        // Cari tahu apakah jenis kegiatan ini butuh DL/Translok
+        const idJenisKegiatan = formDataObj.get('id_jenis_kegiatan');
+        const butuhDlAtauTranslok = window.jenisButuhMap?.[Number(idJenisKegiatan)] == 1;
+
+        if (butuhDlAtauTranslok) {
+            const idAnggota = formDataObj.get('id_anggota');
+            
+            // Kumpulkan dates
+            const datesProcess = [];
+            const tMulai = formDataObj.get('tanggal_mulai');
+            const tSelesai = formDataObj.get('tanggal_selesai');
+            if (tMulai && tSelesai) {
+                datesProcess.push({tanggal_mulai: tMulai, tanggal_selesai: tSelesai});
+            }
+
+            const listMulai = formDataObj.getAll('tanggal_mulai_list[]');
+            const listSelesai = formDataObj.getAll('tanggal_selesai_list[]');
+            for(let i=0; i<listMulai.length; i++) {
+                if(listMulai[i] && listSelesai[i]) {
+                    datesProcess.push({tanggal_mulai: listMulai[i], tanggal_selesai: listSelesai[i]});
+                }
+            }
+
+            // Dapatkan itemKey dari action url jika mode edit
+            let excludeId = null;
+            const actionPath = form.getAttribute('action') || '';
+            const actionParts = actionPath.split('/');
+            const idxPen = actionParts.indexOf('penugasan');
+            if (idxPen !== -1 && actionParts.length > idxPen + 1) {
+                excludeId = actionParts[idxPen + 1];
+            }
+
+            const checkPayload = {
+                id_anggota: idAnggota,
+                dates: datesProcess,
+                exclude_id: excludeId,
+                _token: document.querySelector('input[name="_token"]')?.value
+            };
+
+            try {
+                const btnSubmit = event && event.submitter ? event.submitter : null;
+                const origText = btnSubmit ? btnSubmit.innerHTML : '';
+                if(btnSubmit) {
+                    btnSubmit.innerHTML = 'Memproses ...';
+                    btnSubmit.disabled = true;
+                }
+
+                const response = await fetch('/penugasan/check-duplicate-dates', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(checkPayload)
+                });
+                
+                if(btnSubmit) {
+                    btnSubmit.innerHTML = origText;
+                    btnSubmit.disabled = false;
+                }
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.has_duplicate) {
+                        result.duplicates.forEach(d => {
+                            let fElement = document.getElementById(d.focus_el);
+                            
+                            // Jika element tidak ketemu (misal karena ID dinamis tanpa "_list_id"), fallback ke target utama
+                            if (!fElement && d.focus_el.includes('_')) {
+                                // Pada dynamic items idnya adalah tanggal_selesai_1
+                                fElement = document.getElementById(d.focus_el) || document.getElementById('tanggal_mulai');
+                            } else {
+                                fElement = fElement || document.getElementById('tanggal_mulai');
+                            }
+
+                            errors.push({
+                                message: d.message,
+                                focusEl: fElement
+                            });
+                        });
+                        
+                        showValidationPenugasanBanner(errors);
+                        return; // batalkan submit
+                    }
+                }
+            } catch (err) {
+                console.error("Gagal mengecek duplikasi tanggal", err);
+            }
         }
+
+        // submit form
         form.submit();
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('savePenugasanButton')?.addEventListener('click', savePenugasan);
+        // Intercept form submit event, handle validation & fetching
+        const form = document.getElementById('addPenugasanForm');
+        if (form) {
+            form.addEventListener('submit', savePenugasan);
+        }
     });
 
     let tanggalPenugasanCounter = 0;

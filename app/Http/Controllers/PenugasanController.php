@@ -380,6 +380,92 @@ class PenugasanController extends Controller
         }
     }
 
+    public function checkDuplicateDates(Request $request)
+    {
+        $request->validate([
+            'id_anggota' => 'required',
+            'dates' => 'required|array',
+            'exclude_id' => 'nullable'
+        ]);
+
+        $idAnggota = $request->id_anggota;
+        $excludeId = $request->exclude_id;
+        $dates = $request->dates;
+
+        // Ambil nama anggota sekali saja
+        $anggota = \App\Models\Pegawai::where('id_pegawai', $idAnggota)->first();
+        $namaAnggota = $anggota ? $anggota->nama_pegawai : 'anggota terpilih';
+
+        $duplicates = [];
+
+        foreach ($dates as $index => $date) {
+            $mulai = $date['tanggal_mulai'] ?? null;
+            $selesai = $date['tanggal_selesai'] ?? null;
+
+            if (!$mulai || !$selesai) continue;
+
+            $query = Penugasan::where('id_anggota', $idAnggota)
+                ->where(function($q) {
+                    $q->where('butuh_dl', 1)
+                      ->orWhere('butuh_translok', 1);
+                })
+                ->where('tanggal_mulai', '<=', $selesai)
+                ->where('tanggal_selesai', '>=', $mulai);
+
+            if (!empty($excludeId)) {
+                $query->where('id_penugasan', '!=', $excludeId);
+            }
+
+            $conflict = $query->first(['tanggal_mulai', 'tanggal_selesai']);
+
+            if ($conflict) {
+                $cMulai = $conflict->tanggal_mulai;
+                $cSelesai = $conflict->tanggal_selesai;
+
+                $reqM = \Carbon\Carbon::parse($mulai)->startOfDay();
+                $reqS = \Carbon\Carbon::parse($selesai)->startOfDay();
+                $dbM = \Carbon\Carbon::parse($cMulai)->startOfDay();
+                $dbS = \Carbon\Carbon::parse($cSelesai)->startOfDay();
+
+                $dbMulaiStr = $dbM->translatedFormat('d M Y');
+                $dbSelesaiStr = $dbS->translatedFormat('d M Y');
+
+                $isMulaiHit = $reqM->greaterThanOrEqualTo($dbM) && $reqM->lessThanOrEqualTo($dbS);
+                $isSelesaiHit = $reqS->greaterThanOrEqualTo($dbM) && $reqS->lessThanOrEqualTo($dbS);
+
+                // Penentuan elemen form mana yang akan difokuskan
+                if (!$isMulaiHit && $isSelesaiHit) {
+                    $focusEl = ($index === 0) ? 'tanggal_selesai' : "tanggal_selesai_$index";
+                } else {
+                    $focusEl = ($index === 0) ? 'tanggal_mulai' : "tanggal_mulai_$index";
+                }
+
+                // Penentuan string pesan error (berdasarkan DB range 1 hari atau rentang hari)
+                if ($dbMulaiStr === $dbSelesaiStr) {
+                    if ($isMulaiHit && !$isSelesaiHit) {
+                        $msg = "Tanggal mulai {$dbMulaiStr} untuk {$namaAnggota} sudah ada di penugasan lain.";
+                    } elseif ($isSelesaiHit && !$isMulaiHit) {
+                        $msg = "Tanggal selesai {$dbSelesaiStr} untuk {$namaAnggota} sudah ada di penugasan lain.";
+                    } else {
+                        $msg = "Tanggal {$dbMulaiStr} untuk {$namaAnggota} sudah ada di penugasan lain.";
+                    }
+                } else {
+                    $msg = "Tanggal mulai {$dbMulaiStr} sampai dengan Tanggal selesai {$dbSelesaiStr} untuk {$namaAnggota} sudah ada di penugasan lain.";
+                }
+
+                $duplicates[] = [
+                    'message' => $msg,
+                    'focus_el' => $focusEl
+                ];
+            }
+        }
+
+        return response()->json([
+            'has_duplicate' => count($duplicates) > 0,
+            'duplicates' => $duplicates
+        ]);
+    }
+
     /**
      * Helper to extract flat dates array from main and additional dates,
      * and validate them against SubKegiatan bounds.

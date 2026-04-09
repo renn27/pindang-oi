@@ -128,7 +128,6 @@
                     </label>
                     <input type="text" x-model="formData.tahun_kegiatan" name="tahun_kegiatan" id="tahun_kegiatan" placeholder="Contoh : 2026"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="tahun_kegiatan">Tahun wajib diisi</p>
                 </div>
 
                 {{-- Rencana JPT --}}
@@ -149,7 +148,6 @@
                             </option>
                         @endforeach
                     </select>
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="rk_jpt">Rencana JPT wajib dipilih</p>
                 </div>
 
                 {{-- Indikator JPT --}}
@@ -163,7 +161,6 @@
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                         <option value="">-- Harap pilih RK JPT dulu --</option>
                     </select>
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="iki_jpt">Indikator JPT wajib dipilih</p>
                 </div>
 
                 <div>
@@ -173,7 +170,6 @@
                     <input type="text" x-model="formData.nama_rk_kegiatan" name="nama_rk_kegiatan" id="nama_rk_kegiatan"
                         placeholder="Contoh : SNLIK2026"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                    <p class="field-error-msg text-xs text-red-600 dark:text-red-400 mt-1 hidden" data-for="nama_rk_kegiatan">Nama kegiatan wajib diisi</p>
                 </div>
             </div>
 
