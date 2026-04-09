@@ -455,7 +455,11 @@ class PenugasanController extends Controller
 
                 $duplicates[] = [
                     'message' => $msg,
-                    'focus_el' => $focusEl
+                    'focus_el' => $focusEl,
+                    'index' => $index,
+                    'requested_mulai' => $mulai,
+                    'requested_selesai' => $selesai,
+                    'is_selesai' => (!$isMulaiHit && $isSelesaiHit) // flag to determine which side of the date triggered it
                 ];
             }
         }

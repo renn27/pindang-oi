@@ -1098,7 +1098,7 @@
         // SAVE ALL — dengan validasi frontend
         // =============================================
 
-        function saveAll(event) {
+        async function saveAll(event) {
             if (event) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -1109,6 +1109,103 @@
             if (errors.length > 0) {
                 showValidationBanner(errors);
                 return; // Berhenti — tidak buka modal konfirmasi
+            }
+
+            // ---- CEK DUPLIKASI DL/TRANSLOK KE SERVER ----
+            const anggotaPayloads = {}; // { 'idAnggota':  [{tanggal_mulai, tanggal_selesai, focusEl}]  }
+            const sectionsDL = document.querySelectorAll('[id^="rk-anggota-"]:not([id*="-detail-"])');
+            
+            sectionsDL.forEach(section => {
+                const sectionId = section.id;
+                const detailItems = section.querySelectorAll('[id*="-detail-"]');
+                detailItems.forEach(detail => {
+                    const butuhDLInput = detail.querySelector('input[name*="detail_butuh_dl"]');
+                    const butuhTranslokInput = detail.querySelector('input[name*="detail_butuh_translok"]');
+                    const isDL = butuhDLInput && Number(butuhDLInput.value) === 1;
+                    const isTrans = butuhTranslokInput && Number(butuhTranslokInput.value) === 1;
+                    
+                    if (isDL || isTrans) {
+                        const idAnggotaInput = detail.querySelector('input[name*="detail_id_anggota"]');
+                        const idAnggota = idAnggotaInput ? idAnggotaInput.value : '';
+                        
+                        const mulInput = detail.querySelector(`input[name="detail_tanggal_mulai[${sectionId}][]"]`);
+                        const selInput = detail.querySelector(`input[name="detail_tanggal_selesai[${sectionId}][]"]`);
+                        
+                        if (idAnggota && mulInput && selInput && mulInput.value && selInput.value) {
+                            if(!anggotaPayloads[idAnggota]) anggotaPayloads[idAnggota] = [];
+                            anggotaPayloads[idAnggota].push({
+                                tanggal_mulai: mulInput.value,
+                                tanggal_selesai: selInput.value,
+                                focusElMulai: mulInput,
+                                focusElSelesai: selInput
+                            });
+                        }
+                    }
+                });
+            });
+
+            const anggotaKeys = Object.keys(anggotaPayloads);
+            if (anggotaKeys.length > 0) {
+                try {
+                    const btnSubmit = event && event.target ? event.target : document.getElementById('saveAllButton');
+                    const origText = btnSubmit ? btnSubmit.innerHTML : '';
+                    if(btnSubmit) { btnSubmit.innerHTML = 'Memeriksa...'; btnSubmit.disabled = true; }
+
+                    const token = document.querySelector('input[name="_token"]')?.value;
+                    let hasDbDuplicate = false;
+
+                    for(const idAngg of anggotaKeys) {
+                         const apiDates = anggotaPayloads[idAngg].map(p => ({
+                             tanggal_mulai: p.tanggal_mulai,
+                             tanggal_selesai: p.tanggal_selesai
+                         }));
+
+                         const payload = {
+                             id_anggota: idAngg,
+                             dates: apiDates,
+                             _token: token
+                         };
+
+                         const response = await fetch('/penugasan/check-duplicate-dates', {
+                             method: 'POST',
+                             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                             body: JSON.stringify(payload)
+                         });
+
+                         if (response.ok) {
+                             const result = await response.json();
+                             if (result.has_duplicate) {
+                                 hasDbDuplicate = true;
+                                 result.duplicates.forEach((d) => {
+                                     // Match to the form input for scrolling
+                                     const matchingPayload = anggotaPayloads[idAngg].find(p => p.tanggal_mulai === d.requested_mulai && p.tanggal_selesai === d.requested_selesai);
+                                     
+                                     let targetEl = null;
+                                     if (matchingPayload) {
+                                         // Backend now passed `is_selesai` bool flag to indicate which end triggers the conflict
+                                         targetEl = d.is_selesai
+                                                    ? matchingPayload.focusElSelesai 
+                                                    : matchingPayload.focusElMulai;
+                                     }
+
+                                     errors.push({
+                                         message: d.message,
+                                         focusEl: targetEl
+                                     });
+                                 });
+                             }
+                         }
+                    }
+
+                    if(btnSubmit) { btnSubmit.innerHTML = origText; btnSubmit.disabled = false; }
+
+                    if (hasDbDuplicate) {
+                        showValidationBanner(errors);
+                        return; // batalkan konfirmasi karna ada error duplicate
+                    }
+                } catch(e) {
+                    console.error("Gagal mengecek duplikasi tanggal", e);
+                }
             }
 
             // ---- Lolos validasi, lanjut build confirmation HTML ----

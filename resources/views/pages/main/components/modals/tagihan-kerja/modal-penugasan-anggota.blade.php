@@ -897,12 +897,13 @@
 
         // --- 2. Jenis Kegiatan Pada Penugasan  ---
         const jenisKegiatanSelect = document.getElementById('jenis_kegiatan_select');
+        const jenisKegiatanFocusEl = jenisKegiatanSelect ? jenisKegiatanSelect.nextElementSibling?.querySelector('button') || jenisKegiatanSelect : null;
         const jenisKegiatanSelectErrorMsg = jenisKegiatanSelect?.closest('.md\\:w-3\\/4')?.querySelector(
             '.field-error-msg');
         if (!jenisKegiatanSelect?.value?.trim()) {
             addError(
                 'Jenis Kegiatan pada penugasan wajib diisi',
-                jenisKegiatanSelect, jenisKegiatanSelect,
+                jenisKegiatanFocusEl, jenisKegiatanFocusEl,
                 jenisKegiatanSelectErrorMsg
             );
         }
