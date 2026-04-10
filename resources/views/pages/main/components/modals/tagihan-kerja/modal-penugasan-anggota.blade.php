@@ -79,17 +79,14 @@
                         Nama Pegawai <span class="text-red-500">*</span>
                     </label>
 
-                    <!-- Hidden ID Pegawai (WAJIB buat submit) -->
                     <input type="hidden" name="id_anggota" x-model="selectedId">
 
-                    <!-- Input Visible -->
                     <div class="relative">
                         <input type="text" x-model="search" @click="mode === 'create' && (open = true)"
                             @input="mode === 'create' && (open = true)" @keydown.escape="open = false"
                             :readonly="mode === 'edit'" placeholder="Pilih pegawai..."
                             class="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors">
 
-                        <!-- Dropdown -->
                         <div x-show="open && mode === 'create'" x-transition @click.outside="open = false"
                             class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto
                                     rounded-lg border border-gray-200 bg-white shadow-lg
@@ -108,156 +105,103 @@
                                         x-text="pegawai.nama_pegawai"></div>
                                 </button>
                             </template>
-                            {{-- --}}
                         </div>
                     </div>
                 </div>
 
-                {{-- Toggle Gabungan untuk DL dan Translok --}}
-                {{-- <div x-data="{
-                        open: false,
-                        isOther: false,
-                        highlightedIndex: -1,
-                        options: [
-                            @foreach ($jenisKegiatans as $jenis)
-                                {
-                                    id: '{{ $jenis->id }}',
-                                    text: '{{ addslashes($jenis->jenis_kegiatan) }} ({{ $jenis->kategori }})',
-                                    style: '{{ $jenis->kategori === 'Utama' ? 'text-green-700 font-medium dark:text-green-300' : 'text-orange-700 dark:text-orange-300' }}'
-                                },
-                            @endforeach
-                            {
-                                id: 'LAINNYA',
-                                text: '➕ Lainnya',
-                                style: 'text-blue-700 font-medium dark:text-blue-300' }
-                        ],
-                        get selectText() {
-                            if (!formData.id_jenis_kegiatan) return '-- Pilih Jenis Kegiatan --';
-                            let opt = this.options.find(o => o.id == formData.id_jenis_kegiatan);
-                            return opt ? opt.text : formData.jenis_kegiatan || '-- Pilih Jenis Kegiatan --';
-                        },
-                        selectJenis(opt) {
-                            formData.id_jenis_kegiatan = opt.id;
-                            this.isOther = (opt.id === 'LAINNYA');
-                            this.open = false;
-                            this.highlightedIndex = -1;
-                        },
-                        highlightNext() { if (this.highlightedIndex < this.options.length - 1) this.highlightedIndex++; },
-                        highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
-                        selectHighlighted() { if (this.highlightedIndex >= 0) this.selectJenis(this.options[this.highlightedIndex]); }
-                    }"
-                    @open-smart-modal.window="
-                        if ($event.detail.modalId === 'modal-penugasan-anggota' && mode === 'edit') {
-                            isOther = (formData.id_jenis_kegiatan === 'LAINNYA');
-                        }">
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Jenis Kegiatan <span class="text-red-500">*</span>
-                    </label>
-
-                    <input type="hidden" id="jenis_kegiatan_select" name="id_jenis_kegiatan"
-                        x-model="formData.id_jenis_kegiatan">
-
-                    <div class="relative mb-4"
-                        @keydown.arrow-down.prevent="if(!open) open = true; else highlightNext()"
-                        @keydown.arrow-up.prevent="highlightPrev()"
-                        @keydown.enter.prevent="if(open) selectHighlighted(); else open = true"
-                        @keydown.escape="open = false">
-                        <button type="button" @click="open = !open" @click.outside="open = false"
-                            class="flex h-11 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800">
-                            <span x-text="selectText" class="truncate"
-                                :class="!formData.id_jenis_kegiatan ? 'text-gray-400' : 'text-gray-800 dark:text-gray-200'">
-                            </span>
-                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24">
-                                <path stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                            </svg>
-                        </button>
-
-                        <div x-show="open" x-transition
-                            class="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border bg-white shadow-lg dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-                            <template x-for="(opt, index) in options" :key="opt.id">
-                                <button type="button" @click="selectJenis(opt)"
-                                    class="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0"
-                                    :class="[opt.style, highlightedIndex === index ? 'bg-gray-50 dark:bg-gray-700' : '']">
-                                    <span x-text="opt.text"></span>
-                                </button>
-                            </template>
-                        </div>
-                    </div>
-
-                    <p class="text-xs text-red-600 mt-1 hidden" data-for="jenis_kegiatan_select">
-                        Jenis Kegiatan wajib dipilih
-                    </p>
-
-                    <!-- INPUT JENIS KEGIATAN BARU -->
-                    <div x-show="isOther" x-transition>
-                        <input type="text" name="jenis_kegiatan_baru" placeholder="Masukkan jenis kegiatan baru"
-                            class="h-11 w-full mb-4 rounded-lg border px-4 text-sm dark:bg-gray-800">
-                    </div>
-                </div> --}}
-
                 {{-- Pilih Jenis Kegiatan --}}
-                {{-- <div x-data="{
-                        open: false,
-                        isOther: false,
-                        highlightedIndex: -1,
-                        search: '',
+                <div x-data="{
+                    open: false,
+                    isOther: false,
+                    highlightedIndex: -1,
+                    search: '',
 
-                        options: [
-                            @foreach ($jenisKegiatans as $jenis)
-                                {
-                                    id: '{{ $jenis->id }}',
-                                    text: '{{ addslashes($jenis->jenis_kegiatan) }} ({{ $jenis->kategori }})',
-                                    butuh_dl_atau_translok: {{ $jenis->butuh_dl_atau_translok ? 1 : 0 }},
-                                    style: '{{ $jenis->kategori === 'Utama' ? 'text-green-700 font-medium dark:text-green-300' : 'text-orange-700 dark:text-orange-300' }}'
-                                },
-                            @endforeach
+                    options: [
+                        @foreach ($jenisKegiatans as $jenis)
                             {
-                                id: 'LAINNYA',
-                                text: '➕ Lainnya',
-                                style: 'text-blue-700 font-medium dark:text-blue-300',
-                                butuh_dl_atau_translok : 0
-                            }
-                        ],
-
-                        get filteredOptions() {
-                            if (!this.search) return this.options;
-                            return this.options.filter(o =>
-                                o.text.toLowerCase().includes(this.search.toLowerCase())
-                            );
-                        },
-
-                        get selectText() {
-                            if (!formData.id_jenis_kegiatan) return '-- Pilih Jenis Kegiatan --';
-                            let opt = this.options.find(o => o.id == formData.id_jenis_kegiatan);
-                            return opt ? opt.text : formData.jenis_kegiatan || '-- Pilih Jenis Kegiatan --';
-                        },
-
-                        selectJenis(opt) {
-                            formData.id_jenis_kegiatan = opt.id;
-                            this.isOther = (opt.id === 'LAINNYA');
-                            this.open = false;
-                            this.search = '';
-                            this.highlightedIndex = -1;
-                        },
-
-                        highlightNext() {
-                            if (this.highlightedIndex < this.filteredOptions.length - 1) this.highlightedIndex++;
-                        },
-
-                        highlightPrev() {
-                            if (this.highlightedIndex > 0) this.highlightedIndex--;
-                        },
-
-                        selectHighlighted() {
-                            if (this.highlightedIndex >= 0) {
-                                this.selectJenis(this.filteredOptions[this.highlightedIndex]);
-                            }
+                                id: '{{ $jenis->id }}',
+                                text: '{{ addslashes($jenis->jenis_kegiatan) }} ({{ $jenis->kategori }})',
+                                style: '{{ $jenis->kategori === 'Utama'
+                                    ? 'text-green-700 font-medium dark:text-green-300'
+                                    : 'text-orange-700 dark:text-orange-300' }}'
+                            },
+                        @endforeach
+                        {
+                            id: 'LAINNYA',
+                            text: '➕ Lainnya',
+                            style: 'text-blue-700 font-medium dark:text-blue-300'
                         }
-                    }"
-                    @open-smart-modal.window="
-                        if ($event.detail.modalId === 'modal-penugasan-anggota' && mode === 'edit') {
-                            isOther = (formData.id_jenis_kegiatan === 'LAINNYA');
-                        }">
+                    ],
+
+                    get filteredOptions() {
+                        if (!this.search) return this.options;
+                        return this.options.filter(o =>
+                            o.text.toLowerCase().includes(this.search.toLowerCase())
+                        );
+                    },
+
+                    get selectText() {
+                        if (!formData.id_jenis_kegiatan) return '-- Pilih Jenis Kegiatan --';
+                        let opt = this.options.find(o => o.id == formData.id_jenis_kegiatan);
+                        return opt ? opt.text : formData.jenis_kegiatan || '-- Pilih Jenis Kegiatan --';
+                    },
+
+                    checkAutoTarget(opt) {
+                        if (!opt) {
+                            window.isAutoTargetGlobal = false;
+                            return;
+                        }
+                        const nama = opt.text.toLowerCase();
+                        window.isAutoTargetGlobal = (
+                            nama.includes('pengawasan') ||
+                            nama.includes('supervisi') ||
+                            nama.includes('perjalanan dinas')
+                        );
+                        if (window.isAutoTargetGlobal) formData.target = 1;
+                    },
+
+                    selectJenis(opt) {
+                        formData.id_jenis_kegiatan = opt.id;
+                        this.isOther = (opt.id === 'LAINNYA');
+                        this.open = false;
+                        this.search = '';
+                        this.highlightedIndex = -1;
+                        this.checkAutoTarget(opt);
+                        $dispatch('jenis-kegiatan-changed');
+                    },
+
+                    highlightNext() {
+                        if (this.highlightedIndex < this.filteredOptions.length - 1) this.highlightedIndex++;
+                    },
+
+                    highlightPrev() {
+                        if (this.highlightedIndex > 0) this.highlightedIndex--;
+                    },
+
+                    selectHighlighted() {
+                        if (this.highlightedIndex >= 0) {
+                            this.selectJenis(this.filteredOptions[this.highlightedIndex]);
+                        }
+                    }
+                }"
+                x-init="
+                    window.isAutoTargetGlobal = false;
+                    $nextTick(() => {
+                        const opt = this.options.find(o => o.id == formData.id_jenis_kegiatan);
+                        this.checkAutoTarget(opt || null);
+                    });
+                "
+                @open-smart-modal.window="
+                    if ($event.detail.modalId !== 'modal-penugasan-anggota') return;
+                    isOther = (formData.id_jenis_kegiatan === 'LAINNYA');
+                    window.isAutoTargetGlobal = false;
+                    $nextTick(() => {
+                        const opt = this.options.find(o => o.id == formData.id_jenis_kegiatan);
+                        this.checkAutoTarget(opt || null);
+                        $dispatch('jenis-kegiatan-changed');
+                    });
+                ">
+
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Jenis Kegiatan <span class="text-red-500">*</span>
                     </label>
@@ -265,13 +209,11 @@
                     <input type="hidden" id="jenis_kegiatan_select" name="id_jenis_kegiatan"
                         x-model="formData.id_jenis_kegiatan">
 
-                    <div class="relative mb-4"
-                        @keydown.arrow-down.prevent="if(!open) open = true; else highlightNext()"
+                    <div class="relative mb-4" @keydown.arrow-down.prevent="if(!open) open = true; else highlightNext()"
                         @keydown.arrow-up.prevent="highlightPrev()"
                         @keydown.enter.prevent="if(open) selectHighlighted(); else open = true"
                         @keydown.escape="open = false">
 
-                        <!-- BUTTON -->
                         <button type="button"
                             @click="
                                 open = !open;
@@ -292,32 +234,24 @@
                             </svg>
                         </button>
 
-                        <!-- DROPDOWN -->
                         <div x-show="open" x-transition
                             class="absolute z-50 mt-1 w-full rounded-lg border bg-white shadow-lg dark:bg-gray-800 border-gray-200 dark:border-gray-700">
 
-                            <!-- SEARCH -->
                             <div class="p-2 border-b border-gray-100 dark:border-gray-700">
-                                <input type="text"
-                                    x-model="search"
-                                    placeholder="Cari jenis kegiatan..."
+                                <input type="text" x-model="search" placeholder="Cari jenis kegiatan..."
                                     class="w-full px-3 py-2 text-sm rounded-md border focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
                                     @input="highlightedIndex = -1">
                             </div>
 
-                            <!-- LIST -->
                             <div class="max-h-48 overflow-y-auto">
                                 <template x-for="(opt, index) in filteredOptions" :key="opt.id">
-                                    <button type="button"
-                                        @click="selectJenis(opt)"
+                                    <button type="button" @click="selectJenis(opt)"
                                         class="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0"
                                         :class="[opt.style, highlightedIndex === index ? 'bg-gray-50 dark:bg-gray-700' : '']">
-
                                         <span x-text="opt.text"></span>
                                     </button>
                                 </template>
 
-                                <!-- EMPTY STATE -->
                                 <div x-show="filteredOptions.length === 0"
                                     class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 text-center">
                                     Tidak ditemukan
@@ -330,68 +264,57 @@
                         Jenis Kegiatan wajib dipilih
                     </p>
 
-                    <!-- INPUT JENIS KEGIATAN BARU -->
                     <div x-show="isOther" x-transition>
                         <input type="text" name="jenis_kegiatan_baru" placeholder="Masukkan jenis kegiatan baru"
                             class="h-11 w-full mb-4 rounded-lg border px-4 text-sm dark:bg-gray-800">
                     </div>
-                </div> --}}
+                </div>
 
                 {{-- Toggle Gabungan untuk DL dan Translok --}}
-                {{-- <div x-data="{
-                        butuhDl: false,
-                        butuhTranslok: false,
+                <div x-data="{
+                    butuhDl: false,
+                    butuhTranslok: false,
 
-                        wajibJenis: [3, 4, 5, 6],
+                    get jenisId() {
+                        return Number(formData?.id_jenis_kegiatan || 0)
+                    },
 
-                        get jenisId() {
-                            return Number(formData?.id_jenis_kegiatan || 0)
-                        },
+                    get showToggle() {
+                        return window.jenisButuhMap?.[this.jenisId] == 1
+                    },
 
-                        get showToggle() {
-                            return this.wajibJenis.includes(this.jenisId)
-                        },
-
-                        syncState() {
-                            const dlDB = Boolean(Number(formData?.butuh_dl ?? 0))
-                            const translokDB = Boolean(Number(formData?.butuh_translok ?? 0))
-
-                            if (!this.showToggle) {
-                                this.butuhDl = false
-                                this.butuhTranslok = false
-                                return
-                            }
-
-                            if (mode === 'create') {
-                                this.butuhDl = true
-                                this.butuhTranslok = false
-                            } else {
-                                this.butuhDl = dlDB
-                                this.butuhTranslok = translokDB
-                            }
-                        },
-
-                        toggleDL() {
-                            this.butuhDl = true
-                            this.butuhTranslok = false
-                        },
-
-                        toggleTranslok() {
-                            this.butuhTranslok = true
+                    syncState() {
+                        if (!this.showToggle) {
                             this.butuhDl = false
+                            this.butuhTranslok = false
+                            return
                         }
-                    }" x-init="
-                        syncState();
 
-                        // 🔥 Watch perubahan jenis kegiatan
-                        $watch(() => formData.id_jenis_kegiatan, () => {
-                            syncState();
-                        });
+                        if (mode === 'create') {
+                            this.butuhDl = true
+                            this.butuhTranslok = true
+                        } else {
+                            this.butuhDl = Boolean(Number(formData?.butuh_dl ?? 0))
+                            this.butuhTranslok = Boolean(Number(formData?.butuh_translok ?? 0))
+                        }
+                    },
 
-                        // 🔥 Watch ketika modal edit inject data
-                        $watch(() => formData.butuh_dl, () => syncState());
-                        $watch(() => formData.butuh_translok, () => syncState());" x-show="showToggle"
-                        x-transition class="mb-4">
+                    toggleDL() {
+                        this.butuhDl = !this.butuhDl
+                    },
+
+                    toggleTranslok() {
+                        this.butuhTranslok = !this.butuhTranslok
+                    }
+                }"
+                x-init="$nextTick(() => syncState())"
+                @open-smart-modal.window="
+                    if ($event.detail.modalId !== 'modal-penugasan-anggota') return;
+                    $nextTick(() => syncState());
+                "
+                @jenis-kegiatan-changed.window="$nextTick(() => syncState())"
+                x-show="showToggle" x-transition class="mb-4">
+
                     <label class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
                         Pilih Salah Satu
                     </label>
@@ -400,13 +323,13 @@
 
                         <!-- DL -->
                         <div class="flex items-center gap-3">
-                            <button type="button" @click="toggleDL()" :class="butuhDl ? 'bg-blue-500' : 'bg-gray-300'"
+                            <button type="button" @click="toggleDL()"
+                                :class="butuhDl ? 'bg-blue-500' : 'bg-gray-300'"
                                 class="relative inline-flex h-7 w-14 items-center rounded-full transition">
                                 <span :class="butuhDl ? 'translate-x-7' : 'translate-x-1'"
                                     class="inline-block h-5 w-5 bg-white rounded-full transition">
                                 </span>
                             </button>
-
                             <span class="text-sm font-medium" :class="butuhDl ? 'text-blue-600' : 'text-gray-500'">
                                 DL
                             </span>
@@ -421,7 +344,6 @@
                                     class="inline-block h-5 w-5 bg-white rounded-full transition">
                                 </span>
                             </button>
-
                             <span class="text-sm font-medium"
                                 :class="butuhTranslok ? 'text-teal-600' : 'text-gray-500'">
                                 Translok
@@ -436,263 +358,55 @@
 
                     <input type="hidden" name="butuh_dl" :value="butuhDl ? 1 : 0">
                     <input type="hidden" name="butuh_translok" :value="butuhTranslok ? 1 : 0">
-                </div> --}}
-
-                {{-- YANG SUDAH AMBIL DL ATAU TRANSLOK DARI DATABASE --}}
-                {{-- Pilih Jenis Kegiatan --}}
-                <div x-data="{
-                        open: false,
-                        isOther: false,
-                        highlightedIndex: -1,
-                        search: '',
-
-                        options: [
-                            @foreach ($jenisKegiatans as $jenis)
-                                {
-                                    id: '{{ $jenis->id }}',
-                                    text: '{{ addslashes($jenis->jenis_kegiatan) }} ({{ $jenis->kategori }})',
-                                    style: '{{ $jenis->kategori === 'Utama'
-                                        ? 'text-green-700 font-medium dark:text-green-300'
-                                        : 'text-orange-700 dark:text-orange-300' }}'
-                                },
-                            @endforeach
-                            {
-                                id: 'LAINNYA',
-                                text: '➕ Lainnya',
-                                style: 'text-blue-700 font-medium dark:text-blue-300'
-                            }
-                        ],
-
-                        get filteredOptions() {
-                            if (!this.search) return this.options;
-                            return this.options.filter(o =>
-                                o.text.toLowerCase().includes(this.search.toLowerCase())
-                            );
-                        },
-
-                        get selectText() {
-                            if (!formData.id_jenis_kegiatan) return '-- Pilih Jenis Kegiatan --';
-                            let opt = this.options.find(o => o.id == formData.id_jenis_kegiatan);
-                            return opt ? opt.text : formData.jenis_kegiatan || '-- Pilih Jenis Kegiatan --';
-                        },
-
-                        selectJenis(opt) {
-                            formData.id_jenis_kegiatan = opt.id;
-                            this.isOther = (opt.id === 'LAINNYA');
-                            this.open = false;
-                            this.search = '';
-                            this.highlightedIndex = -1;
-                        },
-
-                        highlightNext() {
-                            if (this.highlightedIndex < this.filteredOptions.length - 1) this.highlightedIndex++;
-                        },
-
-                        highlightPrev() {
-                            if (this.highlightedIndex > 0) this.highlightedIndex--;
-                        },
-
-                        selectHighlighted() {
-                            if (this.highlightedIndex >= 0) {
-                                this.selectJenis(this.filteredOptions[this.highlightedIndex]);
-                            }
-                        }
-                    }"
-                    @open-smart-modal.window="
-                        if ($event.detail.modalId === 'modal-penugasan-anggota' && mode === 'edit') {
-                            isOther = (formData.id_jenis_kegiatan === 'LAINNYA');
-                        }">
-
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Jenis Kegiatan <span class="text-red-500">*</span>
-                    </label>
-
-                    <input type="hidden" id="jenis_kegiatan_select" name="id_jenis_kegiatan"
-                        x-model="formData.id_jenis_kegiatan">
-
-                    <div class="relative mb-4"
-                        @keydown.arrow-down.prevent="if(!open) open = true; else highlightNext()"
-                        @keydown.arrow-up.prevent="highlightPrev()"
-                        @keydown.enter.prevent="if(open) selectHighlighted(); else open = true"
-                        @keydown.escape="open = false">
-
-                        <!-- BUTTON -->
-                        <button type="button"
-                            @click="
-                                open = !open;
-                                if(open){
-                                    search = '';
-                                    highlightedIndex = -1;
-                                }
-                            "
-                            @click.outside="open = false"
-                            class="flex h-11 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800">
-
-                            <span x-text="selectText" class="truncate"
-                                :class="!formData.id_jenis_kegiatan ? 'text-gray-400' : 'text-gray-800 dark:text-gray-200'">
-                            </span>
-
-                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24">
-                                <path stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                            </svg>
-                        </button>
-
-                        <!-- DROPDOWN -->
-                        <div x-show="open" x-transition
-                            class="absolute z-50 mt-1 w-full rounded-lg border bg-white shadow-lg dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-
-                            <!-- SEARCH -->
-                            <div class="p-2 border-b border-gray-100 dark:border-gray-700">
-                                <input type="text"
-                                    x-model="search"
-                                    placeholder="Cari jenis kegiatan..."
-                                    class="w-full px-3 py-2 text-sm rounded-md border focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
-                                    @input="highlightedIndex = -1">
-                            </div>
-
-                            <!-- LIST -->
-                            <div class="max-h-48 overflow-y-auto">
-                                <template x-for="(opt, index) in filteredOptions" :key="opt.id">
-                                    <button type="button"
-                                        @click="selectJenis(opt)"
-                                        class="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0"
-                                        :class="[opt.style, highlightedIndex === index ? 'bg-gray-50 dark:bg-gray-700' : '']">
-
-                                        <span x-text="opt.text"></span>
-                                    </button>
-                                </template>
-
-                                <div x-show="filteredOptions.length === 0"
-                                    class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 text-center">
-                                    Tidak ditemukan
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <p class="text-xs text-red-600 mt-1 hidden" data-for="jenis_kegiatan_select">
-                        Jenis Kegiatan wajib dipilih
-                    </p>
-
-                    <div x-show="isOther" x-transition>
-                        <input type="text" name="jenis_kegiatan_baru" placeholder="Masukkan jenis kegiatan baru"
-                            class="h-11 w-full mb-4 rounded-lg border px-4 text-sm dark:bg-gray-800">
-                    </div>
                 </div>
 
-                {{-- Toggle Gabungan untuk DL dan Translok --}}
-                <div x-data="{
-                        butuhDl: false,
-                        butuhTranslok: false,
-
-                        get jenisId() {
-                            return Number(formData?.id_jenis_kegiatan || 0)
-                        },
-
-                        get showToggle() {
-                            return window.jenisButuhMap?.[this.jenisId] == 1
-                        },
-
-                        syncState() {
-                            const dlDB = Boolean(Number(formData?.butuh_dl ?? 0))
-                            const translokDB = Boolean(Number(formData?.butuh_translok ?? 0))
-
-                            if (!this.showToggle) {
-                                this.butuhDl = false
-                                this.butuhTranslok = false
-                                return
-                            }
-
-                            if (mode === 'create') {
-                                this.butuhDl = true
-                                this.butuhTranslok = false
-                            } else {
-                                this.butuhDl = dlDB
-                                this.butuhTranslok = translokDB
-                            }
-                        },
-
-                        toggleDL() {
-                            this.butuhDl = true
-                            this.butuhTranslok = false
-                        },
-
-                        toggleTranslok() {
-                            this.butuhTranslok = true
-                            this.butuhDl = false
-                        }
-                    }"
+                {{-- INPUT TARGET --}}
+                <div x-data="{ isAutoTarget: false }"
                     x-init="
-                        syncState();
-
-                        $watch(() => formData.id_jenis_kegiatan, () => {
-                            syncState();
+                        $nextTick(() => {
+                            isAutoTarget = window.isAutoTargetGlobal || false;
+                            if (isAutoTarget) formData.target = 1;
                         });
-
-                        $watch(() => formData.butuh_dl, () => syncState());
-                        $watch(() => formData.butuh_translok, () => syncState());
                     "
-                    x-show="showToggle"
-                    x-transition
-                    class="mb-4">
+                    @open-smart-modal.window="
+                        if ($event.detail.modalId !== 'modal-penugasan-anggota') return;
+                        $nextTick(() => {
+                            isAutoTarget = window.isAutoTargetGlobal || false;
+                            if (isAutoTarget) formData.target = 1;
+                        });
+                    "
+                    @jenis-kegiatan-changed.window="
+                        $nextTick(() => {
+                            isAutoTarget = window.isAutoTargetGlobal || false;
+                            if (isAutoTarget) formData.target = 1;
+                        });
+                    ">
 
-                    <label class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                        Pilih Salah Satu
-                    </label>
-
-                    <div class="flex gap-6">
-
-                        <!-- DL -->
-                        <div class="flex items-center gap-3">
-                            <button type="button"
-                                @click="toggleDL()"
-                                :class="butuhDl ? 'bg-blue-500' : 'bg-gray-300'"
-                                class="relative inline-flex h-7 w-14 items-center rounded-full transition">
-                                <span :class="butuhDl ? 'translate-x-7' : 'translate-x-1'"
-                                    class="inline-block h-5 w-5 bg-white rounded-full transition">
-                                </span>
-                            </button>
-
-                            <span class="text-sm font-medium"
-                                :class="butuhDl ? 'text-blue-600' : 'text-gray-500'">
-                                DL
-                            </span>
-                        </div>
-
-                        <!-- TRANSLOK -->
-                        <div class="flex items-center gap-3">
-                            <button type="button"
-                                @click="toggleTranslok()"
-                                :class="butuhTranslok ? 'bg-teal-500' : 'bg-gray-300'"
-                                class="relative inline-flex h-7 w-14 items-center rounded-full transition">
-                                <span :class="butuhTranslok ? 'translate-x-7' : 'translate-x-1'"
-                                    class="inline-block h-5 w-5 bg-white rounded-full transition">
-                                </span>
-                            </button>
-
-                            <span class="text-sm font-medium"
-                                :class="butuhTranslok ? 'text-teal-600' : 'text-gray-500'">
-                                Translok
-                            </span>
-                        </div>
-
-                    </div>
-
-                    <p class="mt-2 text-xs text-gray-500">
-                        Pilih salah satu: DL atau Translok.
-                    </p>
-
-                    <input type="hidden" name="butuh_dl" :value="butuhDl ? 1 : 0">
-                    <input type="hidden" name="butuh_translok" :value="butuhTranslok ? 1 : 0">
-                </div>
-
-                <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Target <span class="text-red-500">*</span>
                     </label>
-                    <input type="number" x-model="formData.target" name="target" id="target"
+                    <input type="number"
+                        x-model="formData.target"
+                        name="target"
+                        id="target"
+                        :readonly="isAutoTarget"
+                        :class="isAutoTarget
+                            ? 'bg-gray-100 cursor-not-allowed text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+                            : 'bg-transparent'"
+                        @keydown="if (isAutoTarget) $event.preventDefault()"
                         placeholder="Misalnya : 200"
-                        class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
+                        class="h-11 w-full mb-1 appearance-none rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
+
+                    <p x-show="isAutoTarget" x-transition
+                        class="mb-4 flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 font-medium">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Target dikunci otomatis ke <strong>1</strong> untuk jenis kegiatan Pengawasan / Supervisi / Perjalanan Dinas
+                    </p>
+                    <div x-show="!isAutoTarget" class="mb-4"></div>
                 </div>
 
                 <div>
@@ -728,7 +442,6 @@
                     <h3 class="text-sm font-semibold text-gray-600 mb-3">
                         Tanggal Penugasan Tambahan
                     </h3>
-
                     <div id="tglPenugasanContainer" class="space-y-4"></div>
                 </div>
 
@@ -750,6 +463,7 @@
                 </div>
 
             </div>
+
             <!-- FOOTER -->
             <div class="shrink-0 border-t border-gray-200 px-6 py-3 dark:border-gray-700">
                 <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
@@ -772,10 +486,12 @@
         </div>
     </form>
 </x-ui.smart-modal>
+
 <script>
     window.jenisButuhMap = @json(
         $jenisKegiatans->pluck('butuh_dl_atau_translok', 'id')
     );
+
     function pegawaiDropdown() {
         return {
             open: false,
@@ -808,7 +524,6 @@
 
             get filteredPegawais() {
                 if (!this.search) return this.pegawais;
-
                 return this.pegawais.filter(p =>
                     p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase())
                 );
@@ -827,37 +542,22 @@
     // =============================================
 
     function clearValidation() {
-        // Hapus semua border merah dari input
         document.querySelectorAll('.input-invalid').forEach(el => {
-            el.classList.remove(
-                'input-invalid',
-                'border-red-500', 'dark:border-red-500',
-                'bg-red-50', 'dark:bg-red-500/10'
-            );
+            el.classList.remove('input-invalid', 'border-red-500', 'dark:border-red-500', 'bg-red-50', 'dark:bg-red-500/10');
         });
-
-        // Sembunyikan semua pesan error field
         document.querySelectorAll('.field-error-msg').forEach(el => {
             el.classList.add('hidden');
         });
-
-        // Hapus border merah dari section/card
         document.querySelectorAll('.section-invalid').forEach(el => {
             el.classList.remove('section-invalid', 'border-red-400', 'dark:border-red-500/60');
         });
-
-        // Sembunyikan banner
         const banner = document.getElementById('validationBannerPenugasan');
         if (banner) banner.classList.add('hidden');
     }
 
     function markInvalid(el) {
         if (!el) return;
-        el.classList.add(
-            'input-invalid',
-            'border-red-500', 'dark:border-red-500',
-            'bg-red-50', 'dark:bg-red-500/10'
-        );
+        el.classList.add('input-invalid', 'border-red-500', 'dark:border-red-500', 'bg-red-50', 'dark:bg-red-500/10');
     }
 
     function showFieldError(el) {
@@ -875,101 +575,72 @@
         const errors = [];
 
         function addError(message, focusEl, inputEl, errorMsgEl) {
-            errors.push({
-                message,
-                focusEl
-            });
+            errors.push({ message, focusEl });
             if (inputEl) markInvalid(inputEl);
             if (errorMsgEl) showFieldError(errorMsgEl);
         }
 
-        // // --- 1. Anggota ---
-        // const AnggotaIdInput = document.querySelector('input[name="id_anggota"]');
-        // const AnggotaSearchInput = document.getElementById('AnggotaSearchInput');
-        // const AnggotaErrorMsg = AnggotaSearchInput?.closest('.relative')?.querySelector('.field-error-msg');
-        // if (!AnggotaIdInput?.value) {
-        //     addError(
-        //         'Anggota wajib dipilih dari daftar dropdown (klik nama dari hasil pencarian)',
-        //         AnggotaSearchInput, AnggotaSearchInput,
-        //         AnggotaErrorMsg
-        //     );
-        // }
+        // --- Validasi DL / Translok ---
+        const idJenisKegiatanVal = document.getElementById('jenis_kegiatan_select')?.value;
+        const butuhDlAtauTranslokVal = window.jenisButuhMap?.[Number(idJenisKegiatanVal)] == 1;
 
-        // --- 2. Jenis Kegiatan Pada Penugasan  ---
-        const jenisKegiatanSelect = document.getElementById('jenis_kegiatan_select');
-        const jenisKegiatanFocusEl = jenisKegiatanSelect ? jenisKegiatanSelect.nextElementSibling?.querySelector('button') || jenisKegiatanSelect : null;
-        const jenisKegiatanSelectErrorMsg = jenisKegiatanSelect?.closest('.md\\:w-3\\/4')?.querySelector(
-            '.field-error-msg');
-        if (!jenisKegiatanSelect?.value?.trim()) {
-            addError(
-                'Jenis Kegiatan pada penugasan wajib diisi',
-                jenisKegiatanFocusEl, jenisKegiatanFocusEl,
-                jenisKegiatanSelectErrorMsg
-            );
+        if (butuhDlAtauTranslokVal) {
+            const dlVal = document.querySelector('input[name="butuh_dl"]')?.value;
+            const translokVal = document.querySelector('input[name="butuh_translok"]')?.value;
+
+            if (dlVal == 1 && translokVal == 1) {
+                addError(
+                    'Pilih salah satu: DL atau Translok — tidak boleh keduanya aktif sekaligus',
+                    document.querySelector('input[name="butuh_dl"]'),
+                    null, null
+                );
+            } else if (dlVal != 1 && translokVal != 1) {
+                addError(
+                    'Salah satu dari DL atau Translok wajib dipilih',
+                    document.querySelector('input[name="butuh_dl"]'),
+                    null, null
+                );
+            }
         }
 
-        // // --- 3. Jenis Kegiatan Pada Penugasan (LAINNYA)  ---
-        // const jenisKegiatanBaru = document.getElementById('jenis_kegiatan_baru');
-        // const jenisKegiatanBaruErrorMsg = jenisKegiatanBaru?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
-        // if (!jenisKegiatanBaru?.value?.trim()) {
-        //     addError(
-        //         'Jenis Kegiatan Baru wajib diisi jika opsi ini dipilih',
-        //         jenisKegiatanBaru, jenisKegiatanBaru,
-        //         jenisKegiatanBaruErrorMsg
-        //     );
-        // }
+        // --- Jenis Kegiatan ---
+        const jenisKegiatanSelect = document.getElementById('jenis_kegiatan_select');
+        const jenisKegiatanFocusEl = jenisKegiatanSelect
+            ? jenisKegiatanSelect.nextElementSibling?.querySelector('button') || jenisKegiatanSelect
+            : null;
+        const jenisKegiatanSelectErrorMsg = jenisKegiatanSelect?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
+        if (!jenisKegiatanSelect?.value?.trim()) {
+            addError('Jenis Kegiatan pada penugasan wajib diisi', jenisKegiatanFocusEl, jenisKegiatanFocusEl, jenisKegiatanSelectErrorMsg);
+        }
 
-        // --- 4. Target Sub Kegiatan ---
+        // --- Target ---
         const targetPenugasan = document.getElementById('target');
         const targetPenugasanErrorMsg = targetPenugasan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
         if (!targetPenugasan?.value?.trim()) {
-            addError(
-                'Target Penugasan wajib diisi',
-                targetPenugasan, targetPenugasan,
-                targetPenugasanErrorMsg
-            );
+            addError('Target Penugasan wajib diisi', targetPenugasan, targetPenugasan, targetPenugasanErrorMsg);
         }
 
-        // --- 5. Satuan Target Sub Kegiatan ---
+        // --- Satuan Target ---
         const satuanTargetPenugasan = document.getElementById('satuan_target');
-        const satuanTargetPenugasanErrorMsg = satuanTargetPenugasan?.closest('.md\\:w-3\\/4')?.querySelector(
-            '.field-error-msg');
+        const satuanTargetPenugasanErrorMsg = satuanTargetPenugasan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
         if (!satuanTargetPenugasan?.value?.trim()) {
-            addError(
-                'Satuan Target Penugasan wajib diisi',
-                satuanTargetPenugasan, satuanTargetPenugasan,
-                satuanTargetPenugasanErrorMsg
-            );
+            addError('Satuan Target Penugasan wajib diisi', satuanTargetPenugasan, satuanTargetPenugasan, satuanTargetPenugasanErrorMsg);
         }
 
-        // --- 6. Tanggal Mulai Sub Kegiatan ---
+        // --- Tanggal Mulai ---
         const tanggalMulaiPenugasan = document.getElementById('tanggal_mulai');
-        const tanggalMulaiPenugasanErrorMsg = tanggalMulaiPenugasan?.closest('.md\\:w-3\\/4')?.querySelector(
-            '.field-error-msg');
+        const tanggalMulaiPenugasanErrorMsg = tanggalMulaiPenugasan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
         if (!tanggalMulaiPenugasan?.value?.trim()) {
-            addError(
-                'Tanggal Mulai Penugasan wajib dipilih',
-                tanggalMulaiPenugasan, tanggalMulaiPenugasan,
-                tanggalMulaiPenugasanErrorMsg
-            );
+            addError('Tanggal Mulai Penugasan wajib dipilih', tanggalMulaiPenugasan, tanggalMulaiPenugasan, tanggalMulaiPenugasanErrorMsg);
         }
 
-        // --- 7. Tanggal Selesai Sub Kegiatan ---
+        // --- Tanggal Selesai ---
         const tanggalSelesaiPenugasan = document.getElementById('tanggal_selesai');
-        const tanggalSelesaiPenugasanErrorMsg = tanggalSelesaiPenugasan?.closest('.md\\:w-3\\/4')?.querySelector(
-            '.field-error-msg');
+        const tanggalSelesaiPenugasanErrorMsg = tanggalSelesaiPenugasan?.closest('.md\\:w-3\\/4')?.querySelector('.field-error-msg');
         if (!tanggalSelesaiPenugasan?.value?.trim()) {
-            addError(
-                'Tanggal Selesai Penugasan wajib dipilih',
-                tanggalSelesaiPenugasan, tanggalSelesaiPenugasan,
-                tanggalSelesaiPenugasanErrorMsg
-            );
+            addError('Tanggal Selesai Penugasan wajib dipilih', tanggalSelesaiPenugasan, tanggalSelesaiPenugasan, tanggalSelesaiPenugasanErrorMsg);
         } else if (tanggalMulaiPenugasan?.value && tanggalSelesaiPenugasan.value < tanggalMulaiPenugasan.value) {
-            addError(
-                'Tanggal Selesai harus sesudah atau sama dengan Tanggal Mulai',
-                tanggalSelesaiPenugasan, tanggalSelesaiPenugasan,
-                tanggalSelesaiPenugasanErrorMsg
-            );
+            addError('Tanggal Selesai harus sesudah atau sama dengan Tanggal Mulai', tanggalSelesaiPenugasan, tanggalSelesaiPenugasan, tanggalSelesaiPenugasanErrorMsg);
         }
 
         return errors;
@@ -987,10 +658,7 @@
             li.className = 'text-xs text-red-600 dark:text-red-400 cursor-pointer hover:underline';
             if (err.focusEl) {
                 li.onclick = () => {
-                    err.focusEl.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
+                    err.focusEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     setTimeout(() => err.focusEl.focus(), 300);
                 };
             }
@@ -998,10 +666,7 @@
         });
 
         banner.classList.remove('hidden');
-        banner.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest'
-        });
+        banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     async function savePenugasan(event) {
@@ -1010,41 +675,36 @@
             event.stopPropagation();
         }
 
-        // ---- Jalankan validasi ----
         const errors = validateFormPenugasan();
         if (errors.length > 0) {
             showValidationPenugasanBanner(errors);
-            return; // Berhenti — tidak buka modal konfirmasi
+            return;
         }
 
-        // ---- CEK DUPLIKASI DL/TRANSLOK KE SERVER ----
         const form = document.getElementById('addPenugasanForm');
         const formDataObj = new FormData(form);
 
-        // Cari tahu apakah jenis kegiatan ini butuh DL/Translok
         const idJenisKegiatan = formDataObj.get('id_jenis_kegiatan');
         const butuhDlAtauTranslok = window.jenisButuhMap?.[Number(idJenisKegiatan)] == 1;
 
         if (butuhDlAtauTranslok) {
             const idAnggota = formDataObj.get('id_anggota');
-            
-            // Kumpulkan dates
+
             const datesProcess = [];
             const tMulai = formDataObj.get('tanggal_mulai');
             const tSelesai = formDataObj.get('tanggal_selesai');
             if (tMulai && tSelesai) {
-                datesProcess.push({tanggal_mulai: tMulai, tanggal_selesai: tSelesai});
+                datesProcess.push({ tanggal_mulai: tMulai, tanggal_selesai: tSelesai });
             }
 
             const listMulai = formDataObj.getAll('tanggal_mulai_list[]');
             const listSelesai = formDataObj.getAll('tanggal_selesai_list[]');
-            for(let i=0; i<listMulai.length; i++) {
-                if(listMulai[i] && listSelesai[i]) {
-                    datesProcess.push({tanggal_mulai: listMulai[i], tanggal_selesai: listSelesai[i]});
+            for (let i = 0; i < listMulai.length; i++) {
+                if (listMulai[i] && listSelesai[i]) {
+                    datesProcess.push({ tanggal_mulai: listMulai[i], tanggal_selesai: listSelesai[i] });
                 }
             }
 
-            // Dapatkan itemKey dari action url jika mode edit
             let excludeId = null;
             const actionPath = form.getAttribute('action') || '';
             const actionParts = actionPath.split('/');
@@ -1063,21 +723,18 @@
             try {
                 const btnSubmit = event && event.submitter ? event.submitter : null;
                 const origText = btnSubmit ? btnSubmit.innerHTML : '';
-                if(btnSubmit) {
+                if (btnSubmit) {
                     btnSubmit.innerHTML = 'Memproses ...';
                     btnSubmit.disabled = true;
                 }
 
                 const response = await fetch('/penugasan/check-duplicate-dates', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify(checkPayload)
                 });
-                
-                if(btnSubmit) {
+
+                if (btnSubmit) {
                     btnSubmit.innerHTML = origText;
                     btnSubmit.disabled = false;
                 }
@@ -1087,23 +744,15 @@
                     if (result.has_duplicate) {
                         result.duplicates.forEach(d => {
                             let fElement = document.getElementById(d.focus_el);
-                            
-                            // Jika element tidak ketemu (misal karena ID dinamis tanpa "_list_id"), fallback ke target utama
                             if (!fElement && d.focus_el.includes('_')) {
-                                // Pada dynamic items idnya adalah tanggal_selesai_1
                                 fElement = document.getElementById(d.focus_el) || document.getElementById('tanggal_mulai');
                             } else {
                                 fElement = fElement || document.getElementById('tanggal_mulai');
                             }
-
-                            errors.push({
-                                message: d.message,
-                                focusEl: fElement
-                            });
+                            errors.push({ message: d.message, focusEl: fElement });
                         });
-                        
                         showValidationPenugasanBanner(errors);
-                        return; // batalkan submit
+                        return;
                     }
                 }
             } catch (err) {
@@ -1111,12 +760,10 @@
             }
         }
 
-        // submit form
         form.submit();
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Intercept form submit event, handle validation & fetching
         const form = document.getElementById('addPenugasanForm');
         if (form) {
             form.addEventListener('submit', savePenugasan);
@@ -1135,21 +782,15 @@
         const wrapper = document.getElementById('tglPenugasanWrapper');
         const container = document.getElementById('tglPenugasanContainer');
 
-        // tampilkan wrapper kalau pertama kali
         if (wrapper.classList.contains('hidden')) {
             wrapper.classList.remove('hidden');
         }
 
         const sectionHTML = `
             <div id="${sectionId}" class="relative border border-gray-200 rounded-lg p-4 bg-white">
-                <button
-                    type="button"
-                    onclick="hapusTanggalPenugasan('${sectionId}')"
-                    class="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition">
-                    ✕
-                </button>
+                <button type="button" onclick="hapusTanggalPenugasan('${sectionId}')"
+                    class="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition">✕</button>
                 <input type="hidden" name="rk_section_keys[]" value="${sectionId}">
-
                 <div class="flex flex-row justify-between items-center gap-6">
                     <div class="flex-1">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -1162,10 +803,8 @@
                             ::minDate="formData.min_date"
                             ::maxDate="formData.max_date"
                             minBind="formData.min_date"
-                            maxBind="formData.max_date"
-                        />
+                            maxBind="formData.max_date" />
                     </div>
-
                     <div class="flex-1">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                             Tanggal Berakhir (Deadline) <span class="text-red-500">*</span>
@@ -1177,33 +816,24 @@
                             ::minDate="formData.min_date"
                             ::maxDate="formData.max_date"
                             minBind="formData.min_date"
-                            maxBind="formData.max_date"
-                        />
+                            maxBind="formData.max_date" />
                     </div>
                 </div>
                 <div id="detail-${sectionId}" class="space-y-4"></div>
             </div>
         `;
 
-        // const container = document.getElementById('tglPenugasanContainer');
         container.insertAdjacentHTML('beforeend', sectionHTML);
 
         setTimeout(() => {
-            document.getElementById(sectionId)?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest'
-            });
+            document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }, 100);
     }
 
     function hapusTanggalPenugasan(sectionId) {
-        // hapus section
         document.getElementById(sectionId)?.remove();
-
         const container = document.getElementById('tglPenugasanContainer');
         const wrapper = document.getElementById('tglPenugasanWrapper');
-
-        // kalau sudah tidak ada item lagi
         if (!container || container.children.length === 0) {
             wrapper.classList.add('hidden');
         }

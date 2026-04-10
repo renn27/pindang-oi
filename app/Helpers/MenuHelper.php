@@ -122,6 +122,12 @@ class MenuHelper
                 'name' => 'BESTI OGAN ILIR',
                 'path' => 'https://besti.bpsoganilir.com/',
                 'is_external' => true,
+            ],
+            [
+                'icon' => 'besti',
+                'name' => 'GC PLN 2026',
+                'path' => 'https://gcpln.bpsoganilir.com/',
+                'is_external' => true,
             ]
         ];
     }
