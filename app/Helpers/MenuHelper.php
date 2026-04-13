@@ -68,7 +68,7 @@ class MenuHelper
             ],
         ];
 
-        if (! $user || ! $activeRole) {
+        if (!$user || !$activeRole) {
             return array_map(
                 fn($menu) => self::normalizeMenuItem($menu),
                 array_filter($menus, fn($m) => $m['name'] === 'Dashboard')
@@ -124,9 +124,15 @@ class MenuHelper
                 'is_external' => true,
             ],
             [
-                'icon' => 'besti',
+                'icon' => 'gcpln',
                 'name' => 'GC PLN 2026',
                 'path' => 'https://gcpln.bpsoganilir.com/',
+                'is_external' => true,
+            ],
+            [
+                'icon' => 'sakip',
+                'name' => 'Bukti Dukung SAKIP',
+                'path' => 'https://drive.google.com/drive/folders/1hbkLUr_y6KWMF_Hz2iZibHuyVbC2qiMv?usp=sharing',
                 'is_external' => true,
             ]
         ];
@@ -202,7 +208,7 @@ class MenuHelper
                 ->contains(fn($sub) => $sub['is_active'] === true);
 
             $item['is_active'] = $hasActiveChild;
-            $item['is_open']   = $hasActiveChild;
+            $item['is_open'] = $hasActiveChild;
         }
 
         return $item;
@@ -274,6 +280,28 @@ class MenuHelper
                 <path d="M7 12H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 <path d="M7 15H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>',
+            'gcpln' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M8 7H16C16.5523 7 17 7.44772 17 8V16C17 16.5523 16.5523 17 16 17H8C7.44772 17 7 16.5523 7 16V8C7 7.44772 7.44772 7 8 7Z" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M12 9V12L13.5 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M12 15H12.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M9 10H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M9 13H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M7 9H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M7 12H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>',
+            'sakip' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M8 7H16C16.5523 7 17 7.44772 17 8V16C17 16.5523 16.5523 17 16 17H8C7.44772 17 7 16.5523 7 16V8C7 7.44772 7.44772 7 8 7Z" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M12 9V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M12 14H12.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M9 10L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M10 10L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M14 10L15 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M15 10L14 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M7 9H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M7 12H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>',
             'ai-assistant' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.75 2.42969V7.70424M9.42261 13.673C10.0259 14.4307 10.9562 14.9164 12 14.9164C13.0438 14.9164 13.9742 14.4307 14.5775 13.673M20 12V18.5C20 19.3284 19.3284 20 18.5 20H5.5C4.67157 20 4 19.3284 4 18.5V12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18.75 2.42969V2.43969M9.50391 9.875L9.50391 9.885M14.4961 9.875V9.885" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
 
             'ecommerce' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.31641 4H3.49696C4.24468 4 4.87822 4.55068 4.98234 5.29112L5.13429 6.37161M5.13429 6.37161L6.23641 14.2089C6.34053 14.9493 6.97407 15.5 7.72179 15.5L17.0833 15.5C17.6803 15.5 18.2205 15.146 18.4587 14.5986L21.126 8.47023C21.5572 7.4795 20.8312 6.37161 19.7507 6.37161H5.13429Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7.7832 19.5H7.7932M16.3203 19.5H16.3303" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
