@@ -1,7 +1,11 @@
 @extends('layouts.dashboard')
 
 @section('content')
-    <x-common.page-breadcrumb pageTitle="Detail Kegiatan" />
+    <x-common.page-breadcrumb 
+        pageTitle="Detail Sub Kegiatan" 
+        backTitle="Daftar Kegiatan"
+        backUrl="{{ route('kegiatan.index', $subKegiatan->kegiatan->bidang->slug) }}" 
+    />
 
     <div class="rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 mb-6 dark:border-gray-800 dark:bg-gray-900">
         <!-- Header Kegiatan -->

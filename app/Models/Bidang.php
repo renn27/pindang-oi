@@ -29,6 +29,28 @@ class Bidang extends Model
         $user = Auth::user();
         $currentBidang = request()->route('bidang');
 
+        // 🔥 TAMBAHAN LOGIC: Jika $currentBidang kosong (berada di route nested tanpa param bidang)
+        // Lakukan perunutan ke model Kegiatan atau SubKegiatan
+        if (!$currentBidang) {
+            $subKegiatan = request()->route('subKegiatan');
+            $kegiatan = request()->route('kegiatan');
+            
+            if ($subKegiatan) {
+                // Bergantung pada tipe parameter binding
+                if ($subKegiatan instanceof \App\Models\SubKegiatan) {
+                    $currentBidang = $subKegiatan->kegiatan->bidang ?? null;
+                } elseif (is_numeric($subKegiatan)) {
+                    $currentBidang = \App\Models\SubKegiatan::with('kegiatan.bidang')->find($subKegiatan)?->kegiatan->bidang;
+                }
+            } elseif ($kegiatan) {
+                if ($kegiatan instanceof \App\Models\Kegiatan) {
+                    $currentBidang = $kegiatan->bidang ?? null;
+                } elseif (is_numeric($kegiatan)) {
+                    $currentBidang = \App\Models\Kegiatan::with('bidang')->find($kegiatan)?->bidang;
+                }
+            }
+        }
+
         $query = self::query()->whereNull('deleted_at');
 
         if ($user) {
