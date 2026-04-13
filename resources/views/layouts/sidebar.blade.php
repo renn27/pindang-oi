@@ -140,6 +140,7 @@
                                                 @foreach ($item['subItems'] as $subItem)
                                                     <li>
                                                         <a href="{{ $subItem['path'] }}"
+                                                            @if (!empty($subItem['is_external'])) target="_blank" rel="noopener noreferrer" @endif
                                                             class="menu-dropdown-item
                                                                 {{ !empty($subItem['is_placeholder']) ?
                                                                     'italic text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400'

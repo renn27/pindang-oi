@@ -131,10 +131,22 @@ class MenuHelper
             ],
             [
                 'icon' => 'sakip',
-                'name' => 'Bukti Dukung SAKIP',
-                'path' => 'https://drive.google.com/drive/folders/1hbkLUr_y6KWMF_Hz2iZibHuyVbC2qiMv?usp=sharing',
+                'name' => 'SAKIP',
+                'subItems' => [
+                    [
+                        'name' => 'SINERGI',
+                        'path' => 'https://sinergi.web.bps.go.id/#/auth/login?next=/',
+                        'is_external' => true,
+                    ],
+                    [
+                        'name' => 'Bukti Dukung SAKIP',
+                        'path' => 'https://drive.google.com/drive/folders/1hbkLUr_y6KWMF_Hz2iZibHuyVbC2qiMv?usp=sharing',
+                        'is_external' => true,
+                    ],
+
+                ],
                 'is_external' => true,
-            ]
+            ],
         ];
     }
 
