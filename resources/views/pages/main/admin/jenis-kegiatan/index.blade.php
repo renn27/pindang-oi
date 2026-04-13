@@ -59,11 +59,18 @@
 
             mode    = $event.detail.mode ?? 'create'
             itemKey  = $event.detail.key ?? null
-            formData = $event.detail.data ??
-                {
-                    jenis_kegiatan: '',
-                    kategori: '',
-                }">
+
+            let data = $event.detail.data ?? {
+                jenis_kegiatan: '',
+                butuh_dl_atau_translok: 0,
+                kategori: '',
+            }
+
+            formData = {
+                ...data,
+                butuh_dl_atau_translok: Boolean(data.butuh_dl_atau_translok)
+            }">
+                
         <!-- HEADER -->
         <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-700">
             <h4 class="text-2xl font-semibold text-gray-800 dark:text-white" x-text="mode === 'create' ? 'Tambah Jenis Kegiatan' : 'Edit Jenis Kegiatan'"></h4>
@@ -112,6 +119,65 @@
                                 <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5"
                                     stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- DL / Translok -->
+                <div class="mt-2 flex flex-col gap-2 md:flex-row md:items-center">
+                    <label class="block text-sm font-medium text-gray-700 md:w-1/4 dark:text-gray-300">
+                        DL/Translok <span class="text-red-500">*</span>
+                    </label>
+
+                    <div class="flex w-full items-center gap-3 md:w-3/4">
+                        <!-- Hidden fallback agar nilai 0 tetap terkirim saat unchecked -->
+                        <input type="hidden" name="butuh_dl_atau_translok" value=0>
+
+                        <!-- Toggle Switch -->
+                        <label class="relative inline-flex cursor-pointer items-center">
+                            <input type="checkbox"
+                                name="butuh_dl_atau_translok"
+                                id="butuh_dl_atau_translok"
+                                value="1"
+                                :checked="formData.butuh_dl_atau_translok"
+                                @change="formData.butuh_dl_atau_translok = $event.target.checked"
+                                class="peer sr-only">
+
+                            <!-- Track -->
+                            <div class="h-6 w-11 rounded-full border border-gray-300 bg-gray-200
+                                after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5
+                                after:rounded-full after:border after:border-gray-300 after:bg-white
+                                after:transition-all after:content-['']
+                                peer-checked:border-brand-500 peer-checked:bg-brand-500
+                                peer-checked:after:translate-x-full peer-checked:after:border-white
+                                peer-focus:ring-3 peer-focus:ring-brand-500/10
+                                dark:border-gray-600 dark:bg-gray-700
+                                dark:after:border-gray-600 dark:after:bg-gray-400
+                                dark:peer-checked:border-brand-500 dark:peer-checked:bg-brand-500">
+                            </div>
+                        </label>
+
+                        <!-- Label Status -->
+                        <span class="text-sm font-medium"
+                            :class="formData.butuh_dl_atau_translok
+                                ? 'text-green-600 dark:text-green-400'
+                                : 'text-gray-500 dark:text-gray-400'">
+                            <template x-if="formData.butuh_dl_atau_translok">
+                                <span class="flex items-center gap-1.5">
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Butuh DL/Translok
+                                </span>
+                            </template>
+                            <template x-if="!formData.butuh_dl_atau_translok">
+                                <span class="flex items-center gap-1.5">
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                    Tidak Butuh
+                                </span>
+                            </template>
                         </span>
                     </div>
                 </div>
@@ -186,6 +252,7 @@
                                                 data: {
                                                     jenis_kegiatan: '{{ $jenisKegiatan->jenis_kegiatan }}',
                                                     kategori: '{{ $jenisKegiatan->kategori }}',
+                                                    butuh_dl_atau_translok: {{ $jenisKegiatan->butuh_dl_atau_translok ? 'true' : 'false' }},
                                                 }
                                             })">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

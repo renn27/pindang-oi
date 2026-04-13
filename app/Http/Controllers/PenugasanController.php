@@ -63,12 +63,7 @@ class PenugasanController extends Controller
         unset($validated['jenis_kegiatan_baru']);
 
         $jenisKegiatan = JenisKegiatan::find($validated['id_jenis_kegiatan']);
-        $wajibDl = in_array($jenisKegiatan->jenis_kegiatan, [
-            'Perjalanan Dinas',
-            'Supervisi',
-            'Pengawasan',
-            'Pendataan',
-        ]);
+        $wajibDl = $jenisKegiatan->butuh_dl_atau_translok == 1;
 
         $requestButuhDl = (bool) ($validated['butuh_dl'] ?? false);
         $requestButuhTranslok = (bool) ($validated['butuh_translok'] ?? false);
@@ -199,12 +194,7 @@ class PenugasanController extends Controller
          */
         $jenisKegiatan = JenisKegiatan::findOrFail($validated['id_jenis_kegiatan']);
 
-        $wajibDl = in_array($jenisKegiatan->jenis_kegiatan, [
-            'Perjalanan Dinas',
-            'Supervisi',
-            'Pengawasan',
-            'Pendataan',
-        ]);
+        $wajibDl = $jenisKegiatan->butuh_dl_atau_translok == 1;
 
         $requestButuhDl = (bool) ($validated['butuh_dl'] ?? false);
         $requestButuhTranslok = (bool) ($validated['butuh_translok'] ?? false);

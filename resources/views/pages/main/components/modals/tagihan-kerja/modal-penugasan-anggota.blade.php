@@ -274,42 +274,50 @@
                 <div x-data="{
                     butuhDl: false,
                     butuhTranslok: false,
+                    showToggle: false,
+                    initialJenisId: null,
 
                     get jenisId() {
                         return Number(formData?.id_jenis_kegiatan || 0)
                     },
 
-                    get showToggle() {
-                        return window.jenisButuhMap?.[this.jenisId] == 1
-                    },
-
                     syncState() {
+                        this.showToggle = (window.jenisButuhMap?.[this.jenisId] == 1)
+
                         if (!this.showToggle) {
                             this.butuhDl = false
                             this.butuhTranslok = false
                             return
                         }
 
-                        if (mode === 'create') {
-                            this.butuhDl = true
-                            this.butuhTranslok = true
-                        } else {
+                        if (mode === 'edit' && this.jenisId === this.initialJenisId) {
                             this.butuhDl = Boolean(Number(formData?.butuh_dl ?? 0))
                             this.butuhTranslok = Boolean(Number(formData?.butuh_translok ?? 0))
+                            
+                            if (!this.butuhDl && !this.butuhTranslok) {
+                                this.butuhDl = true
+                                this.butuhTranslok = true
+                            }
+                        } else {
+                            this.butuhDl = true
+                            this.butuhTranslok = true
                         }
                     },
 
                     toggleDL() {
                         this.butuhDl = !this.butuhDl
+                        if(this.butuhDl) this.butuhTranslok = false
                     },
 
                     toggleTranslok() {
                         this.butuhTranslok = !this.butuhTranslok
+                        if(this.butuhTranslok) this.butuhDl = false
                     }
                 }"
                 x-init="$nextTick(() => syncState())"
                 @open-smart-modal.window="
                     if ($event.detail.modalId !== 'modal-penugasan-anggota') return;
+                    initialJenisId = Number($event.detail.data?.id_jenis_kegiatan || 0);
                     $nextTick(() => syncState());
                 "
                 @jenis-kegiatan-changed.window="$nextTick(() => syncState())"
@@ -323,7 +331,7 @@
 
                         <!-- DL -->
                         <div class="flex items-center gap-3">
-                            <button type="button" @click="toggleDL()"
+                            <button type="button" @click="toggleDL()" id="toggle-dl-btn"
                                 :class="butuhDl ? 'bg-blue-500' : 'bg-gray-300'"
                                 class="relative inline-flex h-7 w-14 items-center rounded-full transition">
                                 <span :class="butuhDl ? 'translate-x-7' : 'translate-x-1'"
@@ -587,17 +595,18 @@
         if (butuhDlAtauTranslokVal) {
             const dlVal = document.querySelector('input[name="butuh_dl"]')?.value;
             const translokVal = document.querySelector('input[name="butuh_translok"]')?.value;
+            const toggleDlBtn = document.getElementById('toggle-dl-btn');
 
             if (dlVal == 1 && translokVal == 1) {
                 addError(
-                    'Pilih salah satu: DL atau Translok — tidak boleh keduanya aktif sekaligus',
-                    document.querySelector('input[name="butuh_dl"]'),
+                    'Pilih salah satu: DL atau Translok — tidak boleh keduanya aktif sekaligus. Silakan matikan salah satu toggle tersebut.',
+                    toggleDlBtn,
                     null, null
                 );
             } else if (dlVal != 1 && translokVal != 1) {
                 addError(
                     'Salah satu dari DL atau Translok wajib dipilih',
-                    document.querySelector('input[name="butuh_dl"]'),
+                    toggleDlBtn,
                     null, null
                 );
             }

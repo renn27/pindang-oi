@@ -33,9 +33,11 @@ class JenisKegiatanController extends Controller
     }
 
     public function store(Request $request) {
+        // dd($request->all());
         $validatedData = $request->validate([
             'jenis_kegiatan' => 'required|string|max:255',
             'kategori' => 'required|string|in:Utama,Tambahan',
+            'butuh_dl_atau_translok' => 'required|boolean',
         ]);
 
         $jenisKegiatan= JenisKegiatan::create($validatedData);
@@ -47,9 +49,11 @@ class JenisKegiatanController extends Controller
 
     public function update(Request $request, JenisKegiatan $jenisKegiatan)
     {
+        // dd($request->all());
         $validatedData = $request->validate([
             'jenis_kegiatan' => 'required|string|max:255',
             'kategori' => 'required|string|in:Utama,Tambahan',
+            'butuh_dl_atau_translok' => 'required|boolean',
         ]);
 
         try {

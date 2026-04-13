@@ -16,6 +16,7 @@ class JenisKegiatan extends Model
     protected $fillable = [
         'jenis_kegiatan',
         'kategori',
+        'butuh_dl_atau_translok',
     ];
 
     public function penugasans() {

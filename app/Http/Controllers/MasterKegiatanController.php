@@ -195,12 +195,7 @@ class MasterKegiatanController extends Controller
                         // ===============================
                         // 🔐 SERVER-SIDE DL VALIDATION
                         // ===============================
-                        $wajibDl = in_array($jenisKegiatan->jenis_kegiatan, [
-                            'Perjalanan Dinas',
-                            'Supervisi',
-                            'Pengawasan',
-                            'Pendataan',
-                        ]);
+                        $wajibDl = $jenisKegiatan->butuh_dl_atau_translok == 1;
 
                         $requestButuhDl = (bool) ($butuhDlInputs[$i] ?? false);
                         $requestButuhTranslok = (bool) ($butuhTranslokInputs[$i] ?? false);

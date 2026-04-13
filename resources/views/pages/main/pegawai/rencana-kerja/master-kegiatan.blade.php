@@ -266,6 +266,7 @@
     <script>
         const app = document.getElementById('app');
         const pegawais = app?.dataset.pegawais ? JSON.parse(app.dataset.pegawais) : [];
+        window.jenisButuhMap = @json($jenisKegiatans->pluck('butuh_dl_atau_translok', 'id'));
 
         // =============================================
         // VALIDASI FRONTEND
@@ -498,6 +499,27 @@
                             addError(
                                 `Sub Kegiatan ${sectionNum} › Anggota ${anggotaNum}: Nama jenis kegiatan baru wajib diisi`,
                                 jenisBaruInput, jenisBaruInput, null
+                            );
+                            detailHasError = true;
+                        }
+                    }
+
+                    // --- Validasi DL / Translok ---
+                    if (jenisInput?.value && window.jenisButuhMap?.[Number(jenisInput.value)] == 1) {
+                        const dlVal = detail.querySelector('input[name*="detail_butuh_dl"]')?.value;
+                        const translokVal = detail.querySelector('input[name*="detail_butuh_translok"]')?.value;
+                        const toggleDlBtn = document.getElementById(`toggle-dl-btn-${detail.id}`);
+
+                        if (dlVal == 1 && translokVal == 1) {
+                            addError(
+                                `Sub Kegiatan ${sectionNum} › Anggota ${anggotaNum}: Pilih salah satu DL atau Translok — tidak boleh keduanya aktif sekaligus. Silakan matikan salah satu toggle tersebut.`,
+                                toggleDlBtn, null, null
+                            );
+                            detailHasError = true;
+                        } else if (dlVal != 1 && translokVal != 1) {
+                            addError(
+                                `Sub Kegiatan ${sectionNum} › Anggota ${anggotaNum}: Salah satu dari DL atau Translok wajib dipilih.`,
+                                toggleDlBtn, null, null
                             );
                             detailHasError = true;
                         }
@@ -811,7 +833,7 @@
                             isOther: false,
                             butuhDl: false,
                             butuhTranslok: false,
-                            wajibJenis: [3,4,5,6],
+                            showToggle: false,
 
                             open: false,
                             highlightedIndex: -1,
@@ -871,11 +893,11 @@
                             },
 
                             get jenisId() { return Number(this.idJenisKegiatan || 0) },
-                            get showToggle() { return this.wajibJenis.includes(this.jenisId) },
                             get isLainnya() { return this.idJenisKegiatan === 'LAINNYA' },
                             get jenisSelected() { return this.jenisId > 0 || this.isLainnya },
 
                             syncState() {
+                                this.showToggle = (window.jenisButuhMap?.[this.jenisId] == 1);
                                 this.isOther = this.idJenisKegiatan === 'LAINNYA';
 
                                 if (!this.showToggle) {
@@ -886,18 +908,18 @@
 
                                 if (!this.butuhDl && !this.butuhTranslok) {
                                     this.butuhDl = true;
-                                    this.butuhTranslok = false;
+                                    this.butuhTranslok = true;
                                 }
                             },
 
                             toggleDL() {
-                                this.butuhDl = true;
-                                this.butuhTranslok = false;
+                                this.butuhDl = !this.butuhDl;
+                                if(this.butuhDl) this.butuhTranslok = false;
                             },
 
                             toggleTranslok() {
-                                this.butuhTranslok = true;
-                                this.butuhDl = false;
+                                this.butuhTranslok = !this.butuhTranslok;
+                                if(this.butuhTranslok) this.butuhDl = false;
                             }
                         }"
                         x-effect="syncState()"
@@ -990,7 +1012,7 @@
 
                                     <div class="flex gap-6">
                                         <div class="flex items-center gap-3">
-                                            <button type="button" @click="toggleDL()"
+                                            <button type="button" @click="toggleDL()" id="toggle-dl-btn-${detailId}"
                                                 :class="butuhDl ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-700'"
                                                 class="relative inline-flex h-6 w-12 items-center rounded-full transition">
                                                 <span :class="butuhDl ? 'translate-x-[26px]' : 'translate-x-1'"
