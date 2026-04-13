@@ -454,7 +454,7 @@
                 // --- Minimal 1 anggota per sub kegiatan ---
                 const detailContainer = document.getElementById(`detail-${sectionId}`);
                 const detailItems = detailContainer ?
-                    detailContainer.querySelectorAll('[id*="-detail-"]') : [];
+                    detailContainer.querySelectorAll('.rk-detail-item') : [];
 
                 if (detailItems.length === 0) {
                     addError(
@@ -736,7 +736,7 @@
             const detailId = sectionId + '-detail-' + detailAnggotaCounter[sectionId];
 
             const detailHTML = `
-            <div id="${detailId}" class="rounded-lg border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-4">
+            <div id="${detailId}" class="rk-detail-item rounded-lg border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-4">
                 <div class="mb-3 flex items-center justify-between">
                     <h6 class="text-xs font-medium text-gray-700 dark:text-gray-400">
                         Anggota ${detailAnggotaCounter[sectionId]}
@@ -834,6 +834,8 @@
                             butuhDl: false,
                             butuhTranslok: false,
                             showToggle: false,
+                            targetDikunci: false,
+                            target: '',
 
                             open: false,
                             highlightedIndex: -1,
@@ -875,6 +877,20 @@
                                 this.open = false;
                                 this.search = '';
                                 this.highlightedIndex = -1;
+
+                                if (opt?.text) {
+                                    const nama = opt.text.toLowerCase();
+                                    this.targetDikunci = (
+                                        nama.includes('pengawasan') ||
+                                        nama.includes('supervisi') ||
+                                        nama.includes('perjalanan dinas')
+                                    );
+                                    if (this.targetDikunci) {
+                                        this.target = 1;
+                                    }
+                                } else {
+                                    this.targetDikunci = false;
+                                }
                             },
 
                             highlightNext() {
@@ -1047,15 +1063,28 @@
 
                         <input type="hidden" name="detail_butuh_dl[${sectionId}][]" :value="butuhDl ? 1 : 0">
                         <input type="hidden" name="detail_butuh_translok[${sectionId}][]" :value="butuhTranslok ? 1 : 0">
-                    </div>
-
-                    <!-- Target Anggota -->
-                    <div class="flex flex-col gap-2 md:flex-row md:items-center">
-                        <label class="mb-1.5 block text-xs font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
+                        
+                        <div class="space-y-3 pt-3">
+                            <!-- Target Anggota -->
+                            <div class="flex flex-col gap-2 md:flex-row md:items-start">
+                        <label class="mt-2 block text-xs font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
                             Target
                         </label>
-                        <input name="detail_target[${sectionId}][]" type="text" placeholder="Masukkan target"
-                            class="md:w-3/4 h-10 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent px-3 py-2 text-xs text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+                        <div class="md:w-3/4">
+                            <input name="detail_target[${sectionId}][]" type="number" placeholder="Masukkan target"
+                                x-model="target"
+                                :readonly="targetDikunci"
+                                :class="targetDikunci
+                                    ? 'bg-gray-100 cursor-not-allowed text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+                                    : 'bg-transparent text-gray-800 dark:text-gray-300'"
+                                @keydown="if (targetDikunci) $event.preventDefault()"
+                                class="h-10 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-xs shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10" />
+
+                            <p x-show="targetDikunci" x-transition
+                                class="mt-2 text-[11px] text-amber-600 dark:text-amber-400 font-medium">
+                                Target dikunci otomatis ke 1 untuk jenis kegiatan Pengawasan / Supervisi / Perjalanan Dinas
+                            </p>
+                        </div>
                     </div>
 
                     <!-- Satuan Target Anggota -->
@@ -1096,7 +1125,7 @@
                                 inputClass="h-10 px-3 py-2 text-xs" />
                         </div>
                     </div>
-                </div>
+                </div></div>
             </div>
         `;
 
@@ -1313,7 +1342,7 @@
                     const detailContainer = document.getElementById(`detail-${sectionId}`);
                     let detailAnggotas = [];
                     if (detailContainer) {
-                        detailAnggotas = detailContainer.querySelectorAll('[id*="-detail-"]');
+                        detailAnggotas = detailContainer.querySelectorAll('.rk-detail-item');
                     }
 
                     if (detailAnggotas.length > 0) {
