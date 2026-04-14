@@ -30,6 +30,11 @@ class KegiatanController extends Controller
                         });
                     }
 
+                    // 🔥 ORDER BY TANGGAL (INI YANG PENTING)
+                    // $q->orderBy('tanggal_mulai', 'asc');
+                    // kalau mau lebih aman:
+                    $q->orderByRaw('COALESCE(tanggal_mulai, tanggal_selesai) ASC');
+
                     // MODE KETUA → tidak difilter
                 },
                 'rencanaJpt',

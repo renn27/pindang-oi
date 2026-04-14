@@ -92,19 +92,19 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div class="flex-1">
                             <!-- Tombol Accordion untuk Nama Kegiatan -->
-                            <button 
+                            <button
                                 @click="openSubKegiatan = !openSubKegiatan"
                                 class="flex items-center gap-3 w-full sm:w-auto text-left group">
                                 <!-- Icon Chevron -->
-                                <svg 
+                                <svg
                                     class="w-5 h-5 text-gray-500 transition-transform duration-200"
                                     :class="{ 'rotate-90': openSubKegiatan }"
-                                    fill="none" 
-                                    stroke="currentColor" 
+                                    fill="none"
+                                    stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                 </svg>
-                                
+
                                 <div>
                                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                         {{ $kegiatan->nama_rk_kegiatan }}
@@ -115,7 +115,7 @@
                                 </div>
                             </button>
                         </div>
-                        
+
                         <!-- ACTION BUTTON -->
                         <div class="flex flex-wrap gap-2">
                             @can('update', $kegiatan)
@@ -200,9 +200,9 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- ACCORDION CONTENT: Tabel Sub Kegiatan -->
-                <div 
+                <div
                     x-show="openSubKegiatan"
                     x-collapse
                     x-cloak
