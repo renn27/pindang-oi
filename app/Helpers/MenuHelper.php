@@ -20,6 +20,11 @@ class MenuHelper
                 'path' => '/',
             ],
             [
+                'icon' => 'capaian-kinerja',
+                'name' => 'CKP Saya',
+                'path' => '/ckp-pegawai',
+            ],
+            [
                 'icon' => 'admin',
                 'name' => 'Admin',
                 'subItems' => [
@@ -38,17 +43,17 @@ class MenuHelper
                 ],
             ],
             [
+                'icon' => 'rencana-kerja',
+                'name' => 'Rencana Kinerja',
+                'subItems' => [
+                    ['name' => 'Rencana Kerja Per Fungsi', 'path' => '/master-kegiatan'],
+                    ['name' => 'Rencana Kerja Perlu DL', 'path' => '/rencana-kerja-dl'],
+                ],
+            ],
+            [
                 'icon' => 'tagihan-kerja',
                 'name' => 'Tagihan Kerja',
-                'subItems' => array_merge(
-                    [
-                        [
-                            'name' => 'CKP',
-                            'path' => '/ckp-pegawai',
-                        ]
-                    ],
-                    Bidang::getNavItems()
-                ),
+                'subItems' => Bidang::getNavItems()
             ],
             [
                 'icon' => 'kalender',
@@ -58,14 +63,7 @@ class MenuHelper
                     ['name' => 'Kalender Kegiatan', 'path' => '/kalender-kegiatan'],
                 ],
             ],
-            [
-                'icon' => 'rencana-kerja',
-                'name' => 'Rencana Kinerja',
-                'subItems' => [
-                    ['name' => 'Rencana Kerja Per Fungsi', 'path' => '/master-kegiatan'],
-                    ['name' => 'Rencana Kerja Perlu DL', 'path' => '/rencana-kerja-dl'],
-                ],
-            ],
+
         ];
 
         if (!$user || !$activeRole) {
@@ -75,32 +73,17 @@ class MenuHelper
             );
         }
 
-        // ADMIN → semua menu
-        if ($user->isActiveRole('Admin')) {
+        // ADMIN dan PIMPINAN → semua menu kecuali CKP Saya
+        if ($user->isActiveRole('Admin') || $user->isActiveRole('Pimpinan')) {
             return array_map(
                 fn($menu) => self::normalizeMenuItem($menu),
-                $menus
+                array_filter($menus, fn($menu) => $menu['name'] !== 'CKP Saya')
             );
         }
 
-        // PIMPINAN → semua kecuali Admin
-        if ($user->isActiveRole('Pimpinan')) {
-            return array_map(
-                fn($menu) => self::normalizeMenuItem($menu),
-                $menus
-            );
-        }
-
-        // KETUA TIM
-        if ($user->isActiveRole('Ketua Tim')) {
-            return array_map(
-                fn($menu) => self::normalizeMenuItem($menu),
-                array_filter($menus, fn($m) => in_array($m['name'], ['Dashboard', 'Tagihan Kerja', 'Rencana Kinerja', 'Kalender']))
-            );
-        }
-
-        // KETUA TIM / PEGAWAI
-        $allowed = ['Dashboard', 'Tagihan Kerja', 'Kalender'];
+        $allowed = $user->isActiveRole('Ketua Tim')
+            ? ['Dashboard', 'Tagihan Kerja', 'Rencana Kinerja', 'Kalender', 'CKP Saya']
+            : ['Dashboard', 'Tagihan Kerja', 'Kalender', 'CKP Saya'];
 
         return array_map(
             fn($menu) => self::normalizeMenuItem($menu),
@@ -249,6 +232,14 @@ class MenuHelper
                 <rect x="7" y="16" width="10" height="1" rx="0.5" fill="currentColor"/>
                 <circle cx="18" cy="18" r="1" fill="currentColor"/>
                 </svg>',
+                'capaian-kinerja' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3L13.5 7.5L18 8L14.5 11L16 15.5L12 13L8 15.5L9.5 11L6 8L10.5 7.5L12 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M20 21H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M18 17L20 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M6 17L4 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <rect x="10" y="17" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="12" cy="19" r="0.75" fill="currentColor"/>
+                    </svg>',
             'kalender' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
                 <path d="M16 2V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -293,22 +284,22 @@ class MenuHelper
                 <path d="M7 15H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>',
             'gcpln' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5"/>
-                    <path d="M8 7H16C16.5523 7 17 7.44772 17 8V16C17 16.5523 16.5523 17 16 17H8C7.44772 17 7 16.5523 7 16V8C7 7.44772 7.44772 7 8 7Z" stroke="currentColor" stroke-width="1.5"/>
-                    <path d="M12 9V12L13.5 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M12 15H12.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M9 10H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M9 13H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M7 9H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M7 12H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>',
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M8 7H16C16.5523 7 17 7.44772 17 8V16C17 16.5523 16.5523 17 16 17H8C7.44772 17 7 16.5523 7 16V8C7 7.44772 7.44772 7 8 7Z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M12 9V12L13.5 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M12 15H12.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M9 10H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M9 13H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M7 9H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M7 12H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>',
             'sakip' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5"/>
-                    <path d="M8 7H16C16.5523 7 17 7.44772 17 8V16C17 16.5523 16.5523 17 16 17H8C7.44772 17 7 16.5523 7 16V8C7 7.44772 7.44772 7 8 7Z" stroke="currentColor" stroke-width="1.5"/>
-                    <path d="M12 9V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M12 14H12.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M9 10L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M10 10L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M8 7H16C16.5523 7 17 7.44772 17 8V16C17 16.5523 16.5523 17 16 17H8C7.44772 17 7 16.5523 7 16V8C7 7.44772 7.44772 7 8 7Z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M12 9V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M12 14H12.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M9 10L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M10 10L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             <path d="M14 10L15 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             <path d="M15 10L14 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             <path d="M7 9H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
