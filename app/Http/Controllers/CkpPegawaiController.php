@@ -13,25 +13,23 @@ class CkpPegawaiController extends Controller
 {
     public function index(Request $request)
     {
-        $bulan = $request->get('bulan', date('m'));
+        $bulan = $request->get('bulan', 'all');
         $tahun = $request->get('tahun', date('Y'));
         $userId = Auth::user()->id_pegawai;
 
-        $startOfMonth = Carbon::create($tahun, $bulan, 1)->startOfMonth();
-        $endOfMonth   = Carbon::create($tahun, $bulan, 1)->endOfMonth();
+        if ($bulan !== 'all') {
+            $startDate = Carbon::create($tahun, $bulan, 1)->startOfMonth();
+            $endDate   = Carbon::create($tahun, $bulan, 1)->endOfMonth();
+        } else {
+            $startDate = Carbon::create($tahun, 1, 1)->startOfYear();
+            $endDate   = Carbon::create($tahun, 12, 31)->endOfYear();
+        }
 
-        // $ckpList = CkpPegawai::with(['pegawai', 'penugasan.jenisKegiatan', 'penugasan.subKegiatan'])
-        //     ->where('id_pegawai', $userId)
-        //     ->whereMonth('created_at', $bulan)
-        //     ->whereYear('created_at', $tahun)
-        //     ->orderBy('created_at', 'desc')
-        //     ->get();
-
-        $ckpList = CkpPegawai::with(['pegawai', 'penugasan.jenisKegiatan', 'penugasan.subKegiatan'])
+        $ckpList = CkpPegawai::with(['pegawai', 'penugasan.jenisKegiatan', 'penugasan.subKegiatan', 'penugasan.pengirimans', 'penugasan.latestPengiriman'])
             ->where('id_pegawai', $userId)
-            ->whereHas('penugasan', function ($query) use ($startOfMonth, $endOfMonth) {
-                $query->whereDate('tanggal_mulai', '<=', $endOfMonth)
-                        ->whereDate('tanggal_selesai', '>=', $startOfMonth);
+            ->whereHas('penugasan.pengirimans', function ($query) use ($startDate, $endDate) {
+                $query->whereDate('tanggal_pengiriman', '<=', $endDate)
+                        ->whereDate('tanggal_pengiriman', '>=', $startDate);
             })
             ->orderBy('created_at', 'desc')
             ->get();
@@ -55,8 +53,9 @@ class CkpPegawaiController extends Controller
         ];
 
         $tahunList = CkpPegawai::join('penugasans', 'penugasans.id_penugasan', '=', 'ckp_pegawais.id_penugasan')
+                ->join('pengirimans', 'pengirimans.id_penugasan', '=', 'penugasans.id_penugasan')
                 ->where('ckp_pegawais.id_pegawai', $userId)
-                ->select(DB::raw('DISTINCT YEAR(penugasans.tanggal_mulai) as tahun'))
+                ->select(DB::raw('DISTINCT YEAR(pengirimans.tanggal_pengiriman) as tahun'))
                 ->orderBy('tahun', 'desc')
                 ->pluck('tahun')
                 ->toArray();
@@ -159,7 +158,7 @@ class CkpPegawaiController extends Controller
     //  Export CKP ke Excel format CKP-T
     public function exportExcel(Request $request)
     {
-        $bulan = $request->get('bulan', date('m'));
+        $bulan = $request->get('bulan', 'all');
         $tahun = $request->get('tahun', date('Y'));
         $userId = Auth::user()->id_pegawai;
 
@@ -178,10 +177,29 @@ class CkpPegawaiController extends Controller
             '12' => 'Desember',
         ];
 
+        if ($bulan !== 'all') {
+            $namaBulan = $bulanList[$bulan];
+            $hariAkhir = Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth()->day;
+            $periodeStr = "1 - {$hariAkhir} {$namaBulan} {$tahun}";
+        } else {
+            $namaBulan = 'Semua Bulan';
+            $periodeStr = "Tahun {$tahun}";
+        }
+
+        if ($bulan !== 'all') {
+            $startDate = Carbon::create($tahun, $bulan, 1)->startOfMonth();
+            $endDate   = Carbon::create($tahun, $bulan, 1)->endOfMonth();
+        } else {
+            $startDate = Carbon::create($tahun, 1, 1)->startOfYear();
+            $endDate   = Carbon::create($tahun, 12, 31)->endOfYear();
+        }
+
         $ckpList = CkpPegawai::with(['pegawai', 'penugasan'])
             ->where('id_pegawai', $userId)
-            ->whereMonth('created_at', $bulan)
-            ->whereYear('created_at', $tahun)
+            ->whereHas('penugasan.pengirimans', function ($query) use ($startDate, $endDate) {
+                $query->whereDate('tanggal_pengiriman', '<=', $endDate)
+                        ->whereDate('tanggal_pengiriman', '>=', $startDate);
+            })
             ->orderBy('jenis_ckp', 'asc')
             ->orderBy('created_at', 'asc')
             ->get();

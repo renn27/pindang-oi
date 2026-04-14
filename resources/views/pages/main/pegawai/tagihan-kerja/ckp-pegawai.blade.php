@@ -20,6 +20,7 @@
                 <select name="bulan"
                     class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
                     :class="isOptionSelected && 'text-gray-800'" @change="isOptionSelected = true">
+                    <option value="all" {{ $bulan === 'all' ? 'selected' : '' }} class="text-gray-700 dark:text-gray-300">Semua Bulan</option>
                     @foreach ($bulanList as $key => $nama)
                         <option value="{{ $key }}" {{ $bulan == $key ? 'selected' : '' }}
                             class="text-gray-700 dark:text-gray-300">
@@ -125,7 +126,7 @@
                 </div>
                 <div>
                     <p class="text-sm text-gray-500 dark:text-gray-400">Periode</p>
-                    <p class="text-2xl font-bold text-gray-800 dark:text-white">{{ $bulanList[$bulan] }}
+                    <p class="text-2xl font-bold text-gray-800 dark:text-white">{{ $bulan === 'all' ? 'Semua Bulan' : $bulanList[$bulan] }}
                         {{ $tahun }}</p>
                 </div>
             </div>
@@ -143,6 +144,12 @@
                             <th rowspan="2"
                                 class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-10 align-middle border-b border-gray-200 dark:border-gray-700 dark:text-gray-400">
                                 No.</th>
+                            @if ($bulan === 'all')
+                            {{-- Bulan --}}
+                            <th rowspan="2"
+                                class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-20 align-middle border-b border-gray-200 dark:border-gray-700 dark:text-gray-400">
+                                Bulan</th>
+                            @endif
                             {{-- Uraian Kegiatan --}}
                             <th rowspan="2"
                                 class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider align-middle border-b border-gray-200 dark:border-gray-700 dark:text-gray-400">
@@ -193,7 +200,7 @@
 
                         @if ($ckpList->isEmpty())
                             <tr>
-                                <td colspan="11" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                <td colspan="{{ $bulan === 'all' ? '12' : '11' }}" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                                     <div class="flex flex-col items-center justify-center">
                                         <svg class="w-12 h-12 mb-3 text-gray-400" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
@@ -203,7 +210,7 @@
                                         <p class="text-base font-medium text-gray-500 dark:text-gray-400">Belum ada data
                                             CKP</p>
                                         <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Belum ada CKP yang
-                                            tercatat untuk periode {{ $bulanList[$bulan] }} {{ $tahun }}</p>
+                                            tercatat untuk periode {{ $bulan === 'all' ? 'Semua Bulan' : $bulanList[$bulan] }} {{ $tahun }}</p>
                                     </div>
                                 </td>
                             </tr>
@@ -212,7 +219,7 @@
                             {{-- SEPARATOR: UTAMA                  --}}
                             {{-- ══════════════════════════════════ --}}
                             <tr class="bg-gray-100 dark:bg-gray-800">
-                                <td colspan="11"
+                                <td colspan="{{ $bulan === 'all' ? '12' : '11' }}"
                                     class="px-4 py-2 text-xs font-bold text-gray-600 uppercase tracking-wider dark:text-gray-400">
                                     UTAMA
                                 </td>
@@ -226,6 +233,17 @@
                                         class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center dark:text-gray-300">
                                         {{ $noUtama++ }}
                                     </td>
+                                    @if ($bulan === 'all')
+                                    {{-- Bulan --}}
+                                    <td class="px-4 py-3 text-sm text-center font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                                        @php
+                                            $tglKirim = $ckp->penugasan?->latestPengiriman?->tanggal_pengiriman;
+                                        @endphp
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                                            {{ $tglKirim ? $bulanList[$tglKirim->format('m')] ?? '-' : '-' }}
+                                        </span>
+                                    </td>
+                                    @endif
                                     {{-- Uraian --}}
                                     <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                                         {{ $ckp->uraian }}
@@ -329,6 +347,7 @@
                                                                     'satuan_target' => $ckp->penugasan->satuan_target,
                                                                     'tanggal_mulai' => optional($ckp->penugasan->tanggal_mulai)->translatedFormat('d M Y'),
                                                                     'tanggal_selesai' => optional($ckp->penugasan->tanggal_selesai)->translatedFormat('d M Y'),
+                                                                    'tanggal_pengiriman' => optional($ckp->penugasan->latestPengiriman?->tanggal_pengiriman)->translatedFormat('d F Y'),
                                                                 ])
                                                                 : 'null' }}
                                                         }
@@ -369,7 +388,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="11"
+                                    <td colspan="{{ $bulan === 'all' ? '12' : '11' }}"
                                         class="px-4 py-3 text-sm text-center text-gray-400 italic dark:text-gray-500">
                                         Tidak ada data utama
                                     </td>
@@ -380,7 +399,7 @@
                             {{-- SEPARATOR: TAMBAHAN               --}}
                             {{-- ══════════════════════════════════ --}}
                             <tr class="bg-gray-100 dark:bg-gray-800">
-                                <td colspan="11"
+                                <td colspan="{{ $bulan === 'all' ? '12' : '11' }}"
                                     class="px-4 py-2 text-xs font-bold text-gray-600 uppercase tracking-wider dark:text-gray-400">
                                     TAMBAHAN
                                 </td>
@@ -394,6 +413,17 @@
                                         class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center dark:text-gray-300">
                                         {{ $noTambahan++ }}
                                     </td>
+                                    @if ($bulan === 'all')
+                                    {{-- Bulan --}}
+                                    <td class="px-4 py-3 text-sm text-center font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                                        @php
+                                            $tglKirim = $ckp->penugasan?->latestPengiriman?->tanggal_pengiriman;
+                                        @endphp
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                                            {{ $tglKirim ? $bulanList[$tglKirim->format('m')] ?? '-' : '-' }}
+                                        </span>
+                                    </td>
+                                    @endif
                                     {{-- Uraian --}}
                                     <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                                         {{ $ckp->uraian }}
@@ -537,7 +567,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="11"
+                                    <td colspan="{{ $bulan === 'all' ? '12' : '11' }}"
                                         class="px-4 py-3 text-sm text-center text-gray-400 italic dark:text-gray-500">
                                         Tidak ada data tambahan
                                     </td>
@@ -698,24 +728,32 @@
                             <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 Informasi Penugasan</p>
                         </div>
-                        <div class="p-4 grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Jenis Kegiatan</p>
-                                <p class="text-sm font-medium text-gray-800 dark:text-gray-200"
-                                    x-text="detailData.penugasan?.jenis_kegiatan || '-'"></p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Target Penugasan</p>
-                                <p class="text-sm font-medium text-gray-800 dark:text-gray-200"
-                                    x-text="(detailData.penugasan?.target || '') + ' ' + (detailData.penugasan?.satuan_target || '')">
-                                </p>
-                            </div>
-                            <div class="col-span-2">
-                                <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Periode</p>
-                                <p class="text-sm font-medium text-gray-800 dark:text-gray-200"
-                                    x-text="(detailData.penugasan?.tanggal_mulai || '') + ' s.d ' + (detailData.penugasan?.tanggal_selesai || '')">
-                                </p>
-                            </div>
+                    </div>
+                    <div class="p-4 grid grid-cols-2 gap-4">
+                        <div class="col-span-2">
+                            <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Jenis Kegiatan</p>
+                            <p class="text-sm font-medium text-gray-800 dark:text-gray-200"
+                                x-text="detailData.penugasan?.jenis_kegiatan || '-'"></p>
+                        </div>
+                        
+                        <div>
+                            <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Target Penugasan</p>
+                            <p class="text-sm font-medium text-gray-800 dark:text-gray-200"
+                                x-text="(detailData.penugasan?.target || '') + ' ' + (detailData.penugasan?.satuan_target || '')">
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Periode</p>
+                            <p class="text-sm font-medium text-gray-800 dark:text-gray-200"
+                                x-text="(detailData.penugasan?.tanggal_mulai || '') + ' s.d ' + (detailData.penugasan?.tanggal_selesai || '')">
+                            </p>
+                        </div>
+                        
+                        <div class="col-span-2">
+                            <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Tanggal Pengiriman Pengerjaan Tugas</p>
+                            <p class="text-sm font-semibold text-green-400 dark:text-green-500"
+                                x-text="detailData.penugasan?.tanggal_pengiriman || '-'"></p>
                         </div>
                     </div>
 
