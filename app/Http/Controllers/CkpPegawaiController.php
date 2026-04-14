@@ -7,6 +7,7 @@ use App\Models\CkpPegawai;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class CkpPegawaiController extends Controller
 {
@@ -16,10 +17,22 @@ class CkpPegawaiController extends Controller
         $tahun = $request->get('tahun', date('Y'));
         $userId = Auth::user()->id_pegawai;
 
+        $startOfMonth = Carbon::create($tahun, $bulan, 1)->startOfMonth();
+        $endOfMonth   = Carbon::create($tahun, $bulan, 1)->endOfMonth();
+
+        // $ckpList = CkpPegawai::with(['pegawai', 'penugasan.jenisKegiatan', 'penugasan.subKegiatan'])
+        //     ->where('id_pegawai', $userId)
+        //     ->whereMonth('created_at', $bulan)
+        //     ->whereYear('created_at', $tahun)
+        //     ->orderBy('created_at', 'desc')
+        //     ->get();
+
         $ckpList = CkpPegawai::with(['pegawai', 'penugasan.jenisKegiatan', 'penugasan.subKegiatan'])
             ->where('id_pegawai', $userId)
-            ->whereMonth('created_at', $bulan)
-            ->whereYear('created_at', $tahun)
+            ->whereHas('penugasan', function ($query) use ($startOfMonth, $endOfMonth) {
+                $query->whereDate('tanggal_mulai', '<=', $endOfMonth)
+                        ->whereDate('tanggal_selesai', '>=', $startOfMonth);
+            })
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -41,11 +54,12 @@ class CkpPegawaiController extends Controller
             '12' => 'Desember',
         ];
 
-        $tahunList = CkpPegawai::where('id_pegawai', $userId)
-            ->select(DB::raw('DISTINCT YEAR(created_at) as tahun'))
-            ->orderBy('tahun', 'desc')
-            ->pluck('tahun')
-            ->toArray();
+        $tahunList = CkpPegawai::join('penugasans', 'penugasans.id_penugasan', '=', 'ckp_pegawais.id_penugasan')
+                ->where('ckp_pegawais.id_pegawai', $userId)
+                ->select(DB::raw('DISTINCT YEAR(penugasans.tanggal_mulai) as tahun'))
+                ->orderBy('tahun', 'desc')
+                ->pluck('tahun')
+                ->toArray();
 
         if (empty($tahunList)) {
             $tahunList = [date('Y')];
