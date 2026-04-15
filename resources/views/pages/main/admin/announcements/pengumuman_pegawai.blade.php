@@ -32,7 +32,9 @@
                     'id' => $item->id,
                     'title' => $item->title,
                     'content' => $item->content,
-                    'image_url' => $item->image_path ? asset('storage/' . $item->image_path) : null,
+                    'image_url' => $item->image_path ? 'https://pindangoi.bpsoganilir.com/storage/' . $item->image_path 
+                    : null,
+                    // 'image_url' => $item->image_path ? asset('storage/' . $item->image_path) : null,
                     'start_date' => $item->start_date->format('d M Y'),
                     'end_date' => $item->end_date->format('d M Y'),
                     'is_active' => $isActive
