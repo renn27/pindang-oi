@@ -189,17 +189,15 @@
                                             }
                                         @endphp
 
-                                        <td class="px-6 py-3 text-center">
-                                            <span
-                                                class="inline-flex px-2 py-1 text-xs font-medium rounded-full
-                                                {{ $status === 'ACC'
-                                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                                    : ($status === 'Ditolak'
-                                                        ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                                        : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400') }}">
-                                                {{ ucfirst($status) }}
-                                            </span>
-                                        </td>
+                                        <span
+                                            class="inline-flex px-2 py-1 text-xs font-medium rounded-full
+                                            {{ $status === 'ACC'
+                                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                                : ($status === 'Ditolak'
+                                                    ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                    : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400') }}">
+                                            {{ ucfirst($status) }}
+                                        </span>
                                     </td>
 
                                     <td class="px-6 py-3 text-center">
