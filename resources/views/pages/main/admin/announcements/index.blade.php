@@ -247,6 +247,7 @@
                                                             content: '{{ addslashes($announcement->content) }}',
                                                             end_date: '{{ $announcement->end_date->format('Y-m-d') }}',
                                                             image_url: '{{ asset('storage/' . $announcement->image_path) }}'
+                                                            image_url: '{{ asset('storage/' . $announcement->image_path) }}'
                                                         }
                                                     })" class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 dark:text-gray-300 dark:hover:bg-gray-700">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
