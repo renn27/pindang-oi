@@ -83,7 +83,7 @@ class PengirimanController extends Controller
                     $hariTelat === 3 => 2,
                     default          => 1,
                 };
-            
+
                 /* =====================================================
                 * 3️⃣ SIMPAN DATA PENGIRIMAN
                 * ===================================================== */
@@ -120,7 +120,7 @@ class PengirimanController extends Controller
         }
     }
 
-    public function destroy(Request $request, Pengiriman $pengiriman)
+    public function delete(Request $request, Pengiriman $pengiriman)
     {
         $penugasan = $pengiriman->penugasan;
         $this->authorize('cancelSend', $penugasan);
@@ -132,7 +132,7 @@ class PengirimanController extends Controller
 
         try {
             DB::transaction(function () use ($penugasan, $pengiriman) {
-                $pengiriman->delete();
+                $pengiriman->forceDelete();
 
                 // Cek jika tidak ada pengiriman lagi, kembalikan status penugasan
                 $remainingCount = $penugasan->pengirimans()->count();
@@ -147,7 +147,7 @@ class PengirimanController extends Controller
                     'subKegiatan' => $penugasan->subKegiatan->id_sub_kegiatan,
                 ])
                 ->with('success', 'Pengiriman kerja berhasil dibatalkan.');
-                
+
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Cancel pengiriman error: ' . $e->getMessage());
             return redirect()

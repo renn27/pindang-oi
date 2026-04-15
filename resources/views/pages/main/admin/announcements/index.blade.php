@@ -10,15 +10,15 @@
             <div class="flex items-center gap-1 p-1 bg-gray-100 rounded-xl dark:bg-gray-800">
                 <button @click="activeTab = 'active'"
                     class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
-                    :class="activeTab === 'active' 
-                        ? 'bg-white text-brand-600 shadow-sm dark:bg-gray-700 dark:text-brand-400' 
+                    :class="activeTab === 'active'
+                        ? 'bg-white text-brand-600 shadow-sm dark:bg-gray-700 dark:text-brand-400'
                         : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'">
                     Aktif
                 </button>
                 <button @click="activeTab = 'inactive'"
                     class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
-                    :class="activeTab === 'inactive' 
-                        ? 'bg-white text-brand-600 shadow-sm dark:bg-gray-700 dark:text-brand-400' 
+                    :class="activeTab === 'inactive'
+                        ? 'bg-white text-brand-600 shadow-sm dark:bg-gray-700 dark:text-brand-400'
                         : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'">
                     Nonaktif
                 </button>
@@ -37,7 +37,7 @@
             if ($event.detail.modalId !== 'modal-announcement') return;
             mode = $event.detail.mode ?? 'create';
             itemKey = $event.detail.key ?? null;
-            
+
             let baseData = $event.detail.data || {};
             formData = {
                 title: '',
@@ -48,8 +48,8 @@
             };
         ">
 
-            <form :action="mode === 'edit' ? `/admin/announcements/${itemKey}` : `{{ route('announcements.store') }}`" 
-                  method="POST" 
+            <form :action="mode === 'edit' ? `/admin/announcements/${itemKey}` : `{{ route('announcements.store') }}`"
+                  method="POST"
                   enctype="multipart/form-data"
                   class="grid grid-cols-1 gap-y-5">
                 @csrf
@@ -58,7 +58,7 @@
                 </template>
 
                 <div class="relative flex h-[85vh] w-full max-w-[600px] flex-col overflow-hidden rounded-3xl bg-white dark:bg-gray-900 dark:border dark:border-gray-800">
-                    
+
                     <!-- HEADER -->
                     <div class="shrink-0 border-b border-gray-200 px-6 py-4 dark:border-gray-700">
                         <h4 class="text-xl font-semibold text-gray-800 dark:text-white"
@@ -70,7 +70,7 @@
 
                     <!-- BODY -->
                     <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar dark:bg-gray-900">
-                        
+
                         <!-- Judul -->
                         <div class="mb-4">
                             <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -86,19 +86,19 @@
                             <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Gambar Pengumuman <span class="text-red-500">*</span>
                             </label>
-                            
+
                             <div class="relative">
                                 <input type="file" name="image" id="image" accept="image/*" class="hidden"
-                                    @change="if ($event.target.files.length) { 
-                                        const file = $event.target.files[0]; 
+                                    @change="if ($event.target.files.length) {
+                                        const file = $event.target.files[0];
                                         const reader = new FileReader();
                                         reader.onload = (e) => formData.image_preview = e.target.result;
                                         reader.readAsDataURL(file);
                                     }">
-                                
-                                <label for="image" 
+
+                                <label for="image"
                                     class="flex min-h-[120px] w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-6 transition-all hover:border-brand-400 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-brand-500 dark:hover:bg-gray-700">
-                                    
+
                                     <div x-show="!formData.image_preview && !(mode === 'edit' && formData.image_url)" class="text-center">
                                         <svg class="mx-auto h-10 w-10 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -110,7 +110,7 @@
                                             JPG, JPEG, PNG, GIF (Max 5MB)
                                         </p>
                                     </div>
-                                    
+
                                     <div x-show="formData.image_preview" class="relative w-full">
                                         <img :src="formData.image_preview" class="max-h-48 mx-auto rounded-lg" />
                                         <button type="button" @click.stop="formData.image_preview = null; document.getElementById('image').value = ''"
@@ -120,7 +120,7 @@
                                             </svg>
                                         </button>
                                     </div>
-                                    
+
                                     <div x-show="!formData.image_preview && mode === 'edit' && formData.image_url" class="relative w-full">
                                         <img :src="formData.image_url" class="max-h-48 mx-auto rounded-lg" />
                                     </div>
@@ -197,7 +197,7 @@
                                     </td>
                                     <td class="px-4 py-3">
                                         @if($announcement->image_path)
-                                            <img src="{{ 'https://pindangoi.bpsoganilir.com/storage/' . $announcement->image_path }}" 
+                                            <img src="{{ 'https://pindangoi.bpsoganilir.com/storage/' . $announcement->image_path }}"
                                                 class="h-12 w-20 object-cover rounded border dark:border-gray-700" />
                                         @else
                                             <div class="h-12 w-20 flex items-center justify-center text-xs text-gray-400 border rounded dark:border-gray-700">
@@ -231,7 +231,7 @@
                                                     <!-- Toggle Status -->
                                                     <form action="{{ route('announcements.toggle', $announcement) }}" method="POST">
                                                         @csrf
-                                                        <button type="submit" 
+                                                        <button type="submit"
                                                             class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 dark:text-gray-300 dark:hover:bg-gray-700">
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -249,8 +249,8 @@
                                                             'title' => $announcement->title,
                                                             'content' => $announcement->content,
                                                             'end_date' => $announcement->end_date->format('Y-m-d'),
-                                                            'image_url' => $announcement->image_path 
-                                                                ? 'https://pindangoi.bpsoganilir.com/storage/' . $announcement->image_path 
+                                                            'image_url' => $announcement->image_path
+                                                                ? 'https://pindangoi.bpsoganilir.com/storage/' . $announcement->image_path
                                                                 : null,
                                                         ]) }}
                                                     })" class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 dark:text-gray-300 dark:hover:bg-gray-700">
@@ -282,7 +282,7 @@
                         @empty
                             @php $hasActive = false; @endphp
                         @endforelse
-                        
+
                         @if($announcements->where('is_active', true)->filter(function($item) { return $item->start_date->isPast() && $item->end_date->isFuture(); })->count() == 0)
                             <tr>
                                 <td colspan="6" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
@@ -325,7 +325,7 @@
                                     </td>
                                     <td class="px-4 py-3">
                                         @if($announcement->image_path)
-                                            <img src="{{ 'https://pindangoi.bpsoganilir.com/storage/' . $announcement->image_path }}" 
+                                            <img src="{{ 'https://pindangoi.bpsoganilir.com/storage/' . $announcement->image_path }}"
                                                 class="h-12 w-20 object-cover rounded border dark:border-gray-700" />
                                         @else
                                             <div class="h-12 w-20 flex items-center justify-center text-xs text-gray-400 border rounded dark:border-gray-700">
@@ -359,7 +359,7 @@
                                                     <!-- Toggle Status -->
                                                     <form action="{{ route('announcements.toggle', $announcement) }}" method="POST">
                                                         @csrf
-                                                        <button type="submit" 
+                                                        <button type="submit"
                                                             class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 dark:text-gray-300 dark:hover:bg-gray-700">
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -377,8 +377,8 @@
                                                             'title' => $announcement->title,
                                                             'content' => $announcement->content,
                                                             'end_date' => $announcement->end_date->format('Y-m-d'),
-                                                            'image_url' => $announcement->image_path 
-                                                                ? 'https://pindangoi.bpsoganilir.com/storage/' . $announcement->image_path 
+                                                            'image_url' => $announcement->image_path
+                                                                ? 'https://pindangoi.bpsoganilir.com/storage/' . $announcement->image_path
                                                                 : null,
                                                         ]) }}
                                                     })" class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 dark:text-gray-300 dark:hover:bg-gray-700">
@@ -410,7 +410,7 @@
                         @empty
                             @php $hasInactive = false; @endphp
                         @endforelse
-                        
+
                         @if($announcements->where('is_active', true)->filter(function($item) { return $item->start_date->isPast() && $item->end_date->isFuture(); })->count() == $announcements->count())
                             <tr>
                                 <td colspan="6" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">

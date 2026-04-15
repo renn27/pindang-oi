@@ -151,11 +151,9 @@ class KegiatanController extends Controller
 
     public function delete(Kegiatan $kegiatan)
     {
-        // 🔐 Authorization
         $this->authorize('delete', $kegiatan);
 
         try {
-            // 🗑️ Hapus kegiatan
             $kegiatan->forceDelete();
 
             return redirect()

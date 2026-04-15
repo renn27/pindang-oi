@@ -66,7 +66,6 @@ class SubKegiatanController extends Controller
             ->orderBy('jenis_kegiatan', 'asc')
             ->get();
 
-        // $penugasans = $subKegiatan->penugasans()->orderBy('tanggal_mulai', 'asc')->get();
 
         $penugasans = $subKegiatan->penugasans()
         ->with([
@@ -156,15 +155,19 @@ class SubKegiatanController extends Controller
     }
 
     public function delete(Kegiatan $kegiatan, SubKegiatan $subKegiatan) {
+
         $this->authorize('delete', $subKegiatan);
-        // optional safety check
-        if ($subKegiatan->id_kegiatan != $kegiatan->id_kegiatan) {
-            abort(403, 'Sub kegiatan tidak sesuai dengan kegiatan');
+
+        try {
+            $subKegiatan->forceDelete();
+
+            return redirect()->back()->with('success', 'Sub kegiatan berhasil dihapus');
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+
+            return redirect()->back()
+                ->with('error', 'Gagal menghapus Sub kegiatan. Silakan coba lagi.');
         }
-
-        $subKegiatan->forceDelete();
-
-        return redirect()->back()->with('success', 'Sub kegiatan berhasil dihapus');
     }
 
     private function hitungTotalKirim($penugasans)
