@@ -201,21 +201,21 @@
                 <div class="rounded-xl border dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Menunggu Verifikasi</p>
                     <p class="mt-1 text-2xl font-semibold text-yellow-600 dark:text-yellow-500">
-                        {{ $allPenugasans->where('status_dl', 'Menunggu')->count() }}
+                        {{ $menunggu }}
                     </p>
                 </div>
 
                 <div class="rounded-xl border dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Diterima</p>
                     <p class="mt-1 text-2xl font-semibold text-green-600 dark:text-green-500">
-                        {{ $allPenugasans->where('status_dl', 'ACC')->count() }}
+                        {{ $diterima }}
                     </p>
                 </div>
 
                 <div class="rounded-xl border dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Ditolak</p>
                     <p class="mt-1 text-2xl font-semibold text-red-600 dark:text-red-500">
-                        {{ $allPenugasans->where('status_dl', 'Ditolak')->count() }}
+                        {{ $ditolak }}
                     </p>
                 </div>
             </div>

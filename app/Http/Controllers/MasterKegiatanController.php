@@ -357,12 +357,27 @@ class MasterKegiatanController extends Controller
             ->flatMap(fn($kegiatan) => $kegiatan->subKegiatans)
             ->flatMap(fn($sub) => $sub->penugasans);
 
+        $menunggu = $allPenugasans->filter(fn($p) =>
+            $p->status_dl === 'Menunggu' || $p->status_translok === 'Menunggu'
+        )->count();
+
+        $diterima = $allPenugasans->filter(fn($p) =>
+            $p->status_dl === 'ACC' || $p->status_translok === 'ACC'
+        )->count();
+
+        $ditolak = $allPenugasans->filter(fn($p) =>
+            $p->status_dl === 'Ditolak' || $p->status_translok === 'Ditolak'
+        )->count();
+
         return view('pages.main.pegawai.rencana-kerja.rencana-kerja-dl', [
             'title' => "Rencana Kerja Perlu DL",
             'bidangs' => $bidangs,
             'pegawais' => $pegawais,
             'ketuaTims' => $ketuaTims,
             'allPenugasans' => $allPenugasans,
+            'menunggu' => $menunggu,
+            'diterima' => $diterima,
+            'ditolak' => $ditolak,
         ]);
     }
 }
