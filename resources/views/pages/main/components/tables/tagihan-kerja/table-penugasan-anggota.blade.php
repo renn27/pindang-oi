@@ -177,18 +177,29 @@
                                     {{-- BADGE STATUS DL --}}
                                     <td class="px-6 py-3 text-center">
                                         @php
-                                            $dlStatus = $penugasan->status_dl ?? 'menunggu';
+                                            $dl = $penugasan->status_dl;
+                                            $translok = $penugasan->status_translok;
+
+                                            if ($dl === 'Ditolak' || $translok === 'Ditolak') {
+                                                $status = 'Ditolak';
+                                            } elseif ($dl === 'Menunggu' || $translok === 'Menunggu') {
+                                                $status = 'Menunggu';
+                                            } else {
+                                                $status = 'ACC';
+                                            }
                                         @endphp
 
-                                        <span
-                                            class="inline-flex px-2 py-1 text-xs font-medium rounded-full
-                                            {{ $dlStatus === 'ACC'
-                                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                                : ($dlStatus === 'Ditolak'
-                                                    ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                                    : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400') }}">
-                                            {{ ucfirst($dlStatus) }}
-                                        </span>
+                                        <td class="px-6 py-3 text-center">
+                                            <span
+                                                class="inline-flex px-2 py-1 text-xs font-medium rounded-full
+                                                {{ $status === 'ACC'
+                                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                                    : ($status === 'Ditolak'
+                                                        ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                        : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400') }}">
+                                                {{ ucfirst($status) }}
+                                            </span>
+                                        </td>
                                     </td>
 
                                     <td class="px-6 py-3 text-center">
