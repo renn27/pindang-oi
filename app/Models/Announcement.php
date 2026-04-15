@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
 
 class Announcement extends Model
 {
@@ -33,12 +34,28 @@ class Announcement extends Model
                      ->where('end_date', '>=', Carbon::now());
     }
 
-    // Get image URL
+    // Get image URL dengan fallback jika file tidak ada di public
     public function getImageUrlAttribute()
     {
-        return $this->image_path 
-            ? asset('storage/' . $this->image_path) 
-            : null;
+        if (!$this->image_path) {
+            return null;
+        }
+
+        $publicPath = public_path('storage/' . $this->image_path);
+        
+        // Jika file tidak ada di public, coba copy dari storage
+        if (!file_exists($publicPath)) {
+            $storagePath = storage_path('app/public/' . $this->image_path);
+            
+            if (file_exists($storagePath)) {
+                File::ensureDirectoryExists(dirname($publicPath));
+                File::copy($storagePath, $publicPath);
+            } else {
+                return null;
+            }
+        }
+
+        return asset('storage/' . $this->image_path);
     }
 
     // Format untuk ditampilkan di modal
