@@ -129,15 +129,15 @@
                         </div>
 
                         <!-- Tanggal Berakhir -->
-<div class="mb-4">
-    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-        Tanggal Berakhir <span class="text-red-500">*</span>
-    </label>
-    <x-form.date-picker id="end_date" name="end_date" x-model="formData.end_date" placeholder="Pilih Tanggal" />
-    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-        Pengumuman akan otomatis nonaktif setelah tanggal ini
-    </p>
-</div>
+                        <div class="mb-4">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Tanggal Berakhir <span class="text-red-500">*</span>
+                            </label>
+                            <x-form.date-picker id="end_date" name="end_date" x-model="formData.end_date" placeholder="Pilih Tanggal" />
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                Pengumuman akan otomatis nonaktif setelah tanggal ini
+                            </p>
+                        </div>
 
                         <!-- Konten -->
                         <div class="mb-4">
@@ -196,11 +196,7 @@
                                         <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{{ Str::limit($announcement->content, 60) }}</div>
                                     </td>
                                     <td class="px-4 py-3">
-                                        @if($announcement->image_url)
-                                            <img src="{{ $announcement->image_url }}" class="h-12 w-20 object-cover rounded border dark:border-gray-700" />
-                                        @else
-                                            <span class="text-gray-400 text-xs">-</span>
-                                        @endif
+                                        <img src="{{ asset('storage/' . $announcement->image_path) }}" class="h-12 w-20 object-cover rounded border dark:border-gray-700" />
                                     </td>
                                     <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                                         <div>{{ $announcement->start_date->format('d/m/Y') }}</div>
@@ -246,7 +242,6 @@
                                                             title: '{{ addslashes($announcement->title) }}',
                                                             content: '{{ addslashes($announcement->content) }}',
                                                             end_date: '{{ $announcement->end_date->format('Y-m-d') }}',
-                                                            image_url: '{{ asset('storage/' . $announcement->image_path) }}'
                                                             image_url: '{{ asset('storage/' . $announcement->image_path) }}'
                                                         }
                                                     })" class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 dark:text-gray-300 dark:hover:bg-gray-700">
@@ -320,11 +315,7 @@
                                         <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{{ Str::limit($announcement->content, 60) }}</div>
                                     </td>
                                     <td class="px-4 py-3">
-                                        @if($announcement->image_url)
-                                            <img src="{{ $announcement->image_url }}" class="h-12 w-20 object-cover rounded border dark:border-gray-700" />
-                                        @else
-                                            <span class="text-gray-400 text-xs">-</span>
-                                        @endif
+                                        <img src="{{ asset('storage/' . $announcement->image_path) }}" class="h-12 w-20 object-cover rounded border dark:border-gray-700" />
                                     </td>
                                     <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                                         <div>{{ $announcement->start_date->format('d/m/Y') }}</div>
