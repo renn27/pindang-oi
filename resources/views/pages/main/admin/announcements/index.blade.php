@@ -196,7 +196,14 @@
                                         <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{{ Str::limit($announcement->content, 60) }}</div>
                                     </td>
                                     <td class="px-4 py-3">
-                                        <img src="{{ asset('storage/' . $announcement->image_path) }}" class="h-12 w-20 object-cover rounded border dark:border-gray-700" />
+                                        @if($announcement->image_path)
+                                            <img src="{{ 'https://pindangoi.bpsoganilir.com/storage/' . $announcement->image_path }}" 
+                                                class="h-12 w-20 object-cover rounded border dark:border-gray-700" />
+                                        @else
+                                            <div class="h-12 w-20 flex items-center justify-center text-xs text-gray-400 border rounded dark:border-gray-700">
+                                                No Image
+                                            </div>
+                                        @endif
                                     </td>
                                     <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                                         <div>{{ $announcement->start_date->format('d/m/Y') }}</div>
@@ -317,7 +324,14 @@
                                         <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{{ Str::limit($announcement->content, 60) }}</div>
                                     </td>
                                     <td class="px-4 py-3">
-                                        <img src="{{ asset('storage/' . $announcement->image_path) }}" class="h-12 w-20 object-cover rounded border dark:border-gray-700" />
+                                        @if($announcement->image_path)
+                                            <img src="{{ 'https://pindangoi.bpsoganilir.com/storage/' . $announcement->image_path }}" 
+                                                class="h-12 w-20 object-cover rounded border dark:border-gray-700" />
+                                        @else
+                                            <div class="h-12 w-20 flex items-center justify-center text-xs text-gray-400 border rounded dark:border-gray-700">
+                                                No Image
+                                            </div>
+                                        @endif
                                     </td>
                                     <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                                         <div>{{ $announcement->start_date->format('d/m/Y') }}</div>
