@@ -31,6 +31,7 @@ class MenuHelper
                     ['name' => 'Bidang Kerja', 'path' => '/bidang-kerja'],
                     ['name' => 'Jenis Kegiatan', 'path' => '/jenis-kegiatan'],
                     ['name' => 'Kelola Role Pegawai', 'path' => '/role-pegawai'],
+                    ['name' => 'Kelola Pengumuman', 'path' => '/admin/announcements'],
                 ],
             ],
             [
@@ -94,6 +95,11 @@ class MenuHelper
     public static function getOthersItems()
     {
         return [
+            [
+                'icon' => 'announcement',
+                'name' => 'Pengumuman',
+                'path' => '/pengumuman',
+            ],
             [
                 'icon' => 'mangcek',
                 'name' => 'MANGCEK SE2026',
@@ -232,7 +238,7 @@ class MenuHelper
                 <rect x="7" y="16" width="10" height="1" rx="0.5" fill="currentColor"/>
                 <circle cx="18" cy="18" r="1" fill="currentColor"/>
                 </svg>',
-                'capaian-kinerja' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            'capaian-kinerja' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 3L13.5 7.5L18 8L14.5 11L16 15.5L12 13L8 15.5L9.5 11L6 8L10.5 7.5L12 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
                     <path d="M20 21H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                     <path d="M18 17L20 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -263,6 +269,9 @@ class MenuHelper
                 <circle cx="12" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/>
                 <path d="M5 20C5 16.134 8.13401 14 12 14C15.866 14 19 16.134 19 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 <path d="M12 2L13.5 5.5L17 6L14.5 8.5L15 12L12 10.5L9 12L9.5 8.5L7 6L10.5 5.5L12 2Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                </svg>',
+            'announcement' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>',
             'mangcek' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5"/>

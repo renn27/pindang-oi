@@ -20,8 +20,7 @@ use App\Http\Controllers\PegawaiRoleController;
 use App\Http\Controllers\AgendaPimpinanController;
 use App\Http\Controllers\CkpPegawaiController;
 use App\Http\Controllers\JenisKegiatanController;
-
-
+use App\Http\Controllers\AnnouncementController;
 use Illuminate\Support\Facades\Auth;
 
 // ROUTE DASHBOARD VISUALISASI DATA
@@ -196,6 +195,27 @@ Route::middleware('auth')->group(function () {
     // Route untuk halaman CKP pegawai
     Route::get('/ckp-pegawai', [CkpPegawaiController::class, 'index'])->name('ckp.pegawai.index');
     Route::put('/ckp-pegawai/{id}', [CkpPegawaiController::class, 'update'])->name('ckp.pegawai.update');
+
+
+    // untuk crud admin
+    Route::prefix('admin')->group(function () {
+        Route::get('/announcements', [AnnouncementController::class, 'index'])
+            ->name('announcements.index');
+        Route::post('/announcements', [AnnouncementController::class, 'store'])
+            ->name('announcements.store');
+        Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])
+            ->name('announcements.update');
+        Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])
+            ->name('announcements.destroy');
+        Route::post('/announcements/{announcement}/toggle', [AnnouncementController::class, 'toggleActive'])
+            ->name('announcements.toggle');
+    });
+
+    // Halaman pengumuman untuk pegawai
+    Route::get('/pengumuman', [AnnouncementController::class, 'pegawaiIndex'])->name('announcements.pegawai');
 });
+
+Route::get('/api/active-announcements', [AnnouncementController::class, 'getActiveAnnouncements']);
+
 
 require __DIR__ . '/auth.php';
