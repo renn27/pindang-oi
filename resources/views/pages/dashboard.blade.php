@@ -113,69 +113,49 @@
                     </div>
 
                     {{-- ===== DAFTAR PENUGASAN BELUM SELESAI SBG ANGGOTA ===== --}}
-                    @if(isset($unfinishedAsAnggota) && $unfinishedAsAnggota->count() > 0)
-                    <div class="mb-8">
+                    @if((isset($unfinishedBerjalanAsAnggota) && $unfinishedBerjalanAsAnggota->count() > 0) || (isset($unfinishedTerlewatAsAnggota) && $unfinishedTerlewatAsAnggota->count() > 0))
+                    <div class="mb-8" x-data="{ activeTabAnggota: 'berjalan' }">
                         <div class="flex items-center gap-2 mb-4">
                             <h3 class="text-lg font-bold text-gray-800 dark:text-white">Daftar Penugasan Belum Selesai (Sebagai Anggota)</h3>
                             <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800">Anggota Tim</span>
                         </div>
-                        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 shadow-sm overflow-hidden">
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                    <thead class="bg-gray-50 dark:bg-gray-800">
-                                        <tr>
-                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-16 dark:text-gray-400">No.</th>
-                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Bidang & Kegiatan</th>
-                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Anggota</th>
-                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-32 dark:text-gray-400">Target</th>
-                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-40 dark:text-gray-400">Status Penugasannya</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
-                                        @foreach ($unfinishedAsAnggota as $index => $penugasan)
-                                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150 cursor-pointer"
-                                                onclick="window.location.href='{{ route('sub.kegiatan.show', ['kegiatan' => $penugasan->subKegiatan->id_kegiatan, 'subKegiatan' => $penugasan->id_sub_kegiatan]) }}#penugasan-{{ $penugasan->id_penugasan }}'">
-                                                <td class="px-4 py-4 text-sm text-gray-600 font-medium text-center dark:text-gray-400">
-                                                    {{ $unfinishedAsAnggota->firstItem() + $index }}
-                                                </td>
-                                                <td class="px-4 py-4">
-                                                    <div class="flex flex-col gap-1">
-                                                        <span class="text-xs text-brand-600 font-medium dark:text-brand-400 line-clamp-1">
-                                                            {{ $penugasan->subKegiatan->kegiatan->bidang->nama_bidang ?? '-' }}
-                                                        </span>
-                                                        <span class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2 p-0 w-80 md:w-full break-words">
-                                                            {{ $penugasan->subKegiatan->kegiatan->nama_rk_kegiatan ?? '-' }}
-                                                        </span>
-                                                        <span class="text-xs text-gray-500 font-medium dark:text-gray-400 line-clamp-2">
-                                                            Sub: {{ $penugasan->subKegiatan->nama_sub_kegiatan ?? '-' }}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td class="px-4 py-4">
-                                                    <span class="text-sm font-semibold text-gray-900 dark:text-white whitespace-nowrap">
-                                                        {{ $penugasan->anggota->nama_pegawai ?? '-' }}
-                                                    </span>
-                                                </td>
-                                                <td class="px-4 py-4">
-                                                    <span class="inline-flex py-1 px-3 rounded-md bg-gray-100 text-gray-800 text-xs font-bold dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
-                                                        {{ $penugasan->target }} {{ $penugasan->satuan_target }}
-                                                    </span>
-                                                </td>
-                                                <td class="px-4 py-4 whitespace-nowrap">
-                                                    @php
-                                                        $statusInfo = $penugasan->statusPenugasan();
-                                                    @endphp
-                                                    <span class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full {{ $statusInfo['class'] ?? 'bg-gray-100 text-gray-600' }}">
-                                                        {{ $statusInfo['label'] ?? 'Tidak Diketahui' }}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+
+                        <!-- Tabs -->
+                        <div class="flex space-x-1 border-b border-gray-200 dark:border-gray-700 mb-4">
+                            <button @click="activeTabAnggota = 'berjalan'"
+                                :class="{'border-blue-500 text-blue-600 dark:text-blue-500 dark:border-blue-500': activeTabAnggota === 'berjalan', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300': activeTabAnggota !== 'berjalan'}"
+                                class="whitespace-nowrap py-2 px-4 border-b-2 font-semibold text-sm transition-colors duration-150 flex items-center">
+                                Sedang Berjalan
+                                @if(isset($unfinishedBerjalanAsAnggota) && $unfinishedBerjalanAsAnggota->total() > 0)
+                                    <span class="ml-2 bg-blue-100 text-blue-600 py-0.5 px-2 rounded-full text-xs dark:bg-blue-900 dark:text-blue-200">{{ $unfinishedBerjalanAsAnggota->total() }}</span>
+                                @endif
+                            </button>
+                            <button @click="activeTabAnggota = 'terlewat'"
+                                :class="{'border-red-500 text-red-600 dark:text-red-500 dark:border-red-500': activeTabAnggota === 'terlewat', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300': activeTabAnggota !== 'terlewat'}"
+                                class="whitespace-nowrap py-2 px-4 border-b-2 font-semibold text-sm transition-colors duration-150 flex items-center">
+                                Sudah Terlewat
+                                @if(isset($unfinishedTerlewatAsAnggota) && $unfinishedTerlewatAsAnggota->total() > 0)
+                                    <span class="ml-2 bg-red-100 text-red-600 py-0.5 px-2 rounded-full text-xs dark:bg-red-900 dark:text-red-200">{{ $unfinishedTerlewatAsAnggota->total() }}</span>
+                                @endif
+                            </button>
+                        </div>
+
+                        <!-- Tab Content -->
+                        <div>
+                            <div x-show="activeTabAnggota === 'berjalan'" style="display: none;">
+                                @if(isset($unfinishedBerjalanAsAnggota) && $unfinishedBerjalanAsAnggota->count() > 0)
+                                    <x-tables.dashboard-penugasan-anggota :penugasans="$unfinishedBerjalanAsAnggota" />
+                                @else
+                                    <div class="rounded-2xl border border-gray-200 bg-gray-50 p-6 text-center text-gray-500 dark:border-gray-800 dark:bg-gray-900/50 dark:text-gray-400">Tidak ada penugasan yang sedang berjalan.</div>
+                                @endif
                             </div>
-                            <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
-                                {{ $unfinishedAsAnggota->links() }}
+
+                            <div x-show="activeTabAnggota === 'terlewat'" style="display: none;" x-cloak>
+                                @if(isset($unfinishedTerlewatAsAnggota) && $unfinishedTerlewatAsAnggota->count() > 0)
+                                    <x-tables.dashboard-penugasan-anggota :penugasans="$unfinishedTerlewatAsAnggota" />
+                                @else
+                                    <div class="rounded-2xl border border-gray-200 bg-gray-50 p-6 text-center text-gray-500 dark:border-gray-800 dark:bg-gray-900/50 dark:text-gray-400">Tidak ada penugasan yang sudah terlewat.</div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -202,69 +182,49 @@
                     </div>
 
                     {{-- ===== DAFTAR PENUGASAN BELUM SELESAI SBG KETUA ===== --}}
-                    @if(isset($unfinishedAsKetua) && $unfinishedAsKetua->count() > 0)
-                    <div class="mb-8">
+                    @if((isset($unfinishedBerjalanAsKetua) && $unfinishedBerjalanAsKetua->count() > 0) || (isset($unfinishedTerlewatAsKetua) && $unfinishedTerlewatAsKetua->count() > 0))
+                    <div class="mb-8" x-data="{ activeTabKetua: 'berjalan' }">
                         <div class="flex items-center gap-2 mb-4">
                             <h3 class="text-lg font-bold text-gray-800 dark:text-white">Daftar Penugasan Anggota Belum Selesai (Sebagai Ketua Tim)</h3>
                             <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-amber-200 dark:text-amber-800">Ketua Tim</span>
                         </div>
-                        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 shadow-sm overflow-hidden">
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                    <thead class="bg-gray-50 dark:bg-gray-800">
-                                        <tr>
-                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-16 dark:text-gray-400">No.</th>
-                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Bidang & Kegiatan</th>
-                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Anggota</th>
-                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-32 dark:text-gray-400">Target</th>
-                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-40 dark:text-gray-400">Status Penugasannya</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
-                                        @foreach ($unfinishedAsKetua as $index => $penugasan)
-                                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150 cursor-pointer"
-                                                onclick="window.location.href='{{ route('sub.kegiatan.show', ['kegiatan' => $penugasan->subKegiatan->id_kegiatan, 'subKegiatan' => $penugasan->id_sub_kegiatan]) }}#penugasan-{{ $penugasan->id_penugasan }}'">
-                                                <td class="px-4 py-4 text-sm text-gray-600 font-medium text-center dark:text-gray-400">
-                                                    {{ $unfinishedAsKetua->firstItem() + $index }}
-                                                </td>
-                                                <td class="px-4 py-4">
-                                                    <div class="flex flex-col gap-1">
-                                                        <span class="text-xs text-brand-600 font-medium dark:text-brand-400 line-clamp-1">
-                                                            {{ $penugasan->subKegiatan->kegiatan->bidang->nama_bidang ?? '-' }}
-                                                        </span>
-                                                        <span class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2 p-0 w-80 md:w-full break-words">
-                                                            {{ $penugasan->subKegiatan->kegiatan->nama_rk_kegiatan ?? '-' }}
-                                                        </span>
-                                                        <span class="text-xs text-gray-500 font-medium dark:text-gray-400 line-clamp-2">
-                                                            Sub: {{ $penugasan->subKegiatan->nama_sub_kegiatan ?? '-' }}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td class="px-4 py-4">
-                                                    <span class="text-sm font-semibold text-gray-900 dark:text-white whitespace-nowrap">
-                                                        {{ $penugasan->anggota->nama_pegawai ?? '-' }}
-                                                    </span>
-                                                </td>
-                                                <td class="px-4 py-4">
-                                                    <span class="inline-flex py-1 px-3 rounded-md bg-gray-100 text-gray-800 text-xs font-bold dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
-                                                        {{ $penugasan->target }} {{ $penugasan->satuan_target }}
-                                                    </span>
-                                                </td>
-                                                <td class="px-4 py-4 whitespace-nowrap">
-                                                    @php
-                                                        $statusInfo = $penugasan->statusPenugasan();
-                                                    @endphp
-                                                    <span class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full {{ $statusInfo['class'] ?? 'bg-gray-100 text-gray-600' }}">
-                                                        {{ $statusInfo['label'] ?? 'Tidak Diketahui' }}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+
+                        <!-- Tabs -->
+                        <div class="flex space-x-1 border-b border-gray-200 dark:border-gray-700 mb-4">
+                            <button @click="activeTabKetua = 'berjalan'"
+                                :class="{'border-blue-500 text-blue-600 dark:text-blue-500 dark:border-blue-500': activeTabKetua === 'berjalan', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300': activeTabKetua !== 'berjalan'}"
+                                class="whitespace-nowrap py-2 px-4 border-b-2 font-semibold text-sm transition-colors duration-150 flex items-center">
+                                Sedang Berjalan
+                                @if(isset($unfinishedBerjalanAsKetua) && $unfinishedBerjalanAsKetua->total() > 0)
+                                    <span class="ml-2 bg-blue-100 text-blue-600 py-0.5 px-2 rounded-full text-xs dark:bg-blue-900 dark:text-blue-200">{{ $unfinishedBerjalanAsKetua->total() }}</span>
+                                @endif
+                            </button>
+                            <button @click="activeTabKetua = 'terlewat'"
+                                :class="{'border-red-500 text-red-600 dark:text-red-500 dark:border-red-500': activeTabKetua === 'terlewat', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300': activeTabKetua !== 'terlewat'}"
+                                class="whitespace-nowrap py-2 px-4 border-b-2 font-semibold text-sm transition-colors duration-150 flex items-center">
+                                Sudah Terlewat
+                                @if(isset($unfinishedTerlewatAsKetua) && $unfinishedTerlewatAsKetua->total() > 0)
+                                    <span class="ml-2 bg-red-100 text-red-600 py-0.5 px-2 rounded-full text-xs dark:bg-red-900 dark:text-red-200">{{ $unfinishedTerlewatAsKetua->total() }}</span>
+                                @endif
+                            </button>
+                        </div>
+
+                        <!-- Tab Content -->
+                        <div>
+                            <div x-show="activeTabKetua === 'berjalan'" style="display: none;">
+                                @if(isset($unfinishedBerjalanAsKetua) && $unfinishedBerjalanAsKetua->count() > 0)
+                                    <x-tables.dashboard-penugasan-ketua :penugasans="$unfinishedBerjalanAsKetua" />
+                                @else
+                                    <div class="rounded-2xl border border-gray-200 bg-gray-50 p-6 text-center text-gray-500 dark:border-gray-800 dark:bg-gray-900/50 dark:text-gray-400">Tidak ada penugasan yang sedang berjalan.</div>
+                                @endif
                             </div>
-                            <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
-                                {{ $unfinishedAsKetua->links() }}
+
+                            <div x-show="activeTabKetua === 'terlewat'" style="display: none;" x-cloak>
+                                @if(isset($unfinishedTerlewatAsKetua) && $unfinishedTerlewatAsKetua->count() > 0)
+                                    <x-tables.dashboard-penugasan-ketua :penugasans="$unfinishedTerlewatAsKetua" />
+                                @else
+                                    <div class="rounded-2xl border border-gray-200 bg-gray-50 p-6 text-center text-gray-500 dark:border-gray-800 dark:bg-gray-900/50 dark:text-gray-400">Tidak ada penugasan yang sudah terlewat.</div>
+                                @endif
                             </div>
                         </div>
                     </div>
