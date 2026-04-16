@@ -8,8 +8,8 @@ use App\Models\RencanaJPT;
 
 class IndikatorJPTController extends Controller
 {
-    public function store(Request $request, RencanaJPT $rencanaJpt)
-    {
+    public function store(Request $request, RencanaJPT $rencanaJpt) {
+        $this->authorize('kelola-master-data');
         $validatedData = $request->validate([
             'nama_indikator_jpt' => 'required|string|max:255',
             'satuan' => 'nullable|string|max:100',
@@ -31,8 +31,8 @@ class IndikatorJPTController extends Controller
         }
     }
 
-    public function update(Request $request, RencanaJPT $rencanaJpt, IndikatorJPT $indikatorJpt)
-    {
+    public function update(Request $request, RencanaJPT $rencanaJpt, IndikatorJPT $indikatorJpt) {
+        $this->authorize('kelola-master-data');
         $validatedData = $request->validate([
             'nama_indikator_jpt' => 'required|string|max:255',
             'satuan' => 'nullable|string|max:100',
@@ -57,12 +57,8 @@ class IndikatorJPTController extends Controller
         }
     }
 
-    public function delete(RencanaJPT $rencanaJpt, IndikatorJPT $indikatorJpt)
-    {
-        // safety check
-        if ($indikatorJpt->id_rencana_jpt !== $rencanaJpt->id) {
-            abort(403);
-        }
+    public function delete(RencanaJPT $rencanaJpt, IndikatorJPT $indikatorJpt) {
+        $this->authorize('kelola-master-data');
 
         try {
             $indikatorJpt->delete();

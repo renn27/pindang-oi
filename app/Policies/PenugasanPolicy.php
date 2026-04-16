@@ -153,6 +153,21 @@ class PenugasanPolicy
         return true;
     }
 
+    public function acceptTranslok(Pegawai $pegawai, Penugasan $penugasan): bool
+    {
+        // 1️⃣ Hanya pimpinan
+        if ($pegawai->active_role !== 'Pimpinan') {
+            return false;
+        }
+
+        // 2️⃣ Penugasan memang butuh Translok
+        if (! $penugasan->butuh_translok) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function setAsCKP(Pegawai $pegawai, Penugasan $penugasan): bool
     {
         // Validasi dasar
@@ -169,22 +184,7 @@ class PenugasanPolicy
             ->whereHas('penerimaan', fn ($q) => $q->where('status', 'Diterima'))
             ->exists();
     }
-
-    public function acceptTranslok(Pegawai $pegawai, Penugasan $penugasan): bool
-    {
-        // 1️⃣ Hanya pimpinan
-        if ($pegawai->active_role !== 'Pimpinan') {
-            return false;
-        }
-
-        // 2️⃣ Penugasan memang butuh Translok
-        if (! $penugasan->butuh_translok) {
-            return false;
-        }
-
-        return true;
-    }
-
+    
     /**
      * Determine whether the user can restore the model.
      */

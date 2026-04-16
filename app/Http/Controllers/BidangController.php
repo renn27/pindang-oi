@@ -9,8 +9,8 @@ use Illuminate\Validation\Rule;
 
 class BidangController extends Controller
 {
-
     public function index() {
+        $this->authorize('kelola-master-data');
         $bidangs = Bidang::orderBy('urutan', 'asc')
             ->orderBy('nama_bidang', 'asc')
             ->get();
@@ -22,6 +22,7 @@ class BidangController extends Controller
     }
 
     public function store(Request $request) {
+        $this->authorize('kelola-master-data');
         $validatedData = $request->validate([
             'nama_bidang' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:bidangs,slug',
@@ -41,8 +42,8 @@ class BidangController extends Controller
         ->with('success', 'Bidang berhasil ditambahkan');
     }
 
-    public function update(Request $request, Bidang $bidang)
-    {
+    public function update(Request $request, Bidang $bidang) {
+        $this->authorize('kelola-master-data');
         $validatedData = $request->validate([
             'nama_bidang' => 'required|string|max:255',
             'slug' => ['nullable','string','max:255',
@@ -65,8 +66,8 @@ class BidangController extends Controller
         }
     }
 
-    public function delete(Bidang $bidang)
-    {
+    public function delete(Bidang $bidang) {
+        $this->authorize('kelola-master-data');
         try {
             $bidang->delete();
 

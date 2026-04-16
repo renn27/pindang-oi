@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 
 class PegawaiRoleController extends Controller
 {
-    public function index()
-    {
+    public function index() {
+        $this->authorize('kelola-master-data');
         return view('pages.main.admin.role-pegawai.index', [
             'title'    => 'Manajemen Role Pegawai',
             'pegawais' => Pegawai::with('roles')->get(),
@@ -18,7 +18,7 @@ class PegawaiRoleController extends Controller
     }
 
     public function store(Request $request) {
-        // dd($request->all());
+        $this->authorize('kelola-master-data');
         $validated = $request->validate([
             'id_pegawai' => 'required|exists:pegawais,id_pegawai',
             'roles'      => 'required|array|min:1',
@@ -50,7 +50,7 @@ class PegawaiRoleController extends Controller
     }
 
     public function update(Request $request, Pegawai $pegawais) {
-        // dd($request->all());
+        $this->authorize('kelola-master-data');
         $validated = $request->validate([
             'id_pegawai' => 'required|exists:pegawais,id_pegawai',
             'roles'      => 'nullable|array',
@@ -128,6 +128,7 @@ class PegawaiRoleController extends Controller
     }
 
     public function switchRolePegawai(Request $request, string $role) {
+        $this->authorize('kelola-master-data');
         $user = $request->user();
         abort_if(! $user, 401);
 

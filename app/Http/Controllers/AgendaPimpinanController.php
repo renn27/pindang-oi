@@ -9,8 +9,8 @@ use Illuminate\Http\Request;
 
 class AgendaPimpinanController extends Controller
 {
-    public function index()
-    {
+    public function index() {
+        $this->authorize('kelola-master-data');
         $agenda = AgendaPimpinan::with(['rencanaJpt', 'indikatorJpt'])->get();
         $rencanaJpts = RencanaJPT::all();
 
@@ -21,8 +21,8 @@ class AgendaPimpinanController extends Controller
         ]);
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
+        $this->authorize('kelola-master-data');
         $validated = $request->validate([
             'nama_kegiatan' => 'required',
             'tanggal_mulai' => 'required|date',
@@ -44,8 +44,8 @@ class AgendaPimpinanController extends Controller
         return back()->with('success', 'Agenda berhasil ditambahkan');
     }
 
-    public function update(Request $request, AgendaPimpinan $agenda)
-    {
+    public function update(Request $request, AgendaPimpinan $agenda) {
+        $this->authorize('kelola-master-data');
         $validated = $request->validate([
             'nama_kegiatan' => 'required',
             'tanggal_mulai' => 'required|date',
@@ -61,8 +61,8 @@ class AgendaPimpinanController extends Controller
         return back()->with('success', 'Agenda berhasil diupdate');
     }
 
-    public function delete(AgendaPimpinan $agenda)
-    {
+    public function delete(AgendaPimpinan $agenda) {
+        $this->authorize('kelola-master-data');
         $agenda->delete();
         return back()->with('success', 'Agenda berhasil dihapus');
     }

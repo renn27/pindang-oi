@@ -305,7 +305,7 @@ class PenugasanController extends Controller
 
     public function update_rk_dl(Request $request, Penugasan $penugasan)
     {
-        // dd($request->all());
+        $this->authorize('acceptDL', $penugasan);
         $validated = $request->validate([
             'status_dl' => ['required', 'in:Menunggu,ACC,Ditolak'],
         ]);
@@ -339,7 +339,7 @@ class PenugasanController extends Controller
 
     public function update_rk_translok(Request $request, Penugasan $penugasan)
     {
-        // dd($request->all());
+        $this->authorize('acceptTranslok', $penugasan);
         $validated = $request->validate([
             'status_translok' => ['required', 'in:Menunggu,ACC,Ditolak'],
         ]);

@@ -10,6 +10,7 @@ class RencanaJPTController extends Controller
 {
     public function index()
     {
+        $this->authorize('kelola-master-data');
         $rencanaJpts = RencanaJPT::with(['indikatorjpts'])->get();
 
         return view('pages.main.admin.rk-iki-jpt.index', ['title' => 'Rencana Kerja dan IKI Pimpinan', 'rencanaJpts' => $rencanaJpts]);
@@ -17,6 +18,7 @@ class RencanaJPTController extends Controller
 
     public function indikator(RencanaJPT $rencanaJpt)
     {
+        $this->authorize('kelola-master-data');
         return $rencanaJpt->indikatorJpts()
             ->orderBy('nama_indikator_jpt')
             ->get(['id', 'nama_indikator_jpt']);
@@ -25,6 +27,7 @@ class RencanaJPTController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('kelola-master-data');
         $validatedData = $request->validate([
             'tahun' => 'required|integer',
             'nama_rencana_jpt' => 'required|string|max:255',
@@ -76,6 +79,7 @@ class RencanaJPTController extends Controller
 
     public function update(Request $request, RencanaJPT $rencanaJpt)
     {
+        $this->authorize('kelola-master-data');
         $validatedData = $request->validate([
             'tahun' => 'required|integer',
             'nama_rencana_jpt' => 'required|string|max:255',
@@ -96,6 +100,7 @@ class RencanaJPTController extends Controller
 
     public function delete(RencanaJPT $rencanaJpt)
     {
+        $this->authorize('kelola-master-data'); 
         try {
             $rencanaJpt->delete();
 

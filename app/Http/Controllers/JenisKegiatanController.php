@@ -8,6 +8,7 @@ use App\Models\JenisKegiatan;
 class JenisKegiatanController extends Controller
 {
     public function index() {
+        $this->authorize('kelola-master-data');
         $jenisKegiatan = JenisKegiatan::get();
 
         return view('pages.main.admin.jenis-kegiatan.index', [
@@ -16,11 +17,8 @@ class JenisKegiatanController extends Controller
         ]);
     }
 
-    public function detail(JenisKegiatan $jenisKegiatan)
-    {
-        if (!in_array(auth()->user()->active_role, ['Admin', 'Pimpinan'])) {
-            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
-        }
+    public function detail(JenisKegiatan $jenisKegiatan){
+        $this->authorize('kelola-master-data');
 
         $jenisKegiatan->load(['penugasans' => function ($query) {
             $query->latest();
@@ -33,7 +31,7 @@ class JenisKegiatanController extends Controller
     }
 
     public function store(Request $request) {
-        // dd($request->all());
+        $this->authorize('kelola-master-data');
         $validatedData = $request->validate([
             'jenis_kegiatan' => 'required|string|max:255',
             'kategori' => 'required|string|in:Utama,Tambahan',
@@ -47,9 +45,8 @@ class JenisKegiatanController extends Controller
         ->with('success', 'Jenis Kegiatan berhasil ditambahkan');
     }
 
-    public function update(Request $request, JenisKegiatan $jenisKegiatan)
-    {
-        // dd($request->all());
+    public function update(Request $request, JenisKegiatan $jenisKegiatan) {
+        $this->authorize('kelola-master-data');
         $validatedData = $request->validate([
             'jenis_kegiatan' => 'required|string|max:255',
             'kategori' => 'required|string|in:Utama,Tambahan',
@@ -69,8 +66,9 @@ class JenisKegiatanController extends Controller
         }
     }
 
-    public function delete(JenisKegiatan $jenisKegiatan)
-    {
+    public function delete(JenisKegiatan $jenisKegiatan) {
+
+        $this->authorize('kelola-master-data');
         try {
             $jenisKegiatan->delete();
 

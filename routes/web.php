@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BidangController;
-use App\Http\Controllers\DashboardAnalyticsController;
 use App\Http\Controllers\IndikatorJPTController;
 use App\Http\Controllers\KalenderDLController;
 use App\Http\Controllers\KalenderKegiatanController;
@@ -53,7 +52,7 @@ Route::middleware('auth')->group(function () {
         ->name('pegawai-role.switchRolePegawai');
 
     // CRUD RK IKI JPT BY PIMPINAN
-    Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(function () {
+    Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->middleware('can:kelola-master-data')->group(function () {
         // ROUTE UNTUK RENCANA JPT
         Route::prefix('rencana')->name('rencana.')->group(function () {
             Route::get('/', [RencanaJPTController::class, 'index'])->name('index');
@@ -74,7 +73,7 @@ Route::middleware('auth')->group(function () {
     // END RK IKI JPT BY PIMPINAN
 
     // CRUD AGENDA PIMPINAN BY PIMPINAN
-    Route::prefix('agenda-pimpinan')->group(function () {
+    Route::prefix('agenda-pimpinan')->middleware('can:kelola-master-data')->group(function () {
         Route::get('/', [AgendaPimpinanController::class, 'index'])->name('agenda.index');
         Route::post('/', [AgendaPimpinanController::class, 'store'])->name('agenda.store');
         Route::put('/{agenda}', [AgendaPimpinanController::class, 'update'])->name('agenda.update');
@@ -83,16 +82,7 @@ Route::middleware('auth')->group(function () {
     // END AGENDA PIMPINAN BY PIMPINAN
 
     // CRUD JENIS KEGIATAN BY ADMIN
-    Route::prefix('agenda-pimpinan')->group(function () {
-        Route::get('/', [AgendaPimpinanController::class, 'index'])->name('agenda.index');
-        Route::post('/', [AgendaPimpinanController::class, 'store'])->name('agenda.store');
-        Route::put('/{agenda}', [AgendaPimpinanController::class, 'update'])->name('agenda.update');
-        Route::delete('/{agenda}', [AgendaPimpinanController::class, 'delete'])->name('agenda.delete');
-    });
-    // END AGENDA PIMPINAN BY PIMPINAN
-
-    // CRUD JENIS KEGIATAN BY ADMIN
-    Route::prefix('jenis-kegiatan')->group(function () {
+    Route::prefix('jenis-kegiatan')->middleware('can:kelola-master-data')->group(function () {
         Route::get('/', [JenisKegiatanController::class, 'index'])->name('jenis-kegiatan.index');
         Route::post('/', [JenisKegiatanController::class, 'store'])->name('jenis-kegiatan.store');
         Route::get('/{jenisKegiatan}/detail', [JenisKegiatanController::class, 'detail'])->name('jenis-kegiatan.detail');
@@ -102,7 +92,7 @@ Route::middleware('auth')->group(function () {
     // END JENIS KEGIATAN BY ADMIN
 
     // CRUD BIDANG KERJA BY ADMIN
-    Route::prefix('bidang-kerja')->group(function () {
+    Route::prefix('bidang-kerja')->middleware('can:kelola-master-data')->group(function () {
         Route::get('/', [BidangController::class, 'index'])->name('bidang.index');
         Route::get('/create', [BidangController::class, 'create'])->name('bidang.create');
         Route::post('/', [BidangController::class, 'store'])->name('bidang.store');
@@ -110,6 +100,25 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{bidang:slug}', [BidangController::class, 'delete'])->name('bidang.delete');
     });
     // END BIDANG KERJA BY ADMIN
+
+    // CRUD ANNOUNCEMENT BY ADMIN
+    Route::prefix('admin')->middleware('can:kelola-master-data')->group(function () {
+        Route::get('/announcements', [AnnouncementController::class, 'index'])
+            ->name('announcements.index');
+        Route::post('/announcements', [AnnouncementController::class, 'store'])
+            ->name('announcements.store');
+        Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])
+            ->name('announcements.update');
+        Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])
+            ->name('announcements.destroy');
+        Route::post('/announcements/{announcement}/toggle', [AnnouncementController::class, 'toggleActive'])
+            ->name('announcements.toggle');
+    });
+
+    // Halaman pengumuman untuk pegawai
+    Route::get('/pengumuman', [AnnouncementController::class, 'pegawaiIndex'])->name('announcements.pegawai');
+
+    // END CRUD ANNOUNCEMENT BY ADMIN
 
     // CRUD KEGIATAN & SUB KEGIATAN BY KETUA TIM
     Route::prefix('kegiatan')->group(function () {
@@ -130,7 +139,7 @@ Route::middleware('auth')->group(function () {
     // END KEGIATAN & SUB KEGIATAN BY KETUA TIM
 
     // HAPUS PENGIRIMAN BY ANGGOTA TIM (DELETE KELUAR DARI SCOPE AGAR CLEAN)
-    Route::delete('pengirimans/{pengiriman:id_pengiriman}', [PengirimanController::class, 'delete'])->name('pengiriman.delete');
+    Route::delete('pengirimans/{pengiriman:id_pengiriman}', [PengirimanController::class, 'delete'])->name('pengiriman.delete')->middleware('can:cancelSend,penugasan');
 
     Route::post('/penugasan/check-duplicate-dates', [PenugasanController::class, 'checkDuplicateDates'])->name('penugasan.check-duplicate-dates');
 
@@ -161,9 +170,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [MasterKegiatanController::class, 'store'])->name('master-kegiatan.store');
     });
 
-    Route::get('/rencana-kerja-dl', [MasterKegiatanController::class, 'index_rk_dl'])->name('master-kegiatan.index_rk_dl');
-    Route::put('/penugasan/{penugasan:id_penugasan}/rencana-kerja-dl', [PenugasanController::class, 'update_rk_dl'])->name('penugasan.update_rk_dl');
-    Route::put('/penugasan/{penugasan:id_penugasan}/rencana-kerja-translok', [PenugasanController::class, 'update_rk_translok'])->name('penugasan.update_rk_translok');
+    Route::get('/rencana-kerja-dl', [MasterKegiatanController::class, 'index_rk_dl'])->name('master-kegiatan.index_rk_dl')->middleware('can:kelola-master-data');
+    Route::put('/penugasan/{penugasan:id_penugasan}/rencana-kerja-dl', [PenugasanController::class, 'update_rk_dl'])->name('penugasan.update_rk_dl')->middleware('can:acceptDL,App\Models\Penugasan,penugasan');
+    Route::put('/penugasan/{penugasan:id_penugasan}/rencana-kerja-translok', [PenugasanController::class, 'update_rk_translok'])->name('penugasan.update_rk_translok')->middleware('can:acceptTranslok,App\Models\Penugasan,penugasan');
     // END ROUTE MASTER KEGIATAN
 
     // ROUTE KALENDER DL
@@ -195,24 +204,6 @@ Route::middleware('auth')->group(function () {
     // Route untuk halaman CKP pegawai
     Route::get('/ckp-pegawai', [CkpPegawaiController::class, 'index'])->name('ckp.pegawai.index');
     Route::put('/ckp-pegawai/{id}', [CkpPegawaiController::class, 'update'])->name('ckp.pegawai.update');
-
-
-    // untuk crud admin
-    Route::prefix('admin')->group(function () {
-        Route::get('/announcements', [AnnouncementController::class, 'index'])
-            ->name('announcements.index');
-        Route::post('/announcements', [AnnouncementController::class, 'store'])
-            ->name('announcements.store');
-        Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])
-            ->name('announcements.update');
-        Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])
-            ->name('announcements.destroy');
-        Route::post('/announcements/{announcement}/toggle', [AnnouncementController::class, 'toggleActive'])
-            ->name('announcements.toggle');
-    });
-
-    // Halaman pengumuman untuk pegawai
-    Route::get('/pengumuman', [AnnouncementController::class, 'pegawaiIndex'])->name('announcements.pegawai');
 });
 
 Route::get('/api/active-announcements', [AnnouncementController::class, 'getActiveAnnouncements']);

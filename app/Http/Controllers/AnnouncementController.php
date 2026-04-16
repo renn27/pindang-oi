@@ -10,8 +10,8 @@ use Carbon\Carbon;
 class AnnouncementController extends Controller
 {
     // Halaman CRUD
-    public function index()
-    {
+    public function index() {
+        $this->authorize('kelola-master-data');
         $announcements = Announcement::orderBy('created_at', 'desc')->get();
 
         return view('pages.main.admin.announcements.index', [
@@ -21,8 +21,8 @@ class AnnouncementController extends Controller
     }
 
     // Simpan pengumuman baru
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
+        $this->authorize('kelola-master-data');
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -51,8 +51,8 @@ class AnnouncementController extends Controller
     }
 
     // Update pengumuman
-    public function update(Request $request, Announcement $announcement)
-    {
+    public function update(Request $request, Announcement $announcement) {
+        $this->authorize('kelola-master-data');
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -82,8 +82,8 @@ class AnnouncementController extends Controller
     }
 
     // Hapus pengumuman
-    public function destroy(Announcement $announcement)
-    {
+    public function destroy(Announcement $announcement) {
+        $this->authorize('kelola-master-data');
         // Hapus gambar
         if ($announcement->image_path) {
             Storage::disk('public')->delete($announcement->image_path);
@@ -96,8 +96,8 @@ class AnnouncementController extends Controller
     }
 
     // Toggle status aktif
-    public function toggleActive(Announcement $announcement)
-    {
+    public function toggleActive(Announcement $announcement) {
+        $this->authorize('kelola-master-data');
         $announcement->update([
             'is_active' => !$announcement->is_active
         ]);
@@ -109,8 +109,8 @@ class AnnouncementController extends Controller
     }
 
     // API untuk modal (mengembalikan data pengumuman aktif)
-    public function getActiveAnnouncements()
-    {
+    public function getActiveAnnouncements() {
+        $this->authorize('kelola-master-data');
         $announcements = Announcement::active()
             ->orderBy('created_at', 'desc')
             ->get()
@@ -121,8 +121,8 @@ class AnnouncementController extends Controller
         return response()->json($announcements);
     }
 
-    public function pegawaiIndex()
-    {
+    public function pegawaiIndex() {
+        $this->authorize('kelola-master-data');
         $announcements = Announcement::orderBy('created_at', 'desc')->get();
 
         return view('pages.main.admin.announcements.pengumuman_pegawai', [
