@@ -52,22 +52,22 @@ Route::middleware('auth')->group(function () {
         ->name('pegawai-role.switchRolePegawai');
 
     // CRUD RK IKI JPT BY PIMPINAN
-    Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->middleware('can:kelola-master-data')->group(function () {
+    Route::prefix('rencana-indikator-jpt')->name('rencana-indikator-jpt.')->group(function () {
         // ROUTE UNTUK RENCANA JPT
         Route::prefix('rencana')->name('rencana.')->group(function () {
-            Route::get('/', [RencanaJPTController::class, 'index'])->name('index');
-            Route::post('/', [RencanaJPTController::class, 'store'])->name('store');
-            Route::put('/{rencanaJpt}', [RencanaJPTController::class, 'update'])->name('update');
-            Route::delete('/{rencanaJpt}', [RencanaJPTController::class, 'delete'])->name('delete');
+            Route::get('/', [RencanaJPTController::class, 'index'])->name('index')->middleware('can:kelola-master-data');
+            Route::post('/', [RencanaJPTController::class, 'store'])->name('store')->middleware('can:kelola-master-data');
+            Route::put('/{rencanaJpt}', [RencanaJPTController::class, 'update'])->name('update')->middleware('can:kelola-master-data');
+            Route::delete('/{rencanaJpt}', [RencanaJPTController::class, 'delete'])->name('delete')->middleware('can:kelola-master-data');
         });
 
         // ROUTE UNTUK INDIKATOR JPT
         Route::prefix('{rencanaJpt}/indikator')->name('indikator.')->group(function () {
             // Select data IKI By RK
             Route::get('/', [RencanaJPTController::class, 'indikator'])->name('rencana-jpt.indikator');
-            Route::post('/', [IndikatorJPTController::class, 'store'])->name('store');
-            Route::put('/{indikatorJpt}', [IndikatorJPTController::class, 'update'])->name('update');
-            Route::delete('/{indikatorJpt}', [IndikatorJPTController::class, 'delete'])->name('delete');
+            Route::post('/', [IndikatorJPTController::class, 'store'])->name('store')->middleware('can:kelola-master-data');
+            Route::put('/{indikatorJpt}', [IndikatorJPTController::class, 'update'])->name('update')->middleware('can:kelola-master-data');
+            Route::delete('/{indikatorJpt}', [IndikatorJPTController::class, 'delete'])->name('delete')->middleware('can:kelola-master-data');
         });
     });
     // END RK IKI JPT BY PIMPINAN

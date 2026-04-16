@@ -18,7 +18,6 @@ class RencanaJPTController extends Controller
 
     public function indikator(RencanaJPT $rencanaJpt)
     {
-        $this->authorize('kelola-master-data');
         return $rencanaJpt->indikatorJpts()
             ->orderBy('nama_indikator_jpt')
             ->get(['id', 'nama_indikator_jpt']);
