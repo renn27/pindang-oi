@@ -12,14 +12,7 @@ use Illuminate\Support\Facades\Auth;
 
 class PenerimaanController extends Controller
 {
-    public function store(
-        Request $request,
-        SubKegiatan $subKegiatan,
-        Penugasan $penugasan,
-        Pengiriman $pengirimans
-    ) {
-        // dd($request->all());
-        // Autorisasi
+    public function store(Request $request, SubKegiatan $subKegiatan, Penugasan $penugasan, Pengiriman $pengirimans) {
         $this->authorize('receive', $penugasan);
 
         // Validasi

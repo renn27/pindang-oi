@@ -1054,3 +1054,20 @@ tr.ckp-completed-row:hover {
         rgba(34, 197, 94, 0.08) 50%,
         rgba(34, 197, 94, 0.15) 100%);
 }
+
+.menu-item-special {
+    @apply bg-gradient-to-r from-brand-200 to-sky-300 text-black shadow-lg relative overflow-hidden animate-pulse;
+}
+
+.menu-item-special:hover {
+    @apply scale-[1.02] shadow-xl;
+}
+
+/* efek glow */
+.menu-item-special::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, rgba(255,255,255,0.3), transparent 50%);
+    opacity: 0.6;
+}

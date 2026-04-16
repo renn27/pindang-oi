@@ -179,7 +179,8 @@
                                         <a href="{{ $item['path'] }}"
                                             @if (!empty($item['is_external'])) target="_blank" rel="noopener noreferrer" @endif
                                             class="menu-item group w-full
-                                            {{ $item['is_active'] ?? false ? 'menu-item-active' : 'menu-item-inactive' }}"
+                                            {{ $item['is_active'] ?? false ? 'menu-item-active' : 'menu-item-inactive' }}
+                                            {{ !empty($item['is_special']) ? 'menu-item-special' : '' }}"
                                             :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar
                                                 .isMobileOpen) ?
                                             'xl:justify-center' :

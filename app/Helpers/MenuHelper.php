@@ -99,6 +99,7 @@ class MenuHelper
                 'icon' => 'announcement',
                 'name' => 'Pengumuman',
                 'path' => '/pengumuman',
+                'is_special' => true,
             ],
             [
                 'icon' => 'mangcek',

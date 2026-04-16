@@ -349,6 +349,12 @@
                                                                         'bukti_dukung' => $p->bukti_dukung,
                                                                         'status' => $p->penerimaan?->status ?? 'Menunggu Diperiksa',
                                                                         'catatan' => $p->penerimaan?->catatan,
+                                                                        'penerimaan' => [
+                                                                            'id_penerima' => $p->penerimaan?->penerima?->nama_pegawai ?? 'Belum Diperiksa',
+                                                                            'tanggal_penerimaan' => $p->penerimaan?->created_at?->format('d F Y') ?? '-',
+                                                                            'jumlah_diterima' => $p->penerimaan?->jumlah_diterima ?? '-',
+                                                                            'status' => $p->penerimaan?->status ?? '-',
+                                                                        ],
                                                                     ],
                                                                 )
                                                                 ->values(),
@@ -1222,6 +1228,12 @@
                                                                         'bukti_dukung' => $p->bukti_dukung,
                                                                         'status' => $p->penerimaan?->status ?? 'Menunggu Diperiksa',
                                                                         'catatan' => $p->penerimaan?->catatan,
+                                                                        'penerimaan' => [
+                                                                            'id_penerima' => $p->penerimaan?->penerima?->nama_pegawai ?? 'Belum Diperiksa',
+                                                                            'tanggal_penerimaan' => $p->penerimaan?->created_at?->format('d F Y') ?? '-',
+                                                                            'jumlah_diterima' => $p->penerimaan?->jumlah_diterima ?? '-',
+                                                                            'status' => $p->penerimaan?->status ?? '-',
+                                                                        ],
                                                                     ],
                                                                 )
                                                                 ->values(),
