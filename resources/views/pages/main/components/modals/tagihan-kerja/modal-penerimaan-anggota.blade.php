@@ -106,7 +106,7 @@
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Jumlah Diterima <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="jumlah_diterima" id="jumlah_diterima" x-model="formData.jumlah_diterima"
+                    <input type="number" name="jumlah_diterima" id="jumlah_diterima" x-model="formData.jumlah_diterima"
                         placeholder="Masukkan jumlah penerimaan"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
                 </div>

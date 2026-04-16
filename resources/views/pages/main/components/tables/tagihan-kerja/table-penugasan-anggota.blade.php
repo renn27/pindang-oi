@@ -347,13 +347,12 @@
                                                                         'jumlah_dikirim' => $p->jumlah_dikirim,
                                                                         'media_pengiriman' => $p->media_pengiriman,
                                                                         'bukti_dukung' => $p->bukti_dukung,
-                                                                        'status' => $p->penerimaan?->status ?? 'Menunggu Diperiksa',
-                                                                        'catatan' => $p->penerimaan?->catatan,
                                                                         'penerimaan' => [
                                                                             'id_penerima' => $p->penerimaan?->penerima?->nama_pegawai ?? 'Belum Diperiksa',
                                                                             'tanggal_penerimaan' => $p->penerimaan?->created_at?->format('d F Y') ?? '-',
                                                                             'jumlah_diterima' => $p->penerimaan?->jumlah_diterima ?? '-',
-                                                                            'status' => $p->penerimaan?->status ?? '-',
+                                                                            'status' => $p->penerimaan?->status ?? 'Menunggu',
+                                                                            'catatan' => $p->penerimaan?->catatan ?? '-',
                                                                         ],
                                                                     ],
                                                                 )
@@ -1218,7 +1217,7 @@
                                                             id_anggota: '{{ $penugasan->id_anggota }}',
                                                             historiData: @js(
                                                             $penugasan->pengirimans
-                                                                ->sortBy(fn($p) => $p->created_at)
+                                                                ->sortByDesc(fn($p) => $p->created_at)
                                                                 ->map(
                                                                     fn($p) => [
                                                                         'id_pengiriman' => $p->id_pengiriman,
@@ -1226,13 +1225,12 @@
                                                                         'jumlah_dikirim' => $p->jumlah_dikirim,
                                                                         'media_pengiriman' => $p->media_pengiriman,
                                                                         'bukti_dukung' => $p->bukti_dukung,
-                                                                        'status' => $p->penerimaan?->status ?? 'Menunggu Diperiksa',
-                                                                        'catatan' => $p->penerimaan?->catatan,
                                                                         'penerimaan' => [
                                                                             'id_penerima' => $p->penerimaan?->penerima?->nama_pegawai ?? 'Belum Diperiksa',
                                                                             'tanggal_penerimaan' => $p->penerimaan?->created_at?->format('d F Y') ?? '-',
                                                                             'jumlah_diterima' => $p->penerimaan?->jumlah_diterima ?? '-',
-                                                                            'status' => $p->penerimaan?->status ?? '-',
+                                                                            'status' => $p->penerimaan?->status ?? 'Menunggu',
+                                                                            'catatan' => $p->penerimaan?->catatan ?? '-',
                                                                         ],
                                                                     ],
                                                                 )

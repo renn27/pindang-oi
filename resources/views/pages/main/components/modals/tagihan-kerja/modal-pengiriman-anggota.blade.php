@@ -90,7 +90,7 @@
                             <input type="text" name="tanggal_pengiriman" id="tanggal_pengiriman"
                                 :value="'{{ now()->format('Y-m-d') }}'" readonly
                                 class="h-11 w-full rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm
-                       text-gray-600 cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400" />
+                        text-gray-600 cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400" />
                         </template>
 
                         <!-- Input BEBAS: pakai date-picker biasa -->
