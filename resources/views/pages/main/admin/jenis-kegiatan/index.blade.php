@@ -70,7 +70,7 @@
                 ...data,
                 butuh_dl_atau_translok: Boolean(data.butuh_dl_atau_translok)
             }">
-                
+
         <!-- HEADER -->
         <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-700">
             <h4 class="text-2xl font-semibold text-gray-800 dark:text-white" x-text="mode === 'create' ? 'Tambah Jenis Kegiatan' : 'Edit Jenis Kegiatan'"></h4>
@@ -209,6 +209,7 @@
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Kategori</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Perlu DL/Translok</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Jumlah Penugasannya</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Tanggal Dibuat</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-32 dark:text-gray-400">Aksi</th>
                 </tr>
             </thead>
@@ -230,6 +231,9 @@
                             <a href="{{ route('jenis-kegiatan.detail', $jenisKegiatan->id) }}" class="hover:underline hover:text-teal-600 dark:hover:text-teal-400 transition-colors duration-200">
                                 {{ $jenisKegiatan->penugasans->count() ?? 0 }} Penugasan
                             </a>
+                        </td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                            {{ $jenisKegiatan->created_at->translatedFormat('d F Y') }}
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-center">
                             <div class="relative inline-block group">

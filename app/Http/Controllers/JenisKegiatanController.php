@@ -9,7 +9,14 @@ class JenisKegiatanController extends Controller
 {
     public function index() {
         $this->authorize('kelola-master-data');
-        $jenisKegiatan = JenisKegiatan::get();
+        $jenisKegiatan = JenisKegiatan::orderByRaw("
+            CASE
+                WHEN kategori = 'Utama' THEN 1
+                WHEN kategori = 'Tambahan' THEN 2
+                ELSE 3
+            END
+        ")
+        ->get();
 
         return view('pages.main.admin.jenis-kegiatan.index', [
             'title' => 'Jenis Kegiatan',

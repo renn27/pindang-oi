@@ -65,7 +65,8 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    // 'timezone' => 'UTC', default from Laravel
+    'timezone' => 'Asia/Jakarta',
 
     /*
     |--------------------------------------------------------------------------
