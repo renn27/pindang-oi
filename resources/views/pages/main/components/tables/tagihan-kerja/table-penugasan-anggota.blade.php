@@ -490,7 +490,7 @@
                                         <!-- Badge TUGAS SELESAI -->
                                         @if($isCkp)
                                             <div class="ckp-completed-badge">
-                                                CONGRATS 🙌 TUGAS KAMU SELESAI
+                                                TUGAS SELESAI
                                             </div>
                                         @endif
                                     </td>
@@ -1368,7 +1368,7 @@
                                         <!-- Badge TUGAS SELESAI -->
                                         @if($isCkp)
                                             <div class="ckp-completed-badge">
-                                                CONGRATS 🙌 TUGAS KAMU SELESAI
+                                                TUGAS SELESAI
                                             </div>
                                         @endif
                                     </td>

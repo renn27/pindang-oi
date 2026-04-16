@@ -111,6 +111,75 @@
                             </div>
                         </div>
                     </div>
+
+                    {{-- ===== DAFTAR PENUGASAN BELUM SELESAI SBG ANGGOTA ===== --}}
+                    @if(isset($unfinishedAsAnggota) && $unfinishedAsAnggota->count() > 0)
+                    <div class="mb-8">
+                        <div class="flex items-center gap-2 mb-4">
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-white">Daftar Penugasan Belum Selesai (Sebagai Anggota)</h3>
+                            <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800">Anggota Tim</span>
+                        </div>
+                        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 shadow-sm overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                    <thead class="bg-gray-50 dark:bg-gray-800">
+                                        <tr>
+                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-16 dark:text-gray-400">No.</th>
+                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Bidang & Kegiatan</th>
+                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Anggota</th>
+                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-32 dark:text-gray-400">Target</th>
+                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-40 dark:text-gray-400">Status Penugasannya</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+                                        @foreach ($unfinishedAsAnggota as $index => $penugasan)
+                                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150 cursor-pointer"
+                                                onclick="window.location.href='{{ route('sub.kegiatan.show', ['kegiatan' => $penugasan->subKegiatan->id_kegiatan, 'subKegiatan' => $penugasan->id_sub_kegiatan]) }}#penugasan-{{ $penugasan->id_penugasan }}'">
+                                                <td class="px-4 py-4 text-sm text-gray-600 font-medium text-center dark:text-gray-400">
+                                                    {{ $unfinishedAsAnggota->firstItem() + $index }}
+                                                </td>
+                                                <td class="px-4 py-4">
+                                                    <div class="flex flex-col gap-1">
+                                                        <span class="text-xs text-brand-600 font-medium dark:text-brand-400 line-clamp-1">
+                                                            {{ $penugasan->subKegiatan->kegiatan->bidang->nama_bidang ?? '-' }}
+                                                        </span>
+                                                        <span class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2 p-0 w-80 md:w-full break-words">
+                                                            {{ $penugasan->subKegiatan->kegiatan->nama_rk_kegiatan ?? '-' }}
+                                                        </span>
+                                                        <span class="text-xs text-gray-500 font-medium dark:text-gray-400 line-clamp-2">
+                                                            Sub: {{ $penugasan->subKegiatan->nama_sub_kegiatan ?? '-' }}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-4 py-4">
+                                                    <span class="text-sm font-semibold text-gray-900 dark:text-white whitespace-nowrap">
+                                                        {{ $penugasan->anggota->nama_pegawai ?? '-' }}
+                                                    </span>
+                                                </td>
+                                                <td class="px-4 py-4">
+                                                    <span class="inline-flex py-1 px-3 rounded-md bg-gray-100 text-gray-800 text-xs font-bold dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
+                                                        {{ $penugasan->target }} {{ $penugasan->satuan_target }}
+                                                    </span>
+                                                </td>
+                                                <td class="px-4 py-4 whitespace-nowrap">
+                                                    @php
+                                                        $statusInfo = $penugasan->statusPenugasan();
+                                                    @endphp
+                                                    <span class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full {{ $statusInfo['class'] ?? 'bg-gray-100 text-gray-600' }}">
+                                                        {{ $statusInfo['label'] ?? 'Tidak Diketahui' }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+                                {{ $unfinishedAsAnggota->links() }}
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 @endif
             @endauth
 
@@ -131,6 +200,75 @@
                             </div>
                         </div>
                     </div>
+
+                    {{-- ===== DAFTAR PENUGASAN BELUM SELESAI SBG KETUA ===== --}}
+                    @if(isset($unfinishedAsKetua) && $unfinishedAsKetua->count() > 0)
+                    <div class="mb-8">
+                        <div class="flex items-center gap-2 mb-4">
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-white">Daftar Penugasan Anggota Belum Selesai (Sebagai Ketua Tim)</h3>
+                            <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-amber-200 dark:text-amber-800">Ketua Tim</span>
+                        </div>
+                        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 shadow-sm overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                    <thead class="bg-gray-50 dark:bg-gray-800">
+                                        <tr>
+                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-16 dark:text-gray-400">No.</th>
+                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Bidang & Kegiatan</th>
+                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Anggota</th>
+                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-32 dark:text-gray-400">Target</th>
+                                            <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-40 dark:text-gray-400">Status Penugasannya</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+                                        @foreach ($unfinishedAsKetua as $index => $penugasan)
+                                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150 cursor-pointer"
+                                                onclick="window.location.href='{{ route('sub.kegiatan.show', ['kegiatan' => $penugasan->subKegiatan->id_kegiatan, 'subKegiatan' => $penugasan->id_sub_kegiatan]) }}#penugasan-{{ $penugasan->id_penugasan }}'">
+                                                <td class="px-4 py-4 text-sm text-gray-600 font-medium text-center dark:text-gray-400">
+                                                    {{ $unfinishedAsKetua->firstItem() + $index }}
+                                                </td>
+                                                <td class="px-4 py-4">
+                                                    <div class="flex flex-col gap-1">
+                                                        <span class="text-xs text-brand-600 font-medium dark:text-brand-400 line-clamp-1">
+                                                            {{ $penugasan->subKegiatan->kegiatan->bidang->nama_bidang ?? '-' }}
+                                                        </span>
+                                                        <span class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2 p-0 w-80 md:w-full break-words">
+                                                            {{ $penugasan->subKegiatan->kegiatan->nama_rk_kegiatan ?? '-' }}
+                                                        </span>
+                                                        <span class="text-xs text-gray-500 font-medium dark:text-gray-400 line-clamp-2">
+                                                            Sub: {{ $penugasan->subKegiatan->nama_sub_kegiatan ?? '-' }}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-4 py-4">
+                                                    <span class="text-sm font-semibold text-gray-900 dark:text-white whitespace-nowrap">
+                                                        {{ $penugasan->anggota->nama_pegawai ?? '-' }}
+                                                    </span>
+                                                </td>
+                                                <td class="px-4 py-4">
+                                                    <span class="inline-flex py-1 px-3 rounded-md bg-gray-100 text-gray-800 text-xs font-bold dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
+                                                        {{ $penugasan->target }} {{ $penugasan->satuan_target }}
+                                                    </span>
+                                                </td>
+                                                <td class="px-4 py-4 whitespace-nowrap">
+                                                    @php
+                                                        $statusInfo = $penugasan->statusPenugasan();
+                                                    @endphp
+                                                    <span class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full {{ $statusInfo['class'] ?? 'bg-gray-100 text-gray-600' }}">
+                                                        {{ $statusInfo['label'] ?? 'Tidak Diketahui' }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+                                {{ $unfinishedAsKetua->links() }}
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 @endif
             @endauth
         @elseif (auth()->user()->isKetuaTim())
