@@ -86,22 +86,10 @@ class PenugasanPolicy
      */
     public function delete(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        // hanya yang boleh manage (ketua / admin / pimpinan)
-        if (! $this->canManagePenugasan($pegawai, $penugasan)) {
-            return false;
-        }
-
-        // kalau sudah ada pengiriman → tidak boleh hapus
-        if ($penugasan->latestPengiriman) {
-            return false;
-        }
-
-        // kalau sudah diterima → tidak boleh hapus
-        if ($penugasan->latestPenerimaan?->status === 'Diterima') {
-            return false;
-        }
-
-        return true;
+        return $this->canManagePenugasan($pegawai, $penugasan)
+            && ! $penugasan->latestPengiriman
+            && $penugasan->latestPenerimaan?->status !== 'Diterima'
+            && ! $penugasan->kalenderDls()->exists();
     }
 
     // === PENGIRIMAN ===
@@ -184,7 +172,7 @@ class PenugasanPolicy
             ->whereHas('penerimaan', fn ($q) => $q->where('status', 'Diterima'))
             ->exists();
     }
-    
+
     /**
      * Determine whether the user can restore the model.
      */

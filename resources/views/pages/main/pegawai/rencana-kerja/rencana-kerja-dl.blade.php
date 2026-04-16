@@ -37,19 +37,19 @@
                 <!-- BODY -->
                 <div class="px-6 py-5 space-y-3 text-sm text-gray-700 dark:text-gray-400">
                     <div>
-                        <span class="font-medium text-gray-800 dark:text-gray-300">Nama Pegawai:</span><br>
+                        <span class="font-medium text-gray-800 dark:text-gray-300">Nama Pegawai :</span><br>
                         <span x-text="formData.nama_pegawai"></span>
                     </div>
 
                     <div>
-                        <span class="font-medium text-gray-800 dark:text-gray-300">Jenis Kegiatan:</span><br>
+                        <span class="font-medium text-gray-800 dark:text-gray-300">Jenis Kegiatan :</span><br>
                         <span x-text="formData.jenis_kegiatan"></span>
                     </div>
 
                     <div>
-                        <span class="font-medium text-gray-800 dark:text-gray-300">Waktu Pelaksanaan:</span><br>
+                        <span class="font-medium text-gray-800 dark:text-gray-300">Waktu Pelaksanaan :</span><br>
                         <span x-text="formData.tanggal_mulai"></span>
-                        –
+                        s.d.
                         <span x-text="formData.tanggal_selesai"></span>
                     </div>
                 </div>
@@ -140,7 +140,7 @@
                     <div>
                         <span class="font-medium text-gray-800 dark:text-gray-300">Waktu Pelaksanaan:</span><br>
                         <span x-text="formData.tanggal_mulai"></span>
-                        â€“
+                        s.d
                         <span x-text="formData.tanggal_selesai"></span>
                     </div>
                 </div>
