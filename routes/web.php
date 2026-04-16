@@ -102,16 +102,16 @@ Route::middleware('auth')->group(function () {
     // END BIDANG KERJA BY ADMIN
 
     // CRUD ANNOUNCEMENT BY ADMIN
-    Route::prefix('admin')->middleware('can:kelola-master-data')->group(function () {
-        Route::get('/announcements', [AnnouncementController::class, 'index'])
+    Route::prefix('announcements')->middleware('can:kelola-master-data')->group(function () {
+        Route::get('/', [AnnouncementController::class, 'index'])
             ->name('announcements.index');
-        Route::post('/announcements', [AnnouncementController::class, 'store'])
+        Route::post('/', [AnnouncementController::class, 'store'])
             ->name('announcements.store');
-        Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])
+        Route::put('/{announcement}', [AnnouncementController::class, 'update'])
             ->name('announcements.update');
-        Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])
+        Route::delete('/{announcement}', [AnnouncementController::class, 'destroy'])
             ->name('announcements.destroy');
-        Route::post('/announcements/{announcement}/toggle', [AnnouncementController::class, 'toggleActive'])
+        Route::post('/{announcement}/toggle', [AnnouncementController::class, 'toggleActive'])
             ->name('announcements.toggle');
     });
 
@@ -205,6 +205,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/ckp-pegawai', [CkpPegawaiController::class, 'index'])->name('ckp.pegawai.index');
     Route::put('/ckp-pegawai/{id}', [CkpPegawaiController::class, 'update'])->name('ckp.pegawai.update');
 });
+
 
 Route::get('/api/active-announcements', [AnnouncementController::class, 'getActiveAnnouncements']);
 

@@ -31,7 +31,7 @@ class MenuHelper
                     ['name' => 'Bidang Kerja', 'path' => '/bidang-kerja'],
                     ['name' => 'Jenis Kegiatan', 'path' => '/jenis-kegiatan'],
                     ['name' => 'Kelola Role Pegawai', 'path' => '/role-pegawai'],
-                    ['name' => 'Kelola Pengumuman', 'path' => '/admin/announcements'],
+                    ['name' => 'Kelola Pengumuman', 'path' => '/announcements'],
                 ],
             ],
             [

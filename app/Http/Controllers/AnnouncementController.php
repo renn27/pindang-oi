@@ -122,7 +122,6 @@ class AnnouncementController extends Controller
     }
 
     public function pegawaiIndex() {
-        $this->authorize('kelola-master-data');
         $announcements = Announcement::orderBy('created_at', 'desc')->get();
 
         return view('pages.main.admin.announcements.pengumuman_pegawai', [
