@@ -128,7 +128,6 @@ class PegawaiRoleController extends Controller
     }
 
     public function switchRolePegawai(Request $request, string $role) {
-        $this->authorize('kelola-master-data');
         $user = $request->user();
         abort_if(! $user, 401);
 
