@@ -178,7 +178,7 @@ class CkpPegawaiController extends Controller
         ];
 
         if ($bulan !== 'all') {
-            $namaBulan = $bulanList[$bulan];
+            $namaBulan = $bulanList[$bulan] ?? '-';
             $hariAkhir = Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth()->day;
             $periodeStr = "1 - {$hariAkhir} {$namaBulan} {$tahun}";
         } else {
@@ -197,8 +197,7 @@ class CkpPegawaiController extends Controller
         $ckpList = CkpPegawai::with(['pegawai', 'penugasan'])
             ->where('id_pegawai', $userId)
             ->whereHas('penugasan.pengirimans', function ($query) use ($startDate, $endDate) {
-                $query->whereDate('tanggal_pengiriman', '<=', $endDate)
-                        ->whereDate('tanggal_pengiriman', '>=', $startDate);
+                $query->whereBetween('tanggal_pengiriman', [$startDate, $endDate]);
             })
             ->orderBy('jenis_ckp', 'asc')
             ->orderBy('created_at', 'asc')
@@ -211,10 +210,6 @@ class CkpPegawaiController extends Controller
         $nipPegawai       = $pegawai->nip ?? 'NIP Pegawai';
         $namaPejabat      = 'Nama Pejabat Penilai';
         $nipPejabat       = 'NIP Pejabat Penilai';
-
-        $namaBulan  = $bulanList[$bulan];
-        $hariAkhir  = \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth()->day;
-        $periodeStr = "1 - {$hariAkhir} {$namaBulan} {$tahun}";
 
         // ─────────────────────────────────────────────────────────
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -418,7 +413,7 @@ class CkpPegawaiController extends Controller
         ]);
         $sheet->getStyle("A{$currentRow}:G{$currentRow}")->applyFromArray($borderAll);
         $sheet->getRowDimension($currentRow)->setRowHeight(16);
-        $currentRow += 2; // +1 baris spasi
+        $currentRow += 2;
 
         // ── Kesepakatan Target ───────────────────────────────────
         $sheet->mergeCells("A{$currentRow}:G{$currentRow}");

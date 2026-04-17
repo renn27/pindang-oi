@@ -84,7 +84,7 @@ class MenuHelper
 
         $allowed = $user->isActiveRole('Ketua Tim')
             ? ['Dashboard', 'Tagihan Kerja', 'Rencana Kinerja', 'Kalender', 'CKP Saya']
-            : ['Dashboard', 'Tagihan Kerja', 'Kalender', 'CKP Saya'];
+            : ['Dashboard', 'Rencana Kinerja', 'Tagihan Kerja', 'Kalender', 'CKP Saya'];
 
         return array_map(
             fn($menu) => self::normalizeMenuItem($menu),

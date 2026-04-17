@@ -161,12 +161,12 @@ Route::middleware('auth')->group(function () {
     // CRUD PENUGASAN  BY KETUA TIM
 
     // ROUTE MASTER KEGIATAN
-    Route::prefix('/master-kegiatan')->middleware('can:create,App\Models\Kegiatan')->group(function () {
+    Route::prefix('/master-kegiatan')->group(function () {
         Route::get('/', [MasterKegiatanController::class, 'index'])->name('master-kegiatan.index');
-        Route::post('/', [MasterKegiatanController::class, 'store'])->name('master-kegiatan.store');
+        Route::post('/', [MasterKegiatanController::class, 'store'])->name('master-kegiatan.store')->middleware('can:create,App\Models\Kegiatan');
     });
 
-    Route::get('/rencana-kerja-dl', [MasterKegiatanController::class, 'index_rk_dl'])->name('master-kegiatan.index_rk_dl')->middleware('can:kelola-master-data');
+    Route::get('/rencana-kerja-dl', [MasterKegiatanController::class, 'index_rk_dl'])->name('master-kegiatan.index_rk_dl');
     Route::put('/penugasan/{penugasan:id_penugasan}/rencana-kerja-dl', [PenugasanController::class, 'update_rk_dl'])->name('penugasan.update_rk_dl')->middleware('can:acceptDL,App\Models\Penugasan,penugasan');
     Route::put('/penugasan/{penugasan:id_penugasan}/rencana-kerja-translok', [PenugasanController::class, 'update_rk_translok'])->name('penugasan.update_rk_translok')->middleware('can:acceptTranslok,App\Models\Penugasan,penugasan');
     // END ROUTE MASTER KEGIATAN

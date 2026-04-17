@@ -61,10 +61,10 @@
             })();
         </script>
     </head>
-    
+
     <body class="font-sans text-gray-900 antialiased dark:bg-gray-900 dark:text-gray-100"
           x-data="{ loaded: true }">
-        
+
         <!-- Preloader untuk Guest Layout -->
         <div x-show="!loaded" class="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-gray-900">
             <div class="flex flex-col items-center">
