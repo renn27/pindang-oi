@@ -12,8 +12,7 @@
     <button
         class="flex items-center text-gray-700 dark:text-gray-400"
         @click.prevent="toggleDropdown()"
-        type="button"
-    >
+        type="button">
         <span class="mr-3 overflow-hidden rounded-full h-11 w-11">
             <img src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/user/userlogodefault.png') }}"
                 class="h-full w-full object-cover"/>
@@ -29,8 +28,7 @@
             :class="{ 'rotate-180': dropdownOpen }"
             fill="none"
             stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
+            viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M19 9l-7 7-7-7">
             </path>
@@ -47,14 +45,13 @@
         x-transition:leave-start="transform opacity-100 scale-100"
         x-transition:leave-end="transform opacity-0 scale-95"
         class="absolute right-0 mt-3 w-[280px] rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800 z-50"
-        style="display: none;"
-    >
+        style="display: none;">
 
         <!-- User Info -->
         <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700">
             <div class="flex items-center gap-4">
                 <div class="h-14 w-14 overflow-hidden rounded-full border border-gray-200 dark:border-gray-600">
-                    <img 
+                    <img
                         src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('images/user/userlogodefault.png') }}"
                         class="h-full w-full object-cover"
                         alt="{{ Auth::user()->username }}"
@@ -117,8 +114,7 @@
                                     {{ $activeRole === $role
                                         ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800'
                                         : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 border border-transparent hover:border-gray-200 dark:hover:border-gray-700'
-                                    }}"
-                            >
+                                    }}">
                                 <div class="flex items-center justify-between">
                                     <span class="font-medium">{{ $role }}</span>
                                     @if($activeRole === $role)
@@ -149,8 +145,7 @@
         <div class="px-2 py-2">
             <a
                 href="{{ route('profile') }}"
-                class="flex items-center gap-3 px-4 py-3.5 rounded-lg text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors duration-150"
-            >
+                class="flex items-center gap-3 px-4 py-3.5 rounded-lg text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors duration-150">
                 <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -165,8 +160,7 @@
                 @csrf
                 <button
                     type="submit"
-                    class="flex items-center gap-3 w-full px-4 py-3.5 rounded-lg text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors duration-150"
-                >
+                    class="flex items-center gap-3 w-full px-4 py-3.5 rounded-lg text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors duration-150">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                     </svg>

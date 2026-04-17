@@ -1,6 +1,6 @@
 <?php
 
-namespace App\View\Components\Profile;
+namespace App\View\Components\Dashboard;
 
 use App\Services\DashboardAnalyticsService;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -30,6 +30,6 @@ class VisRankPegawai extends Component
      */
     public function render(): View
     {
-        return view('components.profile.vis-rank-pegawai');
+        return view('components.dashboard.vis-rank-pegawai');
     }
 }

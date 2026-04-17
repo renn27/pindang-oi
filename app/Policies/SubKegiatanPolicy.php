@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Pegawai;
 use App\Models\SubKegiatan;
-use Illuminate\Auth\Access\Response;
 
 class SubKegiatanPolicy
 {

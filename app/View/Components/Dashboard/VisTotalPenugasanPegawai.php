@@ -1,6 +1,6 @@
 <?php
 
-namespace App\View\Components\Profile;
+namespace App\View\Components\Dashboard;
 
 use App\Services\DashboardAnalyticsService;
 use Illuminate\View\Component;
@@ -34,6 +34,6 @@ class VisTotalPenugasanPegawai extends Component
      */
     public function render(): View
     {
-        return view('components.profile.vis-total-penugasan-pegawai');
+        return view('components.dashboard.vis-total-penugasan-pegawai');
     }
 }

@@ -33,7 +33,7 @@ class Penugasan extends Model
     ];
 
     protected $casts = [
-        'tanggal_mulai'   => 'date',
+        'tanggal_mulai' => 'date',
         'tanggal_selesai' => 'date',
     ];
 
@@ -74,7 +74,7 @@ class Penugasan extends Model
         static::created(function ($penugasan) {
             $pegawai = Pegawai::find($penugasan->id_anggota);
 
-            if ($pegawai && $pegawai->active_role !== 'Anggota Tim') {
+            if ($pegawai && $pegawai->active_role !== 'Anggota Tim' && $pegawai->id_pegawai !== auth()->user()?->id_pegawai) {
                 $pegawai->update([
                     'active_role' => 'Anggota Tim'
                 ]);
@@ -108,10 +108,6 @@ class Penugasan extends Model
         );
     }
 
-    // public function latestPenerimaan()
-    // {
-    //     return $this->latestPengiriman?->penerimaan;
-    // }
     public function latestPenerimaan()
     {
         return $this->hasOneThrough(
@@ -123,18 +119,6 @@ class Penugasan extends Model
             'id_pengiriman'      // local key di Pengiriman
         )->latestOfMany('created_at');
     }
-
-    // public function isDinasLuar()
-    // {
-    //     $jenisKegiatan = [
-    //         'Pengawasan',
-    //         'Pendataan',
-    //         'Supervisi',
-    //         'Perjalanan Dinas',
-    //     ];
-
-    //     return in_array($this->jenisKegiatan->jenis_kegiatan, $jenisKegiatan);
-    // }
 
     public function isDinasLuar()
     {
@@ -159,7 +143,7 @@ class Penugasan extends Model
     public function bolehTerimaPenugasan(): bool
     {
         // 1️⃣ Belum masuk waktu
-        if (! $this->isStarted()) {
+        if (!$this->isStarted()) {
             return false;
         }
 
@@ -167,23 +151,23 @@ class Penugasan extends Model
         $latestPenerimaan = $this->latestPenerimaan;
 
         // 2️⃣ Belum ada pengiriman sama sekali
-        if (! $latestPengiriman) {
+        if (!$latestPengiriman) {
             return false;
         }
 
         return
-            ! $latestPenerimaan ||
+            !$latestPenerimaan ||
             $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman;
     }
 
     public function tooltipPenerimaanPenugasan(): ?string
     {
-        $today   = Carbon::today();
-        $mulai   = Carbon::parse($this->tanggal_mulai);
+        $today = Carbon::today();
+        $mulai = Carbon::parse($this->tanggal_mulai);
         $selesai = Carbon::parse($this->tanggal_selesai);
 
         // ⏳ BELUM MULAI
-        if (! $this->isStarted()) {
+        if (!$this->isStarted()) {
             $hari = now()->startOfDay()->diffInDays($mulai, false);
 
             return 'info|Penugasan Belum dimulai · Aktif ' . $hari . ' hari lagi';
@@ -193,7 +177,7 @@ class Penugasan extends Model
         $latestPenerimaan = $this->latestPenerimaan;
 
         // ❌ BELUM ADA PENGIRIMAN
-        if (! $latestPengiriman) {
+        if (!$latestPengiriman) {
             return 'info|Belum ada pengiriman dari anggota tim';
         }
 
@@ -228,12 +212,12 @@ class Penugasan extends Model
     public function bolehKirimPenugasan(): bool
     {
         // 1️⃣ BELUM DIMULAI → TUTUP BUTTON
-        if (! $this->isStarted()) {
+        if (!$this->isStarted()) {
             return false;
         }
 
         // 2️⃣ Jenis DL tapi belum masuk kalender DL
-        if ($this->isDinasLuar() && ! $this->sudahMasukKalenderDL()) {
+        if ($this->isDinasLuar() && !$this->sudahMasukKalenderDL()) {
             return false;
         }
 
@@ -241,7 +225,7 @@ class Penugasan extends Model
         $latestPenerimaan = $this->latestPenerimaan;
 
         // 2️⃣ Ada pengiriman terbaru tapi BELUM ada penerimaan utk pengiriman tsb
-        if ($latestPengiriman && (! $latestPenerimaan || $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman)) {
+        if ($latestPengiriman && (!$latestPenerimaan || $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman)) {
             return false; // sedang diperiksa
         }
 
@@ -251,12 +235,12 @@ class Penugasan extends Model
 
     public function tooltipPengirimanPenugasan(): ?string
     {
-        $today   = Carbon::today();
-        $mulai   = Carbon::parse($this->tanggal_mulai);
+        $today = Carbon::today();
+        $mulai = Carbon::parse($this->tanggal_mulai);
         $selesai = Carbon::parse($this->tanggal_selesai);
 
         // ⏳ BELUM MULAI
-        if (! $this->isStarted()) {
+        if (!$this->isStarted()) {
             $hari = now()->startOfDay()->diffInDays($mulai, false);
 
             return 'info|Penugasan Belum dimulai · Aktif ' . $hari . ' hari lagi';
@@ -266,8 +250,10 @@ class Penugasan extends Model
         $latestPenerimaan = $this->latestPenerimaan;
 
         // ⚠️ Sedang diperiksa (kapan pun, termasuk lewat deadline)
-        if ($latestPengiriman && (! $latestPenerimaan ||
-            $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman)) {
+        if (
+            $latestPengiriman && (!$latestPenerimaan ||
+                $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman)
+        ) {
             // Telat tapi masih diperiksa
             if ($today->gt($selesai)) {
                 return 'danger|Penerimaan sudah lewat batas waktu, tapi belum diterima ketua tim';
@@ -277,7 +263,7 @@ class Penugasan extends Model
         }
 
         // 🟠 DL TAPI BELUM ACC PIMPINAN
-        if ($this->isDinasLuar() && ! $this->sudahMasukKalenderDL()) {
+        if ($this->isDinasLuar() && !$this->sudahMasukKalenderDL()) {
             return 'warning|Pengajuan DL masih menunggu persetujuan pimpinan';
         }
 
@@ -293,8 +279,8 @@ class Penugasan extends Model
 
     public function statusPenugasan(): array
     {
-        $today            = Carbon::today();
-        $deadline         = Carbon::parse($this->tanggal_selesai)->startOfDay();
+        $today = Carbon::today();
+        $deadline = Carbon::parse($this->tanggal_selesai)->startOfDay();
         $latestPengiriman = $this->latestPengiriman;
         $latestPenerimaan = $this->latestPenerimaan;
 
@@ -348,7 +334,7 @@ class Penugasan extends Model
         | 3️⃣ DEADLINE LEWAT, SUDAH KIRIM TAPI BELUM ADA PENERIMAAN
         |--------------------------------------------------------------------------
         */
-        if ($today->gt($deadline) && $latestPengiriman && ! $latestPenerimaan) {
+        if ($today->gt($deadline) && $latestPengiriman && !$latestPenerimaan) {
             return [
                 'label' => 'Belum Diterima Ketua Tim',
                 'class' => 'bg-red-100 text-red-600',
@@ -360,7 +346,7 @@ class Penugasan extends Model
         | 4️⃣ SUDAH KIRIM, MASIH DALAM DEADLINE, BELUM ADA PENERIMAAN
         |--------------------------------------------------------------------------
         */
-        if ($latestPengiriman && ! $latestPenerimaan) {
+        if ($latestPengiriman && !$latestPenerimaan) {
             return [
                 'label' => 'Menunggu Penerimaan',
                 'class' => 'bg-yellow-100 text-yellow-700',
@@ -395,10 +381,12 @@ class Penugasan extends Model
         $latestPenerimaan = $this->latestPenerimaan;
 
         // 1️⃣ Ada pengiriman terbaru tapi belum ada penerimaan utk pengiriman tsb
-        if ($latestPengiriman && (
-            !$latestPenerimaan ||
-            $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman
-        )) {
+        if (
+            $latestPengiriman && (
+                !$latestPenerimaan ||
+                $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman
+            )
+        ) {
             return [
                 'label' => 'Menunggu Diperiksa',
                 'class' => 'bg-yellow-100 text-yellow-600',
@@ -411,8 +399,8 @@ class Penugasan extends Model
                 'label' => $latestPenerimaan->status,
                 'class' => match ($latestPenerimaan->status) {
                     'Diterima' => 'bg-green-100 text-green-700',
-                    'Revisi'   => 'bg-red-100 text-red-500',
-                    default    => 'bg-gray-100 text-gray-500',
+                    'Revisi' => 'bg-red-100 text-red-500',
+                    default => 'bg-gray-100 text-gray-500',
                 },
             ];
         }

@@ -47,18 +47,6 @@ class Pegawai extends Authenticatable
             $this->isActiveRole('Anggota Tim');
     }
 
-    // // Cek apakah pegawai ini penanggung jawab kegiatan
-    // public function isKetuaOfKegiatan(Kegiatan $kegiatan): bool {
-    //     return $kegiatan->id_penanggung_jawab === $this->id_pegawai;
-    // }
-
-    // // Cek apakah pegawai ini anggota penugasan pada sub kegiatan tertentu
-    // public function isAnggotaOfSubKegiatan(SubKegiatan $subKegiatan): bool {
-    //     return $subKegiatan->penugasan
-    //         ->pluck('id_pegawai')
-    //         ->contains($this->id_pegawai);
-    // }
-
     public function kegiatanYangDipimpin()
     {
         return $this->hasMany(Kegiatan::class, 'id_penanggung_jawab', 'id_pegawai');

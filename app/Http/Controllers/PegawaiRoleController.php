@@ -57,13 +57,6 @@ class PegawaiRoleController extends Controller
             'roles.*'    => 'exists:roles,id',
         ]);
 
-        // 🛡️ safety: URL & body harus konsisten
-        abort_if(
-            $validated['id_pegawai'] != $pegawais->id_pegawai,
-            422,
-            'Pegawai tidak valid'
-        );
-
         $pegawai = Pegawai::with('roles')->findOrFail($validated['id_pegawai']);
 
         // SIMPAN STATE SEBELUM UPDATE
@@ -95,30 +88,21 @@ class PegawaiRoleController extends Controller
         // PENENTUAN ACTIVE ROLE (FIX BUG)
         $currentRoleNames = $pegawai->roles->pluck('nama_role')->toArray();
 
-        // 1️⃣ Jika active_role lama masih ada → BIARKAN
-        if (
-            $previousActiveRole &&
-            in_array($previousActiveRole, $currentRoleNames)
-        ) {
-            // do nothing
-        }
-
-        // 2️⃣ Jika masih ada role struktural lain → pakai itu
-        elseif (! empty($currentRoleNames)) {
+        if ($previousActiveRole && in_array($previousActiveRole, $currentRoleNames)) {
+            // 1️⃣ Jika active_role lama masih ada → BIARKAN
+            return;
+        } elseif (! empty($currentRoleNames)) {
+            // 2️⃣ Jika masih ada role struktural lain → pakai itu
             $pegawai->update([
                 'active_role' => $currentRoleNames[0],
             ]);
-        }
-
-        // 3️⃣ Tidak ada role struktural → fallback ke role kontekstual
-        elseif ($pegawai->penugasanSebagaiAnggota()->exists()) {
+        } elseif ($pegawai->penugasanSebagaiAnggota()->exists()) {
+            // 3️⃣ Tidak ada role struktural → fallback ke role kontekstual
             $pegawai->update([
                 'active_role' => 'Anggota Tim',
             ]);
-        }
-
-        // 4️⃣ Benar-benar kosong
-        else {
+        } else {
+            // 4️⃣ Benar-benar kosong
             $pegawai->update([
                 'active_role' => null,
             ]);

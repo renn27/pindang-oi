@@ -31,16 +31,12 @@ class PenugasanController extends Controller
             'tanggal_mulai' => ['required', 'date'],
             'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
 
-            // tanggal tambahan (OPSIONAL)
             'tanggal_mulai_list' => ['nullable', 'array'],
             'tanggal_mulai_list.*' => ['nullable', 'date'],
             'tanggal_selesai_list' => ['nullable', 'array'],
             'tanggal_selesai_list.*' => ['nullable', 'date'],
         ]);
 
-        /**
-         * 🔥 HANDLE JENIS KEGIATAN (LAINNYA / EXISTING)
-         */
         if ($validated['id_jenis_kegiatan'] === 'LAINNYA') {
             if (empty($validated['jenis_kegiatan_baru'])) {
                 return back()->withErrors([
@@ -54,10 +50,6 @@ class PenugasanController extends Controller
             ]);
 
             $validated['id_jenis_kegiatan'] = $jenis->id;
-        } else {
-            if (!JenisKegiatan::where('id', $validated['id_jenis_kegiatan'])->exists()) {
-                abort(422, 'Jenis kegiatan tidak valid');
-            }
         }
 
         unset($validated['jenis_kegiatan_baru']);
@@ -68,22 +60,18 @@ class PenugasanController extends Controller
         $requestButuhDl = (bool) ($validated['butuh_dl'] ?? false);
         $requestButuhTranslok = (bool) ($validated['butuh_translok'] ?? false);
 
-        // DEFAULT: semua false
         $butuhDl = false;
         $butuhTranslok = false;
 
         if ($wajibDl) {
-            // Untuk 4 jenis kegiatan → wajib pilih salah satu
             if ($requestButuhDl) {
                 $butuhDl = true;
             } elseif ($requestButuhTranslok) {
                 $butuhTranslok = true;
             } else {
-                // fallback (kalau user gak pilih apa2)
                 $butuhDl = true; // default ke DL (sesuai UI kamu)
             }
         } else {
-            // selain 4 jenis → tidak boleh keduanya
             $butuhDl = false;
             $butuhTranslok = false;
         }
@@ -94,7 +82,6 @@ class PenugasanController extends Controller
         $validated['butuh_translok'] = $butuhTranslok;
         $validated['status_translok'] = $butuhTranslok ? 'Menunggu' : null;
 
-        // STATUS AWAL PENUGASAN
         $validated['status'] = 'Belum Dikirim';
 
         $validDatesToSave = $this->extractAndValidateDates(
@@ -108,7 +95,6 @@ class PenugasanController extends Controller
 
         try {
             foreach ($validDatesToSave as $tgl) {
-                // Set array validasi dengan tanggal masing-masing iterasi
                 $validated['tanggal_mulai'] = $tgl['mulai'];
                 $validated['tanggal_selesai'] = $tgl['selesai'];
 
@@ -118,27 +104,22 @@ class PenugasanController extends Controller
 
             DB::commit();
 
-            // /**
-            //  * 🔄 SET ACTIVE ROLE PEGAWAI → ANGGOTA TIM (KONTEKSTUAL)
-            //  */
-            // $pegawai = Pegawai::find($validated['id_anggota']);
-
-            // if ($pegawai && $pegawai->active_role !== 'Anggota Tim') {
-            //     $pegawai->update([
-            //         'active_role' => 'Anggota Tim'
-            //     ]);
-            // }
-
-            return redirect()
+            $isSelfAssign = $validated['id_anggota'] == auth()->user()?->id_pegawai;
+            
+            $response = redirect()
                 ->route('sub.kegiatan.show', [
                     'kegiatan' => $subKegiatan->kegiatan->id_kegiatan,
                     'subKegiatan' => $subKegiatan->id_sub_kegiatan
                 ])
                 ->with('success', 'Penugasan kepada anggota berhasil dilakukan.');
+                
+            if ($isSelfAssign) {
+                $response->with('info', 'Anda menambahkan diri anda sendiri di penugasan sub kegiatan ini.');
+            }
+            
+            return $response;
         } catch (\Exception $e) {
-            // dd($e->getMessage());
-            // DB::rollBack();
-            // Log::error('Gagal membuat penugasan: ' . $e->getMessage());
+            Log::error('Gagal membuat penugasan: ' . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'Gagal membuat penugasan kepada anggota. Silakan coba lagi.')
                 ->withInput();

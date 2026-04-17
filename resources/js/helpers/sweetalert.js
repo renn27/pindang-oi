@@ -188,13 +188,73 @@ const SwalHelper = {
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
-                    </button>
+                     </button>
                 </div>
             `,
             didOpen: () => {
                 const progressBar = Swal.getHtmlContainer().querySelector('.swal2-timer-progress-bar');
                 if (progressBar) {
                     progressBar.style.background = '#f59e0b';
+                }
+            }
+        })
+    },
+
+    stacked(messages) {
+        let htmlContent = '';
+        
+        messages.forEach((msg, index) => {
+            const isLast = index === messages.length - 1;
+            const borderClass = isLast ? '' : 'border-b border-gray-100 dark:border-gray-800';
+            
+            let bgIcon, textIcon, svgIcon, title;
+            if (msg.type === 'success') {
+                bgIcon = 'bg-green-100 dark:bg-green-900/30';
+                textIcon = 'text-green-600 dark:text-green-400';
+                svgIcon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>';
+                title = msg.title || 'Berhasil';
+            } else if (msg.type === 'info') {
+                bgIcon = 'bg-blue-100 dark:bg-blue-900/30';
+                textIcon = 'text-blue-600 dark:text-blue-400';
+                svgIcon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+                title = msg.title || 'Informasi';
+            } else if (msg.type === 'error') {
+                bgIcon = 'bg-red-100 dark:bg-red-900/30';
+                textIcon = 'text-red-600 dark:text-red-400';
+                svgIcon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+                title = msg.title || 'Terjadi Kesalahan';
+            }
+            
+            htmlContent += `
+                <div class="flex items-start gap-3 p-4 ${borderClass}">
+                    <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full ${bgIcon}">
+                        <svg class="h-4 w-4 ${textIcon}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            ${svgIcon}
+                        </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-medium text-gray-900 dark:text-white">${title}</p>
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">${msg.message}</p>
+                    </div>
+                    ${index === 0 ? `
+                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                    ` : '<div class="w-6 ml-2"></div>'}
+                </div>
+            `;
+        });
+
+        return Swal.fire({
+            ...toastConfig,
+            timer: 4500,
+            html: `<div>${htmlContent}</div>`,
+            didOpen: () => {
+                const progressBar = Swal.getHtmlContainer().querySelector('.swal2-timer-progress-bar');
+                if (progressBar) {
+                    progressBar.style.background = '#10b981'; 
                 }
             }
         })

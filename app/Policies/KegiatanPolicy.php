@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Kegiatan;
 use App\Models\Pegawai;
-use Illuminate\Auth\Access\Response;
 
 class KegiatanPolicy
 {

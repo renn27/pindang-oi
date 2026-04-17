@@ -6,10 +6,60 @@ use App\Models\Penugasan;
 use App\Models\Pengiriman;
 use App\Models\Kegiatan;
 use App\Models\SubKegiatan;
-use Illuminate\Support\Facades\Cache;
+use App\Models\Pegawai;
 
 class DashboardAnalyticsService
 {
+
+    public function getRekapPenugasanPegawai($bulan, $tahun) {
+        $pegawai = Pegawai::withCount([
+            // 1. Rekap seluruh penugasan dia bulan ini
+            'penugasanSebagaiAnggota as total_penugasan' => function ($q) use ($bulan, $tahun) {
+                $q->whereMonth('created_at', $bulan)
+                  ->whereYear('created_at', $tahun);
+            },
+            
+            // 2. Rekap penugasan yang sudah disubmit/dikirim (punya pengiriman)
+            'penugasanSebagaiAnggota as total_dikirim' => function ($q) use ($bulan, $tahun) {
+                $q->whereMonth('created_at', $bulan)
+                  ->whereYear('created_at', $tahun)
+                  ->has('pengirimans'); // ada datanya di tabel pengiriman
+            },
+
+            // 3. Rekap penugasan yang sudah diperiksa & terverifikasi "Diterima"
+            'penugasanSebagaiAnggota as total_diterima' => function ($q) use ($bulan, $tahun) {
+                $q->whereMonth('created_at', $bulan)
+                  ->whereYear('created_at', $tahun)
+                  ->whereHas('pengirimans.penerimaan', function ($q2) {
+                      $q2->where('status', 'Diterima');
+                  });
+            },
+
+            // 4. Rekap penugasan yang sudah diperiksa & terverifikasi "Diterima"
+            'penugasanSebagaiAnggota as total_revisi' => function ($q) use ($bulan, $tahun) {
+                $q->whereMonth('created_at', $bulan)
+                  ->whereYear('created_at', $tahun)
+                  ->whereHas('pengirimans.penerimaan', function ($q2) {
+                      $q2->where('status', 'Revisi');
+                  });
+            },
+
+            // 5. Rekap penugasan yang sudah dikirim TAPI belum diterima (Sedang Diperiksa)
+            'penugasanSebagaiAnggota as total_diperiksa' => function ($q) use ($bulan, $tahun) {
+                $q->whereMonth('created_at', $bulan)
+                  ->whereYear('created_at', $tahun)
+                  ->has('pengirimans')
+                  ->whereDoesntHave('pengirimans.penerimaan', function ($q2) {
+                      $q2->where('status', 'Diterima');
+                  });
+            }
+        ])
+        ->orderBy('nama_pegawai', 'asc')
+        ->get();
+
+        return $pegawai;
+    }
+
     public function rankPegawai(int $perPage = 5, $month = null, $year = null)
     {
         $month = $month ?? now()->month;
@@ -242,9 +292,6 @@ class DashboardAnalyticsService
         ];
     }
 
-    /**
-     * Get total kegiatan semua pegawai
-     */
     public function totalKegiatan(): int
     {
         return Penugasan::query()
@@ -253,12 +300,8 @@ class DashboardAnalyticsService
             ->count();
     }
 
-    /**
-     * Get jumlah kegiatan selesai semua pegawai
-     */
     public function kegiatanSelesai(): int
     {
-        // Ambil penugasan dengan pengiriman yang sudah diterima
         return Penugasan::query()
             ->whereHas('pengirimans.penerimaan', function ($query) {
                 $query->where('status', 'Diterima')

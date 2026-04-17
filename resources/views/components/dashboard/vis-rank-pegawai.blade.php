@@ -199,7 +199,12 @@
         </table>
     </div>
 
-    {{-- Pagination --}}
+    <!-- Default Pagination -->
+    <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-800">
+        {{ $rankPegawai->links() }}
+    </div>
+
+    <!-- {{-- Manual Custom Pagination --}}
     @if ($rankPegawai->hasPages())
         <div class="mt-6 border-t border-gray-200 dark:border-gray-800 pt-6">
             <div class="flex items-center justify-between">
@@ -256,5 +261,5 @@
                 </div>
             </div>
         </div>
-    @endif
+    @endif -->
 </div>

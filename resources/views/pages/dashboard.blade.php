@@ -105,7 +105,7 @@
                             </div>
 
                             <div class="col-span-12 xl:col-span-5 space-y-6">
-                                <x-profile.vis-total-penugasan-pegawai :totalpenugasanPegawai="app(\App\Services\DashboardAnalyticsService::class)->summaryPenugasanAnggota(
+                                <x-dashboard.vis-total-penugasan-pegawai :totalpenugasanPegawai="app(\App\Services\DashboardAnalyticsService::class)->summaryPenugasanAnggota(
                                     Auth::user()->id_pegawai,
                                 )" />
                             </div>
@@ -114,10 +114,35 @@
 
                     {{-- ===== DAFTAR PENUGASAN BELUM SELESAI SBG ANGGOTA ===== --}}
                     @if((isset($unfinishedBerjalanAsAnggota) && $unfinishedBerjalanAsAnggota->count() > 0) || (isset($unfinishedTerlewatAsAnggota) && $unfinishedTerlewatAsAnggota->count() > 0))
-                    <div class="mb-8" x-data="{ activeTabAnggota: 'berjalan' }">
-                        <div class="flex items-center gap-2 mb-4">
-                            <h3 class="text-lg font-bold text-gray-800 dark:text-white">Daftar Penugasan Belum Selesai (Sebagai Anggota)</h3>
-                            <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800">Anggota Tim</span>
+                    <div class="mb-8 p-5 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-700/50 rounded-2xl shadow-sm relative overflow-hidden ring-1 ring-yellow-400 dark:ring-yellow-600" x-data="{ 
+                        activeTabAnggota: (new URLSearchParams(window.location.search).has('anggota_terlewat_page') ? 'terlewat' : 'berjalan'),
+                        async fetchTab(e, containerId) {
+                            let link = e.target.closest('nav[role=\'navigation\'] a');
+                            if (link && link.href) {
+                                e.preventDefault();
+                                let container = document.getElementById(containerId);
+                                container.style.opacity = '0.5';
+                                try {
+                                    let res = await fetch(link.href);
+                                    let text = await res.text();
+                                    let doc = new DOMParser().parseFromString(text, 'text/html');
+                                    container.innerHTML = doc.getElementById(containerId).innerHTML;
+                                    window.history.pushState({}, '', link.href);
+                                } finally {
+                                    container.style.opacity = '1';
+                                }
+                            }
+                        }
+                    }">
+                        <!-- Decorative accent border on the left -->
+                        <div class="absolute top-0 left-0 w-2 h-full bg-yellow-400 dark:bg-yellow-500"></div>
+                        
+                        <div class="flex items-center gap-3 mb-5 ml-2">
+                            <span class="p-2 bg-yellow-200 dark:bg-yellow-800 rounded-lg shadow-sm">
+                                <svg class="w-6 h-6 text-yellow-700 dark:text-yellow-300 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </span>
+                            <h3 class="text-xl font-extrabold text-yellow-700 dark:text-yellow-400 animate-pulse tracking-wide">TO DO LIST ANGGOTA</h3>
+                            <span class="bg-orange-100 text-orange-800 text-xs font-bold px-3 py-1 rounded-full border border-orange-200 shadow-sm dark:bg-orange-900 dark:text-orange-300 dark:border-orange-700">Harus Diselesaikan!</span>
                         </div>
 
                         <!-- Tabs -->
@@ -142,7 +167,7 @@
 
                         <!-- Tab Content -->
                         <div>
-                            <div x-show="activeTabAnggota === 'berjalan'" style="display: none;">
+                            <div id="tab-anggota-berjalan" @click="fetchTab($event, 'tab-anggota-berjalan')" x-show="activeTabAnggota === 'berjalan'" style="display: none;" class="transition-opacity duration-200">
                                 @if(isset($unfinishedBerjalanAsAnggota) && $unfinishedBerjalanAsAnggota->count() > 0)
                                     <x-tables.dashboard-penugasan-anggota :penugasans="$unfinishedBerjalanAsAnggota" />
                                 @else
@@ -150,7 +175,7 @@
                                 @endif
                             </div>
 
-                            <div x-show="activeTabAnggota === 'terlewat'" style="display: none;" x-cloak>
+                            <div id="tab-anggota-terlewat" @click="fetchTab($event, 'tab-anggota-terlewat')" x-show="activeTabAnggota === 'terlewat'" style="display: none;" x-cloak class="transition-opacity duration-200">
                                 @if(isset($unfinishedTerlewatAsAnggota) && $unfinishedTerlewatAsAnggota->count() > 0)
                                     <x-tables.dashboard-penugasan-anggota :penugasans="$unfinishedTerlewatAsAnggota" />
                                 @else
@@ -174,7 +199,7 @@
                             </div>
 
                             <div class="col-span-12 xl:col-span-5 space-y-6">
-                                <x-profile.vis-total-kegiatan-ketua :totalkegiatanKetua="app(\App\Services\DashboardAnalyticsService::class)->summaryKegiatanKetua(
+                                <x-dashboard.vis-total-kegiatan-ketua :totalkegiatanKetua="app(\App\Services\DashboardAnalyticsService::class)->summaryKegiatanKetua(
                                     Auth::user()->id_pegawai,
                                 )" />
                             </div>
@@ -183,10 +208,34 @@
 
                     {{-- ===== DAFTAR PENUGASAN BELUM SELESAI SBG KETUA ===== --}}
                     @if((isset($unfinishedBerjalanAsKetua) && $unfinishedBerjalanAsKetua->count() > 0) || (isset($unfinishedTerlewatAsKetua) && $unfinishedTerlewatAsKetua->count() > 0))
-                    <div class="mb-8" x-data="{ activeTabKetua: 'berjalan' }">
-                        <div class="flex items-center gap-2 mb-4">
-                            <h3 class="text-lg font-bold text-gray-800 dark:text-white">Daftar Penugasan Anggota Belum Selesai (Sebagai Ketua Tim)</h3>
-                            <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-amber-200 dark:text-amber-800">Ketua Tim</span>
+                    <div class="mb-8 p-5 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700/50 rounded-2xl shadow-sm relative overflow-hidden ring-1 ring-amber-400 dark:ring-amber-600" x-data="{ 
+                        activeTabKetua: (new URLSearchParams(window.location.search).has('ketua_terlewat_page') ? 'terlewat' : 'berjalan'),
+                        async fetchTab(e, containerId) {
+                            let link = e.target.closest('nav[role=\'navigation\'] a');
+                            if (link && link.href) {
+                                e.preventDefault();
+                                let container = document.getElementById(containerId);
+                                container.style.opacity = '0.5';
+                                try {
+                                    let res = await fetch(link.href);
+                                    let text = await res.text();
+                                    let doc = new DOMParser().parseFromString(text, 'text/html');
+                                    container.innerHTML = doc.getElementById(containerId).innerHTML;
+                                    window.history.pushState({}, '', link.href);
+                                } finally {
+                                    container.style.opacity = '1';
+                                }
+                            }
+                        }
+                    }">
+                        <div class="absolute top-0 left-0 w-2 h-full bg-amber-400 dark:bg-amber-500"></div>
+
+                        <div class="flex items-center gap-3 mb-5 ml-2">
+                            <span class="p-2 bg-amber-200 dark:bg-amber-800 rounded-lg shadow-sm">
+                                <svg class="w-6 h-6 text-amber-700 dark:text-amber-300 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </span>
+                            <h3 class="text-xl font-extrabold text-amber-700 dark:text-amber-400 animate-pulse tracking-wide">TO DO LIST KETUA TIM</h3>
+                            <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full border border-amber-200 shadow-sm dark:bg-amber-900 dark:text-amber-300 dark:border-amber-700">Wajib Diperiksa!</span>
                         </div>
 
                         <!-- Tabs -->
@@ -211,7 +260,7 @@
 
                         <!-- Tab Content -->
                         <div>
-                            <div x-show="activeTabKetua === 'berjalan'" style="display: none;">
+                            <div id="tab-ketua-berjalan" @click="fetchTab($event, 'tab-ketua-berjalan')" x-show="activeTabKetua === 'berjalan'" style="display: none;" class="transition-opacity duration-200">
                                 @if(isset($unfinishedBerjalanAsKetua) && $unfinishedBerjalanAsKetua->count() > 0)
                                     <x-tables.dashboard-penugasan-ketua :penugasans="$unfinishedBerjalanAsKetua" />
                                 @else
@@ -219,7 +268,7 @@
                                 @endif
                             </div>
 
-                            <div x-show="activeTabKetua === 'terlewat'" style="display: none;" x-cloak>
+                            <div id="tab-ketua-terlewat" @click="fetchTab($event, 'tab-ketua-terlewat')" x-show="activeTabKetua === 'terlewat'" style="display: none;" x-cloak class="transition-opacity duration-200">
                                 @if(isset($unfinishedTerlewatAsKetua) && $unfinishedTerlewatAsKetua->count() > 0)
                                     <x-tables.dashboard-penugasan-ketua :penugasans="$unfinishedTerlewatAsKetua" />
                                 @else
@@ -268,7 +317,6 @@
             </div>
         @endif
     @else()
-
         {{-- ===== CARD BESAR ANALYTICS DASHBOARD ===== --}}
         <div class="mb-8">
             <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
@@ -419,9 +467,27 @@
                     </div>
 
                     {{-- ===== RANK EMPLOYEE ===== --}}
-                    <div>
+                    <div id="container-rank-pegawai" x-data="{
+                        async fetchTab(e, containerId) {
+                            let link = e.target.closest('a');
+                            if (link && link.href) {
+                                e.preventDefault();
+                                let container = document.getElementById(containerId);
+                                container.style.opacity = '0.5';
+                                try {
+                                    let res = await fetch(link.href);
+                                    let text = await res.text();
+                                    let doc = new DOMParser().parseFromString(text, 'text/html');
+                                    container.innerHTML = doc.getElementById(containerId).innerHTML;
+                                    window.history.pushState({}, '', link.href);
+                                } finally {
+                                    container.style.opacity = '1';
+                                }
+                            }
+                        }
+                    }" @click="fetchTab($event, 'container-rank-pegawai')" class="transition-opacity duration-200">
                         @auth
-                            <x-profile.vis-rank-pegawai
+                            <x-dashboard.vis-rank-pegawai
                                 :rankPegawai="app(\App\Services\DashboardAnalyticsService::class)->rankPegawai(5, request('month', now()->month), request('year', now()->year))"
                                 :perPage="5" />
                         @endauth
@@ -432,6 +498,12 @@
             </div>
         </div>
 
+    @endif
+
+    @if(auth()->user()->isSuperUser())
+        <div class="mb-8">
+            <x-dashboard.vis-rekap-penugasan-pegawai />
+        </div>
     @endif
 
 </div>

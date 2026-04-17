@@ -130,32 +130,37 @@ window.addEventListener('resize', checkMobile);">
     </div>
 
     @push('scripts')
-        @if (session('success'))
-            <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                    SwalHelper.success(@js(session('success')))
-                })
-            </script>
-        @endif
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const messages = [];
 
-        @if (session('error'))
-            <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                    SwalHelper.error(@js(session('error')))
-                })
-            </script>
-        @endif
+                @if (session('success'))
+                    messages.push({ type: 'success', message: @js(session('success')) });
+                @endif
+                
+                @if (session('error'))
+                    messages.push({ type: 'error', message: @js(session('error')) });
+                @endif
+                
+                @if (session('info'))
+                    messages.push({ type: 'info', message: @js(session('info')) });
+                @endif
 
-        @if (session('info'))
-            <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                    SwalHelper.info(@js(session('info')))
-                })
-            </script>
-        @endif
+                if (messages.length > 1) {
+                    SwalHelper.stacked(messages);
+                } else if (messages.length === 1) {
+                    const msg = messages[0];
+                    if (msg.type === 'success') {
+                        SwalHelper.success(msg.message);
+                    } else if (msg.type === 'error') {
+                        SwalHelper.error(msg.message);
+                    } else if (msg.type === 'info') {
+                        SwalHelper.info(msg.message);
+                    }
+                }
+            });
+        </script>
     @endpush
-
-    <!-- MODAL PENGUMUMAN DENGAN DATA DARI DATABASE -->
 
     <!-- MODAL PENGUMUMAN -->
     <x-ui.announcement-modal id="announcementModal" />

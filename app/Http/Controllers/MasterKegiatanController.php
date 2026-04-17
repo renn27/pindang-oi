@@ -75,7 +75,6 @@ class MasterKegiatanController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
         $this->authorize('create', Kegiatan::class);
         try {
             $validated = $request->validate([
@@ -88,10 +87,6 @@ class MasterKegiatanController extends Controller
 
                 'rk_anggota' => ['required', 'array', 'min:1'],
                 'rk_anggota.*' => ['required', 'string'],
-
-                // ⬇️ PENTING (karena dipakai di controller)
-                // 'status' => ['nullable', 'array'],
-                // 'status.*' => ['nullable', 'in:Belum Mulai,Berjalan,Selesai'],
 
                 'target' => ['array'],
                 'satuan_target' => ['array'],
@@ -122,9 +117,18 @@ class MasterKegiatanController extends Controller
                 'detail_tanggal_selesai' => ['array'],
             ]);
 
-            DB::transaction(function () use ($request) {
+            $hasSelfAssign = false;
+            $currentUserId = auth()->user()?->id_pegawai;
+            if ($request->detail_id_anggota && $currentUserId) {
+                foreach ($request->detail_id_anggota as $sectionId => $anggotaIds) {
+                    if (is_array($anggotaIds) && in_array($currentUserId, $anggotaIds)) {
+                        $hasSelfAssign = true;
+                        break;
+                    }
+                }
+            }
 
-                // 1️⃣ SIMPAN KEGIATAN (PARENT)
+            DB::transaction(function () use ($request) {
                 $kegiatan = Kegiatan::create([
                     'id_bidang' => $request->id_bidang,
                     'nama_rk_kegiatan' => $request->nama_rk_kegiatan,
@@ -168,7 +172,6 @@ class MasterKegiatanController extends Controller
 
                         $idJenisKegiatan = $jenisKegiatans[$i] ?? null;
 
-                        // 🔥 HANDLE JENIS KEGIATAN (SELECT / CREATE)
                         if ($idJenisKegiatan === 'LAINNYA') {
 
                             $namaBaru = $request->detail_jenis_kegiatan_baru[$sectionKey][$i] ?? null;
@@ -192,9 +195,6 @@ class MasterKegiatanController extends Controller
 
                         $jenisKegiatan = JenisKegiatan::find($idJenisKegiatan);
 
-                        // ===============================
-                        // 🔐 SERVER-SIDE DL VALIDATION
-                        // ===============================
                         $wajibDl = $jenisKegiatan->butuh_dl_atau_translok == 1;
 
                         $requestButuhDl = (bool) ($butuhDlInputs[$i] ?? false);
@@ -204,7 +204,6 @@ class MasterKegiatanController extends Controller
                         $butuhTranslokFinal = false;
 
                         if ($wajibDl) {
-                            // Untuk 4 jenis kegiatan → wajib pilih salah satu
                             if ($requestButuhDl) {
                                 $butuhDlFinal = true;
                             } elseif ($requestButuhTranslok) {
@@ -230,30 +229,20 @@ class MasterKegiatanController extends Controller
                     }
                 }
             });
-
-            return redirect()
-                ->back()
-                ->with('success', 'Kegiatan Berhasil Disimpan');
-            // ->with('success', 'RK berhasil disimpan.');
-        } catch (QueryException $e) {
-            // log error DB
-            Log::error('Gagal simpan Data Rencana Kegiatan', [
-                'error' => $e->getMessage()
-            ]);
-
-            return redirect()
-                ->back()
-                ->with('error', 'Terjadi kesalahan database. Silakan coba lagi.')
-                ->withInput();
+            
+            $response = redirect()->back()->with('success', 'Kegiatan Berhasil Disimpan');
+            if ($hasSelfAssign) {
+                $response->with('info', 'Anda menambahkan diri anda sendiri di penugasan sub kegiatan ini.');
+            }
+            return $response;
         } catch (\Exception $e) {
-            // error umum
-            Log::error('Error umum simpan RK', [
+            Log::error('Error umum simpan Data Master Kegiatan', [
                 'error' => $e->getMessage()
             ]);
 
             return redirect()
                 ->back()
-                ->with('error', 'Gagal menyimpan data. Silakan coba lagi.')
+                ->with('error', 'Gagal Menyimpan Data Master Kegiatan. Silakan coba lagi.')
                 ->withInput();
         }
     }

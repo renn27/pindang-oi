@@ -1,6 +1,6 @@
 <?php
 
-namespace App\View\Components\Profile;
+namespace App\View\Components\Dashboard;
 
 use App\Services\DashboardAnalyticsService;
 use Illuminate\View\Component;
@@ -34,6 +34,6 @@ class VisTotalKegiatanKetua extends Component
      */
     public function render(): View
     {
-        return view('components.profile.vis-total-kegiatan-ketua');
+        return view('components.dashboard.vis-total-kegiatan-ketua');
     }
 }
