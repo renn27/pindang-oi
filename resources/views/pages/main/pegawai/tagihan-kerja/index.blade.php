@@ -222,6 +222,9 @@
     {{-- MODAL SUB KEGIATAN --}}
     @include('pages.main.components.modals.tagihan-kerja.modal-sub-kegiatan')
 
+    {{-- MODAL CKP (Universal, dipakai untuk CKP Pegawai dan CKP Ketua Tim) --}}
+    @include('pages.main.components.modals.tagihan-kerja.modal-ckp-universal')
+
     <style>
         [x-cloak] {
             display: none !important;

@@ -1,21 +1,35 @@
 ﻿<!-- Modal Tambah Pengiriman -->
-<x-ui.smart-modal id="modal-pengiriman-anggota" class="max-w-2xl"
+<x-ui.smart-modal id="modal-pengiriman-anggota" class="max-w-2xl" 
+    x-data="{
+        formData: {
+            id_sub_kegiatan: '',
+            id_penugasan: '',
+            nama_anggota: '',
+            target_penugasan: 0,
+            satuan_target: '',
+            tanggal_mulai: '',
+            tanggal_pengiriman: '',
+            jumlah_dikirim: '',
+            media_dikirim: '',
+            bukti_dukung: ''
+        },
+        mode: 'create',
+        itemKey: null
+    }"
     @open-smart-modal.window="
         if ($event.detail.modalId !== 'modal-pengiriman-anggota') return;
 
         mode = $event.detail.mode ?? 'create';
         itemKey = $event.detail.key ?? null;
-        // Ambil data dari dispatch
-        formData = $event.detail.data ?? {
-            id_sub_kegiatan: '',
-            id_penugasan: '',
-            nama_anggota: '',
-            target_penugasan: '',
-            tanggal_pengiriman: '',
-            jumlah_dikirim: '',
-            media_dikirim: '',
-            bukti_dukung: ''
-        }">
+        
+        // Update formData dengan data yang dikirim
+        if ($event.detail.data) {
+            Object.assign(formData, $event.detail.data);
+        }
+        
+        console.log('formData setelah update:', formData);
+        console.log('target_penugasan:', formData.target_penugasan);
+    ">
     <form id="addPengirimanForm"
         :action="`/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${formData.id_penugasan}/pengirimans`"
         method="POST" class="grid grid-cols-1 gap-y-5">
@@ -38,7 +52,7 @@
             <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar dark:bg-gray-900">
                 {{-- ====== VALIDATION BANNER ====== --}}
                 <div id="validationBannerPengiriman"
-                    class="hidden rounded-xl border border-red-300 dark:border-red-500/40 bg-red-50 dark:bg-red-500/10 px-4 py-3">
+                    class="hidden rounded-xl border border-red-300 dark:border-red-500/40 bg-red-50 dark:bg-red-500/10 px-4 py-3 mb-4">
                     <p class="text-sm font-medium text-red-700 dark:text-red-400 mb-1">
                         ⚠ Ada beberapa field yang belum diisi atau tidak valid:
                     </p>
@@ -58,8 +72,8 @@
 
                     {{-- Hidden input untuk mendapatkan value target penugasan untuk dibandingkan dengan jumlah dikirim di validasi frontend --}}
                     <input type="hidden" id="target_penugasan" :value="formData.target_penugasan">
+                    <input type="hidden" id="satuan_target" :value="formData.satuan_target">
                 </div>
-
 
                 <!-- Nama Anggota (readonly tampilan) -->
                 <div>
@@ -108,15 +122,78 @@
                     </div>
                 </div>
 
-                <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Jumlah Dikirim <span class="text-red-500">*</span>
-                    </label>
-                    <input type="number" name="jumlah_dikirim" id="jumlah_dikirim"
+                <!-- Jumlah Dikirim dengan Info Target dan Warning -->
+                <div x-data="{
+                    get target() { return Number(formData.target_penugasan) || 0; },
+                    get satuan() { return formData.satuan_target || ''; },
+                    jumlah: '',
+                    get isBelowTarget() {
+                        return this.jumlah && Number(this.jumlah) > 0 && Number(this.jumlah) < this.target;
+                    },
+                    get isExceedTarget() {
+                        return this.jumlah && Number(this.jumlah) > 0 && Number(this.jumlah) > this.target;
+                    },
+                    get sisaTarget() {
+                        return this.target - Number(this.jumlah);
+                    }
+                }">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Jumlah Dikirim <span class="text-red-500">*</span>
+                        </label>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                            Target: <span x-text="target" class="font-semibold text-gray-700 dark:text-gray-300"></span>
+                            <span x-show="satuan" x-text="satuan" class="ml-0.5"></span>
+                        </span>
+                    </div>
+
+                    <input type="number" 
+                        name="jumlah_dikirim" 
+                        id="jumlah_dikirim"
+                        x-model="jumlah"
                         placeholder="Masukkan jumlah pengiriman (hanya angka)"
-                        class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
+                        class="h-11 w-full appearance-none rounded-lg border text-sm shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
+                        :class="{
+                            'border-gray-300 bg-transparent px-4 py-2.5 text-gray-800 dark:border-gray-700': !isBelowTarget && !isExceedTarget,
+                            'border-yellow-400 bg-yellow-50 px-4 py-2.5 text-gray-800 dark:border-yellow-600 dark:bg-yellow-900/20': isBelowTarget,
+                            'border-red-400 bg-red-50 px-4 py-2.5 text-gray-800 dark:border-red-600 dark:bg-red-900/20': isExceedTarget
+                        }">
+
+                    <!-- Warning jika di bawah target -->
+                    <div x-show="isBelowTarget" 
+                        x-cloak
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 transform -translate-y-1"
+                        x-transition:enter-end="opacity-100 transform translate-y-0"
+                        class="mt-2 flex items-start gap-2 rounded-lg border border-yellow-300 bg-yellow-50 px-3 py-2 dark:border-yellow-600/40 dark:bg-yellow-900/20">
+                        <svg class="h-4 w-4 shrink-0 text-yellow-600 dark:text-yellow-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        <p class="text-xs text-yellow-700 dark:text-yellow-300">
+                            Jumlah yang dikirim <span class="font-medium">kurang dari target</span> penugasan. 
+                            <span x-text="sisaTarget + ' ' + satuan + ' lagi untuk mencapai target'"></span>
+                        </p>
+                    </div>
+
+                    <!-- Warning jika melebihi target -->
+                    <div x-show="isExceedTarget" 
+                        x-cloak
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 transform -translate-y-1"
+                        x-transition:enter-end="opacity-100 transform translate-y-0"
+                        class="mt-2 flex items-start gap-2 rounded-lg border border-red-300 bg-red-50 px-3 py-2 dark:border-red-600/40 dark:bg-red-900/20">
+                        <svg class="h-4 w-4 shrink-0 text-red-600 dark:text-red-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        <p class="text-xs text-red-700 dark:text-red-300">
+                            Jumlah yang dikirim <span class="font-medium">melebihi target</span> penugasan. 
+                            Maksimal <span x-text="target + ' ' + satuan"></span>
+                        </p>
+                    </div>
                 </div>
-                <div>
+
+                <!-- Media Pengiriman -->
+                <div class="mt-4">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Media Pengiriman <span class="text-red-500">*</span>
                     </label>
@@ -124,6 +201,8 @@
                         placeholder="Masukkan jenis media pengiriman"
                         class="h-11 w-full mb-4 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
                 </div>
+
+                <!-- Bukti Dukung -->
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Bukti Dukung <span class="text-red-500">*</span>
@@ -152,6 +231,7 @@
     </form>
 
 </x-ui.smart-modal>
+
 <script>
     // =============================================
     // VALIDASI FRONTEND

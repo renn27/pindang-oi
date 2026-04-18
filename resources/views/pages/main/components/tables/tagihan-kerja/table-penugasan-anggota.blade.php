@@ -299,7 +299,8 @@
                                                                     id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
                                                                     id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                                     nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
-                                                                    target_penugasan: '{{ $penugasan->target }}',
+                                                                    target_penugasan: {{ $penugasan->target }},
+                                                                    satuan_target: '{{ $penugasan->satuan_target ?? '' }}',
                                                                     tanggal_mulai: '{{ optional($penugasan->tanggal_mulai)->format('Y-m-d') }}',
                                                                 }
                                                             })" @endif>
@@ -1176,7 +1177,8 @@
                                                                     id_sub_kegiatan: '{{ $penugasan->subKegiatan->id_sub_kegiatan }}',
                                                                     id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                                     nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
-                                                                    target_penugasan: '{{ $penugasan->target }}',
+                                                                    target_penugasan: {{ $penugasan->target }},
+                                                                    satuan_target: '{{ $penugasan->satuan_target ?? '' }}',
                                                                     tanggal_mulai: '{{ optional($penugasan->tanggal_mulai)->format('Y-m-d') }}',
                                                                 }
                                                             })" @endif>

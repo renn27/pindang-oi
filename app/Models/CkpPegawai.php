@@ -17,6 +17,7 @@ class CkpPegawai extends Model
     protected $fillable = [
         'id_pegawai',
         'id_penugasan',
+        'id_sub_kegiatan',  
         'uraian',
         'jenis_ckp',
         'satuan',

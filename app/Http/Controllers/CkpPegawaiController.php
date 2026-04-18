@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Penugasan;
 use App\Models\CkpPegawai;
+use App\Models\SubKegiatan; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -12,71 +13,92 @@ use Carbon\Carbon;
 class CkpPegawaiController extends Controller
 {
     public function index(Request $request)
-    {
-        $bulan = $request->get('bulan', 'all');
-        $tahun = $request->get('tahun', date('Y'));
-        $userId = Auth::user()->id_pegawai;
+{
+    $bulan = $request->get('bulan', 'all');
+    $tahun = $request->get('tahun', date('Y'));
+    $userId = Auth::user()->id_pegawai;
 
-        if ($bulan !== 'all') {
-            $startDate = Carbon::create($tahun, $bulan, 1)->startOfMonth();
-            $endDate   = Carbon::create($tahun, $bulan, 1)->endOfMonth();
-        } else {
-            $startDate = Carbon::create($tahun, 1, 1)->startOfYear();
-            $endDate   = Carbon::create($tahun, 12, 31)->endOfYear();
-        }
-
-        $ckpList = CkpPegawai::with(['pegawai', 'penugasan.jenisKegiatan', 'penugasan.subKegiatan', 'penugasan.pengirimans', 'penugasan.latestPengiriman'])
-            ->where('id_pegawai', $userId)
-            ->whereHas('penugasan.pengirimans', function ($query) use ($startDate, $endDate) {
-                $query->whereDate('tanggal_pengiriman', '<=', $endDate)
-                        ->whereDate('tanggal_pengiriman', '>=', $startDate);
-            })
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        $totalTarget = $ckpList->sum('target_kuantitas');
-        $totalCkp = $ckpList->count();
-
-        $bulanList = [
-            '01' => 'Januari',
-            '02' => 'Februari',
-            '03' => 'Maret',
-            '04' => 'April',
-            '05' => 'Mei',
-            '06' => 'Juni',
-            '07' => 'Juli',
-            '08' => 'Agustus',
-            '09' => 'September',
-            '10' => 'Oktober',
-            '11' => 'November',
-            '12' => 'Desember',
-        ];
-
-        $tahunList = CkpPegawai::join('penugasans', 'penugasans.id_penugasan', '=', 'ckp_pegawais.id_penugasan')
-                ->join('pengirimans', 'pengirimans.id_penugasan', '=', 'penugasans.id_penugasan')
-                ->where('ckp_pegawais.id_pegawai', $userId)
-                ->select(DB::raw('DISTINCT YEAR(pengirimans.tanggal_pengiriman) as tahun'))
-                ->orderBy('tahun', 'desc')
-                ->pluck('tahun')
-                ->toArray();
-
-        if (empty($tahunList)) {
-            $tahunList = [date('Y')];
-        }
-
-        $title = 'CKP Saya';
-
-        return view('pages.main.pegawai.tagihan-kerja.ckp-pegawai', compact(
-            'title',
-            'ckpList',
-            'totalTarget',
-            'totalCkp',
-            'bulan',
-            'tahun',
-            'bulanList',
-            'tahunList'
-        ));
+    if ($bulan !== 'all') {
+        $startDate = Carbon::create($tahun, $bulan, 1)->startOfMonth();
+        $endDate   = Carbon::create($tahun, $bulan, 1)->endOfMonth();
+    } else {
+        $startDate = Carbon::create($tahun, 1, 1)->startOfYear();
+        $endDate   = Carbon::create($tahun, 12, 31)->endOfYear();
     }
+
+    // Query untuk CKP dari Penugasan (Anggota Tim)
+    $ckpFromPenugasan = CkpPegawai::with(['pegawai', 'penugasan.jenisKegiatan', 'penugasan.subKegiatan', 'penugasan.pengirimans', 'penugasan.latestPengiriman'])
+        ->where('id_pegawai', $userId)
+        ->whereNotNull('id_penugasan')
+        ->whereHas('penugasan.pengirimans', function ($query) use ($startDate, $endDate) {
+            $query->whereDate('tanggal_pengiriman', '<=', $endDate)
+                    ->whereDate('tanggal_pengiriman', '>=', $startDate);
+        });
+
+    // Query untuk CKP dari Sub Kegiatan (Ketua Tim)
+    $ckpFromSubKegiatan = CkpPegawai::with(['pegawai', 'subKegiatan.kegiatan'])
+        ->where('id_pegawai', $userId)
+        ->whereNotNull('id_sub_kegiatan')
+        ->whereNull('id_penugasan')
+        ->whereDate('created_at', '<=', $endDate)
+        ->whereDate('created_at', '>=', $startDate);
+
+    // Gabungkan kedua query
+    $ckpList = $ckpFromPenugasan->union($ckpFromSubKegiatan)
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    $totalTarget = $ckpList->sum('target_kuantitas');
+    $totalCkp = $ckpList->count();
+
+    $bulanList = [
+        '01' => 'Januari',
+        '02' => 'Februari',
+        '03' => 'Maret',
+        '04' => 'April',
+        '05' => 'Mei',
+        '06' => 'Juni',
+        '07' => 'Juli',
+        '08' => 'Agustus',
+        '09' => 'September',
+        '10' => 'Oktober',
+        '11' => 'November',
+        '12' => 'Desember',
+    ];
+
+    // Tahun list dari gabungan kedua sumber
+    $tahunPenugasan = CkpPegawai::join('penugasans', 'penugasans.id_penugasan', '=', 'ckp_pegawais.id_penugasan')
+        ->join('pengirimans', 'pengirimans.id_penugasan', '=', 'penugasans.id_penugasan')
+        ->where('ckp_pegawais.id_pegawai', $userId)
+        ->select(DB::raw('DISTINCT YEAR(pengirimans.tanggal_pengiriman) as tahun'));
+
+    $tahunSubKegiatan = CkpPegawai::where('id_pegawai', $userId)
+        ->whereNotNull('id_sub_kegiatan')
+        ->whereNull('id_penugasan')
+        ->select(DB::raw('DISTINCT YEAR(created_at) as tahun'));
+
+    $tahunList = $tahunPenugasan->union($tahunSubKegiatan)
+        ->orderBy('tahun', 'desc')
+        ->pluck('tahun')
+        ->toArray();
+
+    if (empty($tahunList)) {
+        $tahunList = [date('Y')];
+    }
+
+    $title = 'CKP Saya';
+
+    return view('pages.main.pegawai.tagihan-kerja.ckp-pegawai', compact(
+        'title',
+        'ckpList',
+        'totalTarget',
+        'totalCkp',
+        'bulan',
+        'tahun',
+        'bulanList',
+        'tahunList'
+    ));
+}
 
     public function storeFromPenugasan(Request $request, $id)
     {
@@ -124,6 +146,95 @@ class CkpPegawaiController extends Controller
         return redirect()->back()
             ->with('success', 'Berhasil dijadikan CKP');
     }
+
+    /**
+ * Store CKP dari Sub Kegiatan (untuk Ketua Tim)
+ */
+public function storeFromSubKegiatan(Request $request, SubKegiatan $subKegiatan)
+{
+    // 1. Validasi input
+    $request->validate([
+        'uraian' => 'required|string',
+        'keterangan' => 'nullable|string',
+    ]);
+
+    // 2. Ambil data kegiatan dan id ketua tim
+    $kegiatan = $subKegiatan->kegiatan;
+    $idKetuaTim = $kegiatan->id_penanggung_jawab;
+
+    // 3. Pastikan yang akses adalah Ketua Tim
+    if (Auth::user()->id_pegawai !== $idKetuaTim) {
+        return back()->with('error', 'Hanya Ketua Tim yang dapat membuat CKP Ketua Tim.');
+    }
+
+    // 4. Cek apakah semua penugasan sudah selesai (sudah CKP)
+    $totalPenugasan = $subKegiatan->penugasans()->count();
+    $penugasanSelesai = $subKegiatan->penugasans()
+        ->whereHas('ckp')
+        ->count();
+
+    if ($totalPenugasan === 0) {
+        return back()->with('error', 'Sub kegiatan belum memiliki penugasan.');
+    }
+
+    if ($penugasanSelesai < $totalPenugasan) {
+        return back()->with('error', 'Semua penugasan harus selesai (CKP) terlebih dahulu.');
+    }
+
+    // 5. Cek apakah Ketua Tim sudah memiliki CKP untuk sub kegiatan ini
+    $existingCkp = CkpPegawai::where('id_sub_kegiatan', $subKegiatan->id_sub_kegiatan)
+        ->where('id_pegawai', $idKetuaTim)
+        ->first();
+
+    if ($existingCkp) {
+        return back()->with('error', 'Sub kegiatan ini sudah memiliki CKP Ketua Tim.');
+    }
+
+    // 6. Hitung total realisasi dari semua penugasan
+    $totalRealisasi = $subKegiatan->penugasans()
+        ->with('latestPengiriman')
+        ->get()
+        ->sum(function ($penugasan) {
+            return $penugasan->latestPengiriman?->jumlah_dikirim ?? 0;
+        });
+
+    // 7. Hitung rata-rata persentase realisasi
+    $avgPersentase = $subKegiatan->penugasans()
+        ->with('latestPengiriman')
+        ->get()
+        ->avg(function ($penugasan) {
+            return $penugasan->latestPengiriman?->rr_kirim ?? 0;
+        }) ?? 0;
+
+    // 8. Hitung rata-rata tingkat kualitas
+    $avgKualitas = $subKegiatan->penugasans()
+        ->with('latestPengiriman')
+        ->get()
+        ->avg(function ($penugasan) {
+            return $penugasan->latestPengiriman?->rating_kirim ?? 0;
+        }) ?? 0;
+
+    // 9. Buat CKP untuk Ketua Tim
+    CkpPegawai::create([
+        'id_pegawai' => $idKetuaTim,
+        'id_sub_kegiatan' => $subKegiatan->id_sub_kegiatan,  // Terisi
+        'id_penugasan' => null,                               // NULL
+        'uraian' => $request->uraian,
+        'jenis_ckp' => 'utama',
+        'satuan' => 'Kegiatan',
+        'target_kuantitas' => 1,
+        'kode_butir_kegiatan' => null,
+        'angka_kredit' => null,
+        'keterangan' => $request->keterangan,
+        'realisasi' => $totalRealisasi,
+        'persentase_realisasi' => round($avgPersentase, 2),
+        'tingkat_kualitas' => round($avgKualitas, 2),
+    ]);
+
+    // 10. Redirect dengan pesan sukses
+    return redirect()->back()
+        ->with('success', 'CKP Ketua Tim berhasil dibuat.');
+}
 
     /**
      * Update CKP
