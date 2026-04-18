@@ -11,6 +11,9 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    {{-- Quill Editor --}}
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
     <!-- Alpine.js -->
     {{-- <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
 
@@ -164,6 +167,9 @@ window.addEventListener('resize', checkMobile);">
 
     <!-- MODAL PENGUMUMAN -->
     <x-ui.announcement-modal id="announcementModal" />
+
+    {{-- Quill Editor --}}
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
 </body>
 @stack('scripts')
