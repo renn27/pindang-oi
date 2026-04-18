@@ -74,7 +74,7 @@
         </div>
 
         <div x-show="loaded" class="min-h-screen flex flex-row justify-center items-center bg-gray-100 dark:bg-gray-900">
-            <div class="w-full px-6 py-4 overflow-hidden">
+            <div class="w-full overflow-hidden">
                 {{ $slot }}
             </div>
         </div>
