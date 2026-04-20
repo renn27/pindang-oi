@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 
@@ -63,9 +64,9 @@ class Penugasan extends Model
         return $this->hasMany(KalenderDL::class, 'id_penugasan');
     }
 
-    public function ckp()
+    public function ckp(): MorphOne
     {
-        return $this->hasOne(CkpPegawai::class, 'id_penugasan', 'id_penugasan');
+        return $this->morphOne(CkpPegawai::class, 'ckpable');
     }
     // END RELATIONS
 
@@ -78,6 +79,13 @@ class Penugasan extends Model
                 $pegawai->update([
                     'active_role' => 'Anggota Tim'
                 ]);
+            }
+        });
+
+        // Tambahkan ini untuk mencegah terjadinya penghapusan data penugasan yang sudah masuk ke CKP Anggota Tim
+        static::deleting(function ($penugasan) {
+            if ($penugasan->ckp()->exists()) {
+                throw new \RuntimeException('Penugasan tidak bisa dihapus karena sudah memiliki CKP.');
             }
         });
     }

@@ -1,4 +1,8 @@
-﻿@extends('layouts.dashboard')
+@extends('layouts.dashboard')
+
+@php
+    $kepalaBps = \App\Models\Pegawai::where('jabatan', 'like', '%Kepala BPS Ogan Ilir%')->first();
+@endphp
 
 @section('content')
     <x-common.page-breadcrumb pageTitle="{{ $title }}" />
@@ -62,20 +66,21 @@
 
         let baseData = $event.detail.data || {};
         formData = {
-            nama_kegiatan: '',
+            nama_agenda: '',
             tanggal_mulai: '',
             tanggal_selesai: '',
-            id_rencana_jpt: '',
-            id_indikator_jpt: '',
+            rk_jpt: '',
+            iki_jpt: '',
+            target: '',
+            satuan_target: '',
+            realisasi: '',
             link_bukti: '',
             status: 'Belum Selesai',
-            ikiOptions: [],
-            _pendingIndikatorId: '',
             ...baseData
-        };
-    ">
+        };">
 
         <form
+            id="addAgendaForm"
             :action="mode === 'edit'
                 ? `/agenda-pimpinan/${itemKey}`
                 : `{{ route('agenda.store') }}`"
@@ -110,9 +115,9 @@
                     <!-- Nama Kegiatan -->
                     <div class="mb-4">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Nama Kegiatan <span class="text-red-500">*</span>
+                            Nama Agenda <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" x-model="formData.nama_kegiatan" name="nama_kegiatan" id="nama_kegiatan"
+                        <input type="text" x-model="formData.nama_agenda" name="nama_agenda" id="nama_agenda"
                             placeholder="Masukkan Nama Kegiatan"
                             class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
                     </div>
@@ -140,15 +145,14 @@
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                             Rencana JPT <span class="text-red-500">*</span>
                         </label>
-                        <select id="id_rencana_jpt" name="id_rencana_jpt" x-model="formData.id_rencana_jpt"
+                        <select id="rk_jpt" name="rk_jpt" x-model="formData.rk_jpt"
                             @change="
-                                formData.id_indikator_jpt = '';
-                                formData._pendingIndikatorId = '';
-                                loadIkiByRkForAgenda(formData.id_rencana_jpt, formData)
+                                formData.iki_jpt = '';
+                                loadIkiByRkForAgenda(formData.rk_jpt, {})
                             "
                             class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                             <option value="" class="dark:text-gray-400">-- Pilih RK JPT --</option>
-                            @foreach ($rencanaJpts as $rk)
+                            @foreach ($rkJpts as $rk)
                                 <option value="{{ $rk->id }}" class="dark:text-gray-300">
                                     {{ $rk->nama_rencana_jpt }}
                                 </option>
@@ -157,17 +161,47 @@
                     </div>
 
                     <!-- Indikator JPT -->
-<div class="mb-4">
-    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-        Indikator JPT <span class="text-red-500">*</span>
-    </label>
-    <input type="hidden" name="id_indikator_jpt" id="id_indikator_jpt_hidden">
-    <select id="id_indikator_jpt"
-        @change="document.getElementById('id_indikator_jpt_hidden').value = $event.target.value"
-        class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-        <option value="">-- Harap pilih RK JPT dulu --</option>
-    </select>
-</div>
+                    <div class="mb-4">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Indikator JPT <span class="text-red-500">*</span>
+                        </label>
+                        <input type="hidden" name="iki_jpt" id="iki_jpt_hidden">
+                        <select id="iki_jpt"
+                            @change="document.getElementById('iki_jpt_hidden').value = $event.target.value"
+                            class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                            <option value="">-- Harap pilih RK JPT dulu --</option>
+                        </select>
+                    </div>
+
+                    <!-- Target -->
+                    <div class="mb-4">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Target <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" x-model="formData.target" name="target" id="target"
+                            placeholder="Masukkan Target"
+                            class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
+                    </div>
+
+                    <!-- Satuan Target -->
+                    <div class="mb-4">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Satuan Target <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" x-model="formData.satuan_target" name="satuan_target" id="satuan_target"
+                            placeholder="Masukkan Satuan Target"
+                            class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-5₀₀" />
+                    </div>
+
+                    <!-- Realisasi -->
+                    <div class="mb-4">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Realisasi <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" x-model="formData.realisasi" name="realisasi" id="realisasi"
+                            placeholder="Masukkan Realisasi"
+                            class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-5₀₀" />
+                    </div>
 
                     <!-- Link Bukti -->
                     <div class="mb-4">
@@ -233,6 +267,12 @@
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
                         IKI JPT
                     </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+                        Target
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-24 dark:text-gray-400">
+                        Realisasi
+                    </th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-24 dark:text-gray-400">
                         Status
                     </th>
@@ -245,49 +285,63 @@
                 </tr>
             </thead>
             <tbody id="agendaTableBody" class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
-                @foreach ($agenda as $index => $item)
+                @foreach ($agendas as $index => $agenda)
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 agenda-row"
-                        data-tahun="{{ date('Y', strtotime($item->tanggal_mulai)) }}">
+                        data-tahun="{{ date('Y', strtotime($agenda->tanggal_mulai)) }}">
                         <td
                             class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center dark:text-gray-300">
                             {{ $index + 1 }}
                         </td>
                         <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-                            <div class="max-w-xs break-words">{{ $item->nama_kegiatan }}</div>
+                            <div class="max-w-xs break-words">{{ $agenda->nama_agenda }}</div>
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                            <div>{{ \Carbon\Carbon::parse($item->tanggal_mulai)->format('d/m/Y') }}</div>
+                            <div>{{ \Carbon\Carbon::parse($agenda->tanggal_mulai)->format('d/m/Y') }}</div>
                             <div class="text-xs text-gray-400">sd</div>
-                            <div>{{ \Carbon\Carbon::parse($item->tanggal_selesai)->format('d/m/Y') }}</div>
+                            <div>{{ \Carbon\Carbon::parse($agenda->tanggal_selesai)->format('d/m/Y') }}</div>
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                             <div class="max-w-md">
-                                <div title="{{ $item->rencanaJpt->nama_rencana_jpt ?? '-' }}">
-                                    {{ $item->rencanaJpt->nama_rencana_jpt ?? '-' }}
+                                <div>
+                                    {{ $agenda->rencanaJpt->nama_rencana_jpt ?? '-' }}
                                 </div>
                             </div>
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                             <div class="max-w-md">
-                                <div title="{{ $item->indikatorJpt->nama_indikator_jpt ?? '-' }}">
-                                    {{ $item->indikatorJpt->nama_indikator_jpt ?? '-' }}
+                                <div>
+                                    {{ $agenda->indikatorJpt->nama_indikator_jpt ?? '-' }}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-sm text-orange-600 dark:text-orange-400">
+                            <div class="max-w-md">
+                                <div>
+                                    {{ $agenda->target ?? '-' }} {{ $agenda->satuan_target ?? '-' }}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-sm text-teal-600 dark:text-teal-400">
+                            <div class="max-w-md">
+                                <div>
+                                    {{ $agenda->realisasi ?? '-' }} {{ $agenda->satuan_target ?? '-' }}
                                 </div>
                             </div>
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap">
                             <span
                                 class="inline-flex px-2 py-1 text-xs font-medium rounded-full
-                                {{ $item->status == 'Selesai'
+                                {{ $agenda->status == 'Selesai'
                                     ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                                     : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' }}">
-                                {{ $item->status }}
+                                {{ $agenda->status }}
                             </span>
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm">
-                            @if ($item->link_bukti)
-                                <a href="{{ $item->link_bukti }}" target="_blank"
+                            @if ($agenda->link_bukti)
+                                <a href="{{ $agenda->link_bukti }}" target="_blank"
                                     class="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 border border-blue-300 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100 transition-all duration-200 dark:bg-blue-900/30 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/50"
-                                    title="{{ $item->link_bukti }}">
+                                    title="{{ $agenda->link_bukti }}">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
@@ -320,15 +374,18 @@
                                             @click="$dispatch('open-smart-modal', {
                                             modalId: 'modal-agenda',
                                             mode: 'edit',
-                                            key: '{{ $item->id }}',
+                                            key: '{{ $agenda->id_agenda }}',
                                             data: {
-                                                nama_kegiatan: '{{ addslashes($item->nama_kegiatan) }}',
-                                                tanggal_mulai: '{{ $item->tanggal_mulai }}',
-                                                tanggal_selesai: '{{ $item->tanggal_selesai }}',
-                                                id_rencana_jpt: '{{ $item->id_rencana_jpt }}',
-                                                id_indikator_jpt: '{{ $item->id_indikator_jpt }}',
-                                                link_bukti: '{{ $item->link_bukti }}',
-                                                status: '{{ $item->status }}'
+                                                nama_agenda: '{{ addslashes($agenda->nama_agenda) }}',
+                                                tanggal_mulai: '{{ $agenda->tanggal_mulai }}',
+                                                tanggal_selesai: '{{ $agenda->tanggal_selesai }}',
+                                                rk_jpt: '{{ $agenda->rk_jpt }}',
+                                                iki_jpt: '{{ $agenda->iki_jpt }}',
+                                                target: '{{ $agenda->target }}',
+                                                satuan_target: '{{ $agenda->satuan_target }}',
+                                                realisasi: '{{ $agenda->realisasi }}',
+                                                link_bukti: '{{ $agenda->link_bukti }}',
+                                                status: '{{ $agenda->status }}'
                                             }
                                         })">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -340,12 +397,12 @@
                                             Edit
                                         </button>
 
-                                        <form id="delete-agenda-{{ $item->id }}"
-                                            action="{{ route('agenda.delete', $item->id) }}" method="POST">
+                                        <form id="delete-agenda-{{ $agenda->id_agenda }}"
+                                            action="{{ route('agenda.delete', $agenda->id_agenda) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="button"
-                                                onclick="confirmDeleteAgenda('delete-agenda-{{ $item->id }}', '{{ addslashes($item->nama_kegiatan) }}')"
+                                                onclick="confirmDeleteAgenda('delete-agenda-{{ $agenda->id_agenda }}', '{{ addslashes($agenda->nama_agenda) }}')"
                                                 class="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2 dark:text-red-400 dark:hover:bg-gray-700">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
@@ -355,6 +412,28 @@
                                                 Hapus
                                             </button>
                                         </form>
+
+                                        @if($agenda->status === "Selesai")
+                                            <button type="button"
+                                                @click="$dispatch('open-ckp-modal', {
+                                                    modalId: 'modal-ckp',
+                                                    id_agenda: '{{ $agenda->id_agenda }}',
+                                                    nama_pegawai: '{{ $kepalaBps->nama_pegawai ?? '' }}',
+                                                    nama_agenda: '{{ $agenda->nama_agenda }}',
+                                                    uraian: 'Melaksanakan dan Menyelesaikan {{ $agenda->nama_agenda }}',
+                                                    target_kuantitas: {{ $agenda->target }},
+                                                    satuan: '{{ $agenda->satuan_target }}',
+                                                    is_pimpinan: true,
+                                                })"
+                                                class="w-full text-left px-4 py-3 text-sm flex items-center gap-2
+                                                {{ $agenda->ckp ? 'text-gray-400 cursor-not-allowed bg-gray-50 dark:bg-gray-800' : 'text-green-600 hover:bg-green-50' }}"
+                                                {{ $agenda->ckp ? 'disabled' : '' }}>
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor">
+                                                    <path stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                {{ $agenda->ckp ? 'Sudah jadi CKP Pimpinan' : 'Jadikan CKP Pimpinan' }}
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -365,62 +444,60 @@
         </table>
     </div>
 
+    {{-- MODAL CKP (Universal, dipakai untuk CKP Pegawai dan CKP Ketua Tim) --}}
+    @include('pages.main.components.modals.tagihan-kerja.modal-ckp-universal')
+
     <script>
-        // =============================================
-        // FUNGSI LOAD IKI BERDASARKAN RK
-        // =============================================
+        // FUNGSI LOAD IKI BERDASARKAN RK (untuk modal agenda pimpinan)
         async function loadIkiByRkForAgenda(rkId, formData) {
-    const selectEl = document.getElementById('id_indikator_jpt');
-    const hiddenEl = document.getElementById('id_indikator_jpt_hidden');
+            const selectEl = document.getElementById('iki_jpt');
+            const hiddenEl = document.getElementById('iki_jpt_hidden');
 
-    if (!rkId) {
-        if (selectEl) {
-            selectEl.innerHTML = '<option value="">-- Harap pilih RK JPT dulu --</option>';
+            if (!rkId) {
+                if (selectEl) {
+                    selectEl.innerHTML = '<option value="">-- Harap pilih RK JPT dulu --</option>';
+                }
+                if (hiddenEl) hiddenEl.value = '';
+                return;
+            }
+
+            // Tampilkan loading sementara
+            if (selectEl) {
+                selectEl.innerHTML = '<option value="">Memuat...</option>';
+                selectEl.disabled = true;
+            }
+
+            try {
+                const response = await fetch(`/rencana-indikator-jpt/${rkId}/indikator`);
+                const data = await response.json();
+
+                if (!selectEl) return;
+
+                // Build options langsung ke DOM
+                const pending = formData._pendingIndikatorId ? String(formData._pendingIndikatorId) : '';
+                if (formData._pendingIndikatorId !== undefined) formData._pendingIndikatorId = '';
+
+                let html = '<option value="">-- Pilih IKI JPT --</option>';
+                data.forEach(iki => {
+                    const selected = String(iki.id) === pending ? 'selected' : '';
+                    html += `<option value="${iki.id}" ${selected}>${iki.nama_indikator_jpt}</option>`;
+                });
+
+                selectEl.innerHTML = html;
+                selectEl.disabled = false;
+
+                // Sync ke hidden input
+                if (hiddenEl) hiddenEl.value = selectEl.value;
+
+            } catch (error) {
+                if (selectEl) {
+                    selectEl.innerHTML = '<option value="">Gagal memuat data</option>';
+                    selectEl.disabled = false;
+                }
+            }
         }
-        if (hiddenEl) hiddenEl.value = '';
-        return;
-    }
 
-    // Tampilkan loading sementara
-    if (selectEl) {
-        selectEl.innerHTML = '<option value="">Memuat...</option>';
-        selectEl.disabled = true;
-    }
-
-    try {
-        const response = await fetch(`/rencana-indikator-jpt/${rkId}/indikator`);
-        const data = await response.json();
-
-        if (!selectEl) return;
-
-        // Build options langsung ke DOM
-        const pending = formData._pendingIndikatorId ? String(formData._pendingIndikatorId) : '';
-        formData._pendingIndikatorId = '';
-
-        let html = '<option value="">-- Pilih IKI JPT --</option>';
-        data.forEach(iki => {
-            const selected = String(iki.id) === pending ? 'selected' : '';
-            html += `<option value="${iki.id}" ${selected}>${iki.nama_indikator_jpt}</option>`;
-        });
-
-        selectEl.innerHTML = html;
-        selectEl.disabled = false;
-
-        // Sync ke hidden input
-        if (hiddenEl) hiddenEl.value = selectEl.value;
-
-    } catch (error) {
-        console.error('Error loading IKI:', error);
-        if (selectEl) {
-            selectEl.innerHTML = '<option value="">Gagal memuat data</option>';
-            selectEl.disabled = false;
-        }
-    }
-}
-
-        // =============================================
         // VALIDASI FRONTEND
-        // =============================================
         function clearValidationAgenda() {
             document.querySelectorAll('.input-invalid').forEach(el => {
                 el.classList.remove(
@@ -459,7 +536,7 @@
             }
 
             // Nama Kegiatan
-            const namaKegiatan = document.getElementById('nama_kegiatan');
+            const namaKegiatan = document.getElementById('nama_agenda');
             if (!namaKegiatan?.value?.trim()) {
                 addError('Nama kegiatan wajib diisi', namaKegiatan, namaKegiatan);
             }
@@ -479,15 +556,33 @@
             }
 
             // RK JPT
-            const rkJpt = document.getElementById('id_rencana_jpt');
+            const rkJpt = document.getElementById('rk_jpt');
             if (!rkJpt?.value) {
                 addError('Rencana JPT wajib dipilih', rkJpt, rkJpt);
             }
 
             // IKI JPT
-            const ikiJpt = document.getElementById('id_indikator_jpt');
+            const ikiJpt = document.getElementById('iki_jpt');
             if (!ikiJpt?.value) {
                 addError('Indikator JPT wajib dipilih', ikiJpt, ikiJpt);
+            }
+
+            // Target
+            const target = document.getElementById('target');
+            if (!target?.value) {
+                addError('Target wajib diisi', target, target);
+            }
+
+            // Satuan Target
+            const satuanTarget = document.getElementById('satuan_target');
+            if (!satuanTarget?.value?.trim()) {
+                addError('Satuan target wajib diisi', satuanTarget, satuanTarget);
+            }
+
+            // Realisasi
+            const realisasi = document.getElementById('realisasi');
+            if (!realisasi?.value) {
+                addError('Realisasi wajib diisi', realisasi, realisasi);
             }
 
             // Link Bukti
@@ -547,103 +642,84 @@
             if (form) form.submit();
         }
 
-        // =============================================
-        // KONFIRMASI HAPUS
-        // =============================================
+        function confirmSaveAgenda() {
+            const form = document.getElementById('addAgendaForm');
+            if (!form) {
+                alert('Form tidak ditemukan');
+                return;
+            }
+            form.submit();
+        }
+
         function confirmDeleteAgenda(formId, namaKegiatan) {
             SwalHelper.confirmDelete(formId, namaKegiatan);
         }
 
-        // =============================================
         // FILTER TAHUN
-        // =============================================
         document.addEventListener('DOMContentLoaded', function() {
-    const saveButton = document.getElementById('saveAgendaButton');
-    if (saveButton) {
-        saveButton.addEventListener('click', saveAgenda);
-    }
+            document.getElementById('saveAgendaButton')?.addEventListener('click', saveAgenda);
+            
+            // Listen event yang sama dengan yang di-dispatch tombol Edit
+            // Event ini terpanggil SEBELUM Alpine handle, jadi kita simpan data dulu
+            window.addEventListener('open-smart-modal', function(e) {
+                const detail = e.detail;
+                if (detail.modalId !== 'modal-agenda' || detail.mode !== 'edit') return;
+                if (!detail.data?.rk_jpt) return;
 
-    const filterButton = document.getElementById('filterButton');
-    const tahunSelect = document.getElementById('tahunFilter');
-    const rows = document.querySelectorAll('.agenda-row');
-    let currentTahun = 'all';
+                // Simpan pending data
+                window._agendaEditPending = {
+                    rkId: String(detail.data.rk_jpt),
+                    indikatorId: String(detail.data.iki_jpt || '')
+                };
 
-    function filterTable() {
-        if (currentTahun === 'all') {
-            rows.forEach(row => row.style.display = '');
-        } else {
-            rows.forEach(row => {
-                const rowTahun = row.getAttribute('data-tahun');
-                row.style.display = rowTahun === currentTahun ? '' : 'none';
-            });
-        }
-    }
+                // Tunggu Alpine selesai toggle modal (x-show jalan setelah event handler selesai)
+                // Kita poll sampai select IKI berisi "Memuat..." yang artinya loadIki sudah terpanggil
+                // ATAU langsung set timeout yang cukup untuk Alpine render
+                const checkAndLoad = (attempt) => {
+                    const selectEl = document.getElementById('iki_jpt');
+                    if (!selectEl) {
+                        if (attempt < 20) requestAnimationFrame(() => checkAndLoad(attempt + 1));
+                        return;
+                    }
 
-    if (filterButton && tahunSelect) {
-        filterButton.addEventListener('click', function() {
-            currentTahun = tahunSelect.value;
-            filterTable();
+                    // Cek apakah modal sudah visible
+                    const modalEl = document.getElementById('modal-agenda');
+                    const isVisible = modalEl && getComputedStyle(modalEl).display !== 'none';
+
+                    if (isVisible && window._agendaEditPending) {
+                        const { rkId, indikatorId } = window._agendaEditPending;
+                        window._agendaEditPending = null;
+                        loadIkiByRkForAgenda(rkId, { _pendingIndikatorId: indikatorId });
+                    } else if (attempt < 30) {
+                        requestAnimationFrame(() => checkAndLoad(attempt + 1));
+                    }
+                };
+
+                requestAnimationFrame(() => checkAndLoad(0));
+            }); 
+
+            const filterButton = document.getElementById('filterButton');
+            const tahunSelect = document.getElementById('tahunFilter');
+            const rows = document.querySelectorAll('.agenda-row');
+            let currentTahun = 'all';
+
+            function filterTable() {
+                if (currentTahun === 'all') {
+                    rows.forEach(row => row.style.display = '');
+                } else {
+                    rows.forEach(row => {
+                        const rowTahun = row.getAttribute('data-tahun');
+                        row.style.display = rowTahun === currentTahun ? '' : 'none';
+                    });
+                }
+            }
+
+            if (filterButton && tahunSelect) {
+                filterButton.addEventListener('click', function() {
+                    currentTahun = tahunSelect.value;
+                    filterTable();
+                });
+            }
         });
-    }
-
-    // Listen event yang sama dengan yang di-dispatch tombol Edit
-    // Event ini terpanggil SEBELUM Alpine handle, jadi kita simpan data dulu
-    window.addEventListener('open-smart-modal', function(e) {
-        const detail = e.detail;
-        if (detail.modalId !== 'modal-agenda' || detail.mode !== 'edit') return;
-        if (!detail.data?.id_rencana_jpt) return;
-
-        // Simpan pending data
-        window._agendaEditPending = {
-            rkId: String(detail.data.id_rencana_jpt),
-            indikatorId: String(detail.data.id_indikator_jpt || '')
-        };
-
-        // Tunggu Alpine selesai toggle modal (x-show jalan setelah event handler selesai)
-        // Kita poll sampai select IKI berisi "Memuat..." yang artinya loadIki sudah terpanggil
-        // ATAU langsung set timeout yang cukup untuk Alpine render
-        const checkAndLoad = (attempt) => {
-            const selectEl = document.getElementById('id_indikator_jpt');
-            if (!selectEl) {
-                if (attempt < 20) requestAnimationFrame(() => checkAndLoad(attempt + 1));
-                return;
-            }
-
-            // Cek apakah modal sudah visible
-            const modalEl = document.getElementById('modal-agenda');
-            const isVisible = modalEl && getComputedStyle(modalEl).display !== 'none';
-
-            if (isVisible && window._agendaEditPending) {
-                const { rkId, indikatorId } = window._agendaEditPending;
-                window._agendaEditPending = null;
-                loadIkiByRkForAgenda(rkId, { _pendingIndikatorId: indikatorId });
-            } else if (attempt < 30) {
-                requestAnimationFrame(() => checkAndLoad(attempt + 1));
-            }
-        };
-
-        requestAnimationFrame(() => checkAndLoad(0));
-    });
-});
     </script>
-
-    <style>
-        .overflow-x-auto::-webkit-scrollbar {
-            height: 8px;
-        }
-
-        .overflow-x-auto::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        .overflow-x-auto::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 4px;
-        }
-
-        .overflow-x-auto::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-    </style>
 @endsection

@@ -124,6 +124,9 @@
     </div>
 
     {{-- DAFTAR MODAL --}}
+    {{-- Modal CKP (Universal, dipakai untuk CKP Anggota) --}}
+    @include('pages.main.components.modals.tagihan-kerja.modal-ckp-universal')
+
     {{-- Modal Penugasan Anggota --}}
     @include('pages.main.components.modals.tagihan-kerja.modal-penugasan-anggota')
     {{-- Modal Penerimaan Anggota --}}

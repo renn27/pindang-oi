@@ -75,10 +75,18 @@ class MenuHelper
         }
 
         // ADMIN dan PIMPINAN → semua menu kecuali CKP Saya
-        if ($user->isActiveRole('Admin') || $user->isActiveRole('Pimpinan')) {
+        if ($user->isActiveRole('Admin')) {
             return array_map(
                 fn($menu) => self::normalizeMenuItem($menu),
-                array_filter($menus, fn($menu) => $menu['name'] !== 'CKP Saya')
+                array_filter($menus, fn($menu) => $menu['name'] !== "CKP Saya")
+            );
+        }
+
+        // ADMIN dan PIMPINAN → semua menu kecuali CKP Saya
+        if ($user->isActiveRole('Pimpinan')) {
+            return array_map(
+                fn($menu) => self::normalizeMenuItem($menu),
+                array_filter($menus, fn($menu) => $menu['name'])
             );
         }
 
@@ -117,6 +125,12 @@ class MenuHelper
                 'icon' => 'gcpln',
                 'name' => 'GC PLN 2026',
                 'path' => 'https://gcpln.bpsoganilir.com/',
+                'is_external' => true,
+            ],
+            [
+                'icon' => 'gcpln',
+                'name' => 'GC PBI 2026',
+                'path' => 'https://gcpbi.bpsoganilir.com/',
                 'is_external' => true,
             ],
             [

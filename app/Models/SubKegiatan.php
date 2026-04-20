@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class SubKegiatan extends Model
 {
@@ -36,6 +37,21 @@ class SubKegiatan extends Model
 
     public function penugasans() {
         return $this->hasMany(Penugasan::class, 'id_sub_kegiatan', 'id_sub_kegiatan');
+    }
+
+    public function ckp(): MorphOne
+    {
+        return $this->morphOne(CkpPegawai::class, 'ckpable');
+    }
+
+    // Tambahkan ini untuk mencegah terjadinya penghapusan data penugasan yang sudah masuk ke CKP Ketua Tim
+    protected static function booted(): void
+    {
+        static::deleting(function ($subKegiatan) {
+            if ($subKegiatan->ckp()->exists()) {
+                throw new \RuntimeException('Sub Kegiatan tidak bisa dihapus karena sudah memiliki CKP.');
+            }
+        });
     }
 
     public function scopeForUser($query, $user)

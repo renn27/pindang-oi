@@ -12,33 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('agenda_pimpinans', function (Blueprint $table) {
-            $table->id();
-
-            $table->string('nama_kegiatan');
-
+            $table->uuid('id_agenda')->primary();
+            $table->string('nama_agenda');
             $table->date('tanggal_mulai');
             $table->date('tanggal_selesai');
-
-            // 🔥 IKUTIN STYLE KAMU (id_rencana_jpt)
-            $table->foreignId('id_rencana_jpt')
-                ->constrained('rencana_jpts')
-                ->cascadeOnDelete();
-
-            $table->foreignId('id_indikator_jpt')
-                ->constrained('indikator_jpts')
-                ->cascadeOnDelete();
-
+            $table->foreignId('rk_jpt')->nullable()->constrained('rencana_jpts')->nullOnDelete();
+            $table->foreignId('iki_jpt')->nullable()->constrained('indikator_jpts')->nullOnDelete();
+            $table->integer('target')->nullable();
+            $table->string('satuan_target')->nullable();
+            $table->integer('realisasi')->nullable();
             $table->text('link_bukti')->nullable();
-
             $table->enum('status', ['Selesai', 'Belum Selesai'])
                 ->default('Belum Selesai');
-
             $table->timestamps();
-            $table->softDeletes();
 
-            // 🔥 optional tapi bagus buat performa
-            $table->index('id_rencana_jpt');
-            $table->index('id_indikator_jpt');
+            $table->index('rk_jpt');
+            $table->index('iki_jpt');
         });
     }
 

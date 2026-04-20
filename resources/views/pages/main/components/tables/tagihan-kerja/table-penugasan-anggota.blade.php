@@ -419,10 +419,10 @@
                                                             @click="$dispatch('open-ckp-modal', {
                                                                 modalId: 'modal-ckp',
                                                                 id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                                nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                                nama_pegawai: '{{ $penugasan->anggota->nama_pegawai }}',
                                                                 uraian: 'Melaksanakan {{ $penugasan->jenisKegiatan->jenis_kegiatan }} pada {{ $penugasan->subKegiatan->nama_sub_kegiatan }}',
-                                                                satuan: '{{ $penugasan->satuan_target }}',
-                                                                target_kuantitas: {{ $penugasan->target }}
+                                                                target_kuantitas: {{ $penugasan->target }},
+                                                                satuan: '{{ $penugasan->satuan_target }}'
                                                             })"
                                                         @endif
                                                         class="w-full text-left px-4 py-3 text-sm flex items-center gap-2
@@ -1298,10 +1298,10 @@
                                                             @click="$dispatch('open-ckp-modal', {
                                                                 modalId: 'modal-ckp',
                                                                 id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                                nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
+                                                                nama_pegawai: '{{ $penugasan->anggota->nama_pegawai }}',
                                                                 uraian: 'Melaksanakan {{ $penugasan->jenisKegiatan->jenis_kegiatan }} pada {{ $penugasan->subKegiatan->nama_sub_kegiatan }}',
-                                                                satuan: '{{ $penugasan->satuan_target }}',
-                                                                target_kuantitas: {{ $penugasan->target }}
+                                                                target_kuantitas: {{ $penugasan->target }},
+                                                                satuan: '{{ $penugasan->satuan_target }}'
                                                             })"
                                                         @endif
                                                         class="w-full text-left px-4 py-3 text-sm flex items-center gap-2
@@ -1835,172 +1835,5 @@
             </div>
         </div>
     </div>
-
-    <!-- Modal CKP Konfirmasi -->
-    <div x-data="ckpModal()"
-        @open-ckp-modal.window="
-            if ($event.detail.modalId !== 'modal-ckp') return;
-            ckpData.id_penugasan = $event.detail.id_penugasan;
-            ckpData.nama_anggota = $event.detail.nama_anggota;
-            ckpData.uraian = $event.detail.uraian;
-            ckpData.satuan = $event.detail.satuan;
-            ckpData.target_kuantitas = $event.detail.target_kuantitas;
-            ckpData.keterangan = $event.detail.keterangan || '';
-            showCkpModal = true;">
-
-        <div x-show="showCkpModal"
-            x-cloak
-            x-transition.opacity
-            class="fixed inset-0 z-[100000] overflow-y-auto"
-            style="display: none;">
-
-            <!-- Backdrop -->
-            <div class="fixed inset-0 bg-gray-900/50 dark:bg-gray-950/80 transition-opacity"
-                @click="showCkpModal = false"></div>
-
-            <!-- Modal Content -->
-            <div class="flex min-h-full items-center justify-center p-4">
-                <div class="relative w-full max-w-2xl bg-white dark:bg-gray-900 rounded-2xl shadow-2xl"
-                    @click.away="showCkpModal = false">
-
-                    <!-- HEADER -->
-                    <div class="shrink-0 border-b border-gray-200 px-6 py-4 dark:border-gray-700">
-                        <h4 class="text-xl font-semibold text-gray-800 dark:text-white">
-                            Konfirmasi Jadikan CKP
-                        </h4>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            Konfirmasi dan lengkapi data CKP dari penugasan ini
-                        </p>
-                    </div>
-
-                    <!-- BODY (SCROLL AREA) -->
-                    <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar dark:bg-gray-900 max-h-[70vh]">
-                        <form :action="`{{ url('ckp/from-penugasan') }}/${ckpData.id_penugasan}`"
-                            method="POST"
-                            id="ckpForm">
-                            @csrf
-
-                            <!-- Informasi Penugasan (Readonly Card) -->
-                            <div class="mb-6 rounded-xl border border-gray-200 bg-gray-50/50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
-                                <div class="flex items-center gap-2 mb-3">
-                                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                        Informasi Penugasan
-                                    </h4>
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                        <span class="text-gray-500 dark:text-gray-400">Anggota:</span>
-                                        <span class="ml-2 font-medium text-gray-900 dark:text-white"
-                                            x-text="ckpData.nama_anggota"></span>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-500 dark:text-gray-400">Satuan:</span>
-                                        <span class="ml-2 font-medium text-gray-900 dark:text-white"
-                                            x-text="ckpData.satuan"></span>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-500 dark:text-gray-400">Target Kuantitas:</span>
-                                        <span class="ml-2 font-medium text-gray-900 dark:text-white"
-                                            x-text="ckpData.target_kuantitas"></span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Form CKP (Editable) -->
-                            <div class="space-y-5">
-                                <div class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                        Data CKP
-                                    </h4>
-                                    <span class="text-xs text-gray-400">(bisa diedit)</span>
-                                </div>
-
-                                <!-- Uraian Kegiatan -->
-                                <div>
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Uraian Kegiatan <span class="text-red-500">*</span>
-                                    </label>
-                                    <textarea name="uraian"
-                                        x-model="ckpData.uraian"
-                                        rows="3"
-                                        required
-                                        class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800
-                                                focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors
-                                                dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300
-                                                placeholder:text-gray-400 dark:placeholder:text-gray-500"></textarea>
-                                </div>
-
-                                <!-- Keterangan -->
-                                <div>
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Keterangan
-                                    </label>
-                                    <textarea name="keterangan"
-                                        x-model="ckpData.keterangan"
-                                        rows="2"
-                                        class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800
-                                                focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors
-                                                dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300
-                                                placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                                        placeholder="Isi keterangan jika diperlukan..."></textarea>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- FOOTER -->
-                    <div class="shrink-0 border-t border-gray-200 px-6 py-4 dark:border-gray-700">
-                        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                            <button type="button"
-                                    @click="showCkpModal = false"
-                                    class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto
-                                            dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
-                                Batal
-                            </button>
-                            <button type="button"
-                                    @click="submitCkpForm()"
-                                    class="flex w-full justify-center rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 sm:w-auto
-                                            dark:bg-green-600 dark:hover:bg-green-700">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                                Simpan ke CKP
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
-<script>
-    function ckpModal() {
-        return {
-            showCkpModal: false,
-            ckpData: {
-                id_penugasan: null,
-                nama_anggota: '',
-                uraian: '',
-                satuan: '',
-                target_kuantitas: 0,
-                keterangan: ''
-            },
-
-            submitCkpForm() {
-                const form = document.getElementById('ckpForm');
-                if (form) {
-                    this.showCkpModal = false;
-                    form.submit();
-                }
-            }
-        }
-    }
-</script>

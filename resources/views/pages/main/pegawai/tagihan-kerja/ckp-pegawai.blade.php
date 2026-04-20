@@ -179,9 +179,11 @@
                             </tr>
 
                             @php $noUtama = 1; @endphp
-                            @forelse ($ckpList->where('jenis_ckp', 'utama') as $ckp)
+                            @forelse ($ckpList->where('jenis_ckp', 'Utama') as $ckp)
                                 @php
-                                    $isKetuaTimCkp = !$ckp->penugasan && $ckp->id_sub_kegiatan;
+                                    $isPimpinanCkp = !$ckp->penugasan && !$ckp->id_sub_kegiatan && $ckp->id_agenda;
+                                    $isKetuaTimCkp = !$ckp->penugasan && $ckp->id_sub_kegiatan && !$ckp->id_agenda;
+                                    $isAnggotaCkp  = $ckp->penugasan;
                                     
                                     // Data penugasan untuk modal
                                     $penugasanData = $ckp->penugasan ? [
@@ -198,15 +200,20 @@
                                         'nama_sub_kegiatan' => $ckp->subKegiatan->nama_sub_kegiatan,
                                         'kegiatan' => ['nama_rk_kegiatan' => $ckp->subKegiatan->kegiatan->nama_rk_kegiatan ?? '-']
                                     ] : null;
+
+                                    // Data Agenda untuk modal
+                                    $agendaData = $ckp->agendaPimpinan ? [
+                                        'nama_agenda' => $ckp->agendaPimpinan->nama_agenda,
+                                    ] : null;
                                 @endphp
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 {{ $isKetuaTimCkp ? 'bg-purple-50/30 dark:bg-purple-900/10' : '' }}">
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 {{ $isPimpinanCkp ? 'bg-purple-50/30 dark:bg-purple-900/10' : ($isKetuaTimCkp ? 'bg-green-50/30 dark:bg-green-900/10' : '') }}">
                                     <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center dark:text-gray-300">{{ $noUtama++ }}</td>
                                     @if ($bulan === 'all')
                                     <td class="px-4 py-3 text-sm text-center font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
                                         @php
                                             $tglKirim = $ckp->penugasan ? $ckp->penugasan->latestPengiriman?->tanggal_pengiriman : $ckp->created_at;
                                         @endphp
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $isKetuaTimCkp ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' }}">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $isPimpinanCkp ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' : ($isKetuaTimCkp ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300') }}">
                                             {{ $tglKirim ? $bulanList[$tglKirim->format('m')] ?? '-' : '-' }}
                                         </span>
                                     </td>
@@ -214,12 +221,26 @@
                                     <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                                         <div class="flex items-start gap-2">
                                             <span>{{ $ckp->uraian }}</span>
-                                            @if($isKetuaTimCkp)
+                                            @if($isPimpinanCkp)
                                                 <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border border-purple-200 dark:border-purple-800 whitespace-nowrap">
                                                     <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                                     </svg>
+                                                    Pimpinan
+                                                </span>
+                                            @elseif($isKetuaTimCkp)
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800 whitespace-nowrap">
+                                                    <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
                                                     Ketua Tim
+                                                </span>
+                                            @elseif($isAnggotaCkp)
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800 whitespace-nowrap">
+                                                    <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                    </svg>
+                                                    Anggota
                                                 </span>
                                             @endif
                                         </div>
@@ -262,7 +283,7 @@
                                             <div class="absolute right-0 mt-1 w-36 origin-top-right rounded-md bg-white border border-gray-200 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 dark:bg-gray-800 dark:border-gray-700">
                                                 <div class="py-1">
                                                     <button class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 dark:text-gray-300 dark:hover:bg-gray-700"
-                                                        @click="$dispatch('open-smart-modal', { modalId: 'modal-detail-ckp', data: { id_ckp: '{{ $ckp->id_ckp }}', uraian: {{ json_encode($ckp->uraian) }}, jenis_ckp: '{{ $ckp->jenis_ckp }}', target_kuantitas: '{{ $ckp->target_kuantitas }}', satuan: '{{ $ckp->satuan }}', realisasi: '{{ $ckp->realisasi }}', persentase_realisasi: '{{ $ckp->persentase_realisasi }}', tingkat_kualitas: '{{ $ckp->tingkat_kualitas }}', kode_butir_kegiatan: '{{ $ckp->kode_butir_kegiatan }}', angka_kredit: '{{ $ckp->angka_kredit }}', keterangan: {{ json_encode($ckp->keterangan) }}, created_at: '{{ $ckp->created_at->translatedFormat('d F Y H:i') }}', is_ketua_tim: {{ $isKetuaTimCkp ? 'true' : 'false' }}, penugasan: {{ json_encode($penugasanData) }}, sub_kegiatan: {{ json_encode($subKegiatanData) }} } })">
+                                                        @click="$dispatch('open-smart-modal', { modalId: 'modal-detail-ckp', data: { id_ckp: '{{ $ckp->id_ckp }}', uraian: {{ json_encode($ckp->uraian) }}, jenis_ckp: '{{ $ckp->jenis_ckp }}', target_kuantitas: '{{ $ckp->target_kuantitas }}', satuan: '{{ $ckp->satuan }}', realisasi: '{{ $ckp->realisasi }}', persentase_realisasi: '{{ $ckp->persentase_realisasi }}', tingkat_kualitas: '{{ $ckp->tingkat_kualitas }}', kode_butir_kegiatan: '{{ $ckp->kode_butir_kegiatan }}', angka_kredit: '{{ $ckp->angka_kredit }}', keterangan: {{ json_encode($ckp->keterangan) }}, created_at: '{{ $ckp->created_at->translatedFormat('d F Y H:i') }}', is_ketua_tim: {{ $isKetuaTimCkp ? 'true' : 'false' }}, is_pimpinan: {{ $isPimpinanCkp ? 'true' : 'false' }}, penugasan: {{ json_encode($penugasanData) }}, sub_kegiatan: {{ json_encode($subKegiatanData) }}, agenda: {{ json_encode($agendaData) }} } })">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -291,29 +312,41 @@
                             </tr>
 
                             @php $noTambahan = 1; @endphp
-                            @forelse ($ckpList->where('jenis_ckp', 'tambahan') as $ckp)
+                            @forelse ($ckpList->where('jenis_ckp', 'Tambahan') as $ckp)
                                 @php
-                                    $isKetuaTimCkp = !$ckp->penugasan && $ckp->id_sub_kegiatan;
+                                    $isPimpinanCkp = !$ckp->penugasan && !$ckp->id_sub_kegiatan && $ckp->id_agenda;
+                                    $isKetuaTimCkp = !$ckp->penugasan && $ckp->id_sub_kegiatan && !$ckp->id_agenda;
+                                    $isAnggotaCkp  = $ckp->penugasan;
+                                    
+                                    // Data penugasan untuk modal
                                     $penugasanData = $ckp->penugasan ? [
                                         'jenis_kegiatan' => $ckp->penugasan->jenisKegiatan->jenis_kegiatan ?? '-',
                                         'target' => $ckp->penugasan->target,
                                         'satuan_target' => $ckp->penugasan->satuan_target,
                                         'tanggal_mulai' => optional($ckp->penugasan->tanggal_mulai)->translatedFormat('d M Y'),
                                         'tanggal_selesai' => optional($ckp->penugasan->tanggal_selesai)->translatedFormat('d M Y'),
+                                        'tanggal_pengiriman' => optional($ckp->penugasan->latestPengiriman?->tanggal_pengiriman)->translatedFormat('d F Y'),
                                     ] : null;
+                                    
+                                    // Data sub kegiatan untuk modal
                                     $subKegiatanData = $ckp->subKegiatan ? [
                                         'nama_sub_kegiatan' => $ckp->subKegiatan->nama_sub_kegiatan,
                                         'kegiatan' => ['nama_rk_kegiatan' => $ckp->subKegiatan->kegiatan->nama_rk_kegiatan ?? '-']
                                     ] : null;
+
+                                    // Data Agenda untuk modal
+                                    $agendaData = $ckp->agendaPimpinan ? [
+                                        'nama_agenda' => $ckp->agendaPimpinan->nama_agenda,
+                                    ] : null;
                                 @endphp
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 {{ $isKetuaTimCkp ? 'bg-purple-50/30 dark:bg-purple-900/10' : '' }}">
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 {{ $isPimpinanCkp ? 'bg-purple-50/30 dark:bg-purple-900/10' : ($isKetuaTimCkp ? 'bg-green-50/30 dark:bg-green-900/10' : '') }}">
                                     <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center dark:text-gray-300">{{ $noTambahan++ }}</td>
                                     @if ($bulan === 'all')
                                     <td class="px-4 py-3 text-sm text-center font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
                                         @php
                                             $tglKirim = $ckp->penugasan ? $ckp->penugasan->latestPengiriman?->tanggal_pengiriman : $ckp->created_at;
                                         @endphp
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $isKetuaTimCkp ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' }}">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $isPimpinanCkp ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' : ($isKetuaTimCkp ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300') }}">
                                             {{ $tglKirim ? $bulanList[$tglKirim->format('m')] ?? '-' : '-' }}
                                         </span>
                                     </td>
@@ -321,12 +354,26 @@
                                     <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                                         <div class="flex items-start gap-2">
                                             <span>{{ $ckp->uraian }}</span>
-                                            @if($isKetuaTimCkp)
+                                            @if($isPimpinanCkp)
                                                 <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border border-purple-200 dark:border-purple-800 whitespace-nowrap">
                                                     <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                                     </svg>
+                                                    Pimpinan
+                                                </span>
+                                            @elseif($isKetuaTimCkp)
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800 whitespace-nowrap">
+                                                    <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
                                                     Ketua Tim
+                                                </span>
+                                            @elseif($isAnggotaCkp)
+                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800 whitespace-nowrap">
+                                                    <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                    </svg>
+                                                    Anggota
                                                 </span>
                                             @endif
                                         </div>
@@ -369,7 +416,7 @@
                                             <div class="absolute right-0 mt-1 w-36 origin-top-right rounded-md bg-white border border-gray-200 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 dark:bg-gray-800 dark:border-gray-700">
                                                 <div class="py-1">
                                                     <button class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 dark:text-gray-300 dark:hover:bg-gray-700"
-                                                        @click="$dispatch('open-smart-modal', { modalId: 'modal-detail-ckp', data: { id_ckp: '{{ $ckp->id_ckp }}', uraian: {{ json_encode($ckp->uraian) }}, jenis_ckp: '{{ $ckp->jenis_ckp }}', target_kuantitas: '{{ $ckp->target_kuantitas }}', satuan: '{{ $ckp->satuan }}', realisasi: '{{ $ckp->realisasi }}', persentase_realisasi: '{{ $ckp->persentase_realisasi }}', tingkat_kualitas: '{{ $ckp->tingkat_kualitas }}', kode_butir_kegiatan: '{{ $ckp->kode_butir_kegiatan }}', angka_kredit: '{{ $ckp->angka_kredit }}', keterangan: {{ json_encode($ckp->keterangan) }}, created_at: '{{ $ckp->created_at->translatedFormat('d F Y H:i') }}', is_ketua_tim: {{ $isKetuaTimCkp ? 'true' : 'false' }}, penugasan: {{ json_encode($penugasanData) }}, sub_kegiatan: {{ json_encode($subKegiatanData) }} } })">
+                                                        @click="$dispatch('open-smart-modal', { modalId: 'modal-detail-ckp', data: { id_ckp: '{{ $ckp->id_ckp }}', uraian: {{ json_encode($ckp->uraian) }}, jenis_ckp: '{{ $ckp->jenis_ckp }}', target_kuantitas: '{{ $ckp->target_kuantitas }}', satuan: '{{ $ckp->satuan }}', realisasi: '{{ $ckp->realisasi }}', persentase_realisasi: '{{ $ckp->persentase_realisasi }}', tingkat_kualitas: '{{ $ckp->tingkat_kualitas }}', kode_butir_kegiatan: '{{ $ckp->kode_butir_kegiatan }}', angka_kredit: '{{ $ckp->angka_kredit }}', keterangan: {{ json_encode($ckp->keterangan) }}, created_at: '{{ $ckp->created_at->translatedFormat('d F Y H:i') }}', is_ketua_tim: {{ $isKetuaTimCkp ? 'true' : 'false' }}, is_pimpinan: {{ $isPimpinanCkp ? 'true' : 'false' }}, penugasan: {{ json_encode($penugasanData) }}, sub_kegiatan: {{ json_encode($subKegiatanData) }}, agenda: {{ json_encode($agendaData) }} } })">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -399,19 +446,29 @@
     </div>
 
     {{-- Modal Detail CKP --}}
-    <div x-data="{ detailData: { uraian: '', jenis_ckp: '', target_kuantitas: '', satuan: '', realisasi: '', persentase_realisasi: '', tingkat_kualitas: '', kode_butir_kegiatan: '', angka_kredit: '', keterangan: '', created_at: '', is_ketua_tim: false, penugasan: null, sub_kegiatan: null } }"
-        @open-smart-modal.window="if ($event.detail.modalId !== 'modal-detail-ckp') return; detailData = { uraian: $event.detail.data?.uraian ?? '', jenis_ckp: $event.detail.data?.jenis_ckp ?? '', target_kuantitas: $event.detail.data?.target_kuantitas ?? '', satuan: $event.detail.data?.satuan ?? '', realisasi: $event.detail.data?.realisasi ?? '', persentase_realisasi: $event.detail.data?.persentase_realisasi ?? '', tingkat_kualitas: $event.detail.data?.tingkat_kualitas ?? '', kode_butir_kegiatan: $event.detail.data?.kode_butir_kegiatan ?? '', angka_kredit: $event.detail.data?.angka_kredit ?? '', keterangan: $event.detail.data?.keterangan ?? '', created_at: $event.detail.data?.created_at ?? '', is_ketua_tim: $event.detail.data?.is_ketua_tim ?? false, penugasan: $event.detail.data?.penugasan ?? null, sub_kegiatan: $event.detail.data?.sub_kegiatan ?? null };">
+    <div x-data="{ detailData: { uraian: '', jenis_ckp: '', target_kuantitas: '', satuan: '', realisasi: '', persentase_realisasi: '', tingkat_kualitas: '', kode_butir_kegiatan: '', angka_kredit: '', keterangan: '', created_at: '', is_ketua_tim: false, is_pimpinan: false, penugasan: null, sub_kegiatan: null, agenda: null } }"
+        @open-smart-modal.window="if ($event.detail.modalId !== 'modal-detail-ckp') return; detailData = { uraian: $event.detail.data?.uraian ?? '', jenis_ckp: $event.detail.data?.jenis_ckp ?? '', target_kuantitas: $event.detail.data?.target_kuantitas ?? '', satuan: $event.detail.data?.satuan ?? '', realisasi: $event.detail.data?.realisasi ?? '', persentase_realisasi: $event.detail.data?.persentase_realisasi ?? '', tingkat_kualitas: $event.detail.data?.tingkat_kualitas ?? '', kode_butir_kegiatan: $event.detail.data?.kode_butir_kegiatan ?? '', angka_kredit: $event.detail.data?.angka_kredit ?? '', keterangan: $event.detail.data?.keterangan ?? '', created_at: $event.detail.data?.created_at ?? '', is_ketua_tim: $event.detail.data?.is_ketua_tim ?? false, is_pimpinan: $event.detail.data?.is_pimpinan ?? false, penugasan: $event.detail.data?.penugasan ?? null, sub_kegiatan: $event.detail.data?.sub_kegiatan ?? null, agenda: $event.detail.data?.agenda ?? null };">
         <x-ui.smart-modal id="modal-detail-ckp" class="max-w-2xl">
             <div class="relative flex flex-col bg-white dark:bg-gray-900 dark:border dark:border-gray-800 rounded-3xl overflow-hidden" style="max-height: 85vh;">
                 <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-700">
                     <div class="flex items-center gap-2">
                         <h4 class="text-2xl font-semibold text-gray-800 dark:text-white">Detail CKP</h4>
-                        <template x-if="detailData.is_ketua_tim">
+                        <template x-if="detailData.is_pimpinan">
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
-                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                </svg>
+                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                Pimpinan
+                            </span>
+                        </template>
+                        <template x-if="detailData.is_ketua_tim">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                                 Ketua Tim
+                            </span>
+                        </template>
+                        <template x-if="!detailData.is_ketua_tim && !detailData.is_pimpinan">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                                Anggota Tim
                             </span>
                         </template>
                     </div>
@@ -425,8 +482,8 @@
                     <div class="grid grid-cols-3 gap-3">
                         <div class="rounded-xl bg-blue-50 dark:bg-blue-900/20 p-3">
                             <p class="text-xs font-medium text-blue-500 dark:text-blue-400 mb-1">Jenis CKP</p>
-                            <template x-if="detailData.jenis_ckp === 'utama'"><p class="text-sm font-semibold text-blue-700 dark:text-blue-300">Utama</p></template>
-                            <template x-if="detailData.jenis_ckp === 'tambahan'"><p class="text-sm font-semibold text-gray-700 dark:text-gray-300">Tambahan</p></template>
+                            <template x-if="detailData.jenis_ckp === 'Utama'"><p class="text-sm font-semibold text-blue-700 dark:text-blue-300">Utama</p></template>
+                            <template x-if="detailData.jenis_ckp === 'Tambahan'"><p class="text-sm font-semibold text-gray-700 dark:text-gray-300">Tambahan</p></template>
                             <template x-if="!detailData.jenis_ckp"><p class="text-sm text-gray-500">-</p></template>
                         </div>
                         <div class="rounded-xl bg-gray-50 dark:bg-gray-800 p-3">
@@ -457,9 +514,9 @@
                         <p class="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Keterangan</p>
                         <p class="text-sm text-gray-800 dark:text-gray-200 leading-relaxed" x-text="detailData.keterangan"></p>
                     </div>
-                    <div x-show="detailData.is_ketua_tim && detailData.sub_kegiatan !== null" class="rounded-xl border border-purple-200 dark:border-purple-800 overflow-hidden">
-                        <div class="px-4 py-2.5 bg-purple-50 dark:bg-purple-900/20 border-b border-purple-200 dark:border-purple-800">
-                            <p class="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center gap-2">
+                    <div x-show="detailData.is_ketua_tim && detailData.sub_kegiatan !== null" class="rounded-xl border border-green-200 dark:border-green-800 overflow-hidden">
+                        <div class="px-4 py-2.5 bg-green-50 dark:bg-green-900/20 border-b border-green-200 dark:border-green-800">
+                            <p class="text-xs font-medium text-green-600 dark:text-green-400 uppercase tracking-wider flex items-center gap-2">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                                 Informasi Sub Kegiatan (CKP Ketua Tim)
                             </p>
@@ -469,7 +526,20 @@
                             <div><p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Kegiatan</p><p class="text-sm font-medium text-gray-800 dark:text-gray-200" x-text="detailData.sub_kegiatan?.kegiatan?.nama_rk_kegiatan || '-'"></p></div>
                         </div>
                     </div>
-                    <div x-show="!detailData.is_ketua_tim && detailData.penugasan !== null" class="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    
+                    <div x-show="detailData.is_pimpinan && detailData.agenda !== null" class="rounded-xl border border-purple-200 dark:border-purple-800 overflow-hidden">
+                        <div class="px-4 py-2.5 bg-purple-50 dark:bg-purple-900/20 border-b border-purple-200 dark:border-purple-800">
+                            <p class="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center gap-2">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                                Informasi Agenda (CKP Pimpinan)
+                            </p>
+                        </div>
+                        <div class="p-4 space-y-3">
+                            <div><p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Agenda Pimpinan</p><p class="text-sm font-medium text-gray-800 dark:text-gray-200" x-text="detailData.agenda?.nama_agenda || '-'"></p></div>
+                        </div>
+                    </div>
+
+                    <div x-show="!detailData.is_ketua_tim && !detailData.is_pimpinan && detailData.penugasan !== null" class="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                         <div class="px-4 py-2.5 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"><p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Informasi Penugasan</p></div>
                         <div class="p-4 grid grid-cols-2 gap-4">
                             <div class="col-span-2"><p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Jenis Kegiatan</p><p class="text-sm font-medium text-gray-800 dark:text-gray-200" x-text="detailData.penugasan?.jenis_kegiatan || '-'"></p></div>
@@ -489,8 +559,8 @@
     </div>
 
     {{-- Modal Edit CKP --}}
-    <div x-data="{ editData: { id_ckp: '', uraian: '', jenis_ckp: 'utama', keterangan: '' } }"
-        @open-smart-modal.window="if ($event.detail.modalId !== 'modal-edit-ckp') return; editData = { id_ckp: $event.detail.data?.id_ckp ?? '', uraian: $event.detail.data?.uraian ?? '', jenis_ckp: $event.detail.data?.jenis_ckp ?? 'utama', keterangan: $event.detail.data?.keterangan ?? '' };">
+    <div x-data="{ editData: { id_ckp: '', uraian: '', jenis_ckp: 'Utama', keterangan: '' } }"
+        @open-smart-modal.window="if ($event.detail.modalId !== 'modal-edit-ckp') return; editData = { id_ckp: $event.detail.data?.id_ckp ?? '', uraian: $event.detail.data?.uraian ?? '', jenis_ckp: $event.detail.data?.jenis_ckp ?? 'Utama', keterangan: $event.detail.data?.keterangan ?? '' };">
         <x-ui.smart-modal id="modal-edit-ckp" class="max-w-2xl">
             <div class="relative flex h-auto w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-white dark:bg-gray-900 dark:border dark:border-gray-800">
                 <div class="shrink-0 border-b border-gray-200 px-6 py-3 dark:border-gray-700">
@@ -508,8 +578,8 @@
                         <div>
                             <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Jenis CKP</label>
                             <select name="jenis_ckp" x-model="editData.jenis_ckp" class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                                <option value="utama">Utama</option>
-                                <option value="tambahan">Tambahan</option>
+                                <option value="Utama">Utama</option>
+                                <option value="Tambahan">Tambahan</option>
                             </select>
                         </div>
                         <div>

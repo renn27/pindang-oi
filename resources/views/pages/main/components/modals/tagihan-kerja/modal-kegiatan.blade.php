@@ -62,8 +62,7 @@
                     </label>
 
                     <input type="text" value="{{ $bidang->nama_bidang }}" disabled
-                        class="w-full mb-4 h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800
-                                cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                        class="w-full mb-4 h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800 cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
                 </div>
 
                 <!-- ID Bidang (yang benar-benar dikirim ke backend) -->
@@ -260,10 +259,7 @@
         }
     }
 
-    // =============================================
     // VALIDASI FRONTEND
-    // =============================================
-
     function clearValidation() {
         document.querySelectorAll('.input-invalid').forEach(el => {
             el.classList.remove(

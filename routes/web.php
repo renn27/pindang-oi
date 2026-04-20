@@ -196,13 +196,17 @@ Route::middleware('auth')->group(function () {
     // route CKP
     Route::get('ckp-pegawai/export', [CkpPegawaiController::class, 'exportExcel'])->name('ckp.pegawai.export');
 
-    // Route untuk CKP dari Penugasan (Anggota Tim) - SUDAH ADA
-    Route::post('/ckp/from-penugasan/{id}', [CkpPegawaiController::class, 'storeFromPenugasan'])
+    // Route untuk CKP dari Penugasan (Anggota Tim) 
+    Route::post('/ckp/from-penugasan/{penugasan}', [CkpPegawaiController::class, 'storeFromPenugasan'])
         ->name('ckp.from.penugasan');
 
-    // Route untuk CKP dari Sub Kegiatan (Ketua Tim) - BARU DITAMBAHKAN
+    // Route untuk CKP dari Sub Kegiatan (Ketua Tim) 
     Route::post('/ckp/from-sub-kegiatan/{subKegiatan}', [CkpPegawaiController::class, 'storeFromSubKegiatan'])
         ->name('ckp.from.sub-kegiatan');
+
+    // Route untuk CKP dari Agenda Pimpinan (Pimpinan) 
+    Route::post('/ckp/from-agenda-pimpinan/{agendaPimpinan}', [CkpPegawaiController::class, 'storeFromAgendaPimpinan'])
+        ->name('ckp.from.agenda-pimpinan');
 
     // Route untuk halaman CKP pegawai
     Route::get('/ckp-pegawai', [CkpPegawaiController::class, 'index'])->name('ckp.pegawai.index');

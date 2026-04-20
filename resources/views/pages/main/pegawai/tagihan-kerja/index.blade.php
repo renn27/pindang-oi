@@ -232,9 +232,7 @@
     </style>
 
     <script>
-        // =============================================
         // FUNGSI LOAD IKI BERDASARKAN RK (untuk modal kegiatan)
-        // =============================================
         async function loadIkiByRk(rkId, formData) {
             const selectEl = document.getElementById('iki_jpt');
             const hiddenEl = document.getElementById('iki_jpt_hidden');
@@ -271,7 +269,6 @@
                 if (hiddenEl) hiddenEl.value = selectEl.value;
 
             } catch (error) {
-                console.error('Gagal load IKI JPT:', error);
                 if (selectEl) {
                     selectEl.innerHTML = '<option value="">Gagal memuat data</option>';
                     selectEl.disabled = false;
@@ -279,9 +276,7 @@
             }
         }
 
-        // =============================================
         // LISTENER EDIT MODAL KEGIATAN
-        // =============================================
         document.addEventListener('DOMContentLoaded', function() {
             window.addEventListener('open-smart-modal', function(e) {
                 const detail = e.detail;

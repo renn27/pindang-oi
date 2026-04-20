@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class CkpPegawai extends Model
 {
@@ -16,18 +17,19 @@ class CkpPegawai extends Model
 
     protected $fillable = [
         'id_pegawai',
-        'id_penugasan',
-        'id_sub_kegiatan',  
+        'ckpable_type',
+        'ckpable_id',
+        'tipe_ckp',
         'uraian',
         'jenis_ckp',
         'satuan',
         'target_kuantitas',
-        'kode_butir_kegiatan',
-        'angka_kredit',
-        'keterangan',
         'realisasi',
         'persentase_realisasi',
         'tingkat_kualitas',
+        'kode_butir_kegiatan',
+        'angka_kredit',
+        'keterangan',
     ];
 
     public function pegawai()
@@ -35,8 +37,9 @@ class CkpPegawai extends Model
         return $this->belongsTo(Pegawai::class, 'id_pegawai', 'id_pegawai');
     }
 
-    public function penugasan()
+    // Polymorphic — menunjuk ke parent (Penugasan / SubKegiatan / AgendaPimpinan)
+    public function ckpable(): MorphTo
     {
-        return $this->belongsTo(Penugasan::class, 'id_penugasan', 'id_penugasan');
+        return $this->morphTo();
     }
 }

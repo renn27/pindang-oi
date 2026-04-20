@@ -6,17 +6,19 @@
         ckpData = {
             id_penugasan: $event.detail.id_penugasan || null,
             id_sub_kegiatan: $event.detail.id_sub_kegiatan || null,
-            nama_anggota: $event.detail.nama_anggota || '',
+            id_agenda: $event.detail.id_agenda || null,
+            nama_pegawai: $event.detail.nama_pegawai || '',
             nama_sub_kegiatan: $event.detail.nama_sub_kegiatan || '',
+            nama_agenda: $event.detail.nama_agenda || '',
             uraian: $event.detail.uraian || '',
             satuan: $event.detail.satuan || '',
             target_kuantitas: $event.detail.target_kuantitas || 0,
             keterangan: $event.detail.keterangan || '',
-            is_ketua_tim: $event.detail.is_ketua_tim || false
+            is_ketua_tim: $event.detail.is_ketua_tim || false,
+            is_pimpinan: $event.detail.is_pimpinan || false
         };
         
-        showCkpModal = true;
-    ">
+        showCkpModal = true;">
 
     <div x-show="showCkpModal"
         x-cloak
@@ -37,11 +39,22 @@
                 <div class="shrink-0 border-b border-gray-200 px-6 py-4 dark:border-gray-700">
                     <div class="flex items-center gap-3">
                         <div class="flex h-10 w-10 items-center justify-center rounded-full"
-                            :class="ckpData.is_ketua_tim ? 'bg-green-100 dark:bg-green-900/30' : 'bg-blue-100 dark:bg-blue-900/30'">
-                            <svg class="w-5 h-5" 
-                                :class="ckpData.is_ketua_tim ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'"
+                            :class="ckpData.is_pimpinan 
+                                ? 'bg-purple-100 dark:bg-purple-900/30' 
+                                : ckpData.is_ketua_tim 
+                                    ? 'bg-green-100 dark:bg-green-900/30' 
+                                    : 'bg-blue-100 dark:bg-blue-900/30'">
+
+                            <svg class="w-5 h-5"
+                                :class="ckpData.is_pimpinan 
+                                    ? 'text-purple-600 dark:text-purple-400' 
+                                    : ckpData.is_ketua_tim 
+                                        ? 'text-green-600 dark:text-green-400' 
+                                        : 'text-blue-600 dark:text-blue-400'"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
                             </svg>
                         </div>
                         <div>
@@ -49,8 +62,9 @@
                                 Konfirmasi Jadikan CKP
                             </h4>
                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                <span x-show="!ckpData.is_ketua_tim">Konfirmasi dan lengkapi data CKP dari penugasan ini</span>
-                                <span x-show="ckpData.is_ketua_tim">Konfirmasi dan lengkapi data CKP Ketua Tim dari sub kegiatan ini</span>
+                                <span x-show="!ckpData.is_ketua_tim && !ckpData.is_pimpinan">Konfirmasi dan lengkapi data CKP dari Penugasan ini</span>
+                                <span x-show="ckpData.is_ketua_tim">Konfirmasi dan lengkapi data CKP Ketua Tim dari Sub Kegiatan ini</span>
+                                <span x-show="ckpData.is_pimpinan">Konfirmasi dan lengkapi data CKP Pimpinan dari Agenda Pimpinan ini</span>
                             </p>
                         </div>
                     </div>
@@ -60,7 +74,9 @@
                 <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar dark:bg-gray-900 max-h-[70vh]">
                     <form :action="ckpData.is_ketua_tim 
                         ? `{{ url('ckp/from-sub-kegiatan') }}/${ckpData.id_sub_kegiatan}`
-                        : `{{ url('ckp/from-penugasan') }}/${ckpData.id_penugasan}`"
+                        : ckpData.is_pimpinan
+                            ? `{{ url('ckp/from-agenda-pimpinan') }}/${ckpData.id_agenda}`
+                            : `{{ url('ckp/from-penugasan') }}/${ckpData.id_penugasan}`"
                         method="POST"
                         id="ckpUniversalForm">
                         @csrf
@@ -72,33 +88,18 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                                 <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    <span x-show="!ckpData.is_ketua_tim">Informasi Penugasan</span>
+                                    <span x-show="!ckpData.is_ketua_tim && !ckpData.is_pimpinan">Informasi Penugasan</span>
                                     <span x-show="ckpData.is_ketua_tim">Informasi Sub Kegiatan</span>
+                                    <span x-show="ckpData.is_pimpinan">Informasi Agenda Pimpinan</span>
                                 </h4>
                             </div>
 
                             <div class="grid gap-3 text-sm">
-                                <template x-if="!ckpData.is_ketua_tim">
-                                    <div>
-                                        <div>
-                                            <span class="text-gray-500 dark:text-gray-400">Anggota:</span>
-                                            <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.nama_anggota"></span>
-                                        </div>
-                                        <div class="mt-2">
-                                            <span class="text-gray-500 dark:text-gray-400">Satuan:</span>
-                                            <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.satuan"></span>
-                                        </div>
-                                        <div class="mt-2">
-                                            <span class="text-gray-500 dark:text-gray-400">Target Kuantitas:</span>
-                                            <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.target_kuantitas"></span>
-                                        </div>
-                                    </div>
-                                </template>
-
+                                <!-- Info Khusus Sub Kegiatan (Ketua Tim) -->
                                 <template x-if="ckpData.is_ketua_tim">
                                     <div>
                                         <div>
-                                            <span class="text-gray-500 dark:text-gray-400">Sub Kegiatan:</span>
+                                            <span class="text-gray-500 dark:text-gray-400">Sub Kegiatan : </span>
                                             <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.nama_sub_kegiatan"></span>
                                         </div>
                                         <div class="mt-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-3">
@@ -113,6 +114,34 @@
                                         </div>
                                     </div>
                                 </template>
+
+                                <!-- Info Khusus Agenda Pimpinan -->
+                                <template x-if="ckpData.is_pimpinan">
+                                    <div>
+                                        <span class="text-gray-500 dark:text-gray-400">Agenda Pimpinan : </span>
+                                        <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.nama_agenda"></span>
+                                    </div>
+                                </template>
+
+                                <!-- Info Universal -->
+                                <div>
+                                    <div x-show="ckpData.nama_pegawai">
+                                        <span class="text-gray-500 dark:text-gray-400">
+                                            <span x-show="!ckpData.is_ketua_tim && !ckpData.is_pimpinan">Pegawai (Anggota) :</span>
+                                            <span x-show="ckpData.is_ketua_tim">Pegawai (Ketua Tim) :</span>
+                                            <span x-show="ckpData.is_pimpinan">Pimpinan : </span>
+                                        </span>
+                                        <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.nama_pegawai"></span>
+                                    </div>
+                                    <div :class="ckpData.nama_pegawai ? 'mt-2' : ''">
+                                        <span class="text-gray-500 dark:text-gray-400">Satuan :</span>
+                                        <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.satuan"></span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span class="text-gray-500 dark:text-gray-400">Target Kuantitas :</span>
+                                        <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.target_kuantitas"></span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -173,8 +202,9 @@
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
-                            <span x-show="!ckpData.is_ketua_tim">Simpan ke CKP</span>
-                            <span x-show="ckpData.is_ketua_tim">Simpan ke CKP Ketua Tim</span>
+                            <span x-show="!ckpData.is_ketua_tim && !ckpData.is_pimpinan">Simpan sebagai CKP Anggota</span>
+                            <span x-show="ckpData.is_ketua_tim">Simpan sebagai CKP Ketua Tim</span>
+                            <span x-show="ckpData.is_pimpinan">Simpan sebagai CKP Pimpinan</span>
                         </button>
                     </div>
                 </div>
@@ -190,13 +220,16 @@
             ckpData: {
                 id_penugasan: null,
                 id_sub_kegiatan: null,
-                nama_anggota: '',
+                id_agenda: null,
+                nama_pegawai: '',
                 nama_sub_kegiatan: '',
+                nama_agenda: '',
                 uraian: '',
                 satuan: '',
                 target_kuantitas: 0,
                 keterangan: '',
-                is_ketua_tim: false
+                is_ketua_tim: false,
+                is_pimpinan: false
             },
 
             submitCkpForm() {

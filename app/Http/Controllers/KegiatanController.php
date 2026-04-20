@@ -17,7 +17,6 @@ class KegiatanController extends Controller
     public function index(Bidang $bidang)
     {
         $pegawai = Auth::user();
-        // Data utama
         $this->authorize('viewAny', Kegiatan::class);
         $kegiatanQuery = $bidang->kegiatans()
             ->with([
@@ -28,14 +27,15 @@ class KegiatanController extends Controller
                         $q->whereHas('penugasans', function ($p) use ($pegawai) {
                             $p->where('id_anggota', $pegawai->id_pegawai);
                         });
-                    }
 
-                    // 🔥 ORDER BY TANGGAL (INI YANG PENTING)
-                    // $q->orderBy('tanggal_mulai', 'asc');
-                    // kalau mau lebih aman:
+                    }
                     $q->orderByRaw('COALESCE(tanggal_mulai, tanggal_selesai) ASC');
 
-                    // MODE KETUA → tidak difilter
+                    // ✅ Tambahkan eager load ini
+                    $q->with([
+                        'ckp',                               // cek $isCkpKetuaTim
+                        'penugasans.latestPengiriman.penerimaan', // cek progress selesai
+                    ]);
                 },
                 'rencanaJpt',
                 'indikatorJpt'
@@ -50,6 +50,7 @@ class KegiatanController extends Controller
         }
 
         $kegiatans = $kegiatanQuery->get();
+        // $subKegiatans = $kegiatans->flatMap->subKegiatans;
 
         // Data referensi untuk dropdown modal
         $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
@@ -68,6 +69,7 @@ class KegiatanController extends Controller
             'title'     => $bidang->detail_bidang,
             'bidang'    => $bidang,
             'kegiatans' => $kegiatans,
+            // 'subKegiatans' => $subKegiatans,
             'pegawais'  => $pegawais,
             'rkJpts'    => $rkJpts,
             'ketuaTims' => $ketuaTims
@@ -77,9 +79,7 @@ class KegiatanController extends Controller
     public function store(Request $request, Bidang $bidang)
     {
         // dd($request->all());
-
         $this->authorize('create', Kegiatan::class);
-
         $validated = $request->validate([
             'nama_rk_kegiatan' => ['required', 'string', 'max:255'],
             'rk_jpt' => ['required', 'exists:rencana_jpts,id'],
@@ -114,7 +114,6 @@ class KegiatanController extends Controller
     public function update(Request $request, Kegiatan $kegiatan)
     {
         // dd($request->all());
-        // 🔐 Authorization
         $this->authorize('update', $kegiatan);
 
         // ✅ Validasi
