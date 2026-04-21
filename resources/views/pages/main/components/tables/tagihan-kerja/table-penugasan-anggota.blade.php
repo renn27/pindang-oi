@@ -871,7 +871,7 @@
                                                                     <div>
                                                                         <span class="text-gray-400">Rata-rata
                                                                             Nilai:</span>
-                                                                        {{ number_format($avgRatingKirimDLAtauTranslok, 1) }}/5
+                                                                        {{ $avgRatingKirimDLAtauTranslok }}/5
                                                                     </div>
                                                                 </div>
 
@@ -946,7 +946,7 @@
                                                                     <div>
                                                                         <span class="text-gray-400">Rata-rata
                                                                             Nilai:</span>
-                                                                        {{ number_format($avgRatingTerimaDLAtauTranslok, 1) }}/5
+                                                                        {{ $avgRatingTerimaDLAtauTranslok }}/5
                                                                     </div>
                                                                 </div>
 
@@ -1797,7 +1797,7 @@
                                                                     <div>
                                                                         <span class="text-gray-400">Rata-rata
                                                                             Nilai : </span>
-                                                                        {{ number_format($avgRatingKirimNonDLAtauTranslok, 1) }}/5
+                                                                        {{ $avgRatingKirimNonDLAtauTranslok }}/5
                                                                     </div>
                                                                 </div>
 
@@ -1867,7 +1867,7 @@
                                                                     <div>
                                                                         <span class="text-gray-400">Rata-rata
                                                                             Nilai : </span>
-                                                                        {{ number_format($avgRatingTerimaNonDLAtauTranslok, 1) }}/5
+                                                                        {{ $avgRatingTerimaNonDLAtauTranslok }}/5
                                                                     </div>
                                                                 </div>
 

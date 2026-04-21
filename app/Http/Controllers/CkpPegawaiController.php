@@ -192,7 +192,7 @@ class CkpPegawaiController extends Controller
         // 8. Hitung rata-rata persentase realisasi
         $avgPersentase = round($penugasans->avg(function ($penugasan) {
                 return $penugasan->latestPengiriman?->rr_kirim ?? 0;
-            }) ?? 0, 2);
+            }) ?? 0, 2); // PERBAIKI PERHTIUNGAN RATA-RATA — PAKAI RUMUS YANG KAYAK DI VIEW TABLE-PENUGASAN. TERUS JANGAN CUMA DARI RR KIRIM AJA, RR TERIMA JUGA PERHATIKAN 
 
         // 9. Hitung rata-rata tingkat kualitas
         $avgKualitas = round($penugasans->avg(function ($penugasan) {
@@ -212,9 +212,9 @@ class CkpPegawaiController extends Controller
             'kode_butir_kegiatan' => null,
             'angka_kredit' => null,
             'keterangan' => $request->keterangan,
-            'realisasi' => $totalRealisasi,
-            'persentase_realisasi' => $avgPersentase,
-            'tingkat_kualitas' => $avgKualitas,
+            'realisasi' => $totalRealisasi, // rr
+            'persentase_realisasi' => $avgPersentase, // persen rr
+            'tingkat_kualitas' => $avgKualitas, // rating
         ]);
 
         // 11. Redirect dengan pesan sukses
