@@ -81,7 +81,9 @@ class SubKegiatanController extends Controller
 
         // === FILTER BUTUH DL / TIDAK BUTUH DL ===
         $penugasanButuhDLAtauTranslok = $penugasans->filter(fn ($row) => $row->butuh_dl || $row->butuh_translok);
+        // dd( $penugasanButuhDLAtauTranslok);
         $penugasanTidakButuhDLAtauTranslok = $penugasans->filter(fn ($row) => ! $row->butuh_dl && ! $row->butuh_translok);
+        // dd( $penugasanTidakButuhDLAtauTranslok);
 
         // Total (SEMUA)
         $totalKirim = $this->hitungTotalKirim($penugasans);
@@ -103,7 +105,7 @@ class SubKegiatanController extends Controller
             'penugasanButuhDLAtauTranslok' => $penugasanButuhDLAtauTranslok,
             'penugasanTidakButuhDLAtauTranslok' => $penugasanTidakButuhDLAtauTranslok,
             'totalKirim' => $totalKirim,
-            'totalKirimTerima' => $totalTerima,
+            'totalTerima' => $totalTerima,
             'totalKirimButuhDLAtauTranslok' => $totalKirimButuhDLAtauTranslok,
             'totalTerimaButuhDLAtauTranslok' => $totalTerimaButuhDLAtauTranslok,
             'totalKirimTidakButuhDLAtauTranslok' => $totalKirimTidakButuhDLAtauTranslok,

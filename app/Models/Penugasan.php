@@ -36,6 +36,8 @@ class Penugasan extends Model
     protected $casts = [
         'tanggal_mulai' => 'date',
         'tanggal_selesai' => 'date',
+        // 'butuh_dl' => 'boolean',
+        // 'butuh_translok' => 'boolean',
     ];
 
     // RELATIONS

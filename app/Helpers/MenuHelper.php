@@ -128,7 +128,7 @@ class MenuHelper
                 'is_external' => true,
             ],
             [
-                'icon' => 'gcpln',
+                'icon' => 'gcpbi',
                 'name' => 'GC PBI 2026',
                 'path' => 'https://gcpbi.bpsoganilir.com/',
                 'is_external' => true,
@@ -254,13 +254,13 @@ class MenuHelper
                 <circle cx="18" cy="18" r="1" fill="currentColor"/>
                 </svg>',
             'capaian-kinerja' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 3L13.5 7.5L18 8L14.5 11L16 15.5L12 13L8 15.5L9.5 11L6 8L10.5 7.5L12 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-                    <path d="M20 21H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M18 17L20 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M6 17L4 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <rect x="10" y="17" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.5"/>
-                    <circle cx="12" cy="19" r="0.75" fill="currentColor"/>
-                    </svg>',
+                <path d="M12 3L13.5 7.5L18 8L14.5 11L16 15.5L12 13L8 15.5L9.5 11L6 8L10.5 7.5L12 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                <path d="M20 21H4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M18 17L20 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M6 17L4 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <rect x="10" y="17" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="12" cy="19" r="0.75" fill="currentColor"/>
+                </svg>',
             'kalender' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
                 <path d="M16 2V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -286,7 +286,7 @@ class MenuHelper
                 <path d="M12 2L13.5 5.5L17 6L14.5 8.5L15 12L12 10.5L9 12L9.5 8.5L7 6L10.5 5.5L12 2Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
                 </svg>',
             'announcement' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>',
             'mangcek' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5"/>
@@ -308,14 +308,24 @@ class MenuHelper
                 <path d="M7 15H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>',
             'gcpln' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5"/>
-                <path d="M8 7H16C16.5523 7 17 7.44772 17 8V16C17 16.5523 16.5523 17 16 17H8C7.44772 17 7 16.5523 7 16V8C7 7.44772 7.44772 7 8 7Z" stroke="currentColor" stroke-width="1.5"/>
-                <path d="M12 9V12L13.5 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                <path d="M12 15H12.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                <path d="M9 10H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                <path d="M9 13H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                <path d="M7 9H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                <path d="M7 12H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+                <rect x="7" y="7" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M12 9L10 13H13L11 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M16 5L17 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M18 7L20 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M7 5L6 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M5 7L3 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="12" cy="15.5" r="0.6" fill="currentColor"/>
+                </svg>',
+            'gcpbi' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M7 8L12 5L17 8L12 11L7 8Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <path d="M7 8V12C7 14.5 12 16 12 16C12 16 17 14.5 17 12V8" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <path d="M9 12V13C9 14.5 12 15.5 12 15.5C12 15.5 15 14.5 15 13V12" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <path d="M12 11V15.5" stroke="currentColor" stroke-width="1.5" stroke-dasharray="1 1"/>
+                <circle cx="12" cy="17" r="1" fill="currentColor"/>
+                <path d="M19 19L21 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M5 19L3 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>',
             'sakip' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5"/>

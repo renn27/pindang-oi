@@ -521,11 +521,11 @@
                                                             </p>
                                                         </div>
                                                         <div>
-                                                            <p class="text-xs text-gray-500 dark:text-gray-400">Jumlah
+                                                            <p class="text-xs text-gray-500 dark:text-gray-400">Jumlah Dikirim
                                                             </p>
                                                             <p
                                                                 class="text-sm font-medium text-gray-800 dark:text-gray-300">
-                                                                {{ $penugasan->latestPengiriman?->jumlah_dikirim ?? '-' }}
+                                                                {{ $penugasan->latestPengiriman?->jumlah_dikirim ?? '-' }} {{ $penugasan->satuan_target ?? '-' }}
                                                             </p>
                                                         </div>
                                                         <div>
@@ -642,11 +642,11 @@
                                                             </p>
                                                         </div>
                                                         <div>
-                                                            <p class="text-xs text-gray-500 dark:text-gray-400">Jumlah
+                                                            <p class="text-xs text-gray-500 dark:text-gray-400">Jumlah Diterima
                                                             </p>
                                                             <p
                                                                 class="text-sm font-medium text-gray-800 dark:text-gray-300">
-                                                                {{ $penugasan->latestPenerimaan?->jumlah_diterima ?? '-' }}
+                                                                {{ $penugasan->latestPenerimaan?->jumlah_diterima ?? '-' }} {{ $penugasan->satuan_target ?? '-' }}
                                                             </p>
                                                         </div>
                                                         <div>
@@ -748,31 +748,36 @@
 
                             <!-- Total Row -->
                             @php
-                                $uniquePenugasanButuhDL = $penugasanButuhDLAtauTranslok->unique('id_penugasan');
-                                $sumTargetDL = $uniquePenugasanButuhDL->sum('target');
-                                $avgRrKirimDL =
-                                    $sumTargetDL > 0
-                                        ? round(($totalKirimButuhDLAtauTranslok / $sumTargetDL) * 100, 2)
+                                $uniquePenugasanButuhDLAtauTranslok = $penugasanButuhDLAtauTranslok->unique('id_penugasan');
+                                // ── Target ───────────────────────────────────────────────
+                                $sumTargetDLAtauTranslok = $uniquePenugasanButuhDLAtauTranslok->sum('target');
+                                // ── Response Rate Kirim ──────────────────────────────
+                                $avgRrKirimDLAtauTranslok =
+                                    $sumTargetDLAtauTranslok > 0
+                                        ? round(($totalKirimButuhDLAtauTranslok / $sumTargetDLAtauTranslok) * 100, 2)
                                         : 0;
-                                $avgRrTerimaDL =
-                                    $sumTargetDL > 0
-                                        ? round(($totalTerimaButuhDLAtauTranslok / $sumTargetDL) * 100, 2)
+                                // ── Response Rate Terima ──────────────────────────────
+                                $avgRrTerimaDLAtauTranslok =
+                                    $sumTargetDLAtauTranslok > 0
+                                        ? round(($totalTerimaButuhDLAtauTranslok / $sumTargetDLAtauTranslok) * 100, 2)
                                         : 0;
 
-                                $avgRatingKirimDL =
-                                    $uniquePenugasanButuhDL->avg(function ($p) {
+                                // ── Rating Kirim dan Bintangnya ──────────────────────────────────────────
+                                $avgRatingKirimDLAtauTranslok =
+                                    round($uniquePenugasanButuhDLAtauTranslok->avg(function ($p) {
                                         return $p->latestPengiriman?->rating_kirim ?? 0;
-                                    }) ?? 0;
-                                $bintangKirimDLArray = array_map(function ($i) use ($avgRatingKirimDL) {
-                                    return $i <= round($avgRatingKirimDL);
+                                    }) ?? 0);
+                                $bintangKirimDLAtauTranslokArray = array_map(function ($i) use ($avgRatingKirimDLAtauTranslok) {
+                                    return $i <= round($avgRatingKirimDLAtauTranslok);
                                 }, range(1, 5));
 
-                                $avgRatingTerimaDL =
-                                    $uniquePenugasanButuhDL->avg(function ($p) {
+                                // ── Rating Terima dan Bintanganya ─────────────────────────────────────────
+                                $avgRatingTerimaDLAtauTranslok =
+                                    round($uniquePenugasanButuhDLAtauTranslok->avg(function ($p) {
                                         return $p->latestPenerimaan?->rating_terima ?? 0;
-                                    }) ?? 0;
-                                $bintangTerimaDLArray = array_map(function ($i) use ($avgRatingTerimaDL) {
-                                    return $i <= round($avgRatingTerimaDL);
+                                    }) ?? 0);
+                                $bintangTerimaDLAtauTranslokArray = array_map(function ($i) use ($avgRatingTerimaDLAtauTranslok) {
+                                    return $i <= round($avgRatingTerimaDLAtauTranslok);
                                 }, range(1, 5));
                             @endphp
                             <tr class="bg-gray-50 dark:bg-gray-800 border-t-2 border-gray-200 dark:border-gray-700">
@@ -785,14 +790,12 @@
                                                 <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
                                                     Ringkasan</h4>
                                             </div>
-                                            <div
-                                                class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                                            <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                                                 <div class="grid grid-cols-3 text-center gap-4">
-
                                                     <div>
                                                         <p class="text-xs text-gray-500">Target</p>
                                                         <p class="text-xl font-bold text-blue-600">
-                                                            {{ $sumTargetDL }}
+                                                            {{ $sumTargetDLAtauTranslok }}
                                                         </p>
                                                     </div>
 
@@ -809,9 +812,7 @@
                                                             {{ $totalTerimaButuhDLAtauTranslok }}
                                                         </p>
                                                     </div>
-
                                                 </div>
-
                                             </div>
 
                                         </div>
@@ -826,19 +827,26 @@
 
                                             <div
                                                 class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                                                <div class="grid grid-cols-3 gap-4 items-center">
+                                                <div class="grid grid-cols-2 gap-4 text-center">
 
                                                     <!-- Response Rate -->
                                                     <div>
-                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Response
-                                                            Rate</p>
-                                                        <p
-                                                            class="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                                                            {{ $avgRrKirimDL }}%
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Response Rate</p>
+                                                        <p class="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                                                            {{ $avgRrKirimDLAtauTranslok }}%
                                                         </p>
                                                     </div>
 
                                                     <!-- Rating -->
+                                                    {{-- <div>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Rating</p>
+                                                        <p
+                                                            class="text-lg font-semibold text-green-600 dark:text-green-400">
+                                                            {{ $avgRatingKirimDLAtauTranslok }}
+                                                        </p>
+                                                    </div> --}}
+
+                                                    <!-- Bintang Rating -->
                                                     <div class="text-center">
                                                         <p class="text-xs text-gray-500 dark:text-gray-400">Ketepatan
                                                             Waktu</p>
@@ -847,7 +855,7 @@
                                                             @mouseleave="show = false"
                                                             class="relative flex justify-center gap-0.5 cursor-pointer">
 
-                                                            @foreach ($bintangKirimDLArray as $filled)
+                                                            @foreach ($bintangKirimDLAtauTranslokArray as $filled)
                                                                 <span
                                                                     class="{{ $filled ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-500' }}">★</span>
                                                             @endforeach
@@ -863,7 +871,7 @@
                                                                     <div>
                                                                         <span class="text-gray-400">Rata-rata
                                                                             Nilai:</span>
-                                                                        {{ number_format($avgRatingKirimDL, 1) }}/5
+                                                                        {{ number_format($avgRatingKirimDLAtauTranslok, 1) }}/5
                                                                     </div>
                                                                 </div>
 
@@ -890,7 +898,7 @@
                                             <div
                                                 class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
 
-                                                <div class="grid grid-cols-2 gap-4 items-center">
+                                                <div class="grid grid-cols-2 gap-4 text-center">
 
                                                     <!-- Response Rate -->
                                                     <div>
@@ -898,11 +906,21 @@
                                                             Rate</p>
                                                         <p
                                                             class="text-lg font-semibold text-green-600 dark:text-green-400">
-                                                            {{ $avgRrTerimaDL }}%
+                                                            {{ $avgRrTerimaDLAtauTranslok }}%
                                                         </p>
                                                     </div>
 
                                                     <!-- Rating -->
+                                                    {{-- <div>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Rating</p>
+                                                        <p
+                                                            class="text-lg font-semibold text-green-600 dark:text-green-400">
+                                                            {{ $avgRatingTerimaDLAtauTranslok }}
+                                                        </p>
+                                                    </div> --}}
+
+
+                                                    <!-- Bintang Rating -->
                                                     <div class="text-center">
 
                                                         <p class="text-xs text-gray-500 dark:text-gray-400">Ketepatan
@@ -912,7 +930,7 @@
                                                             @mouseleave="show = false"
                                                             class="relative flex justify-center gap-0.5 cursor-pointer">
 
-                                                            @foreach ($bintangTerimaDLArray as $filled)
+                                                            @foreach ($bintangTerimaDLAtauTranslokArray as $filled)
                                                                 <span
                                                                     class="{{ $filled ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-500' }}">★</span>
                                                             @endforeach
@@ -928,7 +946,7 @@
                                                                     <div>
                                                                         <span class="text-gray-400">Rata-rata
                                                                             Nilai:</span>
-                                                                        {{ number_format($avgRatingTerimaDL, 1) }}/5
+                                                                        {{ number_format($avgRatingTerimaDLAtauTranslok, 1) }}/5
                                                                     </div>
                                                                 </div>
 
@@ -1400,11 +1418,11 @@
                                                             </p>
                                                         </div>
                                                         <div>
-                                                            <p class="text-xs text-gray-500 dark:text-gray-400">Jumlah
+                                                            <p class="text-xs text-gray-500 dark:text-gray-400">Jumlah Dikirim
                                                             </p>
                                                             <p
                                                                 class="text-sm font-medium text-gray-800 dark:text-gray-300">
-                                                                {{ $penugasan->latestPengiriman?->jumlah_dikirim ?? '-' }}
+                                                                {{ $penugasan->latestPengiriman?->jumlah_dikirim ?? '-' }} {{ $penugasan->satuan_target ?? '-' }}
                                                             </p>
                                                         </div>
                                                         <div>
@@ -1510,8 +1528,7 @@
                                                         Penerimaan</h4>
                                                 </div>
 
-                                                <div
-                                                    class="bg-white dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 p-4">
+                                                <div class="bg-white dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 p-4">
                                                     <div class="grid grid-cols-3 gap-3 mb-4">
                                                         <div>
                                                             <p class="text-xs text-gray-500 dark:text-gray-400">Tanggal
@@ -1522,11 +1539,11 @@
                                                             </p>
                                                         </div>
                                                         <div>
-                                                            <p class="text-xs text-gray-500 dark:text-gray-400">Jumlah
+                                                            <p class="text-xs text-gray-500 dark:text-gray-400">Jumlah Diterima
                                                             </p>
                                                             <p
                                                                 class="text-sm font-medium text-gray-800 dark:text-gray-300">
-                                                                {{ $penugasan->latestPenerimaan?->jumlah_diterima ?? '-' }}
+                                                                {{ $penugasan->latestPenerimaan?->jumlah_diterima ?? '-' }} {{ $penugasan->satuan_target ?? '-' }}
                                                             </p>
                                                         </div>
                                                         <div>
@@ -1629,34 +1646,60 @@
 
                             <!-- Total Row -->
                             @php
-                                $uniquePenugasanTidakButuhDL = $penugasanTidakButuhDLAtauTranslok->unique(
+                                $uniquePenugasanTidakButuhDLAtauTranslok = $penugasanTidakButuhDLAtauTranslok->unique(
                                     'id_penugasan',
                                 );
-                                $sumTargetNonDL = $uniquePenugasanTidakButuhDL->sum('target');
-                                $avgRrKirimNonDL =
-                                    $sumTargetNonDL > 0
-                                        ? round(($totalKirimTidakButuhDLAtauTranslok / $sumTargetNonDL) * 100, 2)
-                                        : 0;
-                                $avgRrTerimaNonDL =
-                                    $sumTargetNonDL > 0
-                                        ? round(($totalTerimaTidakButuhDLAtauTranslok / $sumTargetNonDL) * 100, 2)
-                                        : 0;
-
-                                $avgRatingKirimNonDL =
-                                    $uniquePenugasanTidakButuhDL->avg(function ($p) {
-                                        return $p->latestPengiriman?->rating_kirim ?? 0;
-                                    }) ?? 0;
-                                $bintangKirimNonDLArray = array_map(function ($i) use ($avgRatingKirimNonDL) {
-                                    return $i <= round($avgRatingKirimNonDL);
+                                // ── Target ───────────────────────────────────────────────
+                                $sumTargetNonDLAtauTranslok = $uniquePenugasanTidakButuhDLAtauTranslok->sum('target');
+                                // ── Response Rate Kirim ──────────────────────────────
+                                $avgRrKirimNonDLAtauTranslok =
+                                    $sumTargetNonDLAtauTranslok > 0
+                                    ? round(($totalKirimTidakButuhDLAtauTranslok / $sumTargetNonDLAtauTranslok) * 100, 2)
+                                    : 0; 
+                                // ── Response Rate Terima ──────────────────────────────
+                                $avgRrTerimaNonDLAtauTranslok =
+                                    $sumTargetNonDLAtauTranslok > 0
+                                    ? round(($totalTerimaTidakButuhDLAtauTranslok / $sumTargetNonDLAtauTranslok) * 100, 2)
+                                    : 0; 
+                                
+                                // ── Rating Kirim dan Bintangnya ──────────────────────────────────────────
+                                $avgRatingKirimNonDLAtauTranslok =
+                                    round($uniquePenugasanTidakButuhDLAtauTranslok->avg(function ($p) {
+                                        return $p->latestPengiriman?->rating_kirim ?? 0; 
+                                    }) ?? 0);
+                                $bintangKirimNonDLAtauTranslokArray = array_map(function ($i) use ($avgRatingKirimNonDLAtauTranslok) {
+                                    return $i <= round($avgRatingKirimNonDLAtauTranslok);
                                 }, range(1, 5));
 
-                                $avgRatingTerimaNonDL =
-                                    $uniquePenugasanTidakButuhDL->avg(function ($p) {
-                                        return $p->latestPenerimaan?->rating_terima ?? 0;
-                                    }) ?? 0;
-                                $bintangTerimaNonDLArray = array_map(function ($i) use ($avgRatingTerimaNonDL) {
-                                    return $i <= round($avgRatingTerimaNonDL);
+                                // ── Rating Terima dan Bintanganya ─────────────────────────────────────────
+                                $avgRatingTerimaNonDLAtauTranslok =
+                                    round($uniquePenugasanTidakButuhDLAtauTranslok->avg(function ($p) {
+                                        return $p->latestPenerimaan?->rating_terima ?? 0; 
+                                    }) ?? 0);
+                                $bintangTerimaNonDLAtauTranslokArray = array_map(function ($i) use ($avgRatingTerimaNonDLAtauTranslok) {
+                                    return $i <= round($avgRatingTerimaNonDLAtauTranslok);
                                 }, range(1, 5));
+
+                                // @dd([
+                                //     'uniquePenugasanTidakButuhDLAtauTranslok' => $uniquePenugasanTidakButuhDLAtauTranslok->map(fn($p) => [
+                                //         'id_penugasan' => $p->id_penugasan,
+                                //         'latestPengiriman' => $p->latestPengiriman?->toArray(),
+                                //         'latestPenerimaan' => $p->latestPenerimaan?->toArray(),
+                                //         'rating_kirim' => $p->latestPengiriman?->rating_kirim,
+                                //         'rating_terima' => $p->latestPenerimaan?->rating_terima,
+                                //     ]),
+                                //     'avg_rating_kirim_mentah' => $uniquePenugasanTidakButuhDLAtauTranslok->avg(fn($p) => $p->latestPengiriman?->rating_kirim ?? 0),
+                                //     'avg_rating_terima_mentah' => $uniquePenugasanTidakButuhDLAtauTranslok->avg(fn($p) => $p->latestPenerimaan?->rating_terima ?? 0),
+                                //     'sumTargetNonDLAtauTranslok' => $sumTargetNonDLAtauTranslok,
+                                //     'totalKirimTidakButuhDLAtauTranslok' => $totalKirimTidakButuhDLAtauTranslok,
+                                //     'avgRrKirimNonDLAtauTranslok' => $avgRrKirimNonDLAtauTranslok,
+                                //     'avgRatingKirimNonDLAtauTranslok' => $avgRatingKirimNonDLAtauTranslok,
+                                //     'bintangKirimNonDLAtauTranslokArray' => $bintangKirimNonDLAtauTranslokArray,
+                                //     'totalTerimaTidakButuhDLAtauTranslok' => $totalTerimaTidakButuhDLAtauTranslok,
+                                //     'avgRrTerimaNonDLAtauTranslok' => $avgRrTerimaNonDLAtauTranslok,
+                                //     'avgRatingTerimaNonDLAtauTranslok' => $avgRatingTerimaNonDLAtauTranslok,
+                                //     'bintangTerimaNonDLAtauTranslokArray' => $bintangTerimaNonDLAtauTranslokArray,
+                                // ])
                             @endphp
                             <tr class="bg-gray-50 dark:bg-gray-800 border-t-2 border-gray-200 dark:border-gray-700">
                                 <td colspan="20" class="px-6 py-5">
@@ -1666,28 +1709,28 @@
                                             <div class="flex items-center gap-2 mb-3">
                                                 <div class="w-2 h-2 rounded-full bg-blue-500"></div>
                                                 <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                                    Ringkasan</h4>
+                                                    Total</h4>
                                             </div>
                                             <div
                                                 class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                                                 <div class="grid grid-cols-3 text-center gap-4">
 
                                                     <div>
-                                                        <p class="text-xs text-gray-500">Target</p>
+                                                        <p class="text-xs text-gray-500">Target Penugasan</p>
                                                         <p class="text-xl font-bold text-blue-600">
-                                                            {{ $sumTargetNonDL }}
+                                                            {{ $sumTargetNonDLAtauTranslok }}
                                                         </p>
                                                     </div>
 
                                                     <div>
-                                                        <p class="text-xs text-gray-500">Pengiriman</p>
-                                                        <p class="text-xl font-bold text-blue-600">
+                                                        <p class="text-xs text-gray-500">Jumlah Dikirim</p>
+                                                        <p class="text-xl font-bold text-orange-600">
                                                             {{ $totalKirimTidakButuhDLAtauTranslok }}
                                                         </p>
                                                     </div>
 
                                                     <div>
-                                                        <p class="text-xs text-gray-500">Penerimaan</p>
+                                                        <p class="text-xs text-gray-500">Jumlah Diterima</p>
                                                         <p class="text-xl font-bold text-green-600">
                                                             {{ $totalTerimaTidakButuhDLAtauTranslok }}
                                                         </p>
@@ -1702,27 +1745,35 @@
                                         <!-- ================= PENGIRIMAN ================= -->
                                         <div>
                                             <div class="flex items-center gap-2 mb-3">
-                                                <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                                                <div class="w-2 h-2 rounded-full bg-green-500"></div>
                                                 <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
                                                     Pengiriman</h4>
                                             </div>
 
-                                            <div
-                                                class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                                                <div class="grid grid-cols-3 gap-4 items-center">
+                                            <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                                                <div class="grid grid-cols-2 gap-4 text-center">
 
                                                     <!-- Response Rate -->
                                                     <div>
                                                         <p class="text-xs text-gray-500 dark:text-gray-400">Response
                                                             Rate</p>
                                                         <p
-                                                            class="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                                                            {{ $avgRrKirimNonDL }}%
+                                                            class="text-lg font-semibold text-green-600 dark:text-green-400">
+                                                            {{ $avgRrKirimNonDLAtauTranslok }}%
                                                         </p>
                                                     </div>
 
                                                     <!-- Rating -->
-                                                    <div class="text-center">
+                                                    {{-- <div>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Rating</p>
+                                                        <p
+                                                            class="text-lg font-semibold text-green-600 dark:text-green-400">
+                                                            {{ $avgRatingKirimNonDLAtauTranslok }}
+                                                        </p>
+                                                    </div> --}}
+
+                                                    <!-- Bintang Rating -->
+                                                    <div>
                                                         <p class="text-xs text-gray-500 dark:text-gray-400">Ketepatan
                                                             Waktu</p>
 
@@ -1730,7 +1781,7 @@
                                                             @mouseleave="show = false"
                                                             class="relative flex justify-center gap-0.5 cursor-pointer">
 
-                                                            @foreach ($bintangKirimNonDLArray as $filled)
+                                                            @foreach ($bintangKirimNonDLAtauTranslokArray as $filled)
                                                                 <span
                                                                     class="{{ $filled ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-500' }}">★</span>
                                                             @endforeach
@@ -1745,8 +1796,8 @@
                                                                 <div class="space-y-1 text-gray-200">
                                                                     <div>
                                                                         <span class="text-gray-400">Rata-rata
-                                                                            Nilai:</span>
-                                                                        {{ number_format($avgRatingKirimNonDL, 1) }}/5
+                                                                            Nilai : </span>
+                                                                        {{ number_format($avgRatingKirimNonDLAtauTranslok, 1) }}/5
                                                                     </div>
                                                                 </div>
 
@@ -1761,7 +1812,7 @@
                                                 </div>
                                             </div>
                                         </div>
-
+                                        
                                         <!-- ================= PENERIMAAN ================= -->
                                         <div>
                                             <div class="flex items-center gap-2 mb-3">
@@ -1770,10 +1821,8 @@
                                                     Penerimaan</h4>
                                             </div>
 
-                                            <div
-                                                class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-
-                                                <div class="grid grid-cols-2 gap-4 items-center">
+                                            <div class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                                                <div class="grid grid-cols-2 gap-4 text-center">
 
                                                     <!-- Response Rate -->
                                                     <div>
@@ -1781,13 +1830,20 @@
                                                             Rate</p>
                                                         <p
                                                             class="text-lg font-semibold text-green-600 dark:text-green-400">
-                                                            {{ $avgRrTerimaNonDL }}%
+                                                            {{ $avgRrTerimaNonDLAtauTranslok }}%
                                                         </p>
                                                     </div>
 
                                                     <!-- Rating -->
-                                                    <div class="text-center">
+                                                    {{-- <div>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">Rating</p>
+                                                        <p class="text-lg text-center font-semibold text-green-600 dark:text-green-400">
+                                                            {{ $avgRatingTerimaNonDLAtauTranslok }}
+                                                        </p>
+                                                    </div> --}}
 
+                                                    <!-- Bintang Rating -->
+                                                    <div>
                                                         <p class="text-xs text-gray-500 dark:text-gray-400">Ketepatan
                                                             Waktu</p>
 
@@ -1795,7 +1851,7 @@
                                                             @mouseleave="show = false"
                                                             class="relative flex justify-center gap-0.5 cursor-pointer">
 
-                                                            @foreach ($bintangTerimaNonDLArray as $filled)
+                                                            @foreach ($bintangTerimaNonDLAtauTranslokArray as $filled)
                                                                 <span
                                                                     class="{{ $filled ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-500' }}">★</span>
                                                             @endforeach
@@ -1810,8 +1866,8 @@
                                                                 <div class="space-y-1 text-gray-200">
                                                                     <div>
                                                                         <span class="text-gray-400">Rata-rata
-                                                                            Nilai:</span>
-                                                                        {{ number_format($avgRatingTerimaNonDL, 1) }}/5
+                                                                            Nilai : </span>
+                                                                        {{ number_format($avgRatingTerimaNonDLAtauTranslok, 1) }}/5
                                                                     </div>
                                                                 </div>
 

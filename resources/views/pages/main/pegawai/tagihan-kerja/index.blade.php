@@ -84,6 +84,15 @@
 
     <!-- Container untuk Card Kegiatan -->
     <div class="space-y-6">
+        {{-- {{ $kegiatans->last()->nama_rk_kegiatan }}
+        {{ $kegiatans->last()->subKegiatans->sum(function ($sub) {
+            return $sub->penugasans->count();
+        }) }}
+        {{ $kegiatans->last()->subKegiatans->sum(function ($sub) {
+            return $sub->penugasans->filter(function ($p) {
+                return $p->latestPengiriman?->penerimaan?->status === "Diterima";
+            })->count();
+        }) }} --}}
         @foreach ($kegiatans as $kegiatan)
             <!-- CARD PER KEGIATAN dengan Accordion -->
             <div x-data="{ openSubKegiatan: false }" class="rounded-2xl border border-gray-200 bg-white overflow-hidden dark:border-gray-800 dark:bg-gray-900">
