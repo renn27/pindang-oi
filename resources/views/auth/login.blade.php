@@ -12,15 +12,15 @@
         <div class="absolute top-1/3 left-1/4 w-48 h-48 bg-yellow-200/40 dark:bg-yellow-500/5 rounded-full blur-3xl"></div>
 
         {{-- Container Utama --}}
-        <div class="relative w-full max-w-sm bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden transition-all duration-300">
+        <div class="relative w-full max-w-md bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden transition-all duration-300">
             
             {{-- Accent line di atas card warna biru BPS
             <div class="absolute top-0 left-0 right-0 h-1 bg-blue-600"></div> --}}
 
             {{-- Header Area - Clean & Centered --}}
-            <div class="flex flex-col items-center text-center px-8 pt-10 pb-6">
+            <div class="flex flex-col items-center text-center px-8 pt-7 pb-4 border-b mb-6">
                 {{-- Logo dengan ring subtle dan support dark mode --}}
-                <div class="mb-5 p-2 bg-white dark:bg-gray-800">
+                <div class="mb-2 bg-white dark:bg-gray-800">
                     {{-- Light mode logo --}}
                     <img src="/images/logo/logo.svg" alt="Logo BPS" class="h-10 w-auto dark:hidden">
                     {{-- Dark mode logo --}}
@@ -28,15 +28,21 @@
                 </div>
 
                 {{-- Judul & Subjudul --}}
-                <h1 class="text-xl font-semibold text-blue-700 dark:text-blue-400 tracking-tight">
-                    Portal Integrasi Data dan Informasi Penunjang
-                </h1>
-                <div class="relative mt-4">
+                <div class="relative">
+                    <div class="absolute inset-0 bg-blue-500 rounded-full blur opacity-10"></div>
+                    <p class="relative text-xs font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 px-4 py-1.5 rounded-full border border-blue-200 dark:border-blue-800 shadow-sm">
+                        Portal Integrasi Data Kinerja dan Informasi Penunjang
+                    </p>
+                </div>
+                <h6 class="mt-4 text-l font-semibold text-gray-700 dark:text-gray-300">
+                    Badan Pusat Statistik Kabupaten Ogan Ilir
+                </h6>
+                {{-- <div class="relative mt-4">
                     <div class="absolute inset-0 bg-blue-500 rounded-full blur opacity-10"></div>
                     <p class="relative text-xs font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 px-4 py-1.5 rounded-full border border-blue-200 dark:border-blue-800 shadow-sm">
                         Badan Pusat Statistik Kabupaten Ogan Ilir
                     </p>
-                </div>
+                </div> --}}
             </div>
 
             {{-- Session Status --}}
@@ -58,8 +64,8 @@
                     <div class="relative group">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-5 w-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd" />
-                            </svg>
+    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+</svg>
                         </div>
                         <input id="username" type="text" name="username" value="{{ old('username') }}" required autofocus autocomplete="username"
                             class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl shadow-sm text-sm bg-white/50 dark:bg-gray-700/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 dark:focus:border-blue-500 transition-all duration-200"
