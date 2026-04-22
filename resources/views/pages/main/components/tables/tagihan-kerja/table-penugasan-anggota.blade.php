@@ -350,7 +350,7 @@
                                                                         'bukti_dukung' => $p->bukti_dukung,
                                                                         'penerimaan' => [
                                                                             'id_penerima' => $p->penerimaan?->penerima?->nama_pegawai ?? 'Belum Diperiksa',
-                                                                            'tanggal_penerimaan' => $p->penerimaan?->created_at?->format('d F Y') ?? '-',
+                                                                            'tanggal_penerimaan' => $p->penerimaan?->tanggal_penerimaan?->format('d F Y') ?? '-',
                                                                             'jumlah_diterima' => $p->penerimaan?->jumlah_diterima ?? '-',
                                                                             'status' => $p->penerimaan?->status ?? 'Menunggu',
                                                                             'catatan' => $p->penerimaan?->catatan ?? '-',
@@ -413,7 +413,7 @@
                                                     </div>
                                                 @endcan
 
-                                                @can('setAsCKP', $penugasan)
+                                                <!-- @can('setAsCKP', $penugasan)
                                                     <button type="button"
                                                         @if(!$penugasan->ckp)
                                                             @click="$dispatch('open-ckp-modal', {
@@ -433,7 +433,7 @@
                                                         </svg>
                                                         {{ $penugasan->ckp ? 'Sudah jadi CKP' : 'Jadikan CKP' }}
                                                     </button>
-                                                @endcan
+                                                @endcan -->
 
                                                 {{-- Delete --}}
                                                 @can('delete', $penugasan)
@@ -1247,7 +1247,7 @@
                                                                         'bukti_dukung' => $p->bukti_dukung,
                                                                         'penerimaan' => [
                                                                             'id_penerima' => $p->penerimaan?->penerima?->nama_pegawai ?? 'Belum Diperiksa',
-                                                                            'tanggal_penerimaan' => $p->penerimaan?->created_at?->format('d F Y') ?? '-',
+                                                                            'tanggal_penerimaan' => $p->penerimaan?->tanggal_penerimaan?->format('d F Y') ?? '-',
                                                                             'jumlah_diterima' => $p->penerimaan?->jumlah_diterima ?? '-',
                                                                             'status' => $p->penerimaan?->status ?? 'Menunggu',
                                                                             'catatan' => $p->penerimaan?->catatan ?? '-',

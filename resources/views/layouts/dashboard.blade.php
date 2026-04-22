@@ -125,6 +125,30 @@ window.addEventListener('resize', checkMobile);">
             <!-- app header start -->
             @include('layouts.app-header')
             <!-- app header end -->
+            <!-- app header border -->
+            <div x-data="{ showCkpBanner: true }" 
+                 x-show="showCkpBanner" x-transition
+                 class="sticky top-[73px] z-40 mx-4 mt-4 md:mx-6 md:mt-6 rounded-xl border border-amber-500/30 bg-amber-50/70 p-4 shadow-sm backdrop-blur-md dark:border-amber-500/30 dark:bg-amber-900/30 font-medium text-amber-800 dark:text-amber-200"
+                 style="display: none;">
+                <div class="flex items-start sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100/80 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <p class="text-sm">
+                            <strong class="font-bold">Perhatian:</strong> Untuk saat ini fitur CKP, baik Anggota Tim maupun Ketua Tim, sedang dinonaktifkan karena masih ada perbaikan.
+                        </p>
+                    </div>
+                    <button @click="showCkpBanner = false" class="shrink-0 text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-200 focus:outline-none bg-amber-500/10 hover:bg-amber-500/20 rounded-lg p-2 transition-colors">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
             <div class="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
                 @yield('content')
             </div>

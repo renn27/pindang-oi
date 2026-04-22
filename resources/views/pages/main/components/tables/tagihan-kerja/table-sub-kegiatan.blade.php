@@ -67,7 +67,7 @@
                                     'subKegiatan' => $subKegiatan->id_sub_kegiatan,
                                 ]) }}"
                                     title="Lihat detail sub kegiatan"
-                                    class="text-base font-semibold text-gray-800 hover:text-blue-600 dark:text-white dark:hover:text-blue-400 hover:underline transition-colors">
+                                    class="text-sm font-semibold text-gray-600 hover:text-blue-600 dark:text-white dark:hover:text-blue-400 hover:underline transition-colors">
                                     {{ $subKegiatan->nama_sub_kegiatan }}
                                 </a>
 

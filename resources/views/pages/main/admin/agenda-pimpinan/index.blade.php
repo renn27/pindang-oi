@@ -413,7 +413,7 @@
                                             </button>
                                         </form>
 
-                                        @if($agenda->status === "Selesai")
+                                        <!-- @if($agenda->status === "Selesai")
                                             <button type="button"
                                                 @click="$dispatch('open-ckp-modal', {
                                                     modalId: 'modal-ckp',
@@ -433,7 +433,7 @@
                                                 </svg>
                                                 {{ $agenda->ckp ? 'Sudah jadi CKP Pimpinan' : 'Jadikan CKP Pimpinan' }}
                                             </button>
-                                        @endif
+                                        @endif -->
                                     </div>
                                 </div>
                             </div>
