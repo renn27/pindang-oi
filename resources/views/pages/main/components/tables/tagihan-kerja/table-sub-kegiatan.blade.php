@@ -176,7 +176,7 @@
                                     </form>
                                 @endcan
 
-                                {{-- Jadikan CKP --}}
+                                <!-- {{-- Jadikan CKP --}}
                                 @can('update', $subKegiatan)
                                     @if($isCkpKetuaTim)
                                         {{-- Sudah jadi CKP --}}
@@ -221,7 +221,7 @@
                                             <span>Belum CKP</span>
                                         </button>
                                     @endif
-                                @endcan
+                                @endcan -->
                             </div>
                         </td>
                     </tr>
