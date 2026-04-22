@@ -100,10 +100,10 @@
                         @click="$dispatch('open-smart-modal', {
                                 modalId: 'modal-penugasan-anggota',
                                 data: {
-                                    id_sub_kegiatan: '{{ $subKegiatan->id_sub_kegiatan }}',
-                                    nama_sub_kegiatan: '{{ $subKegiatan->nama_sub_kegiatan }}',
-                                    min_date: '{{ $subKegiatan->tanggal_mulai->format('Y-m-d') }}',
-                                    max_date: '{{ $subKegiatan->tanggal_selesai->format('Y-m-d') }}'
+                                    id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
+                                    nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
+                                    min_date: @js($subKegiatan->tanggal_mulai->format('Y-m-d')),
+                                    max_date: @js($subKegiatan->tanggal_selesai->format('Y-m-d'))
                                 }
                             })">
                         <!-- icon -->
