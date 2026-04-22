@@ -169,7 +169,7 @@
                                     <button type="button"
                                         onclick="SwalHelper.confirmDelete(
                                             'delete-kegiatan-{{ $kegiatan->id_kegiatan }}',
-                                            '{{ $kegiatan->nama_rk_kegiatan }}'
+                                            {{ json_encode($kegiatan->nama_rk_kegiatan) }}
                                         )"
                                         class="flex items-center gap-2 rounded-full border border-gray-300
                                         bg-white px-4 py-3 text-sm font-medium text-gray-700

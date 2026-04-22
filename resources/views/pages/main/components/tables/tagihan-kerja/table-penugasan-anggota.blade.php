@@ -450,7 +450,7 @@
                                                         <button type="button"
                                                             onclick="SwalHelper.confirmDelete(
                                                                 'delete-penugasan-{{ $penugasan->id_penugasan }}',
-                                                                '{{ $penugasan->anggota->nama_pegawai }}'
+                                                                {{ json_encode($penugasan->anggota->nama_pegawai) }}
                                                             )"
                                                             class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 border-t">
 
@@ -1347,7 +1347,7 @@
                                                         <button type="button"
                                                             onclick="SwalHelper.confirmDelete(
                                                                 'delete-penugasan-{{ $penugasan->id_penugasan }}',
-                                                                '{{ $penugasan->anggota->nama_pegawai }}'
+                                                                {{ json_encode($penugasan->anggota->nama_pegawai) }}
                                                             )"
                                                             class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 border-t">
 

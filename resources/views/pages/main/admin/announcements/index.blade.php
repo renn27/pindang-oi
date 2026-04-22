@@ -1,4 +1,4 @@
-﻿@extends('layouts.dashboard')
+@extends('layouts.dashboard')
 
 @section('content')
     <x-common.page-breadcrumb pageTitle="{{ $title }}" />
@@ -316,7 +316,7 @@
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="button"
-                                                            onclick="confirmDeleteAnnouncement('delete-announcement-{{ $announcement->id }}', '{{ addslashes($announcement->title) }}')"
+                                                            onclick="confirmDeleteAnnouncement('delete-announcement-{{ $announcement->id }}', {{ json_encode($announcement->title) }})"
                                                             class="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2 dark:text-red-400 dark:hover:bg-gray-700">
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                                 viewBox="0 0 24 24">
@@ -484,7 +484,7 @@
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="button"
-                                                            onclick="confirmDeleteAnnouncement('delete-announcement-inactive-{{ $announcement->id }}', '{{ addslashes($announcement->title) }}')"
+                                                            onclick="confirmDeleteAnnouncement('delete-announcement-inactive-{{ $announcement->id }}', {{ json_encode($announcement->title) }})"
                                                             class="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2 dark:text-red-400 dark:hover:bg-gray-700">
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                                 viewBox="0 0 24 24">

@@ -164,7 +164,7 @@
                                         <button type="button"
                                             onclick="SwalHelper.confirmDelete(
                                                 'delete-sub-kegiatan-{{ $subKegiatan->id_sub_kegiatan }}',
-                                                '{{ $subKegiatan->nama_sub_kegiatan }}'
+                                                {{ json_encode($subKegiatan->nama_sub_kegiatan) }}
                                             )"
                                             class="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                                             title="Hapus Sub Kegiatan">

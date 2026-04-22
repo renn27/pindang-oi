@@ -438,7 +438,7 @@
                                             <button type="button"
                                                 onclick="SwalHelper.confirmDelete(
                                                     'delete-rencana-{{ $rencanaJpt->id }}',
-                                                    '{{ $rencanaJpt->nama_rencana_jpt }}'
+                                                    {{ json_encode($rencanaJpt->nama_rencana_jpt) }}
                                                 )"
                                                 class="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2 dark:text-red-400 dark:hover:bg-gray-700">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -589,7 +589,7 @@
                                                                 <button type="button"
                                                                     onclick="SwalHelper.confirmDelete(
                                                                         'delete-indikator-{{ $indikator->id }}',
-                                                                        '{{ $indikator->nama_indikator_jpt }}'
+                                                                        {{ json_encode($indikator->nama_indikator_jpt) }}
                                                                     )"
                                                                     class="inline-flex items-center text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
                                                                     <svg class="w-4 h-4" fill="none"

@@ -189,7 +189,6 @@ class CkpPegawaiController extends Controller
                 return $penugasan->latestPengiriman?->jumlah_dikirim ?? 0;
             });
 
-
         // 8. Hitung persentase realisasi — total diterima / total target * 100
         $totalTarget = $penugasans->sum(fn($p) => $p->target ?? 0);
         $totalDiterima = $penugasans->sum(fn($p) => $p->latestPenerimaan?->jumlah_diterima ?? 0);
@@ -200,14 +199,6 @@ class CkpPegawaiController extends Controller
                 return $penugasan->latestPenerimaan?->rating_terima ?? 0;
             }) ?? 0);
         $avgKualitas = round($avgRating) * 20;
-
-        // $avgKualitas = round(
-        //     $penugasans->avg(function ($penugasan) {
-        //         $ratingKirim  = $penugasan->latestPengiriman?->rating_kirim ?? 0;
-        //         $ratingTerima = $penugasan->latestPenerimaan?->rating_terima ?? 0;
-        //         return ($ratingKirim + $ratingTerima) / 2;
-        //     }) ?? 0,
-        // 2);
 
         // 10. Buat CKP untuk Ketua Tim
         CkpPegawai::create([
