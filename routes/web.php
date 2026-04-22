@@ -210,7 +210,8 @@ Route::middleware('auth')->group(function () {
 
     // Route untuk halaman CKP pegawai
     Route::get('/ckp-pegawai', [CkpPegawaiController::class, 'index'])->name('ckp.pegawai.index');
-    Route::put('/ckp-pegawai/{id}', [CkpPegawaiController::class, 'update'])->name('ckp.pegawai.update');
+    Route::put('/ckp-pegawai/{ckp}', [CkpPegawaiController::class, 'update'])->name('ckp.pegawai.update');
+    Route::delete('/ckp-pegawai/{ckp}', [CkpPegawaiController::class, 'delete'])->name('ckp.pegawai.delete');
 });
 
 

@@ -21,6 +21,9 @@
             let minD = this.$el.getAttribute('mindate') || this.$el.getAttribute('minDate');
             let maxD = this.$el.getAttribute('maxdate') || this.$el.getAttribute('maxDate');
 
+            if (minD && minD.length <= 10) minD += ' 00:00:00';
+            if (maxD && maxD.length <= 10) maxD += ' 23:59:59';
+
             try { this.flatpickrInstance.set('minDate', minD || null); } catch (e) {}
             try { this.flatpickrInstance.set('maxDate', maxD || null); } catch (e) {}
         }
@@ -31,6 +34,9 @@
         this.$nextTick(() => {
             let initialMin = this.$el.getAttribute('mindate') || this.$el.getAttribute('minDate');
             let initialMax = this.$el.getAttribute('maxdate') || this.$el.getAttribute('maxDate');
+
+            if (initialMin && initialMin.length <= 10) initialMin += ' 00:00:00';
+            if (initialMax && initialMax.length <= 10) initialMax += ' 23:59:59';
 
             this.flatpickrInstance = flatpickr(this.$refs.dateInput, {
                 mode: '{{ $mode }}',
@@ -44,6 +50,9 @@
                     // Dynamically update limits in case the root data changed
                     let openMin = this.$el.getAttribute('mindate') || this.$el.getAttribute('minDate');
                     let openMax = this.$el.getAttribute('maxdate') || this.$el.getAttribute('maxDate');
+
+                    if (openMin && openMin.length <= 10) openMin += ' 00:00:00';
+                    if (openMax && openMax.length <= 10) openMax += ' 23:59:59';
 
                     try { instance.set('minDate', openMin || null); } catch (e) {}
                     try { instance.set('maxDate', openMax || null); } catch (e) {}

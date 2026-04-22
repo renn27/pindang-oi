@@ -162,7 +162,7 @@ class CkpPegawaiController extends Controller
 
         // 4. Load semua penugasan beserta relasi sekaligus — 1 query, dipakai semua step
         $penugasans = $subKegiatan->penugasans()
-            ->with(['latestPengiriman.penerimaan'])
+            ->with(['latestPengiriman.penerimaan', 'latestPenerimaan'])
             ->get();
 
         $totalPenugasan = $penugasans->count();
@@ -189,15 +189,25 @@ class CkpPegawaiController extends Controller
                 return $penugasan->latestPengiriman?->jumlah_dikirim ?? 0;
             });
 
-        // 8. Hitung rata-rata persentase realisasi
-        $avgPersentase = round($penugasans->avg(function ($penugasan) {
-                return $penugasan->latestPengiriman?->rr_kirim ?? 0;
-            }) ?? 0, 2); // PERBAIKI PERHTIUNGAN RATA-RATA — PAKAI RUMUS YANG KAYAK DI VIEW TABLE-PENUGASAN. TERUS JANGAN CUMA DARI RR KIRIM AJA, RR TERIMA JUGA PERHATIKAN 
+
+        // 8. Hitung persentase realisasi — total diterima / total target * 100
+        $totalTarget = $penugasans->sum(fn($p) => $p->target ?? 0);
+        $totalDiterima = $penugasans->sum(fn($p) => $p->latestPenerimaan?->jumlah_diterima ?? 0);
+        $avgPersentase = $totalTarget > 0 ? round(($totalDiterima / $totalTarget) * 100, 2) : 0;
 
         // 9. Hitung rata-rata tingkat kualitas
-        $avgKualitas = round($penugasans->avg(function ($penugasan) {
-                return $penugasan->latestPengiriman?->rating_kirim ?? 0;
-            }) ?? 0, 2);
+        $avgRating = round($penugasans->avg(function ($penugasan) {
+                return $penugasan->latestPenerimaan?->rating_terima ?? 0;
+            }) ?? 0);
+        $avgKualitas = round($avgRating) * 20;
+
+        // $avgKualitas = round(
+        //     $penugasans->avg(function ($penugasan) {
+        //         $ratingKirim  = $penugasan->latestPengiriman?->rating_kirim ?? 0;
+        //         $ratingTerima = $penugasan->latestPenerimaan?->rating_terima ?? 0;
+        //         return ($ratingKirim + $ratingTerima) / 2;
+        //     }) ?? 0,
+        // 2);
 
         // 10. Buat CKP untuk Ketua Tim
         CkpPegawai::create([
@@ -243,7 +253,7 @@ class CkpPegawaiController extends Controller
 
         if (!$isValidPimpinan) {
             return back()->with('error', 'Anda tidak memiliki akses untuk membuat CKP Pimpinan.');
-    }
+        }
 
         // 3. Cek apakah sudah ada CKP untuk Agenda ini
         if ($agendaPimpinan->ckp()->exists()) {
@@ -259,7 +269,7 @@ class CkpPegawaiController extends Controller
 
         // 5. Buat CKP untuk Pimpinan
         CkpPegawai::create([
-            'id_pegawai' => $pimpinan->id_pegawai,
+            'id_pegawai' => $user->id_pegawai,
             'ckpable_type' => AgendaPimpinan::class,
             'ckpable_id' => $agendaPimpinan->id_agenda,
             'tipe_ckp' => 'Pimpinan',
@@ -282,7 +292,7 @@ class CkpPegawaiController extends Controller
     /**
      * Update CKP
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, CkpPegawai $ckp)
     {
         $request->validate([
             'uraian' => 'required|string',
@@ -306,6 +316,23 @@ class CkpPegawaiController extends Controller
 
         return redirect()->route('ckp.pegawai.index')
             ->with('success', 'CKP berhasil diperbarui');
+    }
+
+    /**
+     * Delete CKP
+     */
+    public function delete(CkpPegawai $ckp)
+    {
+        // Pastikan hanya pemilik data yang bisa hapus
+        if ($ckp->id_pegawai !== Auth::user()->id_pegawai) {
+            return redirect()->route('ckp.pegawai.index')
+                ->with('error', 'Anda tidak memiliki akses untuk menghapus data ini');
+        }
+
+        $ckp->delete();
+
+        return redirect()->route('ckp.pegawai.index')
+            ->with('success', 'Data CKP berhasil dihapus');
     }
 
 

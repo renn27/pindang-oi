@@ -1,7 +1,9 @@
 @extends('layouts.dashboard')
 
 @php
-    $kepalaBps = \App\Models\Pegawai::where('jabatan', 'like', '%Kepala BPS Ogan Ilir%')->first();
+    $kepalaBps = Auth::user()->active_role === 'Pimpinan'
+        && Auth::user()->nama_pegawai === 'Sukendro Suryo Wiguno, SST, M.Ec.Dev'
+        && str_contains(Auth::user()->jabatan, 'Kepala BPS Ogan Ilir');
 @endphp
 
 @section('content')
@@ -354,23 +356,38 @@
                             @endif
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm">
-                            <div class="relative inline-block group">
-                                <!-- Button Aksi Minimalis -->
-                                <button
-                                    class="inline-flex items-center gap-1 rounded-lg bg-white border border-gray-300 px-2.5 py-1 text-xs font-medium text-gray-700 hover:border-green-400 hover:text-green-600 transition-all duration-200 shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:border-green-500 dark:hover:text-green-400">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            <div class="relative inline-block" x-data="{
+                                showDropdown: false,
+                                dropdownPosition: { x: 0, y: 0 },
+                                openDropdown(event) {
+                                    const button = event.currentTarget;
+                                    const rect = button.getBoundingClientRect();
+                                    const dropdownWidth = 192;
+                                    
+                                    this.dropdownPosition = {
+                                        x: rect.left - dropdownWidth + 10,
+                                        y: rect.top - 10
+                                    };
+                                    this.showDropdown = true;
+                                },
+                                closeDropdown() {
+                                    this.showDropdown = false;
+                                }}" x-on:mouseleave="closeDropdown()">
+
+                                <button x-on:mouseenter="openDropdown($event)"
+                                    class="inline-flex items-center gap-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <svg class="fill-current" width="16" height="16" viewBox="0 0 18 18" fill="none">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z" />
                                     </svg>
                                     Aksi
                                 </button>
 
-                                <!-- Dropdown -->
-                                <div
-                                    class="absolute right-0 top-full mt-1 w-36 origin-top-right rounded-md bg-white border border-gray-200 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50 dark:bg-gray-800 dark:border-gray-700">
+                                <div x-show="showDropdown" x-transition
+                                    class="fixed z-[9999] bg-white dark:bg-gray-800 rounded shadow-xl border border-gray-200 dark:border-gray-700 min-w-[192px]"
+                                    :style="`left: ${dropdownPosition.x}px; top: ${dropdownPosition.y}px;`"
+                                    x-on:mouseenter="showDropdown = true" x-on:mouseleave="closeDropdown()">
                                     <div class="py-1">
-                                        <button
-                                            class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 dark:text-gray-300 dark:hover:bg-gray-700"
+                                        <button class="w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700"
                                             @click="$dispatch('open-smart-modal', {
                                             modalId: 'modal-agenda',
                                             mode: 'edit',
@@ -403,7 +420,7 @@
                                             @method('DELETE')
                                             <button type="button"
                                                 onclick="confirmDeleteAgenda('delete-agenda-{{ $agenda->id_agenda }}', '{{ addslashes($agenda->nama_agenda) }}')"
-                                                class="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2 dark:text-red-400 dark:hover:bg-gray-700">
+                                                class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 dark:text-red-400 dark:hover:bg-red-900/20">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -413,7 +430,7 @@
                                             </button>
                                         </form>
 
-                                        <!-- @if($agenda->status === "Selesai")
+                                        @if($kepalaBps && $agenda->status === "Selesai")
                                             <button type="button"
                                                 @click="$dispatch('open-ckp-modal', {
                                                     modalId: 'modal-ckp',
@@ -425,15 +442,15 @@
                                                     satuan: '{{ $agenda->satuan_target }}',
                                                     is_pimpinan: true,
                                                 })"
-                                                class="w-full text-left px-4 py-3 text-sm flex items-center gap-2
-                                                {{ $agenda->ckp ? 'text-gray-400 cursor-not-allowed bg-gray-50 dark:bg-gray-800' : 'text-green-600 hover:bg-green-50' }}"
+                                                class="border-t border-gray-100 dark:border-gray-700 w-full text-left px-4 py-3 text-sm flex items-center gap-2
+                                                {{ $agenda->ckp ? 'text-gray-400 cursor-not-allowed bg-gray-50 dark:bg-gray-800' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20' }}"
                                                 {{ $agenda->ckp ? 'disabled' : '' }}>
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor">
-                                                    <path stroke-width="2" d="M5 13l4 4L19 7" />
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                                 </svg>
                                                 {{ $agenda->ckp ? 'Sudah jadi CKP Pimpinan' : 'Jadikan CKP Pimpinan' }}
                                             </button>
-                                        @endif -->
+                                        @endif
                                     </div>
                                 </div>
                             </div>

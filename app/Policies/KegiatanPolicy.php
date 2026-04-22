@@ -97,7 +97,8 @@ class KegiatanPolicy
     public function update(Pegawai $pegawai, Kegiatan $kegiatan): bool
     {
         return in_array($pegawai->active_role, ['Admin', 'Pimpinan'])
-        || $kegiatan->id_penanggung_jawab === $pegawai->id_pegawai;
+        || ($pegawai->active_role === 'Ketua Tim' 
+            && $kegiatan->id_penanggung_jawab === $pegawai->id_pegawai);
     }
 
     /**
@@ -106,7 +107,8 @@ class KegiatanPolicy
     public function delete(Pegawai $pegawai, Kegiatan $kegiatan): bool
     {
         return in_array($pegawai->active_role, ['Admin', 'Pimpinan'])
-        || $kegiatan->id_penanggung_jawab === $pegawai->id_pegawai;
+        || ($pegawai->active_role === 'Ketua Tim' 
+            && $kegiatan->id_penanggung_jawab === $pegawai->id_pegawai);
     }
 
     /**
