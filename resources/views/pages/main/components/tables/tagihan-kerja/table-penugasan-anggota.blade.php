@@ -285,7 +285,7 @@
                                                     </button>
                                                 @endcan
 
-                                                @can('send', $penugasan)
+                                                <!-- @can('send', $penugasan)
                                                     <div class="relative group">
                                                         <button
                                                             class="w-full text-left px-4 py-3 text-sm flex items-center gap-2 border-b
@@ -328,7 +328,7 @@
                                                             </div>
                                                         @endif
                                                     </div>
-                                                @endcan
+                                                @endcan -->
 
                                                 <button
                                                     class="w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700"
@@ -372,7 +372,7 @@
                                                     Histori Pengiriman
                                                 </button>
 
-                                                @can('receive', $penugasan)
+                                                <!-- @can('receive', $penugasan)
                                                     <div class="relative group">
                                                         <button
                                                             class="w-full text-left px-4 py-3 text-sm flex items-center gap-2 border-b
@@ -414,7 +414,7 @@
                                                             </div>
                                                         @endif
                                                     </div>
-                                                @endcan
+                                                @endcan -->
 
                                                 <!-- @can('setAsCKP', $penugasan)
                                                     <button type="button"
@@ -1184,7 +1184,7 @@
                                                     </button>
                                                 @endcan
 
-                                                @can('send', $penugasan)
+                                                <!-- @can('send', $penugasan)
                                                     <div class="relative group">
                                                         <button
                                                             class="w-full text-left px-4 py-3 text-sm flex items-center gap-2 border-b
@@ -1227,7 +1227,7 @@
                                                             </div>
                                                         @endif
                                                     </div>
-                                                @endcan
+                                                @endcan -->
 
                                                 <button
                                                     class="w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2 border-b border-gray-100 dark:border-gray-700"
@@ -1272,7 +1272,7 @@
                                                     Histori Pengiriman
                                                 </button>
 
-                                                @can('receive', $penugasan)
+                                                <!-- @can('receive', $penugasan)
                                                     <div class="relative group">
                                                         <button
                                                             class="w-full text-left px-4 py-3 text-sm flex items-center gap-2 border-b
@@ -1314,9 +1314,9 @@
                                                             </div>
                                                         @endif
                                                     </div>
-                                                @endcan
+                                                @endcan -->
 
-                                                @can('setAsCKP', $penugasan)
+                                                <!-- @can('setAsCKP', $penugasan)
                                                     <button type="button"
                                                         @if(!$penugasan->ckp)
                                                             @click="$dispatch('open-ckp-modal', {
@@ -1336,7 +1336,7 @@
                                                         </svg>
                                                         {{ $penugasan->ckp ? 'Sudah jadi CKP' : 'Jadikan CKP' }}
                                                     </button>
-                                                @endcan
+                                                @endcan -->
 
                                                 {{-- Delete --}}
                                                 @can('delete', $penugasan)
