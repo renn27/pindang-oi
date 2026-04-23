@@ -137,6 +137,9 @@ Route::middleware('auth')->group(function () {
     // HAPUS PENGIRIMAN BY ANGGOTA TIM (DELETE KELUAR DARI SCOPE AGAR CLEAN)
     Route::delete('pengirimans/{pengiriman:id_pengiriman}', [PengirimanController::class, 'delete'])->name('pengiriman.delete');
 
+    // BATALKAN PENERIMAAN BY KETUA TIM (DELETE KELUAR DARI SCOPE AGAR CLEAN)
+    Route::delete('penerimaans/{penerimaan:id_penerimaan}', [PenerimaanController::class, 'delete'])->name('penerimaan.delete');
+
     Route::post('/penugasan/check-duplicate-dates', [PenugasanController::class, 'checkDuplicateDates'])->name('penugasan.check-duplicate-dates');
 
     // CRUD PENUGASAN  BY KETUA TIM

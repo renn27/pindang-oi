@@ -341,14 +341,17 @@
                                                             historiData: @js(
                                                             $penugasan->pengirimans
                                                                 ->sortBy(fn($p) => $p->created_at)
+                                                                ->values()
                                                                 ->map(
-                                                                    fn($p) => [
+                                                                    fn($p, $idx) => [
                                                                         'id_pengiriman' => $p->id_pengiriman,
                                                                         'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
                                                                         'jumlah_dikirim' => $p->jumlah_dikirim,
                                                                         'media_pengiriman' => $p->media_pengiriman,
                                                                         'bukti_dukung' => $p->bukti_dukung,
+                                                                        'is_last' => $idx === $penugasan->pengirimans->count() - 1,
                                                                         'penerimaan' => [
+                                                                            'id_penerimaan' => $p->penerimaan?->id_penerimaan,
                                                                             'id_penerima' => $p->penerimaan?->penerima?->nama_pegawai ?? 'Belum Diperiksa',
                                                                             'tanggal_penerimaan' => $p->penerimaan?->tanggal_penerimaan?->format('d F Y') ?? '-',
                                                                             'jumlah_diterima' => $p->penerimaan?->jumlah_diterima ?? '-',
@@ -1238,14 +1241,17 @@
                                                             historiData: @js(
                                                             $penugasan->pengirimans
                                                                 ->sortByDesc(fn($p) => $p->created_at)
+                                                                ->values()
                                                                 ->map(
-                                                                    fn($p) => [
+                                                                    fn($p, $idx) => [
                                                                         'id_pengiriman' => $p->id_pengiriman,
                                                                         'tanggal_pengiriman' => $p->tanggal_pengiriman->format('d F Y'),
                                                                         'jumlah_dikirim' => $p->jumlah_dikirim,
                                                                         'media_pengiriman' => $p->media_pengiriman,
                                                                         'bukti_dukung' => $p->bukti_dukung,
+                                                                        'is_last' => $idx === 0,
                                                                         'penerimaan' => [
+                                                                            'id_penerimaan' => $p->penerimaan?->id_penerimaan,
                                                                             'id_penerima' => $p->penerimaan?->penerima?->nama_pegawai ?? 'Belum Diperiksa',
                                                                             'tanggal_penerimaan' => $p->penerimaan?->tanggal_penerimaan?->format('d F Y') ?? '-',
                                                                             'jumlah_diterima' => $p->penerimaan?->jumlah_diterima ?? '-',

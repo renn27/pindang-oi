@@ -104,8 +104,8 @@
                                 </div>
                                 <!-- Tombol Batalkan -->
                                 <template x-if="item.penerimaan.status === 'Menunggu' && formData.id_anggota === '{{ auth()->user()->id_pegawai }}'">
-                                    <div class="flex items-start gap-2">
-                                        <svg class="w-4 h-4 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                         </svg>
                                         <form :id="'delete-pengiriman-' + item.id_pengiriman" :action="`/pengirimans/${item.id_pengiriman}`" method="POST">
@@ -189,6 +189,27 @@
                                         <span x-text="item.penerimaan?.catatan ? item.penerimaan.catatan : '-'"></span>
                                     </div>
                                 </div>
+
+                                {{-- Tombol Batalkan Penerimaan (hanya untuk Ketua Tim / Admin / Pimpinan) --}}
+                                @if(in_array(auth()->user()->active_role, ['Ketua Tim']))
+                                    <template x-if="item.penerimaan.status !== 'Menunggu' && item.penerimaan.id_penerimaan && item.is_last">
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                            <form :id="'delete-penerimaan-' + item.penerimaan.id_penerimaan"
+                                                  :action="`/penerimaans/${item.penerimaan.id_penerimaan}`"
+                                                  method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" @click="SwalHelper.confirmDelete('delete-penerimaan-' + item.penerimaan.id_penerimaan, 'Penerimaan ' + item.tanggal_pengiriman)"
+                                                    class="text-sm text-red-600 hover:text-red-700 dark:text-red-400 font-medium transition-colors">
+                                                    Batalkan Penerimaan
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </template>
+                                @endif
                             </div>
                         </template>
                     </div>

@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
+use App\Models\Penerimaan;
+
 class PenerimaanController extends Controller
 {
     public function store(Request $request, SubKegiatan $subKegiatan, Penugasan $penugasan, Pengiriman $pengirimans) {
@@ -109,6 +111,52 @@ class PenerimaanController extends Controller
                 ->back()
                 ->with('error', 'Gagal melakukan penerimaan hasil kerja. Silakan coba lagi.')
                 ->withInput();
+        }
+    }
+
+    public function delete(Penerimaan $penerimaan)
+    {
+        $pengiriman = $penerimaan->pengiriman;
+        $penugasan  = $pengiriman->penugasan;
+
+        // Otorisasi: hanya Ketua Tim yang mengelola penugasan ini
+        $this->authorize('cancelReceive', $penugasan);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Cek apakah session masih valid untuk pembatalan
+        |--------------------------------------------------------------------------
+        | Penerimaan ke-N hanya bisa dibatalkan jika BELUM ada pengiriman ke-(N+1).
+        | Artinya: tidak boleh ada pengiriman yang dibuat SETELAH pengiriman
+        | yang menjadi milik penerimaan ini.
+        */
+        $adaPengirimanLebihBaru = $penugasan->pengirimans()
+            ->where('created_at', '>', $pengiriman->created_at)
+            ->exists();
+
+        if ($adaPengirimanLebihBaru) {
+            return redirect()
+                ->back()
+                ->with('error', 'Penerimaan tidak bisa dibatalkan karena anggota sudah mengirimkan pengiriman berikutnya.');
+        }
+
+        try {
+            DB::transaction(function () use ($penerimaan) {
+                $penerimaan->forceDelete();
+            });
+
+            return redirect()
+                ->route('sub.kegiatan.show', [
+                    'kegiatan'    => $penugasan->subKegiatan->kegiatan->id_kegiatan,
+                    'subKegiatan' => $penugasan->subKegiatan->id_sub_kegiatan,
+                ])
+                ->with('success', 'Penerimaan berhasil dibatalkan. Silakan lakukan penerimaan ulang.');
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Cancel penerimaan error: ' . $e->getMessage());
+            return redirect()
+                ->back()
+                ->with('error', 'Gagal membatalkan penerimaan. Silakan coba lagi.');
         }
     }
 }

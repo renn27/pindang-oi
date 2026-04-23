@@ -125,6 +125,13 @@ class PenugasanPolicy
         return true;
     }
 
+    public function cancelReceive(Pegawai $pegawai, Penugasan $penugasan): bool
+    {
+        // Hanya Ketua Tim yang merupakan penanggung jawab kegiatan dari sub kegiatan penugasan ini
+        return $pegawai->active_role === 'Ketua Tim'
+            && $pegawai->id_pegawai === $penugasan->subKegiatan->kegiatan->id_penanggung_jawab;
+    }
+
     public function acceptDL(Pegawai $pegawai, Penugasan $penugasan): bool
     {
         // 1️⃣ Hanya pimpinan
