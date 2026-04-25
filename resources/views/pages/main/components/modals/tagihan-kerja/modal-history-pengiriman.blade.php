@@ -49,14 +49,31 @@
                                     <p class="text-sm font-medium text-gray-700 dark:text-gray-300" x-text="item.tanggal_pengiriman"></p>
                                 </div>
                             </div>
-                            <span class="rounded-full px-3 py-1 text-xs font-semibold shadow-sm"
-                                :class="{
-                                    'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300': item.penerimaan.status === 'Diterima',
-                                    'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300': item.penerimaan.status === 'Revisi',
-                                    'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300': item.penerimaan.status === 'Menunggu'
-                                }"
-                                x-text="item.penerimaan.status">
-                            </span>
+                            <div class="flex items-center gap-2">
+                                <!-- Badge Bulan -->
+                                <template x-if="item.bulan_pengiriman">
+                                    <span
+                                        class="rounded-full px-2.5 py-0.5 text-[10px] font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300"
+                                        x-text="item.bulan_pengiriman"></span>
+                                </template>
+                                <!-- Badge Tipe -->
+                                <template x-if="item.tipe_pengiriman">
+                                    <span class="rounded-full px-2.5 py-0.5 text-[10px] font-semibold"
+                                        :class="{
+                                            'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300': item.tipe_pengiriman === 'Cicilan',
+                                            'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300': item.tipe_pengiriman === 'Pelunasan'
+                                        }" x-text="item.tipe_pengiriman"></span>
+                                </template>
+                                <!-- Badge Status -->
+                                <span class="rounded-full px-3 py-1 text-xs font-semibold shadow-sm"
+                                    :class="{
+                                        'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300': item.penerimaan.status === 'Diterima',
+                                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300': item.penerimaan.status === 'Revisi',
+                                        'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300': item.penerimaan.status === 'Menunggu'
+                                    }"
+                                    x-text="item.penerimaan.status">
+                                </span>
+                            </div>
                         </div>
                     </div>
 
@@ -160,15 +177,15 @@
                             <div class="space-y-4">
                                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                                     <div class="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm">
-                                        <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">📅 Tanggal Penerimaan</p>
+                                        <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Tanggal Penerimaan</p>
                                         <p class="text-sm font-semibold text-gray-700 dark:text-gray-300" x-text="item.penerimaan.tanggal_penerimaan"></p>
                                     </div>
                                     <div class="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm">
-                                        <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">📊 Jumlah Diterima</p>
+                                        <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Jumlah Diterima</p>
                                         <p class="text-sm font-semibold text-gray-700 dark:text-gray-300" x-text="item.penerimaan.jumlah_diterima"></p>
                                     </div>
                                     <div class="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm">
-                                        <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">🏷️ Status</p>
+                                        <p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Status</p>
                                         <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold"
                                             :class="{
                                                 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300': item.penerimaan.status === 'Diterima',

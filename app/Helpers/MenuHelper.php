@@ -19,11 +19,11 @@ class MenuHelper
                 'name' => 'Dashboard',
                 'path' => '/',
             ],
-            // [
-            //     'icon' => 'capaian-kinerja',
-            //     'name' => 'CKP Saya',
-            //     'path' => '/ckp-pegawai',
-            // ],
+            [
+                'icon' => 'capaian-kinerja',
+                'name' => 'CKP Saya',
+                'path' => '/ckp-pegawai',
+            ],
             [
                 'icon' => 'admin',
                 'name' => 'Admin',

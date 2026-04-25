@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 
@@ -66,9 +67,48 @@ class Penugasan extends Model
         return $this->hasMany(KalenderDL::class, 'id_penugasan');
     }
 
+    public function ckpBulanan(): MorphMany
+    {
+        return $this->morphMany(CkpPegawai::class, 'ckpable');
+    }
+
     public function ckp(): MorphOne
     {
         return $this->morphOne(CkpPegawai::class, 'ckpable');
+    }
+
+    /**
+     * Hitung jumlah bulan pengiriman Diterima yang belum dijadikan CKP.
+     * Digunakan untuk: policy setAsCKP, badge count, dan dropdown bulan CKP.
+     */
+    public function jumlahCkpBelumDibuat(): int
+    {
+        // Bulan-bulan yang sudah ada pengiriman Diterima
+        $bulanDiterima = $this->pengirimans
+            ->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')
+            ->pluck('bulan_pengiriman')
+            ->unique();
+
+        // Bulan-bulan yang sudah punya CKP
+        $bulanSudahCkp = $this->ckpBulanan->pluck('bulan_ckp')->unique();
+
+        // Selisih = bulan yang diterima tapi belum CKP
+        return $bulanDiterima->diff($bulanSudahCkp)->count();
+    }
+
+    /**
+     * Ambil daftar bulan pengiriman Diterima yang belum dijadikan CKP.
+     */
+    public function bulanCkpBelumDibuat(): \Illuminate\Support\Collection
+    {
+        $bulanDiterima = $this->pengirimans
+            ->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')
+            ->pluck('bulan_pengiriman')
+            ->unique();
+
+        $bulanSudahCkp = $this->ckpBulanan->pluck('bulan_ckp')->unique();
+
+        return $bulanDiterima->diff($bulanSudahCkp)->values();
     }
     // END RELATIONS
 
@@ -152,22 +192,23 @@ class Penugasan extends Model
 
     public function bolehTerimaPenugasan(): bool
     {
-        // 1️⃣ Belum masuk waktu
-        if (!$this->isStarted()) {
-            return false;
-        }
-
         $latestPengiriman = $this->latestPengiriman;
-        $latestPenerimaan = $this->latestPenerimaan;
 
-        // 2️⃣ Belum ada pengiriman sama sekali
-        if (!$latestPengiriman) {
-            return false;
-        }
+        // Tidak ada pengiriman → tidak bisa terima
+        if (!$latestPengiriman) return false;
 
-        return
-            !$latestPenerimaan ||
-            $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman;
+        // Sudah ada penerimaan untuk pengiriman terbaru → tidak bisa terima lagi
+        if ($latestPengiriman->penerimaan) return false;
+
+        // Sudah ada pelunasan diterima → tugas selesai
+        $adaPelunasanDiterima = $this->pengirimans()
+            ->where('tipe_pengiriman', 'Pelunasan')
+            ->whereHas('penerimaan', fn($q) => $q->where('status', 'Diterima'))
+            ->exists();
+
+        if ($adaPelunasanDiterima) return false;
+
+        return true;
     }
 
     public function tooltipPenerimaanPenugasan(): ?string
@@ -222,24 +263,30 @@ class Penugasan extends Model
     public function bolehKirimPenugasan(): bool
     {
         // 1️⃣ BELUM DIMULAI → TUTUP BUTTON
-        if (!$this->isStarted()) {
-            return false;
-        }
+        if (!$this->isStarted()) return false;
 
         // 2️⃣ Jenis DL tapi belum masuk kalender DL
-        if ($this->isDinasLuar() && !$this->sudahMasukKalenderDL()) {
-            return false;
-        }
+        if ($this->isDinasLuar() && !$this->sudahMasukKalenderDL()) return false;
 
         $latestPengiriman = $this->latestPengiriman;
         $latestPenerimaan = $this->latestPenerimaan;
 
-        // 2️⃣ Ada pengiriman terbaru tapi BELUM ada penerimaan utk pengiriman tsb
+        // 2️⃣ Ada pengiriman terbaru tapi BELUM ada penerimaan untuk pengiriman tersebut
         if ($latestPengiriman && (!$latestPenerimaan || $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman)) {
             return false; // sedang diperiksa
         }
 
-        // 3️⃣ Selain itu → boleh kirim
+        // 3️⃣ BARU: Jika sudah ada pelunasan yang diterima, blokir pengiriman
+        $adaPelunasanDiterima = $this->pengirimans()
+            ->where('tipe_pengiriman', 'Pelunasan')
+            ->whereHas('penerimaan', fn($q) => $q->where('status', 'Diterima'))
+            ->exists();
+
+        if ($adaPelunasanDiterima) {
+            return false;
+        }
+
+        // 4️⃣ Selain itu → boleh kirim
         return true;
     }
 
@@ -286,7 +333,6 @@ class Penugasan extends Model
         return null;
     }
 
-
     public function statusPenugasan(): array
     {
         $today = Carbon::today();
@@ -312,8 +358,18 @@ class Penugasan extends Model
 
             // Jika penerimaan terakhir adalah DITERIMA
             if ($latestPenerimaan->status === 'Diterima') {
+                // CEK: apakah ini pelunasan atau cicilan?
+                $tipePengiriman = $latestPengiriman->tipe_pengiriman;
+
+                if ($tipePengiriman === 'Cicilan') {
+                    return [
+                        'label' => 'Diterima (Cicilan)',
+                        'class' => 'bg-blue-100 text-blue-700',
+                    ];
+                }                
+
                 return [
-                    'label' => 'Tugas Selesai',
+                    'label' => 'Diterima (Pelunasan)',
                     'class' => 'bg-green-200 text-green-800',
                 ];
             }
@@ -405,13 +461,27 @@ class Penugasan extends Model
 
         // 2️⃣ Penerimaan cocok dengan pengiriman terakhir
         if ($latestPenerimaan) {
+            $label = $latestPenerimaan->status;
+            $class = match ($latestPenerimaan->status) {
+                'Diterima' => 'bg-green-100 text-green-700',
+                'Revisi' => 'bg-red-100 text-red-500',
+                default => 'bg-gray-100 text-gray-500',
+            };
+
+            // Diferensiasi Cicilan vs Pelunasan pada status Diterima
+            if ($latestPenerimaan->status === 'Diterima' && $latestPengiriman) {
+                if ($latestPengiriman->tipe_pengiriman === 'Cicilan') {
+                    $label = 'Diterima (Cicilan)';
+                    $class = 'bg-emerald-50 text-emerald-600';
+                } else {
+                    $label = 'Diterima (Pelunasan)';
+                    $class = 'bg-green-100 text-green-700';
+                }
+            }
+
             return [
-                'label' => $latestPenerimaan->status,
-                'class' => match ($latestPenerimaan->status) {
-                    'Diterima' => 'bg-green-100 text-green-700',
-                    'Revisi' => 'bg-red-100 text-red-500',
-                    default => 'bg-gray-100 text-gray-500',
-                },
+                'label' => $label,
+                'class' => $class,
             ];
         }
 

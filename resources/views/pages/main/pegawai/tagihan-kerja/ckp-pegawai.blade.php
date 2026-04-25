@@ -213,6 +213,7 @@
                                         'satuan_target' => $ckp->penugasan->satuan_target,
                                         'tanggal_mulai' => optional($ckp->penugasan->tanggal_mulai)->translatedFormat('d M Y'),
                                         'tanggal_selesai' => optional($ckp->penugasan->tanggal_selesai)->translatedFormat('d M Y'),
+                                        'bulan_pengiriman' => $ckp->penugasan->latestPengiriman?->bulan_pengiriman ? \Carbon\Carbon::createFromFormat('Y-m', $ckp->penugasan->latestPengiriman->bulan_pengiriman)->translatedFormat('F Y') : '-',
                                         'tanggal_pengiriman' => optional($ckp->penugasan->latestPengiriman?->tanggal_pengiriman)->translatedFormat('d F Y'),
                                     ] : null;
                                     
@@ -232,10 +233,12 @@
                                     @if ($bulan === 'all')
                                     <td class="px-4 py-3 text-sm text-center font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
                                         @php
-                                            $tglKirim = $ckp->penugasan ? $ckp->penugasan->latestPengiriman?->tanggal_pengiriman : $ckp->created_at;
+                                            $bulanCkpValue = $ckp->bulan_ckp; // format "YYYY-MM"
+                                            $bulanIndex = $bulanCkpValue ? str_pad((int) substr($bulanCkpValue, 5, 2), 2, '0', STR_PAD_LEFT) : null;
+                                            $bulanLabel = $bulanIndex ? ($bulanList[$bulanIndex] ?? '-') : '-';
                                         @endphp
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $isPimpinanCkp ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' : ($isKetuaTimCkp ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300') }}">
-                                            {{ $tglKirim ? $bulanList[$tglKirim->format('m')] ?? '-' : '-' }}
+                                            {{ $bulanLabel }}
                                         </span>
                                     </td>
                                     @endif
@@ -343,7 +346,7 @@
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="button" 
-                                                        onclick="SwalHelper.confirmDelete('delete-ckp-{{ $ckp->id_ckp }}', {{ json_encode('CKP ini') }})"
+                                                        onclick="SwalHelper.confirmDelete('delete-ckp-{{ $ckp->id_ckp }}', {{ json_encode('CKP ' . ($ckp->bulan_ckp ? $bulanList[str_pad((int)substr($ckp->bulan_ckp, 5, 2), 2, '0', STR_PAD_LEFT)] . ' ' . substr($ckp->bulan_ckp, 0, 4) : 'ini')) }})"
                                                         class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -378,6 +381,7 @@
                                         'satuan_target' => $ckp->penugasan->satuan_target,
                                         'tanggal_mulai' => optional($ckp->penugasan->tanggal_mulai)->translatedFormat('d M Y'),
                                         'tanggal_selesai' => optional($ckp->penugasan->tanggal_selesai)->translatedFormat('d M Y'),
+                                        'bulan_pengiriman' => $ckp->penugasan->latestPengiriman?->bulan_pengiriman ? \Carbon\Carbon::createFromFormat('Y-m', $ckp->penugasan->latestPengiriman->bulan_pengiriman)->translatedFormat('F Y') : '-',
                                         'tanggal_pengiriman' => optional($ckp->penugasan->latestPengiriman?->tanggal_pengiriman)->translatedFormat('d F Y'),
                                     ] : null;
                                     
@@ -508,7 +512,7 @@
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="button" 
-                                                        onclick="SwalHelper.confirmDelete('delete-ckp-tambahan-{{ $ckp->id_ckp }}', {{ json_encode('CKP ini') }})"
+                                                        onclick="SwalHelper.confirmDelete('delete-ckp-tambahan-{{ $ckp->id_ckp }}', {{ json_encode('CKP ' . ($ckp->bulan_ckp ? $bulanList[str_pad((int)substr($ckp->bulan_ckp, 5, 2), 2, '0', STR_PAD_LEFT)] . ' ' . substr($ckp->bulan_ckp, 0, 4) : 'ini')) }})"
                                                         class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -630,7 +634,8 @@
                             <div class="col-span-2"><p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Jenis Kegiatan</p><p class="text-sm font-medium text-gray-800 dark:text-gray-200" x-text="detailData.penugasan?.jenis_kegiatan || '-'"></p></div>
                             <div><p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Target Penugasan</p><p class="text-sm font-medium text-gray-800 dark:text-gray-200" x-text="(detailData.penugasan?.target || '') + ' ' + (detailData.penugasan?.satuan_target || '')"></p></div>
                             <div><p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Periode</p><p class="text-sm font-medium text-gray-800 dark:text-gray-200" x-text="(detailData.penugasan?.tanggal_mulai || '') + ' s.d ' + (detailData.penugasan?.tanggal_selesai || '')"></p></div>
-                            <div class="col-span-2"><p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Tanggal Pengiriman</p><p class="text-sm font-semibold text-green-600 dark:text-green-400" x-text="detailData.penugasan?.tanggal_pengiriman || '-'"></p></div>
+                            <div><p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Bulan Pengiriman</p><p class="text-sm font-semibold text-gray-800 dark:text-gray-200" x-text="detailData.penugasan?.bulan_pengiriman || '-'"></p></div>
+                            <div><p class="text-xs text-gray-400 dark:text-gray-500 mb-1">Tanggal Pengiriman</p><p class="text-sm font-semibold text-green-600 dark:text-green-400" x-text="detailData.penugasan?.tanggal_pengiriman || '-'"></p></div>
                         </div>
                     </div>
                 </div>

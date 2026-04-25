@@ -1,34 +1,65 @@
-﻿<!-- Modal Tambah Pengiriman -->
-<x-ui.smart-modal id="modal-pengiriman-anggota" class="max-w-2xl" 
-    x-data="{
-        formData: {
-            id_sub_kegiatan: '',
-            id_penugasan: '',
-            nama_anggota: '',
-            target_penugasan: 0,
-            satuan_target: '',
-            tanggal_mulai: '',
-            tanggal_pengiriman: '',
-            jumlah_dikirim: '',
-            media_dikirim: '',
-            bukti_dukung: ''
+<!-- Modal Tambah Pengiriman -->
+<x-ui.smart-modal id="modal-pengiriman-anggota" class="max-w-2xl">
+    <div x-data="{
+        bulanPengiriman: '',
+        tipePengiriman: 'Pelunasan',
+        get bulanOptions() {
+            if (!formData.tanggal_mulai || !formData.tanggal_selesai) return [];
+            const start = new Date(formData.tanggal_mulai);
+            const end = new Date(formData.tanggal_selesai);
+            const options = [];
+            const bulanNama = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+            const bulanDiterima = formData.bulanDiterima || [];
+            const now = new Date();
+            const currentYM = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+            let current = new Date(start.getFullYear(), start.getMonth(), 1);
+            while (current <= end) {
+                const y = current.getFullYear();
+                const m = String(current.getMonth() + 1).padStart(2, '0');
+                const val = y + '-' + m;
+                const label = bulanNama[current.getMonth()] + ' ' + y;
+                let disabled = false;
+                let reason = '';
+                if (bulanDiterima.includes(val)) {
+                    disabled = true;
+                    reason = 'Bulan ini sudah memiliki pengiriman yang Diterima';
+                } else if (val > currentYM) {
+                    disabled = true;
+                    reason = 'Tidak bisa mengirim untuk bulan yang belum tiba';
+                }
+                options.push({ value: val, label, disabled, reason });
+                current.setMonth(current.getMonth() + 1);
+            }
+            return options;
         },
-        mode: 'create',
-        itemKey: null
-    }"
-    @open-smart-modal.window="
-        if ($event.detail.modalId !== 'modal-pengiriman-anggota') return;
-
-        mode = $event.detail.mode ?? 'create';
-        itemKey = $event.detail.key ?? null;
-        
-        // Update formData dengan data yang dikirim
-        if ($event.detail.data) {
-            Object.assign(formData, $event.detail.data);
+        get activeOptions() {
+            return this.bulanOptions.filter(o => !o.disabled);
+        },
+        get isLastMonth() {
+            const active = this.activeOptions;
+            if (!this.bulanPengiriman || active.length === 0) return false;
+            // Cek apakah bulan ini adalah bulan terakhir dari rentang penugasan (bukan dari active)
+            const allOptions = this.bulanOptions;
+            return this.bulanPengiriman === allOptions[allOptions.length - 1].value;
+        },
+        get bolehCicilan() {
+            return this.bulanOptions.length > 1 && !this.isLastMonth;
         }
-        
-        console.log('formData setelah update:', formData);
-        console.log('target_penugasan:', formData.target_penugasan);
+    }"
+    x-effect="
+        // Auto-select bulan if only 1 active option
+        if (activeOptions.length === 1 && !bulanPengiriman) {
+            bulanPengiriman = activeOptions[0].value;
+        }
+        // Force Pelunasan when Cicilan not allowed
+        if (!bolehCicilan && tipePengiriman === 'Cicilan') {
+            tipePengiriman = 'Pelunasan';
+        }
+        // Reset when modal re-opens with new data
+        if (bulanOptions.length === 0) {
+            bulanPengiriman = '';
+            tipePengiriman = 'Pelunasan';
+        }
     ">
     <form id="addPengirimanForm"
         :action="`/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${formData.id_penugasan}/pengirimans`"
@@ -84,6 +115,52 @@
                     <input type="text" :value="formData.nama_anggota" disabled
                         class="w-full mb-4 h-11 rounded-lg border border-gray-300 bg-gray-100 px-4 text-sm text-gray-800
                                         cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                </div>
+
+                <!-- Bulan Pengiriman -->
+                <div class="mb-4">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Bulan Pengiriman <span class="text-red-500">*</span>
+                    </label>
+                    <select name="bulan_pengiriman" id="bulan_pengiriman" x-model="bulanPengiriman"
+                        class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10">
+                        <option value="">-- Pilih Bulan --</option>
+                        <template x-for="opt in bulanOptions" :key="opt.value">
+                            <option :value="opt.value" 
+                                    x-text="opt.disabled ? opt.label + ' — ' + opt.reason : opt.label"
+                                    :disabled="opt.disabled"
+                                    :class="opt.disabled ? 'text-gray-400 bg-gray-100 dark:text-gray-600 dark:bg-gray-800' : ''"></option>
+                        </template>
+                    </select>
+                </div>
+
+                <!-- Tipe Pengiriman -->
+                <div class="mb-4">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Tipe Pengiriman <span class="text-red-500">*</span>
+                    </label>
+                    <select name="tipe_pengiriman" id="tipe_pengiriman" x-model="tipePengiriman"
+                        class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10">
+                        <option value="Pelunasan">Pelunasan (Pengiriman Terakhir)</option>
+                        <template x-if="bolehCicilan">
+                            <option value="Cicilan">Cicilan (Masih Ada Lanjutan)</option>
+                        </template>
+                    </select>
+                    <template x-if="bulanOptions.length <= 1">
+                        <p class="mt-1.5 text-xs text-blue-500 dark:text-blue-400">
+                            Penugasan ini hanya 1 bulan, otomatis Pelunasan.
+                        </p>
+                    </template>
+                    <template x-if="bulanOptions.length > 1 && isLastMonth">
+                        <p class="mt-1.5 text-xs text-amber-500 dark:text-amber-400">
+                            Bulan terakhir dalam rentang penugasan — hanya bisa Pelunasan.
+                        </p>
+                    </template>
+                    <template x-if="bolehCicilan">
+                        <p class="mt-1.5 text-xs text-gray-400 dark:text-gray-500">
+                            Pilih <strong>Cicilan</strong> jika masih akan mengirim lagi, atau <strong>Pelunasan</strong> jika ini pengiriman terakhir.
+                        </p>
+                    </template>
                 </div>
 
                 {{-- lock tanggal setelah 31 maret --}}
@@ -229,6 +306,7 @@
             </div>
         </div>
     </form>
+    </div> {{-- close inner x-data wrapper --}}
 
 </x-ui.smart-modal>
 

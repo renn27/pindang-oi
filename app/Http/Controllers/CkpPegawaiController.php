@@ -20,41 +20,20 @@ class CkpPegawaiController extends Controller
         $user   = Auth::user();
         $userId = $user->id_pegawai;
 
+        // ✅ Filter berdasarkan kolom bulan_ckp (format "YYYY-MM") — universal untuk semua tipe CKP
+        $ckpQuery = CkpPegawai::where('id_pegawai', $userId);
+
         if ($bulan !== 'all') {
-            $startDate = Carbon::create($tahun, $bulan, 1)->startOfMonth();
-            $endDate   = Carbon::create($tahun, $bulan, 1)->endOfMonth();
+            // Filter bulan spesifik: "2026-03"
+            $bulanFilter = $tahun . '-' . str_pad($bulan, 2, '0', STR_PAD_LEFT);
+            $ckpQuery->where('bulan_ckp', $bulanFilter);
         } else {
-            $startDate = Carbon::create($tahun, 1, 1)->startOfYear();
-            $endDate   = Carbon::create($tahun, 12, 31)->endOfYear();
+            // Filter semua bulan dalam tahun
+            $ckpQuery->where('bulan_ckp', '>=', $tahun . '-01')
+                     ->where('bulan_ckp', '<=', $tahun . '-12');
         }
 
-        // ✅ Tidak filter tipe_ckp — tampilkan semua CKP milik pegawai ini
-        $ckpList = CkpPegawai::where('id_pegawai', $userId)
-            ->where(function ($query) use ($startDate, $endDate) {
-
-                // Anggota Tim — filter dari tanggal pengiriman di penugasan
-                $query->where(function ($q) use ($startDate, $endDate) {
-                    $q->where('ckpable_type', Penugasan::class)
-                        ->whereExists(function ($sub) use ($startDate, $endDate) {
-                            $sub->select(\DB::raw(1))
-                                ->from('pengirimans')
-                                ->whereColumn('pengirimans.id_penugasan', 'ckp_pegawais.ckpable_id')
-                                ->whereNull('pengirimans.deleted_at')
-                                ->whereDate('pengirimans.tanggal_pengiriman', '>=', $startDate)
-                                ->whereDate('pengirimans.tanggal_pengiriman', '<=', $endDate);
-                    });
-                })
-
-                // Ketua Tim & Pimpinan — filter dari created_at CKP
-                ->orWhere(function ($q) use ($startDate, $endDate) {
-                    $q->whereIn('ckpable_type', [
-                        SubKegiatan::class,
-                        AgendaPimpinan::class,
-                    ])
-                    ->whereDate('created_at', '>=', $startDate)
-                    ->whereDate('created_at', '<=', $endDate);
-                });
-            })
+        $ckpList = $ckpQuery
             ->with(['pegawai', 'ckpable'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -95,6 +74,7 @@ class CkpPegawaiController extends Controller
     {
         $request->validate([
             'uraian' => 'required|string',
+            'bulan_ckp' => 'required|string|size:7', // format "2026-01"
             'keterangan' => 'nullable|string',
         ]);
 
@@ -105,24 +85,34 @@ class CkpPegawaiController extends Controller
             'latestPengiriman'
         ])->findOrFail($penugasan->id_penugasan);
 
-        if ($penugasan->ckp()->exists()) {
-            return redirect()->back()->with('warning', 'Penugasan ini sudah masuk CKP');
+        // Cek apakah sudah ada CKP untuk bulan ini
+        $existing = $penugasan->ckpBulanan()
+            ->where('bulan_ckp', $request->bulan_ckp)
+            ->exists();
+        
+        if ($existing) {
+            return back()->with('warning', 'CKP untuk bulan ini sudah ada');
+        }
+        // Ambil pengiriman yang relevan untuk bulan ini
+        $pengirimanBulanIni = $penugasan->pengirimans()
+            ->where('bulan_pengiriman', $request->bulan_ckp)
+            ->whereHas('penerimaan', fn($q) => $q->where('status', 'Diterima'))
+            ->latest()
+            ->first();
+
+        if (!$pengirimanBulanIni) {
+            return back()->with('error', 'Belum ada pengiriman yang diterima untuk bulan ini');
         }
 
-        if (!$penugasan->latestPengiriman) {
-            return back()->with('error', 'Belum ada pengiriman untuk penugasan ini');
-        }
-
-        $latestPengiriman = $penugasan->latestPengiriman;
-
-        $realisasi = $latestPengiriman?->jumlah_dikirim ?? 0;
-        $persentase = $latestPengiriman?->rr_kirim ?? 0;
-        $kualitas = $latestPengiriman?->rating_kirim ?? 0;
+        $realisasi = $pengirimanBulanIni?->jumlah_dikirim ?? 0;
+        $persentase = $pengirimanBulanIni?->rr_kirim ?? 0;
+        $kualitas = $pengirimanBulanIni?->rating_kirim ?? 0;
 
         CkpPegawai::create([
             'id_pegawai' => $penugasan->id_anggota,
             'ckpable_type' => Penugasan::class,          
             'ckpable_id' => $penugasan->id_penugasan,  
+            'bulan_ckp' => $request->bulan_ckp,
             'tipe_ckp' => 'Anggota Tim',             
             'uraian' => $request->uraian,
             'jenis_ckp' => 'Utama',
@@ -148,6 +138,7 @@ class CkpPegawaiController extends Controller
         // 1. Validasi input
         $request->validate([
             'uraian' => 'required|string',
+            'bulan_ckp' => 'required|string|size:7',
             'keterangan' => 'nullable|string',
         ]);
 
@@ -158,6 +149,15 @@ class CkpPegawaiController extends Controller
         // 3. Pastikan yang akses adalah Ketua Tim
         if (Auth::user()->id_pegawai !== $idKetuaTim) {
             return back()->with('error', 'Hanya Ketua Tim yang dapat membuat CKP Ketua Tim.');
+        }
+
+        // 4. Cek Duplikat per bulan (bukan secara global)
+        $existing = $subKegiatan->ckpBulanan()
+            ->where('bulan_ckp', $request->bulan_ckp)
+            ->exists();
+        
+        if ($existing) {
+            return back()->with('error', 'Sub kegiatan ini sudah memiliki CKP Ketua Tim untuk bulan tersebut.');
         }
 
         // 4. Load semua penugasan beserta relasi sekaligus — 1 query, dipakai semua step
@@ -174,27 +174,21 @@ class CkpPegawaiController extends Controller
         $penugasanSelesai = $penugasans->filter(function ($penugasan) {
             return $penugasan->latestPengiriman?->penerimaan?->status === 'Diterima';
         })->count();
-
-        if ($penugasanSelesai < $totalPenugasan) {
-            return back()->with('error', 'Semua penugasan harus sudah diterima terlebih dahulu.');
+        if ($penugasanSelesai === 0) {
+            return back()->with('error', 'Belum ada penugasan yang selesai untuk bulan ini.');
         }
 
-        // 5. Cek apakah Ketua Tim sudah memiliki CKP untuk sub kegiatan ini
-        if ($subKegiatan->ckp()->exists()) {
-            return back()->with('error', 'Sub kegiatan ini sudah memiliki CKP Ketua Tim.');
-        }
-
-        // 7. Hitung total realisasi dari semua penugasan
+        // 6. Hitung total realisasi dari semua penugasan
         $totalRealisasi = $penugasans->sum(function ($penugasan) {
-                return $penugasan->latestPengiriman?->jumlah_dikirim ?? 0;
+                return $penugasan->latestPenerimaan?->jumlah_diterima ?? 0;
             });
 
-        // 8. Hitung persentase realisasi — total diterima / total target * 100
+        // 7. Hitung persentase realisasi — total diterima / total target * 100
         $totalTarget = $penugasans->sum(fn($p) => $p->target ?? 0);
         $totalDiterima = $penugasans->sum(fn($p) => $p->latestPenerimaan?->jumlah_diterima ?? 0);
         $avgPersentase = $totalTarget > 0 ? round(($totalDiterima / $totalTarget) * 100, 2) : 0;
 
-        // 9. Hitung rata-rata tingkat kualitas
+        // 8. Hitung rata-rata tingkat kualitas
         $avgRating = round($penugasans->avg(function ($penugasan) {
                 return $penugasan->latestPenerimaan?->rating_terima ?? 0;
             }) ?? 0);
@@ -204,7 +198,8 @@ class CkpPegawaiController extends Controller
         CkpPegawai::create([
             'id_pegawai' => $idKetuaTim,
             'ckpable_type' => SubKegiatan::class,                       
-            'ckpable_id' => $subKegiatan->id_sub_kegiatan,     
+            'ckpable_id' => $subKegiatan->id_sub_kegiatan,   
+            'bulan_ckp' => $request->bulan_ckp,  
             'tipe_ckp' => 'Ketua Tim',                       
             'uraian' => $request->uraian,
             'jenis_ckp' => 'Utama',
@@ -291,7 +286,6 @@ class CkpPegawaiController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        $ckp = CkpPegawai::findOrFail($id);
 
         // Pastikan hanya pemilik data yang bisa edit
         if ($ckp->id_pegawai !== Auth::user()->id_pegawai) {

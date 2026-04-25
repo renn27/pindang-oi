@@ -98,11 +98,17 @@ class PenugasanPolicy
             return false;
         }
 
-        if ($penugasan->latestPenerimaan?->status === 'Diterima') {
+        // Block hanya jika sudah ada PELUNASAN yang diterima (tugas selesai)
+        $adaPelunasanDiterima = $penugasan->pengirimans()
+            ->where('tipe_pengiriman', 'Pelunasan')
+            ->whereHas('penerimaan', fn($q) => $q->where('status', 'Diterima'))
+            ->exists();
+
+        if ($adaPelunasanDiterima) {
             return false;
         }
 
-        // ✅ masih revisi / menunggu → boleh muncul
+        // ✅ masih cicilan / revisi / menunggu → boleh muncul
         return true;
     }
 
@@ -118,7 +124,13 @@ class PenugasanPolicy
             return false;
         }
 
-        if ($penugasan->latestPenerimaan?->status === 'Diterima') {
+        // Block hanya jika sudah ada PELUNASAN yang diterima (tugas selesai)
+        $adaPelunasanDiterima = $penugasan->pengirimans()
+            ->where('tipe_pengiriman', 'Pelunasan')
+            ->whereHas('penerimaan', fn($q) => $q->where('status', 'Diterima'))
+            ->exists();
+
+        if ($adaPelunasanDiterima) {
             return false;
         }
 
@@ -164,19 +176,16 @@ class PenugasanPolicy
 
     public function setAsCKP(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        // Validasi dasar
+        // Validasi dasar: harus Anggota Tim dan pemilik penugasan
         if (
             $pegawai->active_role !== 'Anggota Tim' ||
-            $penugasan->id_anggota !== $pegawai->id_pegawai ||
-            $penugasan->status !== 'Sudah Dikirim'
+            $penugasan->id_anggota !== $pegawai->id_pegawai
         ) {
             return false;
         }
 
-        // Validasi penerimaan (harus ada yang "Diterima")
-        return $penugasan->pengirimans()
-            ->whereHas('penerimaan', fn ($q) => $q->where('status', 'Diterima'))
-            ->exists();
+        // Validasi: masih ada bulan pengiriman Diterima yang belum dijadikan CKP
+        return $penugasan->jumlahCkpBelumDibuat() > 0;
     }
 
     /**

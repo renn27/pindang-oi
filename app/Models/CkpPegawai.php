@@ -19,6 +19,7 @@ class CkpPegawai extends Model
         'id_pegawai',
         'ckpable_type',
         'ckpable_id',
+        'bulan_ckp',
         'tipe_ckp',
         'uraian',
         'jenis_ckp',

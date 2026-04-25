@@ -1,5 +1,44 @@
 <!-- Modal CKP Universal (untuk CKP Pegawai dan CKP Ketua Tim) -->
 <div x-data="ckpUniversalModal()"
+    @open-smart-modal.window="
+        if ($event.detail.modalId !== 'modal-ckp-universal') return;
+        
+        const d = $event.detail.data || {};
+        ckpData = {
+            id_penugasan: d.id_penugasan || null,
+            id_sub_kegiatan: d.id_sub_kegiatan || null,
+            id_agenda: d.id_agenda || null,
+            nama_pegawai: d.nama_pegawai || '',
+            nama_sub_kegiatan: d.nama_sub_kegiatan || '',
+            nama_agenda: d.nama_agenda || '',
+            uraian: d.uraian || '',
+            satuan: d.satuan || '',
+            target_kuantitas: d.target_kuantitas || 0,
+            keterangan: d.keterangan || '',
+            is_ketua_tim: d.is_ketua_tim || false,
+            is_pimpinan: d.is_pimpinan || false,
+            tanggal_mulai: d.tanggal_mulai || '',
+            tanggal_selesai: d.tanggal_selesai || '',
+            bulanDiterima: d.bulanDiterima || [],
+            bulanSudahCkp: d.bulanSudahCkp || [],
+        };
+        bulanCkp = '';
+
+        // Auto-set bulan CKP
+        $nextTick(() => {
+            const isAnggota = !ckpData.is_ketua_tim && !ckpData.is_pimpinan;
+            if (isAnggota) {
+                // Anggota Tim: hanya bulan yang sudah ada pengiriman Diterima
+                const accepted = ckpData.bulanDiterima || [];
+                if (accepted.length === 1) {
+                    bulanCkp = accepted[0];
+                }
+            } else if (bulanOptions.length === 1) {
+                bulanCkp = bulanOptions[0].value;
+            }
+        });
+        
+        showCkpModal = true;"
     @open-ckp-modal.window="
         if ($event.detail.modalId !== 'modal-ckp') return;
         
@@ -15,8 +54,24 @@
             target_kuantitas: $event.detail.target_kuantitas || 0,
             keterangan: $event.detail.keterangan || '',
             is_ketua_tim: $event.detail.is_ketua_tim || false,
-            is_pimpinan: $event.detail.is_pimpinan || false
+            is_pimpinan: $event.detail.is_pimpinan || false,
+            tanggal_mulai: $event.detail.tanggal_mulai || '',
+            tanggal_selesai: $event.detail.tanggal_selesai || '',
+            bulanDiterima: $event.detail.bulanDiterima || [],
         };
+        bulanCkp = '';
+
+        $nextTick(() => {
+            const isAnggota = !ckpData.is_ketua_tim && !ckpData.is_pimpinan;
+            if (isAnggota) {
+                const accepted = ckpData.bulanDiterima || [];
+                if (accepted.length === 1) {
+                    bulanCkp = accepted[0];
+                }
+            } else if (bulanOptions.length === 1) {
+                bulanCkp = bulanOptions[0].value;
+            }
+        });
         
         showCkpModal = true;">
 
@@ -157,6 +212,54 @@
                                 <span class="text-xs text-gray-400">(bisa diedit)</span>
                             </div>
 
+                            <!-- Bulan CKP — Anggota Tim: hanya bulan yang ada pengiriman Diterima -->
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Bulan CKP <span class="text-red-500">*</span>
+                                </label>
+
+                                {{-- Anggota Tim: dropdown dengan hanya bulan yang ada pengiriman Diterima --}}
+                                <template x-if="isAnggotaTim">
+                                    <div>
+                                        <select name="bulan_ckp" x-model="bulanCkp" required
+                                            class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+                                            <option value="">-- Pilih Bulan CKP --</option>
+                                            <template x-for="opt in bulanOptions" :key="opt.value">
+                                                <option :value="opt.value" 
+                                                        x-text="opt.disabled ? (opt.reason === 'sudah_ckp' ? opt.label + ' — ✓ Sudah masuk ke CKP' : opt.label + ' — Belum ada pengiriman Diterima') : opt.label"
+                                                        :disabled="opt.disabled"
+                                                        :style="opt.disabled && opt.reason === 'sudah_ckp' ? 'color: #16a34a; background-color: #f0fdf4;' : (opt.disabled ? 'color: #9ca3af; background-color: #f3f4f6;' : '')"></option>
+                                            </template>
+                                        </select>
+                                        <div class="mt-1.5 flex items-start gap-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 px-3 py-2">
+                                            <svg class="w-4 h-4 shrink-0 text-blue-500 dark:text-blue-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <p class="text-xs text-blue-700 dark:text-blue-300">
+                                                Bulan CKP hanya bisa dipilih dari bulan yang sudah memiliki pengiriman <strong>Diterima</strong>. 
+                                                Ini memastikan sinkronisasi antara bulan pengiriman dan bulan CKP.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                {{-- Ketua Tim & Pimpinan: dropdown bebas --}}
+                                <template x-if="!isAnggotaTim">
+                                    <div>
+                                        <select name="bulan_ckp" x-model="bulanCkp" required
+                                            class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+                                            <option value="">-- Pilih Bulan CKP --</option>
+                                            <template x-for="opt in bulanOptions" :key="opt.value">
+                                                <option :value="opt.value" x-text="opt.label"></option>
+                                            </template>
+                                        </select>
+                                        <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">
+                                            Pilih bulan untuk CKP ini. Setiap bulan hanya boleh memiliki 1 CKP per entitas.
+                                        </p>
+                                    </div>
+                                </template>
+                            </div>
+
                             <div>
                                 <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                     Uraian Kegiatan <span class="text-red-500">*</span>
@@ -217,6 +320,7 @@
     function ckpUniversalModal() {
         return {
             showCkpModal: false,
+            bulanCkp: '',
             ckpData: {
                 id_penugasan: null,
                 id_sub_kegiatan: null,
@@ -229,10 +333,63 @@
                 target_kuantitas: 0,
                 keterangan: '',
                 is_ketua_tim: false,
-                is_pimpinan: false
+                is_pimpinan: false,
+                tanggal_mulai: '',
+                tanggal_selesai: '',
+                bulanDiterima: [],
+            },
+
+            // Helper: apakah ini mode Anggota Tim (dari penugasan)?
+            get isAnggotaTim() {
+                return !this.ckpData.is_ketua_tim && !this.ckpData.is_pimpinan;
+            },
+
+            get bulanOptions() {
+                if (!this.ckpData.tanggal_mulai || !this.ckpData.tanggal_selesai) return [];
+                const start = new Date(this.ckpData.tanggal_mulai);
+                const end = new Date(this.ckpData.tanggal_selesai);
+                const options = [];
+                const bulanNama = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+                const bulanDiterima = this.ckpData.bulanDiterima || [];
+                let current = new Date(start.getFullYear(), start.getMonth(), 1);
+                while (current <= end) {
+                    const y = current.getFullYear();
+                    const m = String(current.getMonth() + 1).padStart(2, '0');
+                    const val = y + '-' + m;
+                    const label = bulanNama[current.getMonth()] + ' ' + y;
+
+                    if (this.isAnggotaTim) {
+                        // Anggota Tim: hanya bulan yang ada pengiriman Diterima & belum CKP
+                        const bulanSudahCkp = this.ckpData.bulanSudahCkp || [];
+                        const isAccepted = bulanDiterima.includes(val);
+                        const isSudahCkp = bulanSudahCkp.includes(val);
+                        
+                        let disabled = false;
+                        let reason = '';
+                        
+                        if (isSudahCkp) {
+                            disabled = true;
+                            reason = 'sudah_ckp';
+                        } else if (!isAccepted) {
+                            disabled = true;
+                            reason = 'belum_diterima';
+                        }
+                        
+                        options.push({ value: val, label, disabled, reason });
+                    } else {
+                        // Ketua Tim & Pimpinan: semua bulan aktif
+                        options.push({ value: val, label, disabled: false, reason: '' });
+                    }
+                    current.setMonth(current.getMonth() + 1);
+                }
+                return options;
             },
 
             submitCkpForm() {
+                if (!this.bulanCkp) {
+                    alert('Pilih bulan CKP terlebih dahulu');
+                    return;
+                }
                 const form = document.getElementById('ckpUniversalForm');
                 if (form) {
                     this.showCkpModal = false;

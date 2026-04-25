@@ -176,7 +176,7 @@
                                     </form>
                                 @endcan
 
-                                <!-- {{-- Jadikan CKP --}}
+                                {{-- Jadikan CKP --}}
                                 @can('update', $subKegiatan)
                                     @if($isCkpKetuaTim)
                                         {{-- Sudah jadi CKP --}}
@@ -192,15 +192,18 @@
                                     @elseif($progressPercent >= 100 && $totalPenugasan > 0)
                                         {{-- Selesai, bisa dijadikan CKP --}}
                                         <button type="button"
-                                            @click="$dispatch('open-ckp-modal', {
-                                                modalId: 'modal-ckp',
-                                                id_sub_kegiatan: '{{ $subKegiatan->id_sub_kegiatan }}',
-                                                nama_sub_kegiatan: '{{ $subKegiatan->nama_sub_kegiatan }}',
-                                                nama_pegawai: '{{ $subKegiatan->kegiatan->penanggungJawab->nama_pegawai }}',
-                                                uraian: 'Melaksanakan dan Mengetuai Sub Kegiatan {{ $subKegiatan->nama_sub_kegiatan }}',
-                                                target_kuantitas: {{ $subKegiatan->target }},
-                                                satuan: '{{ $subKegiatan->satuan_target }}',
-                                                is_ketua_tim: true
+                                            @click="$dispatch('open-smart-modal', {
+                                                modalId: 'modal-ckp-universal',
+                                                data: {
+                                                    id_sub_kegiatan: '{{ $subKegiatan->id_sub_kegiatan }}',
+                                                    nama_pegawai: {{ json_encode($subKegiatan->kegiatan->penanggungJawab->nama_pegawai) }},
+                                                    uraian: {{ json_encode('Melaksanakan dan Mengetuai Sub Kegiatan ' . $subKegiatan->nama_sub_kegiatan) }},
+                                                    target_kuantitas: {{ $subKegiatan->target }},
+                                                    satuan: '{{ $subKegiatan->satuan_target }}',
+                                                    is_ketua_tim: true,
+                                                    tanggal_mulai: '{{ $subKegiatan->tanggal_mulai->format('Y-m-d') }}',
+                                                    tanggal_selesai: '{{ $subKegiatan->tanggal_selesai->format('Y-m-d') }}',
+                                                }
                                             })"
                                             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-green-200 dark:border-green-700 bg-white dark:bg-transparent text-gray-400 dark:text-gray-500 text-xs font-medium hover:bg-green-50 dark:hover:bg-green-900/30 hover:text-green-700 dark:hover:text-green-400 hover:border-green-300 dark:hover:border-green-700 active:scale-95 transition-all duration-150"
                                             title="Jadikan CKP Ketua Tim">
@@ -221,7 +224,7 @@
                                             <span>Belum CKP</span>
                                         </button>
                                     @endif
-                                @endcan -->
+                                @endcan
                             </div>
                         </td>
                     </tr>

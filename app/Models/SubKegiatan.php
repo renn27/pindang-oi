@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class SubKegiatan extends Model
 {
@@ -37,6 +38,10 @@ class SubKegiatan extends Model
 
     public function penugasans() {
         return $this->hasMany(Penugasan::class, 'id_sub_kegiatan', 'id_sub_kegiatan');
+    }
+     public function ckpBulanan(): MorphMany
+    {
+        return $this->morphMany(CkpPegawai::class, 'ckpable');
     }
 
     public function ckp(): MorphOne
