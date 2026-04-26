@@ -12,6 +12,7 @@
             nama_sub_kegiatan: d.nama_sub_kegiatan || '',
             nama_agenda: d.nama_agenda || '',
             uraian: d.uraian || '',
+            base_uraian: d.uraian || '',
             satuan: d.satuan || '',
             target_kuantitas: d.target_kuantitas || 0,
             keterangan: d.keterangan || '',
@@ -50,6 +51,7 @@
             nama_sub_kegiatan: $event.detail.nama_sub_kegiatan || '',
             nama_agenda: $event.detail.nama_agenda || '',
             uraian: $event.detail.uraian || '',
+            base_uraian: $event.detail.uraian || '',
             satuan: $event.detail.satuan || '',
             target_kuantitas: $event.detail.target_kuantitas || 0,
             keterangan: $event.detail.keterangan || '',
@@ -58,6 +60,7 @@
             tanggal_mulai: $event.detail.tanggal_mulai || '',
             tanggal_selesai: $event.detail.tanggal_selesai || '',
             bulanDiterima: $event.detail.bulanDiterima || [],
+            bulanSudahCkp: $event.detail.bulanSudahCkp || [],
         };
         bulanCkp = '';
 
@@ -250,7 +253,10 @@
                                             class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
                                             <option value="">-- Pilih Bulan CKP --</option>
                                             <template x-for="opt in bulanOptions" :key="opt.value">
-                                                <option :value="opt.value" x-text="opt.label"></option>
+                                                <option :value="opt.value" 
+                                                        x-text="opt.disabled ? (opt.reason === 'sudah_ckp_ketua' ? opt.label + ' — Bulan ini sudah masuk CKP Ketua Tim' : (opt.reason === 'belum_tiba' ? opt.label + ' — Belum bisa membuat CKP untuk bulan yang belum tiba' : opt.label)) : opt.label"
+                                                        :disabled="opt.disabled"
+                                                        :style="opt.disabled && opt.reason === 'sudah_ckp_ketua' ? 'color: #16a34a; background-color: #f0fdf4;' : (opt.disabled ? 'color: #9ca3af; background-color: #f3f4f6;' : '')"></option>
                                             </template>
                                         </select>
                                         <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">
@@ -329,6 +335,7 @@
                 nama_sub_kegiatan: '',
                 nama_agenda: '',
                 uraian: '',
+                base_uraian: '',
                 satuan: '',
                 target_kuantitas: 0,
                 keterangan: '',
@@ -337,6 +344,22 @@
                 tanggal_mulai: '',
                 tanggal_selesai: '',
                 bulanDiterima: [],
+                bulanSudahCkp: [],
+            },
+
+            init() {
+                this.$watch('bulanCkp', (value) => {
+                    if (this.ckpData.is_ketua_tim) {
+                        if (value && this.ckpData.base_uraian) {
+                            const bulanNama = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+                            const [y, m] = value.split('-');
+                            const namaBulan = bulanNama[parseInt(m, 10) - 1] + ' ' + y;
+                            this.ckpData.uraian = this.ckpData.base_uraian + ' pada bulan ' + namaBulan;
+                        } else if (!value && this.ckpData.base_uraian) {
+                            this.ckpData.uraian = this.ckpData.base_uraian;
+                        }
+                    }
+                });
             },
 
             // Helper: apakah ini mode Anggota Tim (dari penugasan)?
@@ -351,6 +374,11 @@
                 const options = [];
                 const bulanNama = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
                 const bulanDiterima = this.ckpData.bulanDiterima || [];
+                const bulanSudahCkp = this.ckpData.bulanSudahCkp || [];
+                
+                const now = new Date();
+                const currentMonthValue = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+
                 let current = new Date(start.getFullYear(), start.getMonth(), 1);
                 while (current <= end) {
                     const y = current.getFullYear();
@@ -358,14 +386,13 @@
                     const val = y + '-' + m;
                     const label = bulanNama[current.getMonth()] + ' ' + y;
 
+                    let disabled = false;
+                    let reason = '';
+
                     if (this.isAnggotaTim) {
                         // Anggota Tim: hanya bulan yang ada pengiriman Diterima & belum CKP
-                        const bulanSudahCkp = this.ckpData.bulanSudahCkp || [];
                         const isAccepted = bulanDiterima.includes(val);
                         const isSudahCkp = bulanSudahCkp.includes(val);
-                        
-                        let disabled = false;
-                        let reason = '';
                         
                         if (isSudahCkp) {
                             disabled = true;
@@ -374,12 +401,20 @@
                             disabled = true;
                             reason = 'belum_diterima';
                         }
-                        
-                        options.push({ value: val, label, disabled, reason });
                     } else {
-                        // Ketua Tim & Pimpinan: semua bulan aktif
-                        options.push({ value: val, label, disabled: false, reason: '' });
+                        // Ketua Tim & Pimpinan: semua bulan aktif kecuali yang belum tiba atau sudah CKP
+                        const isSudahCkp = bulanSudahCkp.includes(val);
+                        
+                        if (isSudahCkp) {
+                            disabled = true;
+                            reason = 'sudah_ckp_ketua';
+                        } else if (val > currentMonthValue) {
+                            disabled = true;
+                            reason = 'belum_tiba';
+                        }
                     }
+                    
+                    options.push({ value: val, label, disabled, reason });
                     current.setMonth(current.getMonth() + 1);
                 }
                 return options;

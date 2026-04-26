@@ -64,7 +64,15 @@
                         $progressColor = $progressPercent >= 100 ? 'bg-green-500' : 'bg-blue-500';
                         $progressTextColor = $progressPercent >= 100 ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400';
 
-                        $isCkpKetuaTim = $subKegiatan->ckp !== null;
+                        $startMonth = \Carbon\Carbon::parse($subKegiatan->tanggal_mulai)->startOfMonth();
+                        $endMonth = \Carbon\Carbon::parse($subKegiatan->tanggal_selesai)->startOfMonth();
+                        $totalBulan = $startMonth->diffInMonths($endMonth) + 1;
+                        
+                        $ckpSelesai100Persen = ($progressPercent >= 100) && $subKegiatan->ckpBulanan->contains(function ($ckp) use ($totalTargetPenugasan) {
+                            return $ckp->realisasi >= $totalTargetPenugasan;
+                        });
+
+                        $isCkpKetuaTim = $ckpSelesai100Persen || $subKegiatan->ckpBulanan->count() >= $totalBulan;
                     @endphp
 
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 {{ $isCkpKetuaTim ? 'bg-green-100/50 hover:bg-green-100/80 dark:bg-green-900/50 hover:dark:bg-green-900/80' : '' }}">
@@ -139,57 +147,70 @@
                         {{-- Aksi --}}
                         <td class="px-6 py-4 whitespace-nowrap align-top">
                             <div class="flex justify-center items-center gap-1">
-                                {{-- Edit --}}
-                                @can('update', $subKegiatan)
-                                    <button class="p-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
-                                        @click="$dispatch('open-smart-modal', {
-                                        modalId: 'modal-sub-kegiatan',
-                                        mode: 'edit',
-                                        key: '{{ $subKegiatan->id_sub_kegiatan }}',
-                                        data: {
-                                            id_kegiatan: @js($kegiatan->id_kegiatan),
-                                            nama_rk_kegiatan: @js($kegiatan->nama_rk_kegiatan),
-                                            id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
-                                            nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
-                                            target: @js($subKegiatan->target),
-                                            satuan_target: @js($subKegiatan->satuan_target),
-                                            tanggal_mulai: @js(optional($subKegiatan->tanggal_mulai)->format('Y-m-d')),
-                                            tanggal_selesai: @js(optional($subKegiatan->tanggal_selesai)->format('Y-m-d')),
-                                            status: @js($subKegiatan->status),
-                                        }
-                                    })"
-                                        title="Edit Sub Kegiatan">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                    </button>
-                                @endcan
-
-                                {{-- Delete --}}
-                                @can('delete', $subKegiatan)
-                                    <form id="delete-sub-kegiatan-{{ $subKegiatan->id_sub_kegiatan }}"
-                                        action="{{ route('sub.kegiatan.delete', [
-                                            'kegiatan' => $kegiatan->id_kegiatan,
-                                            'subKegiatan' => $subKegiatan->id_sub_kegiatan,
-                                        ]) }}"
-                                        method="POST" class="inline-flex">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button"
-                                            onclick="SwalHelper.confirmDelete(
-                                                'delete-sub-kegiatan-{{ $subKegiatan->id_sub_kegiatan }}',
-                                                {{ json_encode($subKegiatan->nama_sub_kegiatan) }}
-                                            )"
-                                            class="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
-                                            title="Hapus Sub Kegiatan">
+                                @if(!$ckpSelesai100Persen)
+                                    {{-- Edit --}}
+                                    @can('update', $subKegiatan)
+                                        <button class="p-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                                            @click="$dispatch('open-smart-modal', {
+                                            modalId: 'modal-sub-kegiatan',
+                                            mode: 'edit',
+                                            key: '{{ $subKegiatan->id_sub_kegiatan }}',
+                                            data: {
+                                                id_kegiatan: @js($kegiatan->id_kegiatan),
+                                                nama_rk_kegiatan: @js($kegiatan->nama_rk_kegiatan),
+                                                id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
+                                                nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
+                                                target: @js($subKegiatan->target),
+                                                satuan_target: @js($subKegiatan->satuan_target),
+                                                tanggal_mulai: @js(optional($subKegiatan->tanggal_mulai)->format('Y-m-d')),
+                                                tanggal_selesai: @js(optional($subKegiatan->tanggal_selesai)->format('Y-m-d')),
+                                                status: @js($subKegiatan->status),
+                                            }
+                                        })"
+                                            title="Edit Sub Kegiatan">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </button>
-                                    </form>
-                                @endcan
+                                    @endcan
+
+                                    {{-- Delete --}}
+                                    @can('delete', $subKegiatan)
+                                        @if($totalPenugasanSelesai > 0)
+                                            <button disabled
+                                                title="Sub Kegiatan sudah berjalan&#10;sehingga tidak dapat dihapus"
+                                                class="p-2 text-red-400 dark:text-red-500 bg-red-50/50 dark:bg-red-900/20 rounded-lg cursor-not-allowed opacity-70 transition-colors">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        @else
+                                            <form id="delete-sub-kegiatan-{{ $subKegiatan->id_sub_kegiatan }}"
+                                                action="{{ route('sub.kegiatan.delete', [
+                                                    'kegiatan' => $kegiatan->id_kegiatan,
+                                                    'subKegiatan' => $subKegiatan->id_sub_kegiatan,
+                                                ]) }}"
+                                                method="POST" class="inline-flex">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button"
+                                                    onclick="SwalHelper.confirmDelete(
+                                                        'delete-sub-kegiatan-{{ $subKegiatan->id_sub_kegiatan }}',
+                                                        {{ json_encode($subKegiatan->nama_sub_kegiatan) }}
+                                                    )"
+                                                    class="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                                                    title="Hapus Sub Kegiatan">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @endcan
+                                @endif
 
                                 {{-- Jadikan CKP --}}
                                 @can('update', $subKegiatan)
@@ -197,11 +218,11 @@
                                         {{-- Sudah jadi CKP --}}
                                         <button disabled
                                             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-green-200 dark:border-green-700 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 text-xs font-medium cursor-not-allowed"
-                                            title="Sudah jadi CKP Ketua Tim">
+                                            title="{{ $ckpSelesai100Persen ? 'Semua target sudah jadi CKP' : 'Sudah jadi CKP Ketua Tim' }}">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                                             </svg>
-                                            <span>Sudah CKP</span>
+                                            <span>{{ $ckpSelesai100Persen ? 'Sudah CKP Semua' : 'Sudah CKP' }}</span>
                                         </button>
 
                                     @elseif($penugasanTargetSelesai >= 1)
@@ -212,12 +233,13 @@
                                                 data: {
                                                     id_sub_kegiatan: '{{ $subKegiatan->id_sub_kegiatan }}',
                                                     nama_pegawai: {{ json_encode($subKegiatan->kegiatan->penanggungJawab->nama_pegawai) }},
-                                                    uraian: {{ json_encode('Melaksanakan dan Mengetuai Sub Kegiatan ' . $subKegiatan->nama_sub_kegiatan) }},
+                                                    uraian: {{ json_encode('Melaksanakan dan Mengetuai ' . $subKegiatan->nama_sub_kegiatan . ' dengan target ' . $penugasanTargetSelesai . ' dari total target ' . $totalTargetPenugasan) }},
                                                     target_kuantitas: {{ $subKegiatan->target }},
                                                     satuan: '{{ $subKegiatan->satuan_target }}',
                                                     is_ketua_tim: true,
                                                     tanggal_mulai: '{{ $subKegiatan->tanggal_mulai->format('Y-m-d') }}',
                                                     tanggal_selesai: '{{ $subKegiatan->tanggal_selesai->format('Y-m-d') }}',
+                                                    bulanSudahCkp: @js($subKegiatan->ckpBulanan->pluck('bulan_ckp')->toArray())
                                                 }
                                             })"
                                             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-green-200 dark:border-green-700 bg-white dark:bg-transparent text-gray-400 dark:text-gray-500 text-xs font-medium hover:bg-green-50 dark:hover:bg-green-900/30 hover:text-green-700 dark:hover:text-green-400 hover:border-green-300 dark:hover:border-green-700 active:scale-95 transition-all duration-150"

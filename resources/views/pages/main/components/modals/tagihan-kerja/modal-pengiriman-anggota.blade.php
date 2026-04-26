@@ -25,7 +25,7 @@
                     reason = 'Bulan ini sudah memiliki pengiriman yang Diterima';
                 } else if (val > currentYM) {
                     disabled = true;
-                    reason = 'Tidak bisa mengirim untuk bulan yang belum tiba';
+                    reason = 'Belum bisa mengirim tugas untuk bulan yang belum tiba';
                 }
                 options.push({ value: val, label, disabled, reason });
                 current.setMonth(current.getMonth() + 1);

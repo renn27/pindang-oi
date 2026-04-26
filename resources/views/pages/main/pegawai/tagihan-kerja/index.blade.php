@@ -94,6 +94,15 @@
             })->count();
         }) }} --}}
         @foreach ($kegiatans as $kegiatan)
+            @php
+                $isKegiatanBerjalan = $kegiatan->subKegiatans->contains(function ($sub) {
+                    return $sub->penugasans->contains(function ($penugasan) {
+                        return $penugasan->pengirimans->contains(function ($pengiriman) {
+                            return $pengiriman->penerimaan?->status === 'Diterima';
+                        });
+                    });
+                });
+            @endphp
             <!-- CARD PER KEGIATAN dengan Accordion -->
             <div x-data="{ openSubKegiatan: false }" class="rounded-2xl border border-gray-200 bg-white overflow-hidden dark:border-gray-800 dark:bg-gray-900">
                 <!-- HEADER CARD (Sebagai Tombol Accordion) -->
@@ -158,31 +167,46 @@
 
                             @can('delete', $kegiatan)
                                 {{-- Hapus --}}
-                                <form id="delete-kegiatan-{{ $kegiatan->id_kegiatan }}"
-                                    action="{{ route('kegiatan.delete', [
-                                        'kegiatan' => $kegiatan->id_kegiatan,
-                                    ]) }}"
-                                    method="POST" class="flex flex-col items-center">
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button type="button"
-                                        onclick="SwalHelper.confirmDelete(
-                                            'delete-kegiatan-{{ $kegiatan->id_kegiatan }}',
-                                            {{ json_encode($kegiatan->nama_rk_kegiatan) }}
-                                        )"
-                                        class="flex items-center gap-2 rounded-full border border-gray-300
-                                        bg-white px-4 py-3 text-sm font-medium text-gray-700
-                                        shadow-theme-xs hover:bg-red-50 hover:text-red-700
-                                        hover:border-red-300 transition-all duration-200
-                                        dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-red-900/30 dark:hover:text-red-400">
+                                @if($isKegiatanBerjalan)
+                                    <button disabled
+                                        title="Kegiatan sudah berjalan&#10;sehingga tidak dapat dihapus"
+                                        class="flex items-center gap-2 rounded-full border border-red-200
+                                        bg-red-50/50 px-4 py-3 text-sm font-medium text-red-400
+                                        cursor-not-allowed opacity-70
+                                        dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400/70">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
                                         <span class="text-xs font-medium">Hapus</span>
                                     </button>
-                                </form>
+                                @else
+                                    <form id="delete-kegiatan-{{ $kegiatan->id_kegiatan }}"
+                                        action="{{ route('kegiatan.delete', [
+                                            'kegiatan' => $kegiatan->id_kegiatan,
+                                        ]) }}"
+                                        method="POST" class="flex flex-col items-center">
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button type="button"
+                                            onclick="SwalHelper.confirmDelete(
+                                                'delete-kegiatan-{{ $kegiatan->id_kegiatan }}',
+                                                {{ json_encode($kegiatan->nama_rk_kegiatan) }}
+                                            )"
+                                            class="flex items-center gap-2 rounded-full border border-gray-300
+                                            bg-white px-4 py-3 text-sm font-medium text-gray-700
+                                            shadow-theme-xs hover:bg-red-50 hover:text-red-700
+                                            hover:border-red-300 transition-all duration-200
+                                            dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-red-900/30 dark:hover:text-red-400">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            <span class="text-xs font-medium">Hapus</span>
+                                        </button>
+                                    </form>
+                                @endif
                             @endcan
 
                             @can('createSubKegiatan', $kegiatan)
