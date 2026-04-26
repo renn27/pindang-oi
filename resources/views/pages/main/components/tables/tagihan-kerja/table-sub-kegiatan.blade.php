@@ -224,7 +224,6 @@
                                             </svg>
                                             <span>{{ $ckpSelesai100Persen ? 'Sudah CKP Semua' : 'Sudah CKP' }}</span>
                                         </button>
-
                                     @elseif($penugasanTargetSelesai >= 1)
                                         {{-- Selesai, bisa dijadikan CKP --}}
                                         <button type="button"
@@ -232,9 +231,11 @@
                                                 modalId: 'modal-ckp-universal',
                                                 data: {
                                                     id_sub_kegiatan: '{{ $subKegiatan->id_sub_kegiatan }}',
+                                                    nama_sub_kegiatan: '{{ $subKegiatan->nama_sub_kegiatan }}',
                                                     nama_pegawai: {{ json_encode($subKegiatan->kegiatan->penanggungJawab->nama_pegawai) }},
                                                     uraian: {{ json_encode('Melaksanakan dan Mengetuai ' . $subKegiatan->nama_sub_kegiatan . ' dengan target ' . $penugasanTargetSelesai . ' dari total target ' . $totalTargetPenugasan) }},
-                                                    target_kuantitas: {{ $subKegiatan->target }},
+                                                    target_kuantitas: {{ $totalTargetPenugasan }},
+                                                    realisasi_kuantitas: {{ $penugasanTargetSelesai }},
                                                     satuan: '{{ $subKegiatan->satuan_target }}',
                                                     is_ketua_tim: true,
                                                     tanggal_mulai: '{{ $subKegiatan->tanggal_mulai->format('Y-m-d') }}',
@@ -249,7 +250,6 @@
                                             </svg>
                                             <span>Buat CKP</span>
                                         </button>
-
                                     @else
                                         {{-- Belum selesai, tidak bisa diklik --}}
                                         <button disabled

@@ -39,7 +39,7 @@ class SubKegiatan extends Model
     public function penugasans() {
         return $this->hasMany(Penugasan::class, 'id_sub_kegiatan', 'id_sub_kegiatan');
     }
-     public function ckpBulanan(): MorphMany
+    public function ckpBulanan(): MorphMany
     {
         return $this->morphMany(CkpPegawai::class, 'ckpable');
     }

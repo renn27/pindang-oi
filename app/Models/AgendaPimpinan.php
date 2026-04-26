@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 class AgendaPimpinan extends Model {
 
     use HasFactory, HasUuids;
@@ -36,6 +37,11 @@ class AgendaPimpinan extends Model {
     public function indikatorJpt()
     {
         return $this->belongsTo(IndikatorJPT::class, 'iki_jpt', 'id'); // kolom AgendaPimpinan yang nyimpen id indikator
+    }
+
+    public function ckpBulanan(): MorphMany
+    {
+        return $this->morphMany(CkpPegawai::class, 'ckpable');
     }
 
     public function ckp(): MorphOne

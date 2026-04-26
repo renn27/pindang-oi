@@ -288,7 +288,22 @@
             </thead>
             <tbody id="agendaTableBody" class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
                 @foreach ($agendas as $index => $agenda)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 agenda-row"
+                    @php
+                        $startMonth = \Carbon\Carbon::parse($agenda->tanggal_mulai)->startOfMonth();
+                        $endMonth = \Carbon\Carbon::parse($agenda->tanggal_selesai)->startOfMonth();
+                        $totalBulan = $startMonth->diffInMonths($endMonth) + 1;
+                        
+                        $target = $agenda->target ?? 0;
+                        $realisasi = $agenda->realisasi ?? 0;
+                        $progressPercent = $target > 0 ? round(($realisasi / $target) * 100) : 0;
+                        
+                        $ckpSelesai100Persen = ($progressPercent >= 100) && $agenda->ckpBulanan->contains(function ($ckp) use ($target) {
+                            return $ckp->realisasi >= $target;
+                        });
+
+                        $isCkpPimpinan = $ckpSelesai100Persen || $agenda->ckpBulanan->count() >= $totalBulan;
+                    @endphp
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 agenda-row {{ $isCkpPimpinan ? 'bg-green-100/50 hover:bg-green-100/80 dark:bg-green-900/50 hover:dark:bg-green-900/80' : '' }}"
                         data-tahun="{{ date('Y', strtotime($agenda->tanggal_mulai)) }}">
                         <td
                             class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center dark:text-gray-300">
@@ -430,27 +445,52 @@
                                             </button>
                                         </form>
 
-                                        <!-- @if($kepalaBps && $agenda->status === "Selesai")
-                                            <button type="button"
-                                                @click="$dispatch('open-ckp-modal', {
-                                                    modalId: 'modal-ckp',
-                                                    id_agenda: '{{ $agenda->id_agenda }}',
-                                                    nama_pegawai: '{{ $kepalaBps->nama_pegawai ?? '' }}',
-                                                    nama_agenda: '{{ $agenda->nama_agenda }}',
-                                                    uraian: 'Melaksanakan dan Menyelesaikan {{ $agenda->nama_agenda }}',
-                                                    target_kuantitas: {{ $agenda->target }},
-                                                    satuan: '{{ $agenda->satuan_target }}',
-                                                    is_pimpinan: true,
-                                                })"
-                                                class="border-t border-gray-100 dark:border-gray-700 w-full text-left px-4 py-3 text-sm flex items-center gap-2
-                                                {{ $agenda->ckp ? 'text-gray-400 cursor-not-allowed bg-gray-50 dark:bg-gray-800' : 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20' }}"
-                                                {{ $agenda->ckp ? 'disabled' : '' }}>
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                                {{ $agenda->ckp ? 'Sudah jadi CKP Pimpinan' : 'Jadikan CKP Pimpinan' }}
-                                            </button>
-                                        @endif -->
+                                        @if($kepalaBps)
+                                            @if($isCkpPimpinan)
+                                                <button disabled
+                                                    class="border-t border-gray-100 dark:border-gray-700 w-full text-left px-4 py-3 text-sm flex items-center gap-2 text-green-600 bg-green-50/50 dark:bg-green-900/20 dark:text-green-400 cursor-not-allowed opacity-80"
+                                                    title="{{ $ckpSelesai100Persen ? 'Semua target sudah jadi CKP' : 'Sudah jadi CKP Pimpinan untuk seluruh bulan' }}">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    {{ $ckpSelesai100Persen ? 'Sudah CKP Semua' : 'Sudah CKP' }}
+                                                </button>
+                                            @elseif($agenda->status === "Selesai" && $realisasi > 0)
+                                                <button type="button"
+                                                    @click="$dispatch('open-smart-modal', {
+                                                        modalId: 'modal-ckp-universal',
+                                                        data : {
+                                                            id_agenda: '{{ $agenda->id_agenda }}',
+                                                            nama_pegawai: '{{ Auth::user()->nama_pegawai ?? '' }}',
+                                                            nama_agenda: '{{ $agenda->nama_agenda }}',
+                                                            uraian: 'Melaksanakan dan Menyelesaikan {{ addslashes($agenda->nama_agenda) }} dengan target {{ $realisasi }} dari total target {{ $target }}',
+                                                            target_kuantitas: {{ $agenda->target }},
+                                                            realisasi_kuantitas: {{ $realisasi }},
+                                                            satuan: '{{ $agenda->satuan_target }}',
+                                                            is_pimpinan: true,
+                                                            tanggal_mulai: '{{ $agenda->tanggal_mulai }}',
+                                                            tanggal_selesai: '{{ $agenda->tanggal_selesai }}',
+                                                            bulanSudahCkp : @js($agenda->ckpBulanan->pluck('bulan_ckp')->toArray())
+                                                        }
+                                                    })"
+                                                    class="border-t border-gray-100 dark:border-gray-700 w-full text-left px-4 py-3 text-sm flex items-center gap-2 text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
+                                                    title="Jadikan CKP Pimpinan">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    Buat CKP
+                                                </button>
+                                            @else
+                                                <button disabled
+                                                    class="border-t border-gray-100 dark:border-gray-700 w-full text-left px-4 py-3 text-sm flex items-center gap-2 text-gray-400 cursor-not-allowed bg-gray-50 dark:bg-gray-800"
+                                                    title="{{ $agenda->status !== 'Selesai' ? 'Status Agenda belum Selesai' : 'Belum ada realisasi' }}">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    Belum CKP
+                                                </button>
+                                            @endif
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -600,6 +640,8 @@
             const realisasi = document.getElementById('realisasi');
             if (!realisasi?.value) {
                 addError('Realisasi wajib diisi', realisasi, realisasi);
+            } else if (target?.value && parseFloat(realisasi.value) > parseFloat(target.value)) {
+                addError('Realisasi tidak boleh melebihi target', realisasi, realisasi);
             }
 
             // Link Bukti

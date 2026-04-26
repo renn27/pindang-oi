@@ -357,7 +357,7 @@
                                                             id_anggota: '{{ $penugasan->id_anggota }}',
                                                             historiData: @js(
                                                             $penugasan->pengirimans
-                                                                ->sortBy(fn($p) => $p->created_at)
+                                                                ->sortByDesc(fn($p) => $p->created_at)
                                                                 ->values()
                                                                 ->map(
                                                                     fn($p, $idx) => [
@@ -368,7 +368,7 @@
                                                                         'jumlah_dikirim' => $p->jumlah_dikirim,
                                                                         'media_pengiriman' => $p->media_pengiriman,
                                                                         'bukti_dukung' => $p->bukti_dukung,
-                                                                        'is_last' => $idx === $penugasan->pengirimans->count() - 1,
+                                                                        'is_last' => $idx === 0,
                                                                         'penerimaan' => [
                                                                             'id_penerimaan' => $p->penerimaan?->id_penerimaan,
                                                                             'id_penerima' => $p->penerimaan?->penerima?->nama_pegawai ?? 'Belum Diperiksa',
@@ -442,8 +442,9 @@
                                                             data: {
                                                                 id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                                 nama_pegawai: {{ json_encode($penugasan->anggota->nama_pegawai) }},
-                                                                uraian: {{ json_encode('Melaksanakan ' . $penugasan->jenisKegiatan->jenis_kegiatan . ' pada ' . $penugasan->subKegiatan->nama_sub_kegiatan) }},
+                                                                uraian: {{ json_encode('Melaksanakan ' . $penugasan->jenisKegiatan->jenis_kegiatan . ' pada ' . $penugasan->subKegiatan->nama_sub_kegiatan . ' dengan target ' . ($penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim')) . ' dari total target ' . $penugasan->target) }},
                                                                 target_kuantitas: {{ $penugasan->target }},
+                                                                realisasi_kuantitas: {{ $penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim') }},
                                                                 satuan: '{{ $penugasan->satuan_target }}',
                                                                 tanggal_mulai: '{{ optional($penugasan->tanggal_mulai)->format('Y-m-d') }}',
                                                                 tanggal_selesai: '{{ optional($penugasan->tanggal_selesai)->format('Y-m-d') }}',
@@ -1383,8 +1384,9 @@
                                                             data: {
                                                                 id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                                 nama_pegawai: {{ json_encode($penugasan->anggota->nama_pegawai) }},
-                                                                uraian: {{ json_encode('Melaksanakan ' . $penugasan->jenisKegiatan->jenis_kegiatan . ' pada ' . $penugasan->subKegiatan->nama_sub_kegiatan) }},
+                                                                uraian: {{ json_encode('Melaksanakan ' . $penugasan->jenisKegiatan->jenis_kegiatan . ' pada ' . $penugasan->subKegiatan->nama_sub_kegiatan . ' dengan target ' . ($penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim')) . ' dari total target ' . $penugasan->target . ' '. $penugasan->satuan_target) }},
                                                                 target_kuantitas: {{ $penugasan->target }},
+                                                                realisasi_kuantitas: {{ $penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim') }},
                                                                 satuan: '{{ $penugasan->satuan_target }}',
                                                                 tanggal_mulai: '{{ optional($penugasan->tanggal_mulai)->format('Y-m-d') }}',
                                                                 tanggal_selesai: '{{ optional($penugasan->tanggal_selesai)->format('Y-m-d') }}',

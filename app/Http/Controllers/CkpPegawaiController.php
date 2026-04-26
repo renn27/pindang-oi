@@ -227,6 +227,7 @@ class CkpPegawaiController extends Controller
         // 1. Validasi input
         $request->validate([
             'uraian' => 'required|string',
+            'bulan_ckp' => 'required|string|size:7',
             'keterangan' => 'nullable|string',
         ]);
 
@@ -242,9 +243,11 @@ class CkpPegawaiController extends Controller
             return back()->with('error', 'Anda tidak memiliki akses untuk membuat CKP Pimpinan.');
         }
 
-        // 3. Cek apakah sudah ada CKP untuk Agenda ini
-        if ($agendaPimpinan->ckp()->exists()) {
-            return back()->with('error', 'Agenda Pimpinan ini sudah dijadikan CKP.');
+        // 3. Cek apakah sudah ada CKP untuk bulan tersebut
+        $existing = $agendaPimpinan->ckpBulanan()
+                    ->where('bulan_ckp', $request->bulan_ckp)->exists();
+        if ($existing) {
+            return back()->with('error', 'Agenda Pimpinan ini sudah memilik CKP untuk bulan tersebut.');
         }
 
         // 4. Perhitungan Realisasi, Persentase, dan Kualitas
@@ -259,6 +262,7 @@ class CkpPegawaiController extends Controller
             'id_pegawai' => $user->id_pegawai,
             'ckpable_type' => AgendaPimpinan::class,
             'ckpable_id' => $agendaPimpinan->id_agenda,
+            'bulan_ckp' => $request->bulan_ckp,  
             'tipe_ckp' => 'Pimpinan',
             'uraian' => $request->uraian,
             'jenis_ckp' => 'Utama',

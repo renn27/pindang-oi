@@ -15,6 +15,7 @@
             base_uraian: d.uraian || '',
             satuan: d.satuan || '',
             target_kuantitas: d.target_kuantitas || 0,
+            realisasi_kuantitas: d.realisasi_kuantitas || 0,
             keterangan: d.keterangan || '',
             is_ketua_tim: d.is_ketua_tim || false,
             is_pimpinan: d.is_pimpinan || false,
@@ -31,10 +32,11 @@
             if (isAnggota) {
                 // Anggota Tim: hanya bulan yang sudah ada pengiriman Diterima
                 const accepted = ckpData.bulanDiterima || [];
-                if (accepted.length === 1) {
+                const sudahCkp = ckpData.bulanSudahCkp || [];
+                if (accepted.length === 1 && !sudahCkp.includes(accepted[0])) {
                     bulanCkp = accepted[0];
                 }
-            } else if (bulanOptions.length === 1) {
+            } else if (bulanOptions.length === 1 && !bulanOptions[0].disabled) {
                 bulanCkp = bulanOptions[0].value;
             }
         });
@@ -54,6 +56,7 @@
             base_uraian: $event.detail.uraian || '',
             satuan: $event.detail.satuan || '',
             target_kuantitas: $event.detail.target_kuantitas || 0,
+            realisasi_kuantitas: $event.detail.realisasi_kuantitas || 0,
             keterangan: $event.detail.keterangan || '',
             is_ketua_tim: $event.detail.is_ketua_tim || false,
             is_pimpinan: $event.detail.is_pimpinan || false,
@@ -68,10 +71,11 @@
             const isAnggota = !ckpData.is_ketua_tim && !ckpData.is_pimpinan;
             if (isAnggota) {
                 const accepted = ckpData.bulanDiterima || [];
-                if (accepted.length === 1) {
+                const sudahCkp = ckpData.bulanSudahCkp || [];
+                if (accepted.length === 1 && !sudahCkp.includes(accepted[0])) {
                     bulanCkp = accepted[0];
                 }
-            } else if (bulanOptions.length === 1) {
+            } else if (bulanOptions.length === 1 && !bulanOptions[0].disabled) {
                 bulanCkp = bulanOptions[0].value;
             }
         });
@@ -146,7 +150,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                                 <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    <span x-show="!ckpData.is_ketua_tim && !ckpData.is_pimpinan">Informasi Penugasan</span>
+                                    <span x-show="isAnggotaTim">Informasi Penugasan</span>
                                     <span x-show="ckpData.is_ketua_tim">Informasi Sub Kegiatan</span>
                                     <span x-show="ckpData.is_pimpinan">Informasi Agenda Pimpinan</span>
                                 </h4>
@@ -159,16 +163,6 @@
                                         <div>
                                             <span class="text-gray-500 dark:text-gray-400">Sub Kegiatan : </span>
                                             <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.nama_sub_kegiatan"></span>
-                                        </div>
-                                        <div class="mt-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-3">
-                                            <div class="flex items-center gap-2">
-                                                <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                <span class="text-sm text-green-700 dark:text-green-300">
-                                                    Semua penugasan (100%) telah selesai.
-                                                </span>
-                                            </div>
                                         </div>
                                     </div>
                                 </template>
@@ -191,14 +185,18 @@
                                         </span>
                                         <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.nama_pegawai"></span>
                                     </div>
-                                    <div :class="ckpData.nama_pegawai ? 'mt-2' : ''">
-                                        <span class="text-gray-500 dark:text-gray-400">Satuan : </span>
-                                        <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.satuan"></span>
-                                    </div>
                                     <div class="mt-2">
                                         <span class="text-gray-500 dark:text-gray-400">Target Kuantitas : </span>
                                         <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.target_kuantitas"></span>
                                     </div>
+                                    <div class="mt-2">
+                                        <span class="text-gray-500 dark:text-gray-400">Realisasi : </span>
+                                        <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.realisasi_kuantitas"></span>
+                                    </div>
+                                    <!-- <div class="mt-2">
+                                        <span class="text-gray-500 dark:text-gray-400">Satuan : </span>
+                                        <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.satuan"></span>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -221,7 +219,7 @@
                                     Bulan CKP <span class="text-red-500">*</span>
                                 </label>
 
-                                {{-- Anggota Tim: dropdown dengan hanya bulan yang ada pengiriman Diterima --}}
+                                {{-- Anggota Tim: dropdown dengan hanya bulan yang ada pengiriman Diterima dan yang belum masuk CKP --}}
                                 <template x-if="isAnggotaTim">
                                     <div>
                                         <select name="bulan_ckp" x-model="bulanCkp" required
@@ -246,7 +244,7 @@
                                     </div>
                                 </template>
 
-                                {{-- Ketua Tim & Pimpinan: dropdown bebas --}}
+                                {{-- Ketua Tim dan Pimpinan : dropdown dengan hanya bulan yang belum masuk CKP --}}
                                 <template x-if="!isAnggotaTim">
                                     <div>
                                         <select name="bulan_ckp" x-model="bulanCkp" required
@@ -259,9 +257,14 @@
                                                         :style="opt.disabled && opt.reason === 'sudah_ckp_ketua' ? 'color: #16a34a; background-color: #f0fdf4;' : (opt.disabled ? 'color: #9ca3af; background-color: #f3f4f6;' : '')"></option>
                                             </template>
                                         </select>
-                                        <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">
-                                            Pilih bulan untuk CKP ini. Setiap bulan hanya boleh memiliki 1 CKP per entitas.
-                                        </p>
+                                        <div class="mt-1.5 flex items-start gap-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 px-3 py-2">
+                                            <svg class="w-4 h-4 shrink-0 text-blue-500 dark:text-blue-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <p class="text-xs text-blue-700 dark:text-blue-300">
+                                                Bulan CKP hanya bisa dipilih dari bulan yang belum memiliki CKP disana dan juga bulan sebelum bulan ini.
+                                            </p>
+                                        </div>
                                     </div>
                                 </template>
                             </div>
@@ -338,6 +341,7 @@
                 base_uraian: '',
                 satuan: '',
                 target_kuantitas: 0,
+                realisasi_kuantitas: 0,
                 keterangan: '',
                 is_ketua_tim: false,
                 is_pimpinan: false,
@@ -349,15 +353,13 @@
 
             init() {
                 this.$watch('bulanCkp', (value) => {
-                    if (this.ckpData.is_ketua_tim) {
-                        if (value && this.ckpData.base_uraian) {
-                            const bulanNama = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-                            const [y, m] = value.split('-');
-                            const namaBulan = bulanNama[parseInt(m, 10) - 1] + ' ' + y;
-                            this.ckpData.uraian = this.ckpData.base_uraian + ' pada bulan ' + namaBulan;
-                        } else if (!value && this.ckpData.base_uraian) {
-                            this.ckpData.uraian = this.ckpData.base_uraian;
-                        }
+                    if (value && this.ckpData.base_uraian) {
+                        const bulanNama = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+                        const [y, m] = value.split('-');
+                        const namaBulan = bulanNama[parseInt(m, 10) - 1] + ' ' + y;
+                        this.ckpData.uraian = this.ckpData.base_uraian + ' pada bulan ' + namaBulan;
+                    } else if (!value && this.ckpData.base_uraian) {
+                        this.ckpData.uraian = this.ckpData.base_uraian;
                     }
                 });
             },
@@ -427,7 +429,6 @@
                 }
                 const form = document.getElementById('ckpUniversalForm');
                 if (form) {
-                    this.showCkpModal = false;
                     form.submit();
                 }
             }

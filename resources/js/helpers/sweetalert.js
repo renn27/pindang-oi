@@ -91,7 +91,7 @@ const SwalHelper = {
                         <p class="font-medium text-gray-900 dark:text-white">${title}</p>
                         <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">${message}</p>
                     </div>
-                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
+                    <button onclick="SwalHelper.closeAll()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -122,7 +122,7 @@ const SwalHelper = {
                         <p class="font-medium text-gray-900 dark:text-white">${title}</p>
                         <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">${message}</p>
                     </div>
-                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
+                    <button onclick="SwalHelper.closeAll()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -153,7 +153,7 @@ const SwalHelper = {
                         <p class="font-medium text-gray-900 dark:text-white">${title}</p>
                         <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">${message}</p>
                     </div>
-                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
+                    <button onclick="SwalHelper.closeAll()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -184,7 +184,7 @@ const SwalHelper = {
                         <p class="font-medium text-gray-900 dark:text-white">${title}</p>
                         <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">${message}</p>
                     </div>
-                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
+                    <button onclick="SwalHelper.closeAll()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -237,7 +237,7 @@ const SwalHelper = {
                         <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">${msg.message}</p>
                     </div>
                     ${index === 0 ? `
-                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
+                    <button onclick="SwalHelper.closeAll()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -272,7 +272,7 @@ const SwalHelper = {
                     <div class="flex-1">
                         <p class="font-medium text-gray-900 dark:text-white">${message}</p>
                     </div>
-                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
+                    <button onclick="SwalHelper.closeAll()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -324,7 +324,7 @@ const SwalHelper = {
                     <div class="flex-1">
                         <p class="text-gray-900 dark:text-white">${message}</p>
                     </div>
-                    <button onclick="Swal.close()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
+                    <button onclick="SwalHelper.closeAll()" class="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>

@@ -126,7 +126,7 @@ window.addEventListener('resize', checkMobile);">
             @include('layouts.app-header')
             <!-- app header end -->
             <!-- app header border -->
-            <div x-data="{ showCkpBanner: true }" 
+            <!-- <div x-data="{ showCkpBanner: true }" 
                  x-show="showCkpBanner" x-transition
                  class="sticky top-[73px] z-40 mx-4 mt-4 md:mx-6 md:mt-6 rounded-xl border border-amber-500/30 bg-amber-50/70 p-4 shadow-sm backdrop-blur-md dark:border-amber-500/30 dark:bg-amber-900/30 font-medium text-amber-800 dark:text-amber-200"
                  style="display: none;">
@@ -169,7 +169,7 @@ window.addEventListener('resize', checkMobile);">
                         </svg>
                     </button>
                 </div>
-            </div>
+            </div> -->
 
             <div class="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
                 @yield('content')
