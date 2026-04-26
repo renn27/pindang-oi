@@ -242,6 +242,14 @@ class Penugasan extends Model
             return 'warning|Tunggu anggota tim mengirimkan perbaikan';
         }
 
+        // Sudah ada pelunasan diterima → tugas selesai
+        $adaPelunasanDiterima = $this->pengirimans()
+            ->where('tipe_pengiriman', 'Pelunasan')
+            ->whereHas('penerimaan', fn($q) => $q->where('status', 'Diterima'))
+            ->exists();
+
+        if (!$adaPelunasanDiterima) return 'info|Tunggu  anggota tim mengirimkan Pelunasannya';
+
         // // ⚠️ DEADLINE LEWAT, SUDAH ADA PENGIRIMAN, BELUM DIPERIKSA
         // if  ($latestPengiriman && (! $latestPenerimaan ||
         //         $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman)) {

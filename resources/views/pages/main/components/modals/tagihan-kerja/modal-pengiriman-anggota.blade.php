@@ -141,6 +141,7 @@
                     </label>
                     <select name="tipe_pengiriman" id="tipe_pengiriman" x-model="tipePengiriman"
                         class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10">
+                        <option value="">-- Pilih Tipe Pengiriman --</option>
                         <option value="Pelunasan">Pelunasan (Pengiriman Terakhir)</option>
                         <template x-if="bolehCicilan">
                             <option value="Cicilan">Cicilan (Masih Ada Lanjutan)</option>

@@ -1109,7 +1109,6 @@
                                         $borderColor = 'border-l-blue-400';
                                     }
 
-                                    // Jika sudah CKP, tambahkan class khusus
                                     $ckpClass = $isCkp ? 'ckp-completed-row' : ($isSiapCkp ? 'ckp-siap-row' : '');
                                 @endphp
                                 <!-- Row Utama -->

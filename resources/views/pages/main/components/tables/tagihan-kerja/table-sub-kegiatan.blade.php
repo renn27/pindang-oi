@@ -37,13 +37,28 @@
             <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                 @forelse ($kegiatan->subKegiatans as $index => $subKegiatan)
                     @php
-                        $totalPenugasan = $subKegiatan->penugasans->count(); // 1 / 11
-                        $penugasanSelesai = $subKegiatan->penugasans->filter(function($p) {
-                            return $p->latestPengiriman?->penerimaan?->status === 'Diterima';
+                        $totalPenugasan = $subKegiatan->penugasans->count();
+                        $totalPenugasanSelesai = $subKegiatan->penugasans->filter(function($p) {
+                            return $p->pengirimans->contains(function ($pengiriman) {
+                                return $pengiriman->penerimaan?->status === 'Diterima';
+                            }); 
                         })->count(); 
-                        $progressPercent = $totalPenugasan
-                            ? round(($penugasanSelesai / $totalPenugasan) * 100)
-                            : 0; 
+
+                        $totalTargetPenugasan = $subKegiatan->penugasans->sum('target');
+                        $penugasanTargetSelesai = $subKegiatan->penugasans->sum(function($p) {
+                            $adaPelunasan = $p->pengirimans->contains(fn($k) =>
+                                $k->tipe_pengiriman === 'Pelunasan' && $k->penerimaan?->status === 'Diterima'
+                            );
+
+                            return $p->pengirimans->sum(fn($k) =>
+                                $k->penerimaan?->status === 'Diterima' &&
+                                $k->tipe_pengiriman === ($adaPelunasan ? 'Pelunasan' : 'Cicilan')
+                                    ? $k->jumlah_dikirim ?? 0
+                                    : 0
+                            );
+                        });
+
+                        $progressPercent = $totalTargetPenugasan ? round(($penugasanTargetSelesai / $totalTargetPenugasan) * 100) : 0;
 
                         // Tentukan warna progress bar
                         $progressColor = $progressPercent >= 100 ? 'bg-green-500' : 'bg-blue-500';
@@ -116,7 +131,7 @@
                                     {{ $progressPercent }}%
                                 </span>
                                 <span class="text-xs text-gray-400 dark:text-gray-500">
-                                    ({{ $penugasanSelesai }}/{{ $totalPenugasan }})
+                                    ({{ $penugasanTargetSelesai }}/{{ $totalTargetPenugasan }})
                                 </span>
                             </div>
                         </td>
@@ -189,7 +204,7 @@
                                             <span>Sudah CKP</span>
                                         </button>
 
-                                    @elseif($progressPercent >= 100 && $totalPenugasan > 0)
+                                    @elseif($penugasanTargetSelesai >= 1)
                                         {{-- Selesai, bisa dijadikan CKP --}}
                                         <button type="button"
                                             @click="$dispatch('open-smart-modal', {
@@ -217,7 +232,7 @@
                                         {{-- Belum selesai, tidak bisa diklik --}}
                                         <button disabled
                                             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-transparent text-gray-400 dark:text-gray-500 text-xs font-medium cursor-not-allowed opacity-60"
-                                            title="{{ $totalPenugasan == 0 ? 'Belum ada penugasan' : 'Progress harus 100% (saat ini ' . $progressPercent . '%)' }}">
+                                            title="{{ $totalPenugasan == 0 ? 'Belum ada penugasan' : 'Belum ada Pengiriman yang diterima saat ini (' . $progressPercent . '%)' }}">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                             </svg>

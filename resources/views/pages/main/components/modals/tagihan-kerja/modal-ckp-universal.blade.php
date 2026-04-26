@@ -182,18 +182,18 @@
                                 <div>
                                     <div x-show="ckpData.nama_pegawai">
                                         <span class="text-gray-500 dark:text-gray-400">
-                                            <span x-show="!ckpData.is_ketua_tim && !ckpData.is_pimpinan">Pegawai (Anggota) :</span>
-                                            <span x-show="ckpData.is_ketua_tim">Pegawai (Ketua Tim) :</span>
+                                            <span x-show="!ckpData.is_ketua_tim && !ckpData.is_pimpinan">Pegawai (Anggota) : </span>
+                                            <span x-show="ckpData.is_ketua_tim">Pegawai (Ketua Tim) : </span>
                                             <span x-show="ckpData.is_pimpinan">Pimpinan : </span>
                                         </span>
                                         <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.nama_pegawai"></span>
                                     </div>
                                     <div :class="ckpData.nama_pegawai ? 'mt-2' : ''">
-                                        <span class="text-gray-500 dark:text-gray-400">Satuan :</span>
+                                        <span class="text-gray-500 dark:text-gray-400">Satuan : </span>
                                         <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.satuan"></span>
                                     </div>
                                     <div class="mt-2">
-                                        <span class="text-gray-500 dark:text-gray-400">Target Kuantitas :</span>
+                                        <span class="text-gray-500 dark:text-gray-400">Target Kuantitas : </span>
                                         <span class="ml-2 font-medium text-gray-900 dark:text-white" x-text="ckpData.target_kuantitas"></span>
                                     </div>
                                 </div>

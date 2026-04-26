@@ -107,6 +107,7 @@ class CkpPegawaiController extends Controller
         $realisasi = $pengirimanBulanIni?->jumlah_dikirim ?? 0;
         $persentase = $pengirimanBulanIni?->rr_kirim ?? 0;
         $kualitas = $pengirimanBulanIni?->rating_kirim ?? 0;
+        $kualitas = $kualitas * 20; // jadi persentase
 
         CkpPegawai::create([
             'id_pegawai' => $penugasan->id_anggota,
