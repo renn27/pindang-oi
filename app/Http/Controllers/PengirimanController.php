@@ -25,6 +25,7 @@ class PengirimanController extends Controller
             'tipe_pengiriman'    => ['required', 'string', 'in:Cicilan,Pelunasan'],
             'media_pengiriman'   => ['required', 'string', 'max:255'],
             'bukti_dukung'       => ['required', 'string', 'max:255'],
+            'catatan'            => ['nullable', 'string', 'max:255'],
         ]);
 
         try {
@@ -90,6 +91,7 @@ class PengirimanController extends Controller
                     'bukti_dukung'       => $validated['bukti_dukung'],
                     'rr_kirim'           => $rrKirim,
                     'rating_kirim'       => $ratingKirim,
+                    'catatan'            => $validated['catatan'],
                 ]);
 
                 // 4️⃣ UPDATE STATUS PENUGASAN

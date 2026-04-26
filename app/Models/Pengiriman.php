@@ -26,6 +26,7 @@ class Pengiriman extends Model
         'bukti_dukung',
         'rr_kirim',
         'rating_kirim',
+        'catatan',
     ];
 
     protected $casts = [

@@ -24,7 +24,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('ckp_pegawais', function (Blueprint $table) {
-            //
+            // saya lupa, migrasi sudah dilakukan, tapi saya baru menambahkan ini
+            $table->dropColumn('realisasi');
+            $table->dropColumn('persentase_realisasi');
+            $table->dropColumn('tingkat_kualitas');
         });
     }
 };

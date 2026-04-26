@@ -375,40 +375,21 @@ class CkpPegawaiController extends Controller
             };
         };
 
-        if ($bulan !== 'all') {
-            $namaBulan = $bulanList[$bulan] ?? '-';
-            $hariAkhir = Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth()->day;
-            $periodeStr = "1 - {$hariAkhir} {$namaBulan} {$tahun}";
-            $startDate = Carbon::create($tahun, $bulan, 1)->startOfMonth();
-            $endDate = Carbon::create($tahun, $bulan, 1)->endOfMonth();
-            $tanggalPenilaian = "{$hariAkhir} {$namaBulan} {$tahun}";
-        } else {
-            $namaBulan = 'Semua Bulan';
-            $periodeStr = "Tahun {$tahun}";
-            $startDate = Carbon::create($tahun, 1, 1)->startOfYear();
-            $endDate = Carbon::create($tahun, 12, 31)->endOfYear();
-            $tanggalPenilaian = "31 Desember {$tahun}";
+        if ($bulan === 'all') {
+            return redirect()->back()->with('error', 'Export Excel hanya tersedia untuk filter per bulan.');
         }
 
-        // Query untuk CKP dari Penugasan (Anggota Tim)
-        $ckpFromPenugasan = CkpPegawai::with(['pegawai', 'penugasan.jenisKegiatan', 'penugasan.subKegiatan'])
-            ->where('id_pegawai', $userId)
-            ->whereNotNull('id_penugasan')
-            ->whereHas('penugasan.pengirimans', function ($query) use ($startDate, $endDate) {
-                $query->whereDate('tanggal_pengiriman', '<=', $endDate)
-                    ->whereDate('tanggal_pengiriman', '>=', $startDate);
-            });
+        $namaBulan = $bulanList[$bulan] ?? '-';
+        $hariAkhir = Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth()->day;
+        $periodeStr = "1 - {$hariAkhir} {$namaBulan} {$tahun}";
+        $tanggalPenilaian = "{$hariAkhir} {$namaBulan} {$tahun}";
 
-        // Query untuk CKP dari Sub Kegiatan (Ketua Tim)
-        $ckpFromSubKegiatan = CkpPegawai::with(['pegawai', 'subKegiatan.kegiatan'])
-            ->where('id_pegawai', $userId)
-            ->whereNotNull('id_sub_kegiatan')
-            ->whereNull('id_penugasan')
-            ->whereDate('created_at', '<=', $endDate)
-            ->whereDate('created_at', '>=', $startDate);
+        $bulanFilter = $tahun . '-' . str_pad($bulan, 2, '0', STR_PAD_LEFT);
 
-        // Gabungkan kedua query
-        $ckpList = $ckpFromPenugasan->union($ckpFromSubKegiatan)
+        // Ambil semua tipe CKP (Anggota, Ketua Tim, Pimpinan) berdasarkan bulan_ckp
+        $ckpList = CkpPegawai::with(['pegawai', 'ckpable'])
+            ->where('id_pegawai', $userId)
+            ->where('bulan_ckp', $bulanFilter)
             ->orderBy('jenis_ckp', 'asc')
             ->orderBy('created_at', 'asc')
             ->get();
@@ -626,7 +607,7 @@ class CkpPegawaiController extends Controller
         $tulisSeksi($currentRow, 'UTAMA');
         $currentRow++;
 
-        $ckpUtama = $ckpList->where('jenis_ckp', 'utama')->values();
+        $ckpUtama = $ckpList->where('jenis_ckp', 'Utama')->values();
         $noUtama = 1;
 
         if ($ckpUtama->isEmpty()) {
@@ -650,7 +631,7 @@ class CkpPegawaiController extends Controller
         $tulisSeksi($currentRow, 'TAMBAHAN');
         $currentRow++;
 
-        $ckpTambahan = $ckpList->where('jenis_ckp', 'tambahan')->values();
+        $ckpTambahan = $ckpList->where('jenis_ckp', 'Tambahan')->values();
         $noTambahan = 1;
 
         if ($ckpTambahan->isEmpty()) {

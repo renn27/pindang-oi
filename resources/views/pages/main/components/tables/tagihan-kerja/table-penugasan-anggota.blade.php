@@ -368,6 +368,10 @@
                                                                         'jumlah_dikirim' => $p->jumlah_dikirim,
                                                                         'media_pengiriman' => $p->media_pengiriman,
                                                                         'bukti_dukung' => $p->bukti_dukung,
+                                                                        'catatan_pengiriman' => $p->catatan ?? '-',
+                                                                        'rr_kirim' => $p->rr_kirim ?? 0,
+                                                                        'rating_kirim' => $p->rating_kirim ?? 0,
+                                                                        'bintang_kirim_array' => array_map(fn($i) => $i <= ($p->rating_kirim ?? 0), range(1, 5)),
                                                                         'is_last' => $idx === 0,
                                                                         'penerimaan' => [
                                                                             'id_penerimaan' => $p->penerimaan?->id_penerimaan,
@@ -376,6 +380,9 @@
                                                                             'jumlah_diterima' => $p->penerimaan?->jumlah_diterima ?? '-',
                                                                             'status' => $p->penerimaan?->status ?? 'Menunggu',
                                                                             'catatan' => $p->penerimaan?->catatan ?? '-',
+                                                                            'rr_terima' => $p->penerimaan?->rr_terima ?? 0,
+                                                                            'rating_terima' => $p->penerimaan?->rating_terima ?? 0,
+                                                                            'bintang_terima_array' => array_map(fn($i) => $i <= ($p->penerimaan?->rating_terima ?? 0), range(1, 5)),
                                                                         ],
                                                                     ],
                                                                 )
@@ -1304,9 +1311,10 @@
                                                                         'jumlah_dikirim' => $p->jumlah_dikirim,
                                                                         'media_pengiriman' => $p->media_pengiriman,
                                                                         'bukti_dukung' => $p->bukti_dukung,
+                                                                        'catatan_pengiriman' => $p->catatan ?? '-',
                                                                         'rr_kirim' => $p->rr_kirim ?? 0,
                                                                         'rating_kirim' => $p->rating_kirim ?? 0,
-                                                                        'bintang_kirim_array' => $p->bintang_kirim_array ?? [false, false, false, false, false],
+                                                                        'bintang_kirim_array' => array_map(fn($i) => $i <= ($p->rating_kirim ?? 0), range(1, 5)),
                                                                         'is_last' => $idx === 0,
                                                                         'penerimaan' => [
                                                                             'id_penerimaan' => $p->penerimaan?->id_penerimaan,
@@ -1317,7 +1325,7 @@
                                                                             'catatan' => $p->penerimaan?->catatan ?? '-',
                                                                             'rr_terima' => $p->penerimaan?->rr_terima ?? 0,
                                                                             'rating_terima' => $p->penerimaan?->rating_terima ?? 0,
-                                                                            'bintang_terima_array' => $p->penerimaan?->bintang_terima_array ?? [false, false, false, false, false],
+                                                                            'bintang_terima_array' => array_map(fn($i) => $i <= ($p->penerimaan?->rating_terima ?? 0), range(1, 5)),
                                                                         ],
                                                                     ],
                                                                 )
