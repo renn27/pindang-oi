@@ -166,6 +166,19 @@ class CkpPegawaiController extends Controller
             ->with(['latestPengiriman.penerimaan', 'latestPenerimaan'])
             ->get();
 
+        // Validasi Bulan Terakhir Khusus Pelunasan (Opsi B)
+        $bulanSelesai = $subKegiatan->tanggal_selesai ? $subKegiatan->tanggal_selesai->format('Y-m') : null;
+        if ($bulanSelesai && $request->bulan_ckp === $bulanSelesai) {
+            $totalRealisasiCheck = $penugasans->sum(function ($penugasan) {
+                return $penugasan->latestPenerimaan?->jumlah_diterima ?? 0;
+            });
+            $totalTargetCheck = $penugasans->sum(fn($p) => $p->target ?? 0);
+            
+            if ($totalRealisasiCheck < $totalTargetCheck) {
+                return back()->with('error', 'Bulan terakhir pelaksanaan hanya dapat digunakan untuk CKP Penyelesaian 100% (semua target telah diselesaikan).');
+            }
+        }
+
         $totalPenugasan = $penugasans->count();
         if ($totalPenugasan === 0) {
             return back()->with('error', 'Sub kegiatan ini belum memiliki penugasan.');

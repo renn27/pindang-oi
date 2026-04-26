@@ -252,7 +252,7 @@
                                             <option value="">-- Pilih Bulan CKP --</option>
                                             <template x-for="opt in bulanOptions" :key="opt.value">
                                                 <option :value="opt.value" 
-                                                        x-text="opt.disabled ? (opt.reason === 'sudah_ckp_ketua' ? opt.label + ' — Bulan ini sudah masuk CKP Ketua Tim' : (opt.reason === 'belum_tiba' ? opt.label + ' — Belum bisa membuat CKP untuk bulan yang belum tiba' : opt.label)) : opt.label"
+                                                        x-text="opt.disabled ? (opt.reason === 'sudah_ckp_ketua' ? opt.label + ' — Bulan ini sudah masuk CKP' : (opt.reason === 'belum_tiba' ? opt.label + ' — Belum bisa membuat CKP untuk bulan yang belum tiba' : (opt.reason === 'pelunasan_kurang_ketua' ? opt.label + ' — Bulan terakhir akan terbuka jika progres sudah 100%' : opt.label))) : opt.label"
                                                         :disabled="opt.disabled"
                                                         :style="opt.disabled && opt.reason === 'sudah_ckp_ketua' ? 'color: #16a34a; background-color: #f0fdf4;' : (opt.disabled ? 'color: #9ca3af; background-color: #f3f4f6;' : '')"></option>
                                             </template>
@@ -406,6 +406,7 @@
                     } else {
                         // Ketua Tim & Pimpinan: semua bulan aktif kecuali yang belum tiba atau sudah CKP
                         const isSudahCkp = bulanSudahCkp.includes(val);
+                        const endMonth = end.getFullYear() + '-' + String(end.getMonth() + 1).padStart(2, '0');
                         
                         if (isSudahCkp) {
                             disabled = true;
@@ -413,6 +414,9 @@
                         } else if (val > currentMonthValue) {
                             disabled = true;
                             reason = 'belum_tiba';
+                        } else if (this.ckpData.is_ketua_tim && val === endMonth && this.ckpData.realisasi_kuantitas < this.ckpData.target_kuantitas) {
+                            disabled = true;
+                            reason = 'pelunasan_kurang_ketua';
                         }
                     }
                     
