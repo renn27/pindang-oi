@@ -217,7 +217,7 @@ class CkpPegawaiController extends Controller
             'tipe_ckp' => 'Ketua Tim',                       
             'uraian' => $request->uraian,
             'jenis_ckp' => 'Utama',
-            'target_kuantitas' => $subKegiatan->target,
+            'target_kuantitas' => $totalTarget,
             'satuan' => $subKegiatan->satuan_target,
             'kode_butir_kegiatan' => null,
             'angka_kredit' => null,
@@ -268,7 +268,11 @@ class CkpPegawaiController extends Controller
         $realisasi = $agendaPimpinan->realisasi ?? 0;
 
         $persentaseRealisasi = $target > 0 ? ($realisasi / $target) * 100 : 0;
-        $tingkatKualitas     = $persentaseRealisasi;
+        
+        // Pimpinan tidak di-rating secara eksplisit (skala 1-5), 
+        // sehingga rating diturunkan dari proporsi realisasinya terhadap target (maksimal 5).
+        $ratingKualitas      = $target > 0 ? ($realisasi / $target) * 5 : 0; 
+        $tingkatKualitas     = $ratingKualitas * 20;
 
         // 5. Buat CKP untuk Pimpinan
         CkpPegawai::create([
@@ -300,7 +304,7 @@ class CkpPegawaiController extends Controller
     {
         $request->validate([
             'uraian' => 'required|string',
-            'jenis_ckp' => 'required|in:utama,tambahan',
+            'jenis_ckp' => 'required|in:Utama,Tambahan',
             'keterangan' => 'nullable|string',
         ]);
 
@@ -361,19 +365,7 @@ class CkpPegawaiController extends Controller
             '12' => 'Desember',
         ];
 
-        // Konversi tingkat kualitas ke persentase
-        $kualitasToPersen = function ($nilai) {
-            if ($nilai === null)
-                return null;
-            return match ((int) $nilai) {
-                1 => 20,
-                2 => 40,
-                3 => 60,
-                4 => 80,
-                5 => 100,
-                default => 0
-            };
-        };
+        // Tingkat kualitas sudah dalam bentuk persentase
 
         if ($bulan === 'all') {
             return redirect()->back()->with('error', 'Export Excel hanya tersedia untuk filter per bulan.');
@@ -398,14 +390,14 @@ class CkpPegawaiController extends Controller
         $namaPegawai = $pegawai->nama_pegawai ?? '';
         $jabatan = $pegawai->jabatan ?? '';
         $satuanOrganisasi = $pegawai->satuan_organisasi ?? 'BPS Kabupaten';
-        $nipPegawai = $pegawai->nip ?? 'NIP Pegawai';
-        $namaPejabat = 'Sukendro Suryo Wiguno,SST, M.Ec.Dev';
-        $nipPejabat = '198211122006021001';
+        $nipPegawai = '';
+        $namaPejabat = 'Sukendro Suryo Wiguno, SST, M.Ec.Dev';
+        $nipPejabat = '';
 
         // ─────────────────────────────────────────────────────────
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('CKP-T');
+        $sheet->setTitle('CKP-R');
 
         // Page setup
         $sheet->getPageSetup()
@@ -517,11 +509,10 @@ class CkpPegawaiController extends Controller
         $sheet->setCellValue("I{$headerRow1}", 'Angka Kredit');
         $sheet->setCellValue("J{$headerRow1}", 'Keterangan');
 
-        // Style header - WARNA ABU-ABU
+        // Style header - TANPA WARNA
         $sheet->getStyle("A{$headerRow1}:J{$headerRow2}")->applyFromArray([
             'font' => ['bold' => true, 'size' => 10, 'name' => 'Arial'],
             'alignment' => ['horizontal' => $CENTER, 'vertical' => $MIDDLE, 'wrapText' => true],
-            'fill' => ['fillType' => $SOLID, 'startColor' => ['argb' => 'FFD9D9D9']],
         ]);
         $sheet->getRowDimension($headerRow1)->setRowHeight(20);
         $sheet->getRowDimension($headerRow2)->setRowHeight(20);
@@ -545,7 +536,6 @@ class CkpPegawaiController extends Controller
         $sheet->getStyle('A9:J9')->applyFromArray([
             'font' => ['size' => 9, 'name' => 'Arial'],
             'alignment' => ['horizontal' => $CENTER, 'vertical' => $MIDDLE],
-            'fill' => ['fillType' => $SOLID, 'startColor' => ['argb' => 'FFD9D9D9']],
         ]);
         $sheet->getRowDimension(9)->setRowHeight(16);
 
@@ -554,17 +544,14 @@ class CkpPegawaiController extends Controller
         // ─────────────────────────────────────────────────────────
         // HELPER: tulis satu baris data CKP
         // ─────────────────────────────────────────────────────────
-        $tulisDataRow = function (int $row, int $no, $ckp) use ($sheet, $borderAll, $CENTER, $LEFT, $MIDDLE, $kualitasToPersen) {
-            // Konversi tingkat kualitas ke persen
-            $kualitasPersen = $kualitasToPersen($ckp->tingkat_kualitas);
-
+        $tulisDataRow = function (int $row, int $no, $ckp) use ($sheet, $borderAll, $CENTER, $LEFT, $MIDDLE) {
             $sheet->setCellValue("A{$row}", $no);
             $sheet->setCellValue("B{$row}", $ckp->uraian ?? '');
             $sheet->setCellValue("C{$row}", $ckp->satuan ?? '');
             $sheet->setCellValue("D{$row}", $ckp->target_kuantitas ?? '0');
             $sheet->setCellValue("E{$row}", $ckp->realisasi ?? '0');
-            $sheet->setCellValue("F{$row}", $ckp->persentase_realisasi ? $ckp->persentase_realisasi . '%' : '-');
-            $sheet->setCellValue("G{$row}", $kualitasPersen ? $kualitasPersen . '%' : '-');
+            $sheet->setCellValue("F{$row}", $ckp->persentase_realisasi ? $ckp->persentase_realisasi . ' %' : '-');
+            $sheet->setCellValue("G{$row}", $ckp->tingkat_kualitas ? $ckp->tingkat_kualitas . ' %' : '-');
             $sheet->setCellValue("H{$row}", $ckp->kode_butir_kegiatan ?? '');
             $sheet->setCellValue("I{$row}", $ckp->angka_kredit ?? '');
             $sheet->setCellValue("J{$row}", $ckp->keterangan ?? '');
@@ -587,14 +574,13 @@ class CkpPegawaiController extends Controller
             $sheet->getRowDimension($row)->setRowHeight(-1);
         };
 
-        // HELPER: tulis label seksi (UTAMA / TAMBAHAN) - WARNA ABU-ABU MUDA
-        $tulisSeksi = function (int $row, string $label) use ($sheet, $borderAll, $CENTER, $MIDDLE, $SOLID) {
+        // HELPER: tulis label seksi (UTAMA / TAMBAHAN) - TANPA WARNA
+        $tulisSeksi = function (int $row, string $label) use ($sheet, $borderAll, $CENTER, $MIDDLE, $LEFT) {
             $sheet->mergeCells("A{$row}:J{$row}");
             $sheet->setCellValue("A{$row}", $label);
             $sheet->getStyle("A{$row}:J{$row}")->applyFromArray([
                 'font' => ['bold' => true, 'size' => 11, 'name' => 'Arial'],
-                'alignment' => ['horizontal' => $CENTER, 'vertical' => $MIDDLE],
-                'fill' => ['fillType' => $SOLID, 'startColor' => ['argb' => 'FFE6E6E6']],
+                'alignment' => ['horizontal' => $LEFT, 'vertical' => $MIDDLE],
             ]);
             $sheet->getStyle("A{$row}:J{$row}")->applyFromArray($borderAll);
             $sheet->getRowDimension($row)->setRowHeight(18);
@@ -651,59 +637,50 @@ class CkpPegawaiController extends Controller
             }
         }
 
-        // ── Baris JUMLAH - WARNA ABU-ABU ────────────────────────
-        $totalTarget = $ckpList->sum('target_kuantitas');
-        $totalRealisasi = $ckpList->sum('realisasi');
+        // ── Baris JUMLAH - TANPA WARNA ────────────────────────
         $totalAngkaKredit = $ckpList->sum('angka_kredit');
 
-        $sheet->mergeCells("A{$currentRow}:C{$currentRow}");
+        $sheet->mergeCells("A{$currentRow}:H{$currentRow}");
         $sheet->setCellValue("A{$currentRow}", 'JUMLAH');
-        $sheet->setCellValue("D{$currentRow}", $totalTarget);
-        $sheet->setCellValue("E{$currentRow}", $totalRealisasi);
         $sheet->setCellValue("I{$currentRow}", $totalAngkaKredit ?: 0);
 
         $sheet->getStyle("A{$currentRow}:J{$currentRow}")->applyFromArray([
             'font' => ['bold' => true, 'size' => 10, 'name' => 'Arial'],
             'alignment' => ['horizontal' => $CENTER, 'vertical' => $MIDDLE],
-            'fill' => ['fillType' => $SOLID, 'startColor' => ['argb' => 'FFD9D9D9']],
         ]);
         $sheet->getStyle("A{$currentRow}:J{$currentRow}")->applyFromArray($borderAll);
         $sheet->getRowDimension($currentRow)->setRowHeight(18);
         $currentRow++;
 
-        // ── Baris RATA-RATA - WARNA ABU-ABU MUDA ────────────────
+        // ── Baris RATA-RATA - TANPA WARNA ────────────────
         $countCkp = $ckpList->count();
         $avgPersentase = $countCkp > 0 ? $ckpList->avg('persentase_realisasi') : 0;
         $avgKualitas = $countCkp > 0 ? $ckpList->avg('tingkat_kualitas') : 0;
-        $avgKualitasPersen = $kualitasToPersen($avgKualitas);
 
-        $sheet->mergeCells("A{$currentRow}:C{$currentRow}");
+        $sheet->mergeCells("A{$currentRow}:E{$currentRow}");
         $sheet->setCellValue("A{$currentRow}", 'RATA-RATA');
-        $sheet->setCellValue("F{$currentRow}", $avgPersentase ? round($avgPersentase, 2) . '%' : '-');
-        $sheet->setCellValue("G{$currentRow}", $avgKualitasPersen ? $avgKualitasPersen . '%' : '-');
+        $sheet->setCellValue("F{$currentRow}", $avgPersentase ? round($avgPersentase, 2) : '-');
+        $sheet->setCellValue("G{$currentRow}", $avgKualitas ? round($avgKualitas, 2) : '-');
 
         $sheet->getStyle("A{$currentRow}:J{$currentRow}")->applyFromArray([
             'font' => ['bold' => true, 'size' => 10, 'name' => 'Arial'],
             'alignment' => ['horizontal' => $CENTER, 'vertical' => $MIDDLE],
-            'fill' => ['fillType' => $SOLID, 'startColor' => ['argb' => 'FFE6E6E6']],
         ]);
         $sheet->getStyle("A{$currentRow}:J{$currentRow}")->applyFromArray($borderAll);
         $sheet->getRowDimension($currentRow)->setRowHeight(18);
         $currentRow++;
 
-        // ── Baris CAPAIAN KINERJA PEGAWAI (CKP) - WARNA HIJAU ───
-        // Merge hanya 2 kolom: F (%), G (Tingkat Kualitas)
-        $ckpFinal = ($avgPersentase + $avgKualitasPersen) / 2;
+        // ── Baris CAPAIAN KINERJA PEGAWAI (CKP) - TANPA WARNA ───
+        $ckpFinal = ($avgPersentase + $avgKualitas) / 2;
 
         $sheet->mergeCells("A{$currentRow}:E{$currentRow}");
         $sheet->setCellValue("A{$currentRow}", 'CAPAIAN KINERJA PEGAWAI (CKP)');
         $sheet->mergeCells("F{$currentRow}:G{$currentRow}");
-        $sheet->setCellValue("F{$currentRow}", round($ckpFinal, 3) . '%');
+        $sheet->setCellValue("F{$currentRow}", round($ckpFinal, 3));
 
         $sheet->getStyle("A{$currentRow}:J{$currentRow}")->applyFromArray([
             'font' => ['bold' => true, 'size' => 11, 'name' => 'Arial'],
             'alignment' => ['horizontal' => $CENTER, 'vertical' => $MIDDLE],
-            'fill' => ['fillType' => $SOLID, 'startColor' => ['argb' => 'FFB8D9B8']],
         ]);
         $sheet->getStyle("A{$currentRow}:J{$currentRow}")->applyFromArray($borderAll);
         $sheet->getRowDimension($currentRow)->setRowHeight(22);
@@ -771,14 +748,14 @@ class CkpPegawaiController extends Controller
         $sheet->getRowDimension($namaRow)->setRowHeight(18);
 
         $sheet->mergeCells("A{$nipRow}:E{$nipRow}");
-        $sheet->setCellValue("A{$nipRow}", $nipPegawai ? 'NIP. ' . $nipPegawai : '');
+        $sheet->setCellValue("A{$nipRow}", 'NIP. ' . $nipPegawai);
         $sheet->getStyle("A{$nipRow}")->applyFromArray([
             'font' => ['size' => 10, 'name' => 'Arial'],
             'alignment' => ['horizontal' => $CENTER],
         ]);
 
         $sheet->mergeCells("F{$nipRow}:J{$nipRow}");
-        $sheet->setCellValue("F{$nipRow}", $nipPejabat ? 'NIP. ' . $nipPejabat : '');
+        $sheet->setCellValue("F{$nipRow}", 'NIP. ' . $nipPejabat);
         $sheet->getStyle("F{$nipRow}")->applyFromArray([
             'font' => ['size' => 10, 'name' => 'Arial'],
             'alignment' => ['horizontal' => $CENTER],
@@ -786,7 +763,7 @@ class CkpPegawaiController extends Controller
         $sheet->getRowDimension($nipRow)->setRowHeight(18);
 
         // ── Output ───────────────────────────────────────────────
-        $namaFile = 'CKP-T_' . ($bulan === 'all' ? 'Semua_Bulan' : $namaBulan) . '_' . $tahun . '.xlsx';
+        $namaFile = 'CKP-R_' . ($bulan === 'all' ? 'Semua_Bulan' : $namaBulan) . '_' . $tahun . '.xlsx';
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $namaFile . '"');

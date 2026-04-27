@@ -470,16 +470,6 @@
                                                             </span>
                                                         @endif
                                                     </button>
-                                                @else
-                                                    @if($loginUserId === $penugasan->id_anggota && auth()->user()->active_role === 'Anggota Tim' && $penugasan->ckpBulanan->count() > 0 && $jumlahCkpBelumDibuat == 0)
-                                                        <button type="button" disabled
-                                                            class="w-full text-left px-4 py-3 text-sm flex items-center gap-2 text-gray-400 bg-gray-50 cursor-not-allowed border-b border-gray-100 dark:border-gray-700 dark:bg-gray-800/50">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor">
-                                                                <path stroke-width="2" d="M5 13l4 4L19 7" />
-                                                            </svg>
-                                                            Sudah masuk CKP semua
-                                                        </button>
-                                                    @endif
                                                 @endcan
 
                                                 {{-- Delete --}}
@@ -1413,16 +1403,6 @@
                                                             </span>
                                                         @endif
                                                     </button>
-                                                @else
-                                                    @if($loginUserId === $penugasan->id_anggota && auth()->user()->active_role === 'Anggota Tim' && $penugasan->ckpBulanan->count() > 0 && $jumlahCkpBelumDibuat == 0)
-                                                        <button type="button" disabled
-                                                            class="w-full text-left px-4 py-3 text-sm flex items-center gap-2 text-gray-400 bg-gray-50 cursor-not-allowed border-b border-gray-100 dark:border-gray-700 dark:bg-gray-800/50">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor">
-                                                                <path stroke-width="2" d="M5 13l4 4L19 7" />
-                                                            </svg>
-                                                            Sudah masuk CKP semua
-                                                        </button>
-                                                    @endif
                                                 @endcan
 
                                                 {{-- Delete --}}

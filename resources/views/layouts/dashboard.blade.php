@@ -126,50 +126,30 @@ window.addEventListener('resize', checkMobile);">
             @include('layouts.app-header')
             <!-- app header end -->
             <!-- app header border -->
-            <!-- <div x-data="{ showCkpBanner: true }" 
-                 x-show="showCkpBanner" x-transition
-                 class="sticky top-[73px] z-40 mx-4 mt-4 md:mx-6 md:mt-6 rounded-xl border border-amber-500/30 bg-amber-50/70 p-4 shadow-sm backdrop-blur-md dark:border-amber-500/30 dark:bg-amber-900/30 font-medium text-amber-800 dark:text-amber-200"
-                 style="display: none;">
-                <div class="flex items-start sm:items-center justify-between gap-4">
+            <div x-data="{ showFeatureBanner: true }" 
+                 x-show="showFeatureBanner" x-transition
+                 class="sticky top-[73px] z-40 mx-4 mt-4 md:mx-6 md:mt-6 rounded-xl border border-brand-500/30 bg-brand-50/80 p-4 shadow-sm backdrop-blur-md dark:border-brand-500/30 dark:bg-brand-900/40 font-medium text-brand-800 dark:text-brand-200">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100/80 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100/80 text-brand-600 dark:bg-brand-800/50 dark:text-brand-400">
+                            <svg class="h-6 w-6 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                         <p class="text-sm">
-                            <strong class="font-bold">Perhatian:</strong> Untuk saat ini, Fitur CKP sedang dinonaktifkan karena masih ada perbaikan.
+                            <strong class="font-bold">🎉 Update Baru!</strong> Fitur CKP dan Pengiriman/Penerimaan tugas bulanan sudah bisa diakses. 
+                            <button @click="$dispatch('open-feature-modal')" class="inline-block mt-1 sm:mt-0 sm:ml-1 font-bold text-brand-700 underline decoration-brand-400 decoration-2 underline-offset-2 hover:text-brand-800 hover:decoration-brand-600 dark:text-brand-300 dark:decoration-brand-500 dark:hover:text-brand-200 transition-colors">
+                                Lihat apa saja perubahannya
+                            </button>
                         </p>
                     </div>
-                    <button @click="showCkpBanner = false" class="shrink-0 text-amber-600 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-200 focus:outline-none bg-orange-500/10 hover:bg-orange-500/20 rounded-lg p-2 transition-colors">
+                    <button @click="showFeatureBanner = false" class="shrink-0 text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-200 focus:outline-none bg-brand-500/10 hover:bg-brand-500/20 rounded-lg p-2 transition-colors">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
             </div>
-            <div x-data="{ showCkpBanner: true }" 
-                 x-show="showCkpBanner" x-transition
-                 class="sticky top-[73px] z-40 mx-4 mt-4 md:mx-6 md:mt-6 rounded-xl border border-orange-500/30 bg-orange-50/70 p-4 shadow-sm backdrop-blur-md dark:border-orange-500/30 dark:bg-orange-900/30 font-medium text-orange-800 dark:text-orange-200"
-                 style="display: none;">
-                <div class="flex items-start sm:items-center justify-between gap-4">
-                    <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100/80 text-orange-600 dark:bg-orange-900/50 dark:text-orange-400">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                        </div>
-                        <p class="text-sm">
-                            <strong class="font-bold">Perhatian:</strong> Untuk saat ini, Fitur Pengiriman dan Penerimaan Tugas juga sedang dinonaktifkan karena masih dalam perbaikan.
-                        </p>
-                    </div>
-                    <button @click="showCkpBanner = false" class="shrink-0 text-amber-600 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-200 focus:outline-none bg-orange-500/10 hover:bg-orange-500/20 rounded-lg p-2 transition-colors">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-            </div> -->
 
             <div class="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
                 @yield('content')
@@ -213,6 +193,9 @@ window.addEventListener('resize', checkMobile);">
 
     <!-- MODAL PENGUMUMAN -->
     <x-ui.announcement-modal id="announcementModal" />
+
+    <!-- MODAL FEATURE LAUNCH -->
+    <x-ui.feature-launch-modal />
 
     {{-- Quill Editor --}}
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
