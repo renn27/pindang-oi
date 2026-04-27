@@ -1,16 +1,18 @@
 @php
     $loginUserId = auth()->user()->id_pegawai;
 
-    // Helper untuk mengurutkan: user yang sedang login akan berada di paling atas
-    $penugasanButuhDLAtauTranslok = $penugasanButuhDLAtauTranslok->sortByDesc(function ($row) use ($loginUserId) {
-        return $row->id_anggota === $loginUserId ? 1 : 0;
-    });
+    // Helper untuk mengurutkan: user yang sedang login akan berada di paling atas, sisanya urut abjad
+    $penugasanButuhDLAtauTranslok = $penugasanButuhDLAtauTranslok->sort(function ($a, $b) use ($loginUserId) {
+        if ($a->id_anggota === $loginUserId && $b->id_anggota !== $loginUserId) return -1;
+        if ($b->id_anggota === $loginUserId && $a->id_anggota !== $loginUserId) return 1;
+        return strcasecmp($a->anggota->nama_pegawai ?? '', $b->anggota->nama_pegawai ?? '');
+    })->values();
 
-    $penugasanTidakButuhDLAtauTranslok = $penugasanTidakButuhDLAtauTranslok->sortByDesc(function ($row) use (
-        $loginUserId,
-    ) {
-        return $row->id_anggota === $loginUserId ? 1 : 0;
-    });
+    $penugasanTidakButuhDLAtauTranslok = $penugasanTidakButuhDLAtauTranslok->sort(function ($a, $b) use ($loginUserId) {
+        if ($a->id_anggota === $loginUserId && $b->id_anggota !== $loginUserId) return -1;
+        if ($b->id_anggota === $loginUserId && $a->id_anggota !== $loginUserId) return 1;
+        return strcasecmp($a->anggota->nama_pegawai ?? '', $b->anggota->nama_pegawai ?? '');
+    })->values();
 @endphp
 
 <!-- Legenda Status Penugasan -->

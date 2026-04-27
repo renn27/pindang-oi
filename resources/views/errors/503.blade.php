@@ -29,31 +29,7 @@
         }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-        }
-        .gear {
-            animation: spin 6s linear infinite;
-        }
-        .gear-reverse {
-            animation: spin-reverse 4s linear infinite;
-        }
-        @keyframes spin {
-            100% { transform: rotate(360deg); }
-        }
-        @keyframes spin-reverse {
-            100% { transform: rotate(-360deg); }
-        }
-        .blob {
-            animation: pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.1; }
-            50% { transform: scale(1.05); opacity: 0.2; }
-        }
-    </style>
+    <link rel="stylesheet" href="/css/errors.css">
 </head>
 <body class="min-h-screen flex items-center justify-center relative overflow-hidden bg-slate-50 text-slate-800">
     
