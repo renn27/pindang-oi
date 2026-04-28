@@ -7,6 +7,7 @@ use App\Models\Pengiriman;
 use App\Models\Kegiatan;
 use App\Models\SubKegiatan;
 use App\Models\Pegawai;
+use Carbon\Carbon;
 
 class DashboardAnalyticsService
 {
@@ -250,29 +251,42 @@ class DashboardAnalyticsService
     {
         $month = $month ?? now()->month;
         $year = $year ?? now()->year;
+        $startOfMonth = Carbon::create($year, $month, 1)->startOfMonth();
+        $endOfMonth   = Carbon::create($year, $month, 1)->endOfMonth();
 
-        // Total Kegiatan
-        $totalKegiatan = Kegiatan::whereMonth('created_at', $month)
-            ->whereYear('created_at', $year)
-            ->count();
+        $totalKegiatan = Kegiatan::whereHas('subKegiatans')
+                        ->withMin('subKegiatans', 'tanggal_mulai')
+                        ->withMax('subKegiatans', 'tanggal_selesai')
+                        ->having('sub_kegiatans_min_tanggal_mulai', '<=', $endOfMonth)
+                        ->having('sub_kegiatans_max_tanggal_selesai', '>=', $startOfMonth)
+                        ->count();
 
-        // Total Sub Kegiatan
-        $totalSubKegiatan = SubKegiatan::whereMonth('created_at', $month)
-            ->whereYear('created_at', $year)
-            ->count();
+        $totalSubKegiatan = SubKegiatan::where('tanggal_mulai', '<=', $endOfMonth) 
+                        ->where('tanggal_selesai', '>=', $startOfMonth)
+                        ->count();
+
+        $totalPenugasan = Penugasan::where('tanggal_mulai', '<=', $endOfMonth) 
+                        ->where('tanggal_selesai', '>=', $startOfMonth)
+                        ->count();
+                        
+        $penugasanSelesai = Penugasan::where('tanggal_mulai', '<=', $endOfMonth) 
+                        ->where('tanggal_selesai', '>=', $startOfMonth)
+                        ->whereHas('latestPengiriman.penerimaan', function ($query) {
+                            $query->where('status', 'Diterima');
+                        })->count();
 
         // Total Penugasan
-        $totalPenugasan = Penugasan::whereMonth('created_at', $month)
-            ->whereYear('created_at', $year)
-            ->count();
+        // $totalPenugasan = Penugasan::whereMonth('created_at', $month)
+        //     ->whereYear('created_at', $year)
+        //     ->count();
 
         // Total Penugasan Selesai (yang sudah diterima)
         // Menggunakan query manual untuk menghindari masalah relationship
-        $penugasanSelesai = Penugasan::whereMonth('created_at', $month)
-            ->whereYear('created_at', $year)
-            ->whereHas('pengirimans.penerimaan', function ($query) {
-            $query->where('status', 'Diterima');
-        })->count();
+        // $penugasanSelesai = Penugasan::whereMonth('created_at', $month)
+        //     ->whereYear('created_at', $year)
+        //     ->whereHas('pengirimans.penerimaan', function ($query) {
+        //     $query->where('status', 'Diterima');
+        // })->count();
 
         // Hitung persentase
         $persentaseSelesai = $totalPenugasan > 0
