@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Services\DashboardAnalyticsService;
 
 class DashboardController extends Controller
 {
-    public function index(\Illuminate\Http\Request $request)
+    public function index(Request $request, DashboardAnalyticsService $analytics)
     {
         $user = auth()->user();
 
@@ -52,12 +53,24 @@ class DashboardController extends Controller
                 ->paginate(5, ['*'], 'ketua_berjalan_page');
         }
 
+        $selectedMonth = request('month', now()->month);
+        $selectedYear = request('year', now()->year);
+        $stats = $analytics->getDashboardStats($selectedMonth, $selectedYear);
+
+        $bestEmployee = $analytics->rankPegawai(1, $selectedMonth, $selectedYear)->first();
+        $rankPegawai = $analytics->rankPegawai(5, $selectedMonth, $selectedYear);
+
         return view('pages.dashboard', [
             'title'                       => 'Dashboard',
             'unfinishedTerlewatAsAnggota' => $unfinishedTerlewatAsAnggota,
             'unfinishedBerjalanAsAnggota' => $unfinishedBerjalanAsAnggota,
             'unfinishedTerlewatAsKetua'   => $unfinishedTerlewatAsKetua,
             'unfinishedBerjalanAsKetua'   => $unfinishedBerjalanAsKetua,
+            'stats'                       => $stats,
+            'selectedMonth'               => $selectedMonth,
+            'selectedYear'                => $selectedYear,
+            'bestEmployee'                => $bestEmployee,
+            'rankPegawai'                 => $rankPegawai,
         ]);
     }
 }

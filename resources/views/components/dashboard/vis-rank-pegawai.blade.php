@@ -38,7 +38,15 @@
                     </th>
                     <th scope="col"
                         class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">
+                        Skor Cepat
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">
                         Rata-rata
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">
+                        Aksi
                     </th>
                 </tr>
             </thead>
@@ -172,17 +180,41 @@
                             </span>
                         </td>
 
+                        {{-- Skor Cepat --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span class="font-medium text-gray-800 dark:text-white">
+                                {{ number_format($pegawai->avg_skor_cepat ?? 0, 2) }}%
+                            </span>
+                        </td>
+
                         {{-- Rata-rata --}}
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             <span
                                 class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold {{ ($pegawai->rata_rata ?? 0) >= 80 ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-300' : (($pegawai->rata_rata ?? 0) >= 60 ? 'bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 dark:from-yellow-900/30 dark:to-amber-900/30 dark:text-yellow-300' : 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 dark:from-red-900/30 dark:to-pink-900/30 dark:text-red-300') }}">
-                                {{ number_format($pegawai->rata_rata ?? 0, 0) }}%
+                                {{ number_format($pegawai->rata_rata ?? 0, 2) }}%
                             </span>
+                        </td>
+
+                        {{-- Aksi --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <button @click="$dispatch('open-calc-modal', {
+                                nama: '{{ addslashes($pegawai->nama_pegawai) }}',
+                                rr_kirim: {{ number_format($pegawai->rr_kirim ?? 0, 2, '.', '') }},
+                                rating_persen: {{ number_format($pegawai->rating_persen ?? 0, 2, '.', '') }},
+                                skor_cepat: {{ number_format($pegawai->avg_skor_cepat ?? 0, 2, '.', '') }},
+                                rata_rata: {{ number_format($pegawai->rata_rata ?? 0, 2, '.', '') }},
+                                details: {{ $pegawai->details->toJson() }}
+                            })" class="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 transition-colors">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                </svg>
+                                Rumus
+                            </button>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                        <td colspan="8" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                             <div class="flex flex-col items-center justify-center">
                                 <svg class="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
@@ -262,4 +294,7 @@
             </div>
         </div>
     @endif -->
+
+    <!-- Modal Perhitungan Rumus Component -->
+    <x-dashboard.modal-perhitungan-rumus />
 </div>

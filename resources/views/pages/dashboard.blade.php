@@ -318,9 +318,6 @@
             <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
 
                 @php
-                    $selectedMonth = request('month', now()->month);
-                    $selectedYear = request('year', now()->year);
-                    $stats = app(\App\Services\DashboardAnalyticsService::class)->getDashboardStats($selectedMonth, $selectedYear);
                     $hasData = $stats['total_kegiatan'] > 0 || $stats['total_sub_kegiatan'] > 0 || $stats['total_penugasan'] > 0;
                 @endphp
 
@@ -459,7 +456,7 @@
                         </div>
 
                         <x-profile.employe-rank-card
-                            :bestEmployee="app(\App\Services\DashboardAnalyticsService::class)->rankPegawai(1, request('month', now()->month), request('year', now()->year))->first()" />
+                            :bestEmployee="$bestEmployee" />
                     </div>
 
                     {{-- ===== RANK EMPLOYEE ===== --}}
@@ -484,7 +481,7 @@
                     }" @click="fetchTab($event, 'container-rank-pegawai')" class="transition-opacity duration-200">
                         @auth
                             <x-dashboard.vis-rank-pegawai
-                                :rankPegawai="app(\App\Services\DashboardAnalyticsService::class)->rankPegawai(5, request('month', now()->month), request('year', now()->year))"
+                                :rankPegawai="$rankPegawai"
                                 :perPage="5" />
                         @endauth
                     </div>
