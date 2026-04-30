@@ -299,7 +299,7 @@ class MasterKegiatanController extends Controller
     }
         ])->orderBy('nama_bidang')->get();
 
-        // 🔹 Hitung jumlah "Menunggu" dan "Ditolak" untuk tiap bidang (Status DL ATAU Translok)
+        // 🔹 Hitung jumlah "Menunggu", "Ditolak", dan "ACC Belum Masuk Kalender" untuk tiap bidang
         $bidangs->each(function ($bidang) {
             $bidang->menungguCount = $bidang->kegiatans->sum(function ($kegiatan) {
                 return $kegiatan->subKegiatans->sum(function ($sub) {
@@ -313,6 +313,15 @@ class MasterKegiatanController extends Controller
                 return $kegiatan->subKegiatans->sum(function ($sub) {
                     return $sub->penugasans->filter(function ($p) {
                         return $p->status_dl === 'Ditolak' || $p->status_translok === 'Ditolak';
+                    })->count();
+                });
+            });
+
+            $bidang->accBelumMasukKalenderCount = $bidang->kegiatans->sum(function ($kegiatan) {
+                return $kegiatan->subKegiatans->sum(function ($sub) {
+                    return $sub->penugasans->filter(function ($p) {
+                        $isAcc = $p->status_dl === 'ACC' || $p->status_translok === 'ACC';
+                        return $isAcc && !$p->sudahMasukKalenderDL();
                     })->count();
                 });
             });

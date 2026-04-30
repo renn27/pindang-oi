@@ -82,7 +82,7 @@ class AnnouncementController extends Controller
     }
 
     // Hapus pengumuman
-    public function destroy(Announcement $announcement) {
+    public function delete(Announcement $announcement) {
         $this->authorize('kelola-master-data');
         // Hapus gambar
         if ($announcement->image_path) {

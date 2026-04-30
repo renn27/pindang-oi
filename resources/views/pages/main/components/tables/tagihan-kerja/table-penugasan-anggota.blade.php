@@ -198,22 +198,25 @@
                                             $translok = $penugasan->status_translok;
 
                                             if ($dl === 'Ditolak' || $translok === 'Ditolak') {
-                                                $status = 'Ditolak';
+                                                $statusClass = 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+                                                $statusLabel = 'Ditolak';
                                             } elseif ($dl === 'Menunggu' || $translok === 'Menunggu') {
-                                                $status = 'Menunggu';
+                                                $statusClass = 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
+                                                $statusLabel = 'Menunggu';
                                             } else {
-                                                $status = 'ACC';
+                                                if ($penugasan->sudahMasukKalenderDL()) {
+                                                    $statusClass = 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
+                                                    $statusLabel = 'ACC';
+                                                } else {
+                                                    $statusClass = 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400 border border-green-200 dark:border-green-800';
+                                                    $statusLabel = 'ACC (belum masuk kalender)';
+                                                }
                                             }
                                         @endphp
 
                                         <span
-                                            class="inline-flex px-2 py-1 text-xs font-medium rounded-full
-                                            {{ $status === 'ACC'
-                                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                                : ($status === 'Ditolak'
-                                                    ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                                    : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400') }}">
-                                            {{ ucfirst($status) }}
+                                            class="inline-flex px-2 py-1 text-xs font-medium rounded-full {{ $statusClass }}">
+                                            {{ $statusLabel }}
                                         </span>
                                     </td>
 
@@ -357,6 +360,7 @@
                                                             id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                             nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
                                                             id_anggota: '{{ $penugasan->id_anggota }}',
+                                                            bulan_sudah_ckp: @js($penugasan->ckpBulanan->pluck('bulan_ckp')->unique()->values()),
                                                             historiData: @js(
                                                             $penugasan->pengirimans
                                                                 ->sortByDesc(fn($p) => $p->created_at)
@@ -444,35 +448,45 @@
                                                     </div>
                                                 @endcan
 
-                                                @can('setAsCKP', $penugasan)
-                                                    <button type="button"
-                                                        @click="$dispatch('open-smart-modal', {
-                                                            modalId: 'modal-ckp-universal',
-                                                            data: {
-                                                                id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                                nama_pegawai: {{ json_encode($penugasan->anggota->nama_pegawai) }},
-                                                                uraian: {{ json_encode('Melaksanakan ' . $penugasan->jenisKegiatan->jenis_kegiatan . ' pada ' . $penugasan->subKegiatan->nama_sub_kegiatan . ' dengan target ' . ($penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim')) . ' dari total target ' . $penugasan->target) }},
-                                                                target_kuantitas: {{ $penugasan->target }},
-                                                                realisasi_kuantitas: {{ $penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim') }},
-                                                                satuan: '{{ $penugasan->satuan_target }}',
-                                                                tanggal_mulai: '{{ optional($penugasan->tanggal_mulai)->format('Y-m-d') }}',
-                                                                tanggal_selesai: '{{ optional($penugasan->tanggal_selesai)->format('Y-m-d') }}',
-                                                                bulanDiterima: @js($penugasan->bulanCkpBelumDibuat()),
-                                                                bulanSudahCkp: @js($penugasan->ckpBulanan->pluck('bulan_ckp')->unique()->values()),
-                                                            }
-                                                        })"
-                                                        class="w-full text-left px-4 py-3 text-sm flex items-center gap-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 border-b border-gray-100 dark:border-gray-700">
+                                                @if($isCkp && $isMe && auth()->user()->active_role === 'Anggota Tim')
+                                                    <button type="button" disabled
+                                                        class="w-full text-left px-4 py-3 text-sm flex items-center gap-2 text-gray-400 bg-gray-50 dark:bg-gray-800 cursor-not-allowed border-b border-gray-100 dark:border-gray-700">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor">
                                                             <path stroke-width="2" d="M5 13l4 4L19 7" />
                                                         </svg>
-                                                        Jadikan CKP
-                                                        @if($jumlahCkpBelumDibuat > 0)
-                                                            <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold bg-green-500 text-white">
-                                                                {{ $jumlahCkpBelumDibuat }}
-                                                            </span>
-                                                        @endif
+                                                        Sudah CKP Semua
                                                     </button>
-                                                @endcan
+                                                @else
+                                                    @can('setAsCKP', $penugasan)
+                                                        <button type="button"
+                                                            @click="$dispatch('open-smart-modal', {
+                                                                modalId: 'modal-ckp-universal',
+                                                                data: {
+                                                                    id_penugasan: '{{ $penugasan->id_penugasan }}',
+                                                                    nama_pegawai: {{ json_encode($penugasan->anggota->nama_pegawai) }},
+                                                                    uraian: {{ json_encode('Melaksanakan ' . $penugasan->jenisKegiatan->jenis_kegiatan . ' pada ' . $penugasan->subKegiatan->nama_sub_kegiatan . ' dengan target ' . ($penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim')) . ' dari total target ' . $penugasan->target) }},
+                                                                    target_kuantitas: {{ $penugasan->target }},
+                                                                    realisasi_kuantitas: {{ $penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim') }},
+                                                                    satuan: '{{ $penugasan->satuan_target }}',
+                                                                    tanggal_mulai: '{{ optional($penugasan->tanggal_mulai)->format('Y-m-d') }}',
+                                                                    tanggal_selesai: '{{ optional($penugasan->tanggal_selesai)->format('Y-m-d') }}',
+                                                                    bulanDiterima: @js($penugasan->bulanCkpBelumDibuat()),
+                                                                    bulanSudahCkp: @js($penugasan->ckpBulanan->pluck('bulan_ckp')->unique()->values()),
+                                                                }
+                                                            })"
+                                                            class="w-full text-left px-4 py-3 text-sm flex items-center gap-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 border-b border-gray-100 dark:border-gray-700">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor">
+                                                                <path stroke-width="2" d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                            Jadikan CKP
+                                                            @if($jumlahCkpBelumDibuat > 0)
+                                                                <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold bg-green-500 text-white">
+                                                                    {{ $jumlahCkpBelumDibuat }}
+                                                                </span>
+                                                            @endif
+                                                        </button>
+                                                    @endcan
+                                                @endif
 
                                                 {{-- Delete --}}
                                                 @can('delete', $penugasan)
@@ -530,7 +544,7 @@
                                         <!-- Badge TUGAS SELESAI / SIAP MASUK CKP -->
                                         @if($isCkp)
                                             <div class="ckp-completed-badge">
-                                                TUGAS SELESAI
+                                                TUGAS SELESAI (SUDAH MASUK CKP)
                                             </div>
                                         @elseif($isSiapCkp)
                                             <div class="ckp-siap-badge">
@@ -542,14 +556,37 @@
 
                                 <!-- Row Detail - Individual per row -->
                                 <tr x-data="{ showDetails: false }" x-show="showDetails" x-cloak>
-                                    <td colspan="11" class="px-0 py-4 bg-gray-50 dark:bg-gray-800">
-                                        <div class="grid grid-cols-2 gap-4 px-6">
+                                    <td colspan="11" class="px-0 py-4 bg-gray-50 dark:bg-gray-800 relative">
+                                        @php
+                                            $jmlPengiriman = $penugasan->pengirimans->count();
+                                            $jmlPenerimaan = $penugasan->pengirimans->filter(fn($p) => $p->penerimaan)->count();
+                                        @endphp
+
+                                        <!-- LINK ICON IN MIDDLE -->
+                                        <div class="absolute left-1/2 top-[60%] -translate-x-1/2 -translate-y-1/2 z-10 hidden md:block">
+                                            @if($jmlPengiriman > 0 && $jmlPengiriman === $jmlPenerimaan)
+                                                <div class="bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 p-2.5 rounded-full ring-4 ring-gray-50 dark:ring-gray-800 shadow-sm" title="Sudah sinkron">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                    </svg>
+                                                </div>
+                                            @else
+                                                <div class="bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 p-2.5 rounded-full ring-4 ring-gray-50 dark:ring-gray-800 shadow-sm" title="Belum sinkron">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                                                    </svg>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-6 px-6">
                                             <!-- PENGIRIMAN -->
                                             <div>
                                                 <div class="flex items-center gap-2 mb-3">
                                                     <div class="w-2 h-2 rounded-full bg-blue-500"></div>
                                                     <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                                        Pengiriman</h4>
+                                                        Pengiriman {{ $jmlPengiriman > 0 ? 'ke-' . $jmlPengiriman : '' }}
+                                                    </h4>
                                                 </div>
 
                                                 <div
@@ -670,7 +707,8 @@
                                                 <div class="flex items-center gap-2 mb-3">
                                                     <div class="w-2 h-2 rounded-full bg-green-500"></div>
                                                     <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                                        Penerimaan</h4>
+                                                        Penerimaan {{ $jmlPenerimaan > 0 ? 'ke-' . $jmlPenerimaan : '' }}
+                                                    </h4>
                                                 </div>
 
                                                 <div
@@ -1290,6 +1328,7 @@
                                                             id_penugasan: '{{ $penugasan->id_penugasan }}',
                                                             nama_anggota: '{{ $penugasan->anggota->nama_pegawai }}',
                                                             id_anggota: '{{ $penugasan->id_anggota }}',
+                                                            bulan_sudah_ckp: @js($penugasan->ckpBulanan->pluck('bulan_ckp')->unique()->values()),
                                                             historiData: @js(
                                                             $penugasan->pengirimans
                                                                 ->sortByDesc(fn($p) => $p->created_at)
@@ -1377,35 +1416,45 @@
                                                     </div>
                                                 @endcan
 
-                                                @can('setAsCKP', $penugasan)
-                                                    <button type="button"
-                                                        @click="$dispatch('open-smart-modal', {
-                                                            modalId: 'modal-ckp-universal',
-                                                            data: {
-                                                                id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                                nama_pegawai: {{ json_encode($penugasan->anggota->nama_pegawai) }},
-                                                                uraian: {{ json_encode('Melaksanakan ' . $penugasan->jenisKegiatan->jenis_kegiatan . ' pada ' . $penugasan->subKegiatan->nama_sub_kegiatan . ' dengan target ' . ($penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim')) . ' dari total target ' . $penugasan->target . ' '. $penugasan->satuan_target) }},
-                                                                target_kuantitas: {{ $penugasan->target }},
-                                                                realisasi_kuantitas: {{ $penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim') }},
-                                                                satuan: '{{ $penugasan->satuan_target }}',
-                                                                tanggal_mulai: '{{ optional($penugasan->tanggal_mulai)->format('Y-m-d') }}',
-                                                                tanggal_selesai: '{{ optional($penugasan->tanggal_selesai)->format('Y-m-d') }}',
-                                                                bulanDiterima: @js($penugasan->bulanCkpBelumDibuat()),
-                                                                bulanSudahCkp: @js($penugasan->ckpBulanan->pluck('bulan_ckp')->unique()->values()),
-                                                            }
-                                                        })"
-                                                        class="w-full text-left px-4 py-3 text-sm flex items-center gap-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 border-b border-gray-100 dark:border-gray-700">
+                                                @if($isCkp && $isMe && auth()->user()->active_role === 'Anggota Tim')
+                                                    <button type="button" disabled
+                                                        class="w-full text-left px-4 py-3 text-sm flex items-center gap-2 text-gray-400 bg-gray-50 dark:bg-gray-800 cursor-not-allowed border-b border-gray-100 dark:border-gray-700">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor">
                                                             <path stroke-width="2" d="M5 13l4 4L19 7" />
                                                         </svg>
-                                                        Jadikan CKP
-                                                        @if($jumlahCkpBelumDibuat > 0)
-                                                            <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold bg-green-500 text-white">
-                                                                {{ $jumlahCkpBelumDibuat }}
-                                                            </span>
-                                                        @endif
+                                                        Sudah CKP Semua
                                                     </button>
-                                                @endcan
+                                                @else
+                                                    @can('setAsCKP', $penugasan)
+                                                        <button type="button"
+                                                            @click="$dispatch('open-smart-modal', {
+                                                                modalId: 'modal-ckp-universal',
+                                                                data: {
+                                                                    id_penugasan: '{{ $penugasan->id_penugasan }}',
+                                                                    nama_pegawai: {{ json_encode($penugasan->anggota->nama_pegawai) }},
+                                                                    uraian: {{ json_encode('Melaksanakan ' . $penugasan->jenisKegiatan->jenis_kegiatan . ' pada ' . $penugasan->subKegiatan->nama_sub_kegiatan . ' dengan target ' . ($penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim')) . ' dari total target ' . $penugasan->target . ' '. $penugasan->satuan_target) }},
+                                                                    target_kuantitas: {{ $penugasan->target }},
+                                                                    realisasi_kuantitas: {{ $penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim') }},
+                                                                    satuan: '{{ $penugasan->satuan_target }}',
+                                                                    tanggal_mulai: '{{ optional($penugasan->tanggal_mulai)->format('Y-m-d') }}',
+                                                                    tanggal_selesai: '{{ optional($penugasan->tanggal_selesai)->format('Y-m-d') }}',
+                                                                    bulanDiterima: @js($penugasan->bulanCkpBelumDibuat()),
+                                                                    bulanSudahCkp: @js($penugasan->ckpBulanan->pluck('bulan_ckp')->unique()->values()),
+                                                                }
+                                                            })"
+                                                            class="w-full text-left px-4 py-3 text-sm flex items-center gap-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 border-b border-gray-100 dark:border-gray-700">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor">
+                                                                <path stroke-width="2" d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                            Jadikan CKP
+                                                            @if($jumlahCkpBelumDibuat > 0)
+                                                                <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold bg-green-500 text-white">
+                                                                    {{ $jumlahCkpBelumDibuat }}
+                                                                </span>
+                                                            @endif
+                                                        </button>
+                                                    @endcan
+                                                @endif
 
                                                 {{-- Delete --}}
                                                 @can('delete', $penugasan)
@@ -1463,7 +1512,7 @@
                                         <!-- Badge TUGAS SELESAI / SIAP MASUK CKP -->
                                         @if($isCkp)
                                             <div class="ckp-completed-badge">
-                                                TUGAS SELESAI
+                                                TUGAS SELESAI (SUDAH MASUK CKP)
                                             </div>
                                         @elseif($isSiapCkp)
                                             <div class="ckp-siap-badge">
@@ -1475,14 +1524,37 @@
 
                                 <!-- Row Detail - Individual per row -->
                                 <tr x-data="{ showDetails: false }" x-show="showDetails" x-cloak>
-                                    <td colspan="10" class="px-0 py-4 bg-gray-50 dark:bg-gray-800">
-                                        <div class="grid grid-cols-2 gap-4 px-6">
+                                    <td colspan="10" class="px-0 py-4 bg-gray-50 dark:bg-gray-800 relative">
+                                        @php
+                                            $jmlPengiriman = $penugasan->pengirimans->count();
+                                            $jmlPenerimaan = $penugasan->pengirimans->filter(fn($p) => $p->penerimaan)->count();
+                                        @endphp
+
+                                        <!-- LINK ICON IN MIDDLE -->
+                                        <div class="absolute left-1/2 top-[60%] -translate-x-1/2 -translate-y-1/2 z-10 hidden md:block">
+                                            @if($jmlPengiriman > 0 && $jmlPengiriman === $jmlPenerimaan)
+                                                <div class="bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 p-2.5 rounded-full ring-4 ring-gray-50 dark:ring-gray-800 shadow-sm" title="Sudah sinkron">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                    </svg>
+                                                </div>
+                                            @else
+                                                <div class="bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 p-2.5 rounded-full ring-4 ring-gray-50 dark:ring-gray-800 shadow-sm" title="Belum sinkron">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                                                    </svg>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-6 px-6">
                                             <!-- PENGIRIMAN -->
                                             <div>
                                                 <div class="flex items-center gap-2 mb-3">
                                                     <div class="w-2 h-2 rounded-full bg-blue-500"></div>
                                                     <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                                        Pengiriman</h4>
+                                                        Pengiriman {{ $jmlPengiriman > 0 ? 'ke-' . $jmlPengiriman : '' }}
+                                                    </h4>
                                                 </div>
 
                                                 <div
@@ -1604,7 +1676,8 @@
                                                 <div class="flex items-center gap-2 mb-3">
                                                     <div class="w-2 h-2 rounded-full bg-green-500"></div>
                                                     <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                                        Penerimaan</h4>
+                                                        Penerimaan {{ $jmlPenerimaan > 0 ? 'ke-' . $jmlPenerimaan : '' }}
+                                                    </h4>
                                                 </div>
 
                                                 <div class="bg-white dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 p-4">

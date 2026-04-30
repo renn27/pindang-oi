@@ -185,22 +185,24 @@
                                         </div>
                                     </div>
 
-                                    <!-- Tombol Batalkan -->
-                                    <template x-if="item.penerimaan.status === 'Menunggu' && formData.id_anggota === '{{ auth()->user()->id_pegawai }}'">
-                                        <div class="mt-4 pt-4 border-t border-red-50 dark:border-red-900/20 flex items-center gap-2">
-                                            <svg class="w-4 h-4 text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                            </svg>
-                                            <form :id="'delete-pengiriman-' + item.id_pengiriman" :action="`/pengirimans/${item.id_pengiriman}`" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" @click="SwalHelper.confirmDelete('delete-pengiriman-' + item.id_pengiriman, 'Pengiriman ' + item.tanggal_pengiriman)"
-                                                    class="text-sm text-red-600 hover:text-red-700 dark:text-red-400 font-medium transition-colors">
-                                                    Batalkan Pengiriman
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </template>
+                                    <!-- Tombol Batalkan Pengiriman (hanya untuk Anggota Tim) -->
+                                    @if(in_array(auth()->user()->active_role, ['Anggota Tim']))
+                                        <template x-if="item.penerimaan.status === 'Menunggu' && formData.id_anggota === '{{ auth()->user()->id_pegawai }}'">
+                                            <div class="mt-4 pt-4 border-t border-red-50 dark:border-red-900/20 flex items-center gap-2">
+                                                <svg class="w-4 h-4 text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                                <form :id="'delete-pengiriman-' + item.id_pengiriman" :action="`/pengirimans/${item.id_pengiriman}`" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button" @click="SwalHelper.confirmDelete('delete-pengiriman-' + item.id_pengiriman, 'Pengiriman ' + item.tanggal_pengiriman)"
+                                                        class="text-sm text-red-600 hover:text-red-700 dark:text-red-400 font-medium transition-colors">
+                                                        Batalkan Pengiriman
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </template>
+                                    @endif
                                 </div>
 
                                 <!-- Footer Card: Informasi Penerimaan & Tombol Expand -->
@@ -285,23 +287,45 @@
                                                 </div>
                                             </div>
 
-                                            {{-- Tombol Batalkan Penerimaan (hanya untuk Ketua Tim / Admin / Pimpinan) --}}
+                                            {{-- Tombol Batalkan Penerimaan (hanya untuk Ketua Tim) --}}
                                             @if(in_array(auth()->user()->active_role, ['Ketua Tim']))
                                                 <template x-if="item.penerimaan.status !== 'Menunggu' && item.penerimaan.id_penerimaan && item.is_last">
                                                     <div class="mt-2 flex items-center gap-2">
-                                                        <svg class="w-4 h-4 text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                                        </svg>
-                                                        <form :id="'delete-penerimaan-' + item.penerimaan.id_penerimaan"
-                                                              :action="`/penerimaans/${item.penerimaan.id_penerimaan}`"
-                                                              method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="button" @click="SwalHelper.confirmDelete('delete-penerimaan-' + item.penerimaan.id_penerimaan, 'Penerimaan ' + item.tanggal_pengiriman)"
-                                                                class="text-sm text-red-600 hover:text-red-700 dark:text-red-400 font-medium transition-colors">
-                                                                Batalkan Penerimaan
-                                                            </button>
-                                                        </form>
+                                                        <!-- Jika sudah masuk CKP, tampilkan button disabled dengan tooltip -->
+                                                        <template x-if="formData.bulan_sudah_ckp && formData.bulan_sudah_ckp.includes(item.bulan_pengiriman)">
+                                                            <div class="relative group flex items-center gap-2">
+                                                                <svg class="w-4 h-4 text-gray-400 dark:text-gray-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                                </svg>
+                                                                <button type="button" disabled
+                                                                    class="text-sm text-gray-400 dark:text-gray-500 font-medium cursor-not-allowed">
+                                                                    Batalkan Penerimaan
+                                                                </button>
+                                                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-40 p-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs rounded-lg shadow-xl ring-1 ring-black/5 dark:ring-white/10 z-10 text-center leading-relaxed whitespace-normal">
+                                                                    Sudah masuk CKP Anggota Tim.<br>Gak bisa dibatalkan.
+                                                                    <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-white dark:border-t-gray-800"></div>
+                                                                </div>
+                                                            </div>
+                                                        </template>
+
+                                                        <!-- Jika belum masuk CKP, tampilkan button aktif -->
+                                                        <template x-if="!formData.bulan_sudah_ckp || !formData.bulan_sudah_ckp.includes(item.bulan_pengiriman)">
+                                                            <div class="flex items-center gap-2">
+                                                                <svg class="w-4 h-4 text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                                </svg>
+                                                                <form :id="'delete-penerimaan-' + item.penerimaan.id_penerimaan"
+                                                                      :action="`/penerimaans/${item.penerimaan.id_penerimaan}`"
+                                                                      method="POST">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="button" @click="SwalHelper.confirmDelete('delete-penerimaan-' + item.penerimaan.id_penerimaan, 'Penerimaan ' + item.tanggal_pengiriman)"
+                                                                        class="text-sm text-red-600 hover:text-red-700 dark:text-red-400 font-medium transition-colors">
+                                                                        Batalkan Penerimaan
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </template>
                                                     </div>
                                                 </template>
                                             @endif

@@ -95,4 +95,19 @@ class KalenderDLController extends Controller
                 ->withInput();
         }
     }
+    public function delete($id_penugasan)
+    {
+        try {
+            KalenderDL::where('id_penugasan', $id_penugasan)->delete();
+            
+            return redirect()
+                ->route('master-kegiatan.index_rk_dl')
+                ->with('success', 'Berhasil mencabut DL dari Kalender.');
+        } catch (\Exception $e) {
+            Log::error('Gagal hapus Kalender DL: ' . $e->getMessage());
+
+            return redirect()->back()
+                ->with('error', 'Gagal mencabut DL dari Kalender.');
+        }
+    }
 }

@@ -260,11 +260,19 @@
                                     <h3 class="text-sm font-semibold text-gray-800 dark:text-white flex items-center gap-2">
                                         {{ $bidang->nama_bidang }}
                                         {{-- Untuk Pimpinan --}}
-                                        @if(Auth::user()->active_role === 'Pimpinan' && $bidang->menungguCount > 0)
-                                            <span class="animate-pulse inline-flex items-center justify-center px-2 py-0.5 text-xs font-semibold text-yellow-800 dark:text-yellow-300 bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
-                                                {{ $bidang->menungguCount }} menunggu verifikasi
-                                            </span>
+                                        @if(Auth::user()->active_role === 'Pimpinan')
+                                            @if($bidang->menungguCount > 0)
+                                                <span class="animate-pulse inline-flex items-center justify-center px-2 py-0.5 text-xs font-semibold text-yellow-800 dark:text-yellow-300 bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
+                                                    {{ $bidang->menungguCount }} menunggu verifikasi
+                                                </span>
+                                            @endif
+                                            @if($bidang->accBelumMasukKalenderCount > 0)
+                                                <span class="animate-pulse inline-flex items-center justify-center px-2 py-0.5 text-xs font-semibold text-orange-800 dark:text-orange-300 bg-orange-100 dark:bg-orange-900/30 rounded-full">
+                                                    {{ $bidang->accBelumMasukKalenderCount }} menunggu masuk kalender DL
+                                                </span>
+                                            @endif
                                         @endif
+
 
                                         {{-- Untuk Ketua Tim --}}
                                         @if(Auth::user()->active_role === 'Ketua Tim' && $bidang->ditolakCount > 0)
@@ -440,6 +448,13 @@
                                                                                     <span class="items-center px-2 py-1 text-[8px] cursor-not-allowed font-medium bg-blue-100/50 dark:bg-blue-900/20 text-blue-600/50 dark:text-blue-500/50 flex whitespace-nowrap border-b border-blue-200 dark:border-blue-800">
                                                                                         ✓ Sudah masuk kalender
                                                                                     </span>
+                                                                                    <form id="delete-kalender-dl-{{ $penugasan->id_penugasan }}" action="{{ route('kalenderDL.delete', $penugasan->id_penugasan) }}" method="POST" class="inline">
+                                                                                        @csrf
+                                                                                        @method('DELETE')
+                                                                                        <button type="button" onclick="SwalHelper.confirmDelete('delete-kalender-dl-{{ $penugasan->id_penugasan }}', 'Data Kalender DL {{ addslashes($penugasan->anggota->nama_pegawai ?? '') }}')" class="items-center px-2 py-1 text-[8px] font-medium bg-red-100/80 dark:bg-red-900/40 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800/60 flex whitespace-nowrap border-b border-red-200 dark:border-red-800">
+                                                                                            ✕ Cabut
+                                                                                        </button>
+                                                                                    </form>
                                                                                 @else
                                                                                     <form action="{{ route('kalenderDL.store') }}" method="POST" class="inline">
                                                                                         @csrf
@@ -514,6 +529,13 @@
                                                                                     <span class="items-center px-2 py-1 text-[8px] cursor-not-allowed font-medium bg-teal-100/50 dark:bg-teal-900/20 text-teal-600/50 dark:text-teal-500/50 flex whitespace-nowrap border-b border-teal-200 dark:border-teal-800">
                                                                                         ✓ Sudah masuk kalender
                                                                                     </span>
+                                                                                    <form id="delete-kalender-translok-{{ $penugasan->id_penugasan }}" action="{{ route('kalenderDL.delete', $penugasan->id_penugasan) }}" method="POST" class="inline">
+                                                                                        @csrf
+                                                                                        @method('DELETE')
+                                                                                        <button type="button" onclick="SwalHelper.confirmDelete('delete-kalender-translok-{{ $penugasan->id_penugasan }}', 'Data Kalender DL {{ addslashes($penugasan->anggota->nama_pegawai ?? '') }}')" class="items-center px-2 py-1 text-[8px] font-medium bg-red-100/80 dark:bg-red-900/40 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800/60 flex whitespace-nowrap border-b border-red-200 dark:border-red-800">
+                                                                                            ✕ Cabut
+                                                                                        </button>
+                                                                                    </form>
                                                                                 @else
                                                                                     <form action="{{ route('kalenderDL.store') }}" method="POST" class="inline">
                                                                                         @csrf
@@ -589,5 +611,6 @@
             </div>
         </x-common.component-card>
     </div>
+
 @endsection
 

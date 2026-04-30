@@ -213,7 +213,7 @@
                                 @endif
 
                                 {{-- Jadikan CKP --}}
-                                @can('update', $subKegiatan)
+                                @if(auth()->user()->active_role === 'Ketua Tim' && auth()->user()->id_pegawai === $subKegiatan->kegiatan->id_penanggung_jawab)
                                     @if($isCkpKetuaTim)
                                         {{-- Sudah jadi CKP --}}
                                         <button disabled
@@ -261,7 +261,7 @@
                                             <span>Belum CKP</span>
                                         </button>
                                     @endif
-                                @endcan
+                                @endif
                             </div>
                         </td>
                     </tr>

@@ -429,21 +429,40 @@
                                             Edit
                                         </button>
 
-                                        <form id="delete-agenda-{{ $agenda->id_agenda }}"
-                                            action="{{ route('agenda.delete', $agenda->id_agenda) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button"
-                                                onclick="confirmDeleteAgenda('delete-agenda-{{ $agenda->id_agenda }}', {{ json_encode($agenda->nama_agenda) }})"
-                                                class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 dark:text-red-400 dark:hover:bg-red-900/20">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                                Hapus
-                                            </button>
-                                        </form>
+                                        @if($agenda->ckpBulanan->count() > 0)
+                                            <div class="relative group flex w-full">
+                                                <button type="button" disabled
+                                                    class="w-full text-left px-4 py-3 text-sm text-gray-400 dark:text-gray-500 flex items-center gap-2 cursor-not-allowed">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                    Hapus
+                                                </button>
+                                                <!-- Tooltip di sebelah kiri dropdown -->
+                                                <div class="absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover:block w-40 p-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs rounded-lg shadow-xl ring-1 ring-black/5 dark:ring-white/10 z-50 text-center leading-relaxed whitespace-normal">
+                                                    Sudah masuk CKP Pimpinan.<br>Gak bisa dibatalkan.
+                                                    <div class="absolute top-1/2 -right-2 -translate-y-1/2 border-4 border-transparent border-l-white dark:border-l-gray-800"></div>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <form id="delete-agenda-{{ $agenda->id_agenda }}"
+                                                action="{{ route('agenda.delete', $agenda->id_agenda) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button"
+                                                    onclick="confirmDeleteAgenda('delete-agenda-{{ $agenda->id_agenda }}', {{ json_encode($agenda->nama_agenda) }})"
+                                                    class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 dark:text-red-400 dark:hover:bg-red-900/20">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                    Hapus
+                                                </button>
+                                            </form>
+                                        @endif
 
                                         @if($kepalaBps)
                                             @if($isCkpPimpinan)

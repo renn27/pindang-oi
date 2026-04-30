@@ -105,7 +105,7 @@ Route::middleware('auth')->group(function () {
             ->name('announcements.store');
         Route::put('/{announcement}', [AnnouncementController::class, 'update'])
             ->name('announcements.update');
-        Route::delete('/{announcement}', [AnnouncementController::class, 'destroy'])
+        Route::delete('/{announcement}', [AnnouncementController::class, 'delete'])
             ->name('announcements.destroy');
         Route::post('/{announcement}/toggle', [AnnouncementController::class, 'toggleActive'])
             ->name('announcements.toggle');
@@ -177,6 +177,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('/kalender-dl')->group(function () {
         Route::get('/', [KalenderDLController::class, 'index'])->name('kalenderDL.index');
         Route::post('/', [KalenderDLController::class, 'store'])->name('kalenderDL.store');
+        Route::delete('/{id_penugasan}', [KalenderDLController::class, 'delete'])->name('kalenderDL.delete');
     });
     // END ROUTE KALENDER DL
 

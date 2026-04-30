@@ -51,15 +51,14 @@
             };
         ">
 
-            <form :action="mode === 'edit' ? `/admin/announcements/${itemKey}` : `{{ route('announcements.store') }}`"
+            <form :action="mode === 'edit' ? `/announcements/${itemKey}` : `{{ route('announcements.store') }}`"
                 method="POST" enctype="multipart/form-data" class="grid grid-cols-1 gap-y-5">
                 @csrf
                 <template x-if="mode === 'edit'">
                     <input type="hidden" name="_method" value="PUT">
                 </template>
 
-                <div
-                    class="relative flex h-[85vh] w-full max-w-[600px] flex-col overflow-hidden rounded-3xl bg-white dark:bg-gray-900 dark:border dark:border-gray-800">
+                <div class="relative flex h-[85vh] w-full flex-col overflow-hidden">
 
                     <!-- HEADER -->
                     <div class="shrink-0 border-b border-gray-200 px-6 py-4 dark:border-gray-700">
@@ -187,7 +186,7 @@
 
         <!-- TABEL PENGUMUMAN AKTIF -->
         <div x-show="activeTab === 'active'" x-cloak>
-            <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 overflow-x-auto">
+            <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 overflow-visible">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead>
                         <tr class="bg-gray-50 dark:bg-gray-800">
@@ -354,7 +353,7 @@
 
         <!-- TABEL PENGUMUMAN NONAKTIF -->
         <div x-show="activeTab === 'inactive'" x-cloak>
-            <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 overflow-x-auto">
+            <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 overflow-visible">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead>
                         <tr class="bg-gray-50 dark:bg-gray-800">
@@ -440,16 +439,36 @@
                                                     <form action="{{ route('announcements.toggle', $announcement) }}"
                                                         method="POST">
                                                         @csrf
-                                                        <button type="submit"
-                                                            class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 dark:text-gray-300 dark:hover:bg-gray-700">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                            </svg>
-                                                            Aktifkan
-                                                        </button>
+                                                        @if($announcement->end_date->isFuture())
+                                                            <button type="submit"
+                                                                class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 dark:text-gray-300 dark:hover:bg-gray-700">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                </svg>
+                                                                Aktifkan
+                                                            </button>
+                                                        @else
+                                                            <div class="relative group/tooltip flex w-full">
+                                                                <button type="button" disabled
+                                                                    class="w-full text-left px-3 py-2 text-sm text-gray-400 flex items-center gap-2 cursor-not-allowed dark:text-gray-600">
+                                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                                        viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                                            stroke-width="2"
+                                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                    </svg>
+                                                                    Aktifkan
+                                                                </button>
+                                                                <!-- Tooltip custom ke arah kiri -->
+                                                                <div class="absolute right-full top-1/2 -translate-y-1/2 mr-2 hidden group-hover/tooltip:block w-36 p-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-[11px] rounded-lg shadow-xl ring-1 ring-black/5 dark:ring-white/10 z-50 text-center leading-relaxed whitespace-normal">
+                                                                    Gagal, sudah lewat<br>tanggal berakhir.
+                                                                    <div class="absolute top-1/2 -right-2 -translate-y-1/2 border-4 border-transparent border-l-white dark:border-l-gray-800"></div>
+                                                                </div>
+                                                            </div>
+                                                        @endif
                                                     </form>
 
                                                     <!-- Edit -->

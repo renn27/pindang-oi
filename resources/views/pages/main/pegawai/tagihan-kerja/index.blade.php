@@ -37,7 +37,6 @@
 
         <!-- Bagian Kanan: Tombol Aksi -->
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-            @can('create', App\Models\Kegiatan::class)
                 <!-- Tombol Liat MPH -->
                 <button
                     class="flex items-center justify-center gap-2 rounded-full border border-gray-300
@@ -59,6 +58,7 @@
                     Lihat MPH
                 </button>
 
+            @can('create', App\Models\Kegiatan::class)
                 <!-- Tombol Tambah Kegiatan -->
                 <button
                     class="flex items-center justify-center gap-2 rounded-full border border-gray-300
