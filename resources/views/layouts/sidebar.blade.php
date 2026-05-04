@@ -90,7 +90,7 @@
                                 <li>
                                     @if (isset($item['subItems']))
                                         <!-- Menu Item with Submenu -->
-                                        <button @click="toggle('{{ $key }}')" class="menu-item group w-full"
+                                        <button @click="toggle('{{ $key }}')" class="menu-item group w-full {{ !empty($item['is_special_se']) ? 'menu-item-special-se' : '' }}"
                                             :class="[
                                                 {{ $item['is_active'] ?? false ? 'true' : 'false' }} ?
                                                 'menu-item-active' : 'menu-item-inactive',
@@ -144,11 +144,17 @@
                                                             class="menu-dropdown-item
                                                                 {{ !empty($subItem['is_placeholder']) ?
                                                                     'italic text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400'
-                                                                    : '' }}"
+                                                                    : '' }}
+                                                                {{ !empty($subItem['is_special_se']) ? 'menu-dropdown-item-special-se' : '' }}"
                                                             :class="{{ $subItem['is_active'] ?? false ? 'true' : 'false' }} ?
                                                                 'menu-dropdown-item-active' :
                                                                 'menu-dropdown-item-inactive'">
-                                                            {{ $subItem['name'] }}
+                                                            @if (!empty($subItem['icon']))
+                                                                <span class="shrink-0 w-5 h-5 flex items-center justify-center">
+                                                                    {!! MenuHelper::getIconSvg($subItem['icon']) !!}
+                                                                </span>
+                                                            @endif
+                                                            <span>{{ $subItem['name'] }}</span>
                                                             <span class="flex items-center gap-1 ml-auto">
                                                                 @if (!empty($subItem['new']))
                                                                     <span

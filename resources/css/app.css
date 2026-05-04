@@ -1164,3 +1164,11 @@ tr.ckp-siap-row:hover {
 .menu-item-special-se:hover::before {
     opacity: 0.4;
 }
+
+.menu-dropdown-item-special-se {
+    @apply !bg-transparent !text-orange-600 dark:!text-orange-500 transition-all duration-200;
+}
+
+.menu-dropdown-item-special-se:hover {
+    @apply !bg-orange-500 !text-white dark:!bg-orange-500 dark:!text-white scale-[1.02] shadow-md;
+}

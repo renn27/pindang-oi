@@ -110,23 +110,29 @@ class MenuHelper
                 'is_special' => true,
             ],
             [
-                'icon' => 'dashboardse2026',
-                'name' => 'DASHBOARD SE2026',
-                'path' => 'https://dashboard-se2026-dev.apps.bps.go.id/se2026',
-                'is_external' => true,
-                'is_special_se' => true,
-            ],
-            [
-                'icon' => 'sempati',
-                'name' => 'SEMPATI-SE2026',
-                'path' => 'https://se2026.bpssumsel.com/',
-                'is_external' => true,
-                'is_special_se' => true,
-            ],
-            [
-                'icon' => 'mangcek',
-                'name' => 'SE2026',
-                'path' => 'https://mangcek.bpsoganilir.com/admin',
+                'icon' => 'se-main',
+                'name' => 'SE 2026',
+                'subItems' => [
+                    [
+                        'icon' => 'dashboardse2026',
+                        'name' => 'DASHBOARD SE2026',
+                        'path' => 'https://dashboard-se2026-dev.apps.bps.go.id/se2026',
+                        'is_external' => true,
+                    ],
+                    [
+                        'icon' => 'sempati',
+                        'name' => 'SEMPATI SE2026',
+                        'path' => 'https://se2026.bpssumsel.com/',
+                        'is_external' => true,
+                    ],
+                    [
+                        'icon' => 'mangcek',
+                        'name' => 'SE2026',
+                        'path' => 'https://mangcek.bpsoganilir.com/admin',
+                        'is_external' => true,
+                    ],
+                    
+                ],
                 'is_external' => true,
                 'is_special_se' => true,
             ],
@@ -153,11 +159,13 @@ class MenuHelper
                 'name' => 'SAKIP',
                 'subItems' => [
                     [
+                        'icon' => 'sinergi',
                         'name' => 'SINERGI',
                         'path' => 'https://sinergi.web.bps.go.id/#/auth/login?next=/',
                         'is_external' => true,
                     ],
                     [
+                        'icon' => 'drive',
                         'name' => 'Bukti Dukung SAKIP',
                         'path' => 'https://drive.google.com/drive/folders/1hbkLUr_y6KWMF_Hz2iZibHuyVbC2qiMv?usp=sharing',
                         'is_external' => true,
@@ -248,6 +256,23 @@ class MenuHelper
     public static function getIconSvg($iconName)
     {
         $icons = [
+            'se-main' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 7V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V7C3 5.89543 3.89543 5 5 5H19C20.1046 5 21 5.89543 21 7Z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M7 15V13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M10 15V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M13 15V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M17 9L15 11L13 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="17" cy="14" r="1.5" stroke="currentColor" stroke-width="1.5"/>
+                </svg>',
+            'sinergi' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>',
+            'drive' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.17 6L3 17.5L6 22.5L12.17 12L9.17 6Z" fill="currentColor"/>
+                <path d="M15 6L9.17 6L12.17 12L18 12L15 6Z" fill="currentColor" opacity="0.7"/>
+                <path d="M18 12L12.17 12L6 22.5L17.83 22.5L21 17.5L18 12Z" fill="currentColor" opacity="0.4"/>
+                </svg>',
             'dashboardse2026' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 <path d="M9 3C9 2.44772 9.44772 2 10 2H14C14.5523 2 15 2.44772 15 3V5H9V3Z" stroke="currentColor" stroke-width="1.5"/>
