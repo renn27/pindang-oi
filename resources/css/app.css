@@ -1133,3 +1133,34 @@ tr.ckp-siap-row:hover {
     background: radial-gradient(circle at top right, rgba(255,255,255,0.3), transparent 50%);
     opacity: 0.6;
 }
+
+.menu-item-special-se {
+    @apply !bg-transparent !text-orange-600 dark:!text-orange-500 relative overflow-hidden transition-all duration-200;
+}
+
+.menu-item-special-se span,
+.menu-item-special-se svg {
+    @apply !text-orange-600 dark:!text-orange-500;
+}
+
+.menu-item-special-se:hover {
+    @apply !bg-orange-500 !text-white dark:!bg-orange-500 dark:!text-white scale-[1.02] shadow-md;
+}
+
+.menu-item-special-se:hover span,
+.menu-item-special-se:hover svg {
+    @apply !text-white dark:!text-white !bg-transparent;
+}
+
+.menu-item-special-se::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, rgba(255,255,255,0.3), transparent 50%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.menu-item-special-se:hover::before {
+    opacity: 0.4;
+}

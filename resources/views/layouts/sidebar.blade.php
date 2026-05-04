@@ -180,7 +180,8 @@
                                             @if (!empty($item['is_external'])) target="_blank" rel="noopener noreferrer" @endif
                                             class="menu-item group w-full
                                             {{ $item['is_active'] ?? false ? 'menu-item-active' : 'menu-item-inactive' }}
-                                            {{ !empty($item['is_special']) ? 'menu-item-special' : '' }}"
+                                            {{ !empty($item['is_special']) ? 'menu-item-special' : '' }}
+                                            {{ !empty($item['is_special_se']) ? 'menu-item-special-se' : '' }}"
                                             :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar
                                                 .isMobileOpen) ?
                                             'xl:justify-center' :
