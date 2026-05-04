@@ -125,7 +125,7 @@ class MenuHelper
             ],
             [
                 'icon' => 'mangcek',
-                'name' => 'MANGCEK SE2026',
+                'name' => 'SE2026',
                 'path' => 'https://mangcek.bpsoganilir.com/admin',
                 'is_external' => true,
                 'is_special_se' => true,
