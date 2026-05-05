@@ -385,7 +385,7 @@ class Penugasan extends Model
             // Jika penerimaan terakhir adalah REVISI
             if ($latestPenerimaan->status === 'Revisi') {
                 return [
-                    'label' => 'Menunggu Pengiriman Ulang',
+                    'label' => 'Revisi : Menunggu Pengiriman Ulang',
                     'class' => 'bg-orange-100 text-orange-700',
                 ];
             }

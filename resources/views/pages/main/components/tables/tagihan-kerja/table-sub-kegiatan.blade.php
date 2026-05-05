@@ -28,10 +28,12 @@
                         class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-48">
                         Progres Tugas
                     </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-28">
-                        Aksi
-                    </th>
+                    @if(auth()->user()->active_role !== 'Anggota Tim')
+                        <th scope="col"
+                            class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-28">
+                            Aksi
+                        </th>
+                    @endif
                 </tr>
             </thead>
             <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
@@ -145,6 +147,7 @@
                         </td>
 
                         {{-- Aksi --}}
+                        @if(auth()->user()->active_role !== 'Anggota Tim')
                         <td class="px-6 py-4 whitespace-nowrap align-top">
                             <div class="flex justify-center items-center gap-1">
                                 @if(!$ckpSelesai100Persen)
@@ -264,6 +267,7 @@
                                 @endif
                             </div>
                         </td>
+                        @endif
                     </tr>
                 @empty
                     <tr>

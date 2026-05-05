@@ -28,18 +28,18 @@ class MenuHelper
                 'icon' => 'admin',
                 'name' => 'Admin',
                 'subItems' => [
-                    ['name' => 'Bidang Kerja', 'path' => '/bidang-kerja'],
-                    ['name' => 'Jenis Kegiatan', 'path' => '/jenis-kegiatan'],
-                    ['name' => 'Kelola Role Pegawai', 'path' => '/role-pegawai'],
-                    ['name' => 'Kelola Pengumuman', 'path' => '/announcements'],
+                    ['icon' => 'admin', 'name' => 'Bidang Kerja', 'path' => '/bidang-kerja'],
+                    ['icon' => 'admin', 'name' => 'Jenis Kegiatan', 'path' => '/jenis-kegiatan'],
+                    ['icon' => 'admin', 'name' => 'Kelola Role Pegawai', 'path' => '/role-pegawai'],
+                    ['icon' => 'admin','name' => 'Kelola Pengumuman', 'path' => '/announcements'],
                 ],
             ],
             [
                 'icon' => 'pimpinan',
                 'name' => 'Pimpinan',
                 'subItems' => [
-                    ['name' => 'RK & IKI Pimpinan', 'path' => '/rencana-indikator-jpt/rencana'],
-                    ['name' => 'Agenda Pimpinan', 'path' => '/agenda-pimpinan'],
+                    ['icon' => 'pimpinan', 'name' => 'RK & IKI Pimpinan', 'path' => '/rencana-indikator-jpt/rencana'],
+                    ['icon' => 'pimpinan', 'name' => 'Agenda Pimpinan', 'path' => '/agenda-pimpinan'],
 
                 ],
             ],
@@ -47,8 +47,8 @@ class MenuHelper
                 'icon' => 'rencana-kerja',
                 'name' => 'Rencana Kinerja',
                 'subItems' => [
-                    ['name' => 'Rencana Kerja Per Fungsi', 'path' => '/master-kegiatan'],
-                    ['name' => 'Rencana Kerja Perlu DL', 'path' => '/rencana-kerja-dl'],
+                    ['icon' => 'rencana-kerja', 'name' => 'Rencana Kerja Per Fungsi', 'path' => '/master-kegiatan'],
+                    ['icon' => 'rencana-kerja', 'name' => 'Rencana Kerja Perlu DL/Translok', 'path' => '/rencana-kerja-dl'],
                 ],
             ],
             [
@@ -60,8 +60,8 @@ class MenuHelper
                 'icon' => 'kalender',
                 'name' => 'Kalender',
                 'subItems' => [
-                    ['name' => 'Kalender DL / Translok', 'path' => '/kalender-dl'],
-                    ['name' => 'Kalender Kegiatan', 'path' => '/kalender-kegiatan'],
+                    ['icon' => 'kalender', 'name' => 'Kalender DL / Translok', 'path' => '/kalender-dl'],
+                    ['icon' => 'kalender', 'name' => 'Kalender Kegiatan', 'path' => '/kalender-kegiatan'],
                 ],
             ],
 

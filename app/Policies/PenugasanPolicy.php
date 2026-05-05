@@ -146,32 +146,48 @@ class PenugasanPolicy
 
     public function acceptDL(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        // 1️⃣ Hanya pimpinan
-        if ($pegawai->active_role !== 'Pimpinan') {
-            return false;
-        }
-
-        // 2️⃣ Penugasan memang butuh DL
+        // 1️⃣ Penugasan memang butuh DL
         if (! $penugasan->butuh_dl) {
             return false;
         }
 
-        return true;
+        // 2️⃣ Pimpinan: boleh ACC / Ditolak
+        if ($pegawai->active_role === 'Pimpinan') {
+            return true;
+        }
+
+        // 3️⃣ Ketua Tim (penanggung jawab kegiatan): boleh Ajukan Kembali (set → Menunggu)
+        if (
+            $pegawai->active_role === 'Ketua Tim'
+            && $pegawai->id_pegawai === $penugasan->subKegiatan->kegiatan->id_penanggung_jawab
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     public function acceptTranslok(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        // 1️⃣ Hanya pimpinan
-        if ($pegawai->active_role !== 'Pimpinan') {
-            return false;
-        }
-
-        // 2️⃣ Penugasan memang butuh Translok
+        // 1️⃣ Penugasan memang butuh Translok
         if (! $penugasan->butuh_translok) {
             return false;
         }
 
-        return true;
+        // 2️⃣ Pimpinan: boleh ACC / Ditolak
+        if ($pegawai->active_role === 'Pimpinan') {
+            return true;
+        }
+
+        // 3️⃣ Ketua Tim (penanggung jawab kegiatan): boleh Ajukan Kembali (set → Menunggu)
+        if (
+            $pegawai->active_role === 'Ketua Tim'
+            && $pegawai->id_pegawai === $penugasan->subKegiatan->kegiatan->id_penanggung_jawab
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     public function setAsCKP(Pegawai $pegawai, Penugasan $penugasan): bool

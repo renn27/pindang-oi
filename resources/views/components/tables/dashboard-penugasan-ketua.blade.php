@@ -1,4 +1,4 @@
-@props(['penugasans'])
+@props(['penugasans', 'showDlStatus' => false])
 
 <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
@@ -12,6 +12,9 @@
                     <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-32 dark:text-gray-400">Target</th>
                     <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-32 dark:text-gray-400">Deadline</th>
                     <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-40 dark:text-gray-400">Status Penugasannya</th>
+                    @if($showDlStatus)
+                    <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-36 dark:text-gray-400">Status DL / Translok</th>
+                    @endif
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
@@ -19,7 +22,7 @@
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150 cursor-pointer"
                         onclick="window.location.href='{{ route('sub.kegiatan.show', ['kegiatan' => $penugasan->subKegiatan->id_kegiatan, 'subKegiatan' => $penugasan->id_sub_kegiatan]) }}#penugasan-{{ $penugasan->id_penugasan }}'">
                         <td class="px-4 py-4 text-sm text-gray-600 font-medium text-center dark:text-gray-400">
-                            {{ $penugasans->firstItem() + $index }}
+                            {{ method_exists($penugasans, 'firstItem') ? $penugasans->firstItem() + $index : $index + 1 }}
                         </td>
                         <td class="px-4 py-4">
                             <span class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">
@@ -83,12 +86,24 @@
                                 {{ $statusInfo['label'] ?? 'Tidak Diketahui' }}
                             </span>
                         </td>
+                        @if($showDlStatus)
+                            <td class="px-4 py-4 whitespace-nowrap">
+                                @php
+                                    $dlStatus = $penugasan->status_dl === 'Ditolak' ? ['label' => 'DL Ditolak', 'class' => 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400']
+                                        : ($penugasan->status_translok === 'Ditolak' ? ['label' => 'Translok Ditolak', 'class' => 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400']
+                                        : ['label' => '-', 'class' => 'bg-gray-100 text-gray-400']);
+                                @endphp
+                                <span class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full {{ $dlStatus['class'] }}">
+                                    {{ $dlStatus['label'] }}
+                                </span>
+                            </td>
+                        @endif
                     </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
-    @if ($penugasans->hasPages())
+    @if (method_exists($penugasans, 'hasPages') && $penugasans->hasPages())
     <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
         {{ $penugasans->links() }}
     </div>

@@ -109,9 +109,9 @@
                     </div>
 
                     {{-- ===== DAFTAR PENUGASAN BELUM SELESAI SBG ANGGOTA ===== --}}
-                    @if((isset($unfinishedBerjalanAsAnggota) && $unfinishedBerjalanAsAnggota->count() > 0) || (isset($unfinishedTerlewatAsAnggota) && $unfinishedTerlewatAsAnggota->count() > 0))
+                    @php $revisiCount = isset($revisiAsAnggota) ? $revisiAsAnggota->count() : 0; @endphp
                     <div class="mb-8 p-5 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-700/50 rounded-2xl shadow-sm relative overflow-hidden ring-1 ring-yellow-400 dark:ring-yellow-600" x-data="{ 
-                        activeTabAnggota: (new URLSearchParams(window.location.search).has('anggota_terlewat_page') ? 'terlewat' : 'berjalan'),
+                        activeTabAnggota: (new URLSearchParams(window.location.search).has('anggota_terlewat_page') ? 'terlewat' : (new URLSearchParams(window.location.search).has('anggota_berjalan_page') ? 'berjalan' : 'revisi')),
                         async fetchTab(e, containerId) {
                             let link = e.target.closest('nav[role=\'navigation\'] a');
                             if (link && link.href) {
@@ -143,6 +143,18 @@
 
                         <!-- Tabs -->
                         <div class="flex space-x-1 border-b border-gray-200 dark:border-gray-700 mb-4">
+                            {{-- Tab Revisi: selalu tampil untuk Anggota Tim --}}
+                            <button @click="activeTabAnggota = 'revisi'"
+                                :class="{'border-orange-500 text-orange-600 dark:text-orange-400 dark:border-orange-500': activeTabAnggota === 'revisi', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300': activeTabAnggota !== 'revisi'}"
+                                class="whitespace-nowrap py-2 px-4 border-b-2 font-semibold text-sm transition-colors duration-150 flex items-center">
+                                <svg class="w-3.5 h-3.5 mr-1.5 flex-shrink-0" :class="activeTabAnggota === 'revisi' ? 'text-orange-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                                Revisi Ketua Tim
+                                @if($revisiCount > 0)
+                                    <span class="ml-2 bg-orange-100 text-orange-700 py-0.5 px-2 rounded-full text-xs dark:bg-orange-900 dark:text-orange-200 font-bold animate-pulse">{{ $revisiCount }}</span>
+                                @else
+                                    <span class="ml-2 bg-gray-100 text-gray-400 py-0.5 px-2 rounded-full text-xs dark:bg-gray-800 dark:text-gray-500 font-medium">0</span>
+                                @endif
+                            </button>
                             <button @click="activeTabAnggota = 'berjalan'"
                                 :class="{'border-blue-500 text-blue-600 dark:text-blue-500 dark:border-blue-500': activeTabAnggota === 'berjalan', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300': activeTabAnggota !== 'berjalan'}"
                                 class="whitespace-nowrap py-2 px-4 border-b-2 font-semibold text-sm transition-colors duration-150 flex items-center">
@@ -163,6 +175,25 @@
 
                         <!-- Tab Content -->
                         <div>
+                            {{-- Panel Revisi: selalu ada, tampilkan empty state jika kosong --}}
+                            <div id="tab-anggota-revisi" x-show="activeTabAnggota === 'revisi'" style="display: none;" x-cloak class="transition-opacity duration-200">
+                                @if($revisiCount > 0)
+                                    <div class="mb-3 flex items-center gap-2 px-1">
+                                        <svg class="w-4 h-4 text-orange-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                                        <p class="text-sm text-orange-700 dark:text-orange-400 font-medium">Pengiriman berikut telah direvisi oleh Ketua Tim dan perlu dikirim ulang segera.</p>
+                                    </div>
+                                    <x-tables.dashboard-penugasan-anggota :penugasans="collect($revisiAsAnggota->values())" />
+                                @else
+                                    <div class="flex flex-col items-center justify-center py-10 gap-3">
+                                        <div class="w-14 h-14 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                                            <svg class="w-7 h-7 text-green-500 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        </div>
+                                        <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">Tidak Ada Revisi</p>
+                                        <p class="text-xs text-gray-400 dark:text-gray-500 text-center max-w-xs">Semua pengiriman Anda saat ini tidak sedang dalam status revisi dari Ketua Tim. Kerja bagus!</p>
+                                    </div>
+                                @endif
+                            </div>
+
                             <div id="tab-anggota-berjalan" @click="fetchTab($event, 'tab-anggota-berjalan')" x-show="activeTabAnggota === 'berjalan'" style="display: none;" class="transition-opacity duration-200">
                                 @if(isset($unfinishedBerjalanAsAnggota) && $unfinishedBerjalanAsAnggota->count() > 0)
                                     <x-tables.dashboard-penugasan-anggota :penugasans="$unfinishedBerjalanAsAnggota" />
@@ -180,7 +211,6 @@
                             </div>
                         </div>
                     </div>
-                    @endif
                 @endif
             @endauth
 
@@ -203,9 +233,9 @@
                     </div>
 
                     {{-- ===== DAFTAR PENUGASAN BELUM SELESAI SBG KETUA ===== --}}
-                    @if((isset($unfinishedBerjalanAsKetua) && $unfinishedBerjalanAsKetua->count() > 0) || (isset($unfinishedTerlewatAsKetua) && $unfinishedTerlewatAsKetua->count() > 0))
+                    @php $revisiDlCount = isset($revisiDlAsKetua) ? $revisiDlAsKetua->count() : 0; @endphp
                     <div class="mb-8 p-5 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700/50 rounded-2xl shadow-sm relative overflow-hidden ring-1 ring-amber-400 dark:ring-amber-600" x-data="{ 
-                        activeTabKetua: (new URLSearchParams(window.location.search).has('ketua_terlewat_page') ? 'terlewat' : 'berjalan'),
+                        activeTabKetua: (new URLSearchParams(window.location.search).has('ketua_terlewat_page') ? 'terlewat' : (new URLSearchParams(window.location.search).has('ketua_berjalan_page') ? 'berjalan' : 'revisi-dl')),
                         async fetchTab(e, containerId) {
                             let link = e.target.closest('nav[role=\'navigation\'] a');
                             if (link && link.href) {
@@ -236,6 +266,18 @@
 
                         <!-- Tabs -->
                         <div class="flex space-x-1 border-b border-gray-200 dark:border-gray-700 mb-4">
+                            {{-- Tab Revisi DL: selalu tampil untuk Ketua Tim --}}
+                            <button @click="activeTabKetua = 'revisi-dl'"
+                                :class="{'border-red-500 text-red-600 dark:text-red-400 dark:border-red-500': activeTabKetua === 'revisi-dl', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300': activeTabKetua !== 'revisi-dl'}"
+                                class="whitespace-nowrap py-2 px-4 border-b-2 font-semibold text-sm transition-colors duration-150 flex items-center">
+                                <svg class="w-3.5 h-3.5 mr-1.5 flex-shrink-0" :class="activeTabKetua === 'revisi-dl' ? 'text-red-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                Revisi Tanggal DL
+                                @if($revisiDlCount > 0)
+                                    <span class="ml-2 bg-red-100 text-red-700 py-0.5 px-2 rounded-full text-xs dark:bg-red-900 dark:text-red-200 font-bold animate-pulse">{{ $revisiDlCount }}</span>
+                                @else
+                                    <span class="ml-2 bg-gray-100 text-gray-400 py-0.5 px-2 rounded-full text-xs dark:bg-gray-800 dark:text-gray-500 font-medium">0</span>
+                                @endif
+                            </button>
                             <button @click="activeTabKetua = 'berjalan'"
                                 :class="{'border-blue-500 text-blue-600 dark:text-blue-500 dark:border-blue-500': activeTabKetua === 'berjalan', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300': activeTabKetua !== 'berjalan'}"
                                 class="whitespace-nowrap py-2 px-4 border-b-2 font-semibold text-sm transition-colors duration-150 flex items-center">
@@ -256,6 +298,25 @@
 
                         <!-- Tab Content -->
                         <div>
+                            {{-- Panel Revisi DL: selalu ada --}}
+                            <div id="tab-ketua-revisi-dl" x-show="activeTabKetua === 'revisi-dl'" style="display: none;" x-cloak class="transition-opacity duration-200">
+                                @if($revisiDlCount > 0)
+                                    <div class="mb-3 flex items-center gap-2 px-1">
+                                        <svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                                        <p class="text-sm text-red-700 dark:text-red-400 font-medium">Penugasan DL / Translok berikut ditolak oleh Pimpinan. Segera edit dan ajukan ulang.</p>
+                                    </div>
+                                    <x-tables.dashboard-penugasan-ketua :penugasans="collect($revisiDlAsKetua->values())" :showDlStatus="true" />
+                                @else
+                                    <div class="flex flex-col items-center justify-center py-10 gap-3">
+                                        <div class="w-14 h-14 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                                            <svg class="w-7 h-7 text-green-500 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        </div>
+                                        <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">Tidak Ada Revisi DL</p>
+                                        <p class="text-xs text-gray-400 dark:text-gray-500 text-center max-w-xs">Semua pengajuan Dinas Luar / Translok anggota tim Anda saat ini tidak ada yang ditolak oleh Pimpinan.</p>
+                                    </div>
+                                @endif
+                            </div>
+
                             <div id="tab-ketua-berjalan" @click="fetchTab($event, 'tab-ketua-berjalan')" x-show="activeTabKetua === 'berjalan'" style="display: none;" class="transition-opacity duration-200">
                                 @if(isset($unfinishedBerjalanAsKetua) && $unfinishedBerjalanAsKetua->count() > 0)
                                     <x-tables.dashboard-penugasan-ketua :penugasans="$unfinishedBerjalanAsKetua" />
@@ -273,7 +334,6 @@
                             </div>
                         </div>
                     </div>
-                    @endif
                 @endif
             @endauth
         @elseif (auth()->user()->isKetuaTim())

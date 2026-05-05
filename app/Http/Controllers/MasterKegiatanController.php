@@ -300,7 +300,7 @@ class MasterKegiatanController extends Controller
         ])->orderBy('nama_bidang')->get();
 
         // 🔹 Hitung jumlah "Menunggu", "Ditolak", dan "ACC Belum Masuk Kalender" untuk tiap bidang
-        $bidangs->each(function ($bidang) {
+        $bidangs->each(function ($bidang) use ($pegawai, $activeRole) {
             $bidang->menungguCount = $bidang->kegiatans->sum(function ($kegiatan) {
                 return $kegiatan->subKegiatans->sum(function ($sub) {
                     return $sub->penugasans->filter(function ($p) {
@@ -309,7 +309,12 @@ class MasterKegiatanController extends Controller
                 });
             });
 
-            $bidang->ditolakCount = $bidang->kegiatans->sum(function ($kegiatan) {
+            $bidang->ditolakCount = $bidang->kegiatans->sum(function ($kegiatan) use ($pegawai, $activeRole) {
+                // Jika Ketua Tim, hanya hitung yang dia tanggung jawab
+                if ($activeRole === 'Ketua Tim' && $kegiatan->id_penanggung_jawab !== $pegawai->id_pegawai) {
+                    return 0;
+                }
+
                 return $kegiatan->subKegiatans->sum(function ($sub) {
                     return $sub->penugasans->filter(function ($p) {
                         return $p->status_dl === 'Ditolak' || $p->status_translok === 'Ditolak';

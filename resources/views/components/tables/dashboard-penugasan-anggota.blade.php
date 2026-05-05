@@ -18,7 +18,7 @@
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150 cursor-pointer"
                         onclick="window.location.href='{{ route('sub.kegiatan.show', ['kegiatan' => $penugasan->subKegiatan->id_kegiatan, 'subKegiatan' => $penugasan->id_sub_kegiatan]) }}#penugasan-{{ $penugasan->id_penugasan }}'">
                         <td class="px-4 py-4 text-sm text-gray-600 font-medium text-center dark:text-gray-400">
-                            {{ $penugasans->firstItem() + $index }}
+                            {{ method_exists($penugasans, 'firstItem') ? $penugasans->firstItem() + $index : $index + 1 }}
                         </td>
                         <td class="px-4 py-4">
                             <span class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">
@@ -82,7 +82,7 @@
             </tbody>
         </table>
     </div>
-    @if ($penugasans->hasPages())
+    @if (method_exists($penugasans, 'hasPages') && $penugasans->hasPages())
     <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
         {{ $penugasans->links() }}
     </div>

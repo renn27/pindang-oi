@@ -5,20 +5,14 @@
 
     <div id="app" data-pegawais='@json($pegawais)'></div>
 
-    <x-ui.smart-modal
-        id="modal-verifikasi-translok"
-        class="max-w-md"
-        @open-smart-modal.window="
-            if ($event.detail.modalId !== 'modal-verifikasi-translok') return;
+    <x-ui.smart-modal id="modal-verifikasi-translok" class="max-w-md" @open-smart-modal.window="
+                if ($event.detail.modalId !== 'modal-verifikasi-translok') return;
 
-            itemKey = $event.detail.key ?? null;
+                itemKey = $event.detail.key ?? null;
 
-            Object.assign(formData, $event.detail.data ?? {});
-        ">
-        <form
-            :action="`/penugasan/${itemKey}/rencana-kerja-translok`"
-            method="POST"
-            class="grid grid-cols-1 gap-y-4">
+                Object.assign(formData, $event.detail.data ?? {});
+            ">
+        <form :action="`/penugasan/${itemKey}/rencana-kerja-translok`" method="POST" class="grid grid-cols-1 gap-y-4">
             @csrf
             @method('PUT')
 
@@ -56,36 +50,25 @@
 
                 <!-- FOOTER -->
                 <div class="border-t dark:border-gray-700 px-6 py-4 flex justify-end gap-2">
-                    <button
-                        type="button"
-                        @click="open = false"
+                    <button type="button" @click="open = false"
                         class="rounded-lg border dark:border-gray-600 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                         Batal
                     </button>
 
                     @if (Auth::user()->active_role === 'Pimpinan')
-                        <button
-                            type="submit"
-                            name="status_translok"
-                            value="Ditolak"
+                        <button type="submit" name="status_translok" value="Ditolak"
                             class="rounded-lg bg-red-600 hover:bg-red-700 px-4 py-2 text-sm text-white">
                             Tolak
                         </button>
 
-                        <button
-                            type="submit"
-                            name="status_translok"
-                            value="ACC"
+                        <button type="submit" name="status_translok" value="ACC"
                             class="rounded-lg bg-teal-600 hover:bg-teal-700 px-4 py-2 text-sm text-white">
                             Setujui
                         </button>
                     @endif
 
                     @if (Auth::user()->active_role === 'Ketua Tim')
-                        <button
-                            type="submit"
-                            name="status_translok"
-                            value="Menunggu"
+                        <button type="submit" name="status_translok" value="Menunggu"
                             class="rounded-lg bg-orange-600 hover:bg-orange-700 px-4 py-2 text-sm text-white">
                             Ajukan Kembali
                         </button>
@@ -96,20 +79,14 @@
         </form>
     </x-ui.smart-modal>
 
-    <x-ui.smart-modal
-        id="modal-verifikasi-dl"
-        class="max-w-md"
-        @open-smart-modal.window="
-            if ($event.detail.modalId !== 'modal-verifikasi-dl') return;
+    <x-ui.smart-modal id="modal-verifikasi-dl" class="max-w-md" @open-smart-modal.window="
+                if ($event.detail.modalId !== 'modal-verifikasi-dl') return;
 
-            itemKey = $event.detail.key ?? null;
+                itemKey = $event.detail.key ?? null;
 
-            Object.assign(formData, $event.detail.data ?? {});
-        ">
-        <form
-            :action="`/penugasan/${itemKey}/rencana-kerja-dl`"
-            method="POST"
-            class="grid grid-cols-1 gap-y-4">
+                Object.assign(formData, $event.detail.data ?? {});
+            ">
+        <form :action="`/penugasan/${itemKey}/rencana-kerja-dl`" method="POST" class="grid grid-cols-1 gap-y-4">
             @csrf
             @method('PUT')
 
@@ -147,36 +124,25 @@
 
                 <!-- FOOTER -->
                 <div class="border-t dark:border-gray-700 px-6 py-4 flex justify-end gap-2">
-                    <button
-                        type="button"
-                        @click="open = false"
+                    <button type="button" @click="open = false"
                         class="rounded-lg border dark:border-gray-600 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                         Batal
                     </button>
 
                     @if (Auth::user()->active_role === 'Pimpinan')
-                        <button
-                            type="submit"
-                            name="status_dl"
-                            value="Ditolak"
+                        <button type="submit" name="status_dl" value="Ditolak"
                             class="rounded-lg bg-red-600 hover:bg-red-700 px-4 py-2 text-sm text-white">
                             Tolak
                         </button>
 
-                        <button
-                            type="submit"
-                            name="status_dl"
-                            value="ACC"
+                        <button type="submit" name="status_dl" value="ACC"
                             class="rounded-lg bg-green-600 hover:bg-green-700 px-4 py-2 text-sm text-white">
                             Setujui
                         </button>
                     @endif
 
                     @if (Auth::user()->active_role === 'Ketua Tim')
-                        <button
-                            type="submit"
-                            name="status_dl"
-                            value="Menunggu"
+                        <button type="submit" name="status_dl" value="Menunggu"
                             class="rounded-lg bg-orange-600 hover:bg-orange-700 px-4 py-2 text-sm text-white">
                             Ajukan Kembali
                         </button>
@@ -192,7 +158,7 @@
         <x-common.component-card title="Daftar Rencana Kerja Perlu DL">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <div class="rounded-xl border dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Total Rencana Kerja</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Total Penugasan / Rencana Kerja</p>
                     <p class="mt-1 text-2xl font-semibold text-gray-800 dark:text-white">
                         {{ $allPenugasans->count() }}
                     </p>
@@ -223,34 +189,33 @@
             <div class="space-y-4">
                 @foreach ($bidangs as $index => $bidang)
                     <div x-data="{
-                        id: 'accordion-{{ $bidang->id_bidang }}',
-                        open: false,
+                                id: 'accordion-{{ $bidang->id_bidang }}',
+                                open: false,
 
-                        init() {
-                            const saved = JSON.parse(localStorage.getItem(this.id))
+                                init() {
+                                    const saved = JSON.parse(localStorage.getItem(this.id))
 
-                            if (saved) {
-                                const now = Date.now()
-                                const limit = 1 * 60 * 1000 // 1 menit
+                                    if (saved) {
+                                        const now = Date.now()
+                                        const limit = 1 * 60 * 1000 // 1 menit
 
-                                if (now - saved.time < limit) {
-                                    this.open = saved.open
-                                } else {
-                                    localStorage.removeItem(this.id)
+                                        if (now - saved.time < limit) {
+                                            this.open = saved.open
+                                        } else {
+                                            localStorage.removeItem(this.id)
+                                        }
+                                    }
+                                },
+
+                                toggle() {
+                                    this.open = !this.open
+
+                                    localStorage.setItem(this.id, JSON.stringify({
+                                        open: this.open,
+                                        time: Date.now()
+                                    }))
                                 }
-                            }
-                        },
-
-                        toggle() {
-                            this.open = !this.open
-
-                            localStorage.setItem(this.id, JSON.stringify({
-                                open: this.open,
-                                time: Date.now()
-                            }))
-                        }
-                    }"
-                        x-init="init()"
+                            }" x-init="init()"
                         class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                         <!-- Header Fungsi -->
                         <button @click="toggle()"
@@ -262,12 +227,14 @@
                                         {{-- Untuk Pimpinan --}}
                                         @if(Auth::user()->active_role === 'Pimpinan')
                                             @if($bidang->menungguCount > 0)
-                                                <span class="animate-pulse inline-flex items-center justify-center px-2 py-0.5 text-xs font-semibold text-yellow-800 dark:text-yellow-300 bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
+                                                <span
+                                                    class="animate-pulse inline-flex items-center justify-center px-2 py-0.5 text-xs font-semibold text-yellow-800 dark:text-yellow-300 bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
                                                     {{ $bidang->menungguCount }} menunggu verifikasi
                                                 </span>
                                             @endif
                                             @if($bidang->accBelumMasukKalenderCount > 0)
-                                                <span class="animate-pulse inline-flex items-center justify-center px-2 py-0.5 text-xs font-semibold text-orange-800 dark:text-orange-300 bg-orange-100 dark:bg-orange-900/30 rounded-full">
+                                                <span
+                                                    class="animate-pulse inline-flex items-center justify-center px-2 py-0.5 text-xs font-semibold text-orange-800 dark:text-orange-300 bg-orange-100 dark:bg-orange-900/30 rounded-full">
                                                     {{ $bidang->accBelumMasukKalenderCount }} menunggu masuk kalender DL
                                                 </span>
                                             @endif
@@ -276,7 +243,8 @@
 
                                         {{-- Untuk Ketua Tim --}}
                                         @if(Auth::user()->active_role === 'Ketua Tim' && $bidang->ditolakCount > 0)
-                                            <span class="animate-pulse inline-flex items-center justify-center px-2 py-0.5 text-xs font-semibold text-red-800 dark:text-red-300 bg-red-100 dark:bg-red-900/30 rounded-full">
+                                            <span
+                                                class="animate-pulse inline-flex items-center justify-center px-2 py-0.5 text-xs font-semibold text-red-800 dark:text-red-300 bg-red-100 dark:bg-red-900/30 rounded-full">
                                                 {{ $bidang->ditolakCount }} ditolak
                                             </span>
                                         @endif
@@ -286,8 +254,9 @@
                                     </p>
                                 </div>
                             </div>
-                            <svg :class="{ 'rotate-180': open }" class="h-5 w-5 text-gray-500 dark:text-gray-400 transition-transform"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg :class="{ 'rotate-180': open }"
+                                class="h-5 w-5 text-gray-500 dark:text-gray-400 transition-transform" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
@@ -295,282 +264,193 @@
                         <!-- Accordion Content -->
                         <div x-show="open" x-collapse class="border-t border-gray-100 dark:border-gray-700">
                             @if ($bidang->kegiatans->count() > 0)
-                                <div class="overflow-x-auto">
-                                    <table class="min-w-full border border-gray-200 dark:border-gray-700 table-fixed">
+                                <div class="overflow-x-auto custom-scrollbar">
+                                    <table class="min-w-[1250px] w-full border-collapse border border-gray-200 dark:border-gray-700 table-fixed bg-white dark:bg-gray-800">
                                         <colgroup>
-                                            <col class="w-[15%]"> <!-- Kegiatan -->
-                                            <col class="w-[20%]"> <!-- Sub Kegiatan -->
-                                            <col class="w-[15%]"> <!-- Nama Pegawai -->
-                                            <col class="w-[10%]"> <!-- Jenis Kegiatan -->
-                                            <col class="w-[10%]"> <!-- Target dan Satuan -->
-                                            <col class="w-[15%]"> <!-- Tanggal -->
-                                            <col class="w-[15%]"> <!-- Status DL -->
+                                            <col class="w-[200px]"> <!-- Kegiatan -->
+                                            <col class="w-[220px]"> <!-- Sub Kegiatan -->
+                                            <col class="w-[180px]"> <!-- Nama Anggota -->
+                                            <col class="w-[120px]"> <!-- Jenis -->
+                                            <col class="w-[90px]">  <!-- Target -->
+                                            <col class="w-[190px]"> <!-- Waktu -->
+                                            <col class="w-[250px]"> <!-- Status/Aksi -->
                                         </colgroup>
-                                        <thead class="bg-gray-50 dark:bg-gray-900">
-                                            <tr>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border border-gray-200 dark:border-gray-700">
-                                                    Kegiatan
-                                                </th>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border border-gray-200 dark:border-gray-700">
-                                                    Sub Kegiatan
-                                                </th>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border border-gray-200 dark:border-gray-700">
-                                                    Nama Anggota
-                                                </th>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border border-gray-200 dark:border-gray-700">
-                                                    Jenis Kegiatan
-                                                </th>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border border-gray-200 dark:border-gray-700">
-                                                    Target
-                                                </th>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border border-gray-200 dark:border-gray-700">
-                                                    Waktu Pelaksanaan
-                                                </th>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border border-gray-200 dark:border-gray-700">
-                                                    Status DL / Translok
-                                                </th>
+                                        <thead>
+                                            <tr class="bg-gray-50/80 dark:bg-gray-900/50">
+                                                <th class="px-4 py-3 text-left text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider border border-gray-200 dark:border-gray-700">Kegiatan</th>
+                                                <th class="px-4 py-3 text-left text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider border border-gray-200 dark:border-gray-700">Sub Kegiatan</th>
+                                                <th class="px-4 py-3 text-left text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider border border-gray-200 dark:border-gray-700">Nama Anggota</th>
+                                                <th class="px-4 py-3 text-left text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider border border-gray-200 dark:border-gray-700">Jenis</th>
+                                                <th class="px-4 py-3 text-left text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider border border-gray-200 dark:border-gray-700 text-center">Target</th>
+                                                <th class="px-4 py-3 text-left text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider border border-gray-200 dark:border-gray-700">Waktu Pelaksanaan</th>
+                                                <th class="px-4 py-3 text-left text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider border border-gray-200 dark:border-gray-700">Status & Aksi</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            @php
-                                                $rowCounter = 0;
-                                            @endphp
-
+                                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                             @foreach ($bidang->kegiatans as $kegiatan)
                                                 @php
                                                     $kegiatanRowCount = 0;
-                                                    // Hitung total baris untuk kegiatan ini
-                                                    foreach ($kegiatan->subKegiatans as $subKegiatan) {
-                                                        $kegiatanRowCount += $subKegiatan->penugasans->count();
+                                                    foreach ($kegiatan->subKegiatans as $subKeg) {
+                                                        $kegiatanRowCount += $subKeg->penugasans->count();
                                                     }
                                                 @endphp
 
                                                 @foreach ($kegiatan->subKegiatans as $subIndex => $subKegiatan)
-                                                    @php
-                                                        $subRowCount = $subKegiatan->penugasans->count();
-                                                    @endphp
+                                                    @php $subRowCount = $subKegiatan->penugasans->count(); @endphp
 
                                                     @foreach ($subKegiatan->penugasans as $penugasanIndex => $penugasan)
-                                                        <tr
-                                                            class="{{ !($loop->parent->last && $loop->last) ? 'border-b border-gray-200 dark:border-gray-700' : '' }}">
-                                                            <!-- Kolom Kegiatan (rowspan hanya untuk baris pertama tiap kegiatan) -->
+                                                        <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors duration-150">
+                                                            {{-- KOLOM KEGIATAN --}}
                                                             @if ($subIndex === 0 && $penugasanIndex === 0)
-                                                                <td class="px-4 py-3 align-top border border-gray-200 dark:border-gray-700"
-                                                                    rowspan="{{ $kegiatanRowCount }}">
-                                                                    <div class="flex flex-col">
-                                                                        <span class="text-sm font-medium text-gray-800 dark:text-gray-300">
+                                                                <td class="px-4 py-3 align-top border border-gray-200 dark:border-gray-700" rowspan="{{ $kegiatanRowCount }}">
+                                                                    <div class="space-y-1">
+                                                                        <div class="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight">
                                                                             {{ $kegiatan->nama_rk_kegiatan }}
-                                                                        </span>
-                                                                        <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                                            Ketua:
+                                                                        </div>
+                                                                        <div class="flex items-center gap-1.5 text-[10px] text-gray-500 dark:text-gray-400 font-medium">
+                                                                            <span class="p-0.5 bg-gray-100 dark:bg-gray-700 rounded text-gray-400">
+                                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                                                            </span>
                                                                             {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
-                                                                        </span>
+                                                                        </div>
                                                                     </div>
                                                                 </td>
                                                             @endif
 
-                                                            <!-- Kolom Sub Kegiatan (rowspan hanya untuk baris pertama tiap sub kegiatan) -->
+                                                            {{-- KOLOM SUB KEGIATAN --}}
                                                             @if ($penugasanIndex === 0)
-                                                                <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-300 align-top border border-gray-200 dark:border-gray-700"
-                                                                    rowspan="{{ $subRowCount }}">
+                                                                <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 align-top border border-gray-200 dark:border-gray-700" rowspan="{{ $subRowCount }}">
                                                                     {{ $subKegiatan->nama_sub_kegiatan }}
                                                                 </td>
                                                             @endif
 
-                                                            <!-- Kolom Nama Pegawai -->
-                                                            <td
-                                                                class="px-4 py-3 text-sm text-gray-800 dark:text-gray-300 align-top border border-gray-200 dark:border-gray-700">
+                                                            {{-- KOLOM ANGGOTA --}}
+                                                            <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 align-top border border-gray-200 dark:border-gray-700">
                                                                 {{ $penugasan->anggota->nama_pegawai ?? '-' }}
                                                             </td>
 
-                                                            <!-- Kolom Jenis Kegiatan dengan Badge -->
-                                                            <td
-                                                                class="px-4 py-3 text-sm text-gray-800 dark:text-gray-300 align-top border border-gray-200 dark:border-gray-700">
-                                                                {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? '-' }}
+                                                            {{-- KOLOM JENIS --}}
+                                                            <td class="px-4 py-3 align-top border border-gray-200 dark:border-gray-700">
+                                                                <span class="inline-flex px-2 py-0.5 text-[10px] font-semibold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded uppercase tracking-tighter">
+                                                                    {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? '-' }}
+                                                                </span>
                                                             </td>
 
-                                                            <!-- Kolom Target -->
-                                                            <td
-                                                                class="px-4 py-3 text-sm text-gray-800 dark:text-gray-300 align-top border border-gray-200 dark:border-gray-700">
-                                                                {{ $penugasan->target ?? '-' }} <span class="text-orange-800 dark:text-orange-400">({{ $penugasan->satuan_target ?? '-' }})</span>
+                                                            {{-- KOLOM TARGET --}}
+                                                            <td class="px-4 py-3 text-center align-top border border-gray-200 dark:border-gray-700">
+                                                                <div class="text-sm font-bold text-gray-800 dark:text-gray-200">{{ $penugasan->target }}</div>
+                                                                <div class="text-[9px] text-gray-400 uppercase font-medium">{{ $penugasan->satuan_target }}</div>
                                                             </td>
 
-                                                            <!-- Kolom Satuan -->
-                                                            <td
-                                                                class="px-4 py-3 text-sm text-gray-800 dark:text-gray-300 align-top border border-gray-200 dark:border-gray-700">
-                                                                {{ $penugasan->tanggal_mulai?->translatedFormat('d M Y') ?? '-' }} - {{ $penugasan->tanggal_selesai?->translatedFormat('d M Y') ?? '-' }}
+                                                            {{-- KOLOM WAKTU --}}
+                                                            <td class="px-4 py-3 text-xs text-gray-600 dark:text-gray-400 align-top border border-gray-200 dark:border-gray-700 leading-relaxed font-medium">
+                                                                <div class="flex items-start gap-1.5">
+                                                                    <svg class="w-3.5 h-3.5 text-gray-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                                                    {{ $penugasan->tanggal_mulai->format('d M Y') }} - {{ $penugasan->tanggal_selesai->format('d M Y') }}
+                                                                </div>
                                                             </td>
 
-                                                            <td class="px-4 py-3 text-sm align-top border border-gray-200 dark:border-gray-700 space-y-4">
-                                                                {{-- DARI SINI ADALAH BLOK UNTUK DL --}}
-                                                                @if($penugasan->butuh_dl)
-                                                                    <div class="flex items-center gap-2">
-                                                                        <div class="justify-self-start font-medium text-[10px] text-gray-500 w-12 border-t border-gray-100 dark:border-gray-700 pt-1 mt-1">DL:</div>
-                                                                        <div class="justify-self-start">
-                                                                            {{-- BADGE STATUS DL --}}
-                                                                            @if ($penugasan->status_dl === 'Menunggu')
-                                                                                <span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/30 px-2.5 py-1 text-xs font-medium text-yellow-800 dark:text-yellow-400">Menunggu</span>
-                                                                            @elseif ($penugasan->status_dl === 'ACC')
-                                                                                <span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-2.5 py-1 text-xs font-medium text-blue-800 dark:text-blue-400">Diterima</span>
-                                                                            @elseif ($penugasan->status_dl === 'Ditolak')
-                                                                                <div class="flex items-center gap-2">
-                                                                                    <span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900/30 px-2.5 py-1 text-xs font-medium text-red-800 dark:text-red-400">Ditolak</span>
-                                                                                    @if (Auth::user()->active_role === 'Ketua Tim')
-                                                                                        <button type="button" title="Ajukan Kembali"
-                                                                                            @click="$dispatch('open-smart-modal', {
-                                                                                                modalId: 'modal-verifikasi-dl',
-                                                                                                key: @js($penugasan->id_penugasan),
-                                                                                                data: {
-                                                                                                    nama_pegawai: @js($penugasan->anggota->nama_pegawai),
-                                                                                                    jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
-                                                                                                    tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')),
-                                                                                                    tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')),
-                                                                                                }
-                                                                                            })"
-                                                                                            class="flex items-center px-2 py-1 text-[8px] font-medium bg-gray-200/80 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-200 dark:hover:bg-blue-800/30 hover:text-blue-700 dark:hover:text-blue-400 whitespace-nowrap border-b border-gray-200 dark:border-gray-600">
-                                                                                            <span class="mr-1">↻</span> Ajukan Kembali
-                                                                                        </button>
+                                                            {{-- KOLOM STATUS & AKSI --}}
+                                                            <td class="px-4 py-3 align-top border border-gray-200 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-900/20">
+                                                                <div class="space-y-3">
+                                                                    {{-- BLOK DL --}}
+                                                                    @if($penugasan->butuh_dl)
+                                                                        <div class="grid grid-cols-[45px_1fr] items-start gap-2">
+                                                                            <span class="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase mt-1 tracking-widest border-r border-gray-200 dark:border-gray-700 pr-1">DL</span>
+                                                                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                                {{-- BADGE STATUS DL --}}
+                                                                                @if ($penugasan->status_dl === 'Menunggu')
+                                                                                    <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-full border border-yellow-200 dark:border-yellow-800">MENUNGGU</span>
+                                                                                @elseif ($penugasan->status_dl === 'ACC')
+                                                                                    @if ($penugasan->sudahMasukKalenderDL())
+                                                                                        <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 rounded-full border border-teal-200 dark:border-teal-800 uppercase tracking-tighter">Diterima</span>
+                                                                                    @else
+                                                                                        <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full border border-orange-200 dark:border-orange-800">Diterima (Belum masuk kalender)</span>
                                                                                     @endif
-                                                                                </div>
-                                                                            @endif
-                                                                        </div>
-
-                                                                        @can('acceptDL', $penugasan)
-                                                                            @if ($penugasan->status_dl === 'ACC')
-                                                                                @if ($penugasan->sudahMasukKalenderDL())
-                                                                                    <span class="items-center px-2 py-1 text-[8px] cursor-not-allowed font-medium bg-blue-100/50 dark:bg-blue-900/20 text-blue-600/50 dark:text-blue-500/50 flex whitespace-nowrap border-b border-blue-200 dark:border-blue-800">
-                                                                                        ✓ Sudah masuk kalender
-                                                                                    </span>
-                                                                                    <form id="delete-kalender-dl-{{ $penugasan->id_penugasan }}" action="{{ route('kalenderDL.delete', $penugasan->id_penugasan) }}" method="POST" class="inline">
-                                                                                        @csrf
-                                                                                        @method('DELETE')
-                                                                                        <button type="button" onclick="SwalHelper.confirmDelete('delete-kalender-dl-{{ $penugasan->id_penugasan }}', 'Data Kalender DL {{ addslashes($penugasan->anggota->nama_pegawai ?? '') }}')" class="items-center px-2 py-1 text-[8px] font-medium bg-red-100/80 dark:bg-red-900/40 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800/60 flex whitespace-nowrap border-b border-red-200 dark:border-red-800">
-                                                                                            ✕ Cabut
-                                                                                        </button>
-                                                                                    </form>
-                                                                                @else
-                                                                                    <form action="{{ route('kalenderDL.store') }}" method="POST" class="inline">
-                                                                                        @csrf
-                                                                                        <input type="hidden" name="id_pegawai" value="{{ $penugasan->id_anggota }}">
-                                                                                        <input type="hidden" name="id_penugasan" value="{{ $penugasan->id_penugasan }}">
-                                                                                        <input type="hidden" name="tanggal_mulai" value="{{ $penugasan->tanggal_mulai }}">
-                                                                                        <input type="hidden" name="tanggal_selesai" value="{{ $penugasan->tanggal_selesai }}">
-                                                                                        <button type="submit" class="items-center px-2 py-1 text-[8px] font-medium bg-gray-100/80 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-200 dark:hover:bg-blue-800/30 flex whitespace-nowrap border-b border-gray-200 dark:border-gray-600">
-                                                                                            Masukkan Kalender DL
-                                                                                        </button>
-                                                                                    </form>
+                                                                                @elseif ($penugasan->status_dl === 'Ditolak')
+                                                                                    <div class="flex flex-wrap items-center gap-1.5 w-full">
+                                                                                        <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full border border-red-200 dark:border-red-800">DITOLAK</span>
+                                                                                        @if (Auth::user()->active_role === 'Ketua Tim' && Auth::user()->id_pegawai === $penugasan->subKegiatan->kegiatan->id_penanggung_jawab)
+                                                                                            <button type="button" @click="$dispatch('open-smart-modal', { modalId: 'modal-verifikasi-dl', key: @js($penugasan->id_penugasan), data: { nama_pegawai: @js($penugasan->anggota->nama_pegawai), jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan), tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')), tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')), } })" class="px-2 py-0.5 text-[9px] font-bold bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors shadow-sm">↻ Ajukan Kembali</button>
+                                                                                        @endif
+                                                                                        @if (Auth::user()->active_role === 'Pimpinan')
+                                                                                            <span class="px-2 py-0.5 text-[9px] font-bold bg-red-50 dark:bg-red-900/10 text-red-400 border border-red-100 dark:border-red-900/30 rounded cursor-not-allowed">Tunggu Pengajuan</span>
+                                                                                        @endif
+                                                                                    </div>
                                                                                 @endif
-                                                                            @elseif ($penugasan->status_dl === 'Ditolak')
-                                                                                <span class="items-center px-2 py-1 text-[8px] font-medium cursor-not-allowed bg-red-100/50 dark:bg-red-900/20 text-red-600/50 dark:text-red-500/50 flex whitespace-nowrap border-b border-red-200 dark:border-red-800">
-                                                                                    Tunggu Perubahan
-                                                                                </span>
-                                                                            @else
-                                                                                <button type="button" @click="$dispatch('open-smart-modal', {
-                                                                                        modalId: 'modal-verifikasi-dl',
-                                                                                        key: @js($penugasan->id_penugasan),
-                                                                                        data: {
-                                                                                            nama_pegawai: @js($penugasan->anggota->nama_pegawai),
-                                                                                            jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
-                                                                                            tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')),
-                                                                                            tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')),
-                                                                                        }
-                                                                                    })"
-                                                                                    class="items-center px-2 py-1 text-[8px] font-medium bg-gray-100/80 dark:bg-gray-700 text-gray-700 dark:text-gray-300 flex whitespace-nowrap border-b border-gray-200 dark:border-gray-600 hover:bg-orange-200 dark:hover:bg-orange-800/30">
-                                                                                    ✓ Verifikasi
-                                                                                </button>
-                                                                            @endif
-                                                                        @endcan
-                                                                    </div>
-                                                                @endif
 
-                                                                {{-- DARI SINI ADALAH BLOK UNTUK TRANSLOK --}}
-                                                                @if($penugasan->butuh_translok)
-                                                                    <div class="flex items-center gap-2">
-                                                                        <div class="justify-self-start font-medium text-[10px] text-gray-500 w-12 border-t border-gray-100 dark:border-gray-700 pt-1 mt-1">Translok:</div>
-                                                                        <div class="justify-self-start">
-                                                                            {{-- BADGE STATUS TRANSLOK --}}
-                                                                            @if ($penugasan->status_translok === 'Menunggu')
-                                                                                <span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/30 px-2.5 py-1 text-xs font-medium text-yellow-800 dark:text-yellow-400">Menunggu</span>
-                                                                            @elseif ($penugasan->status_translok === 'ACC')
-                                                                                <span class="inline-flex items-center rounded-full bg-teal-100 dark:bg-teal-900/30 px-2.5 py-1 text-xs font-medium text-teal-800 dark:text-teal-400">Diterima</span>
-                                                                            @elseif ($penugasan->status_translok === 'Ditolak')
-                                                                                <div class="flex items-center gap-2">
-                                                                                    <span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900/30 px-2.5 py-1 text-xs font-medium text-red-800 dark:text-red-400">Ditolak</span>
-                                                                                    @if (Auth::user()->active_role === 'Ketua Tim')
-                                                                                        <button type="button" title="Ajukan Kembali"
-                                                                                            @click="$dispatch('open-smart-modal', {
-                                                                                                modalId: 'modal-verifikasi-translok',
-                                                                                                key: @js($penugasan->id_penugasan),
-                                                                                                data: {
-                                                                                                    nama_pegawai: @js($penugasan->anggota->nama_pegawai),
-                                                                                                    jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
-                                                                                                    tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')),
-                                                                                                    tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')),
-                                                                                                }
-                                                                                            })"
-                                                                                            class="flex items-center px-2 py-1 text-[8px] font-medium bg-gray-200/80 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-teal-200 dark:hover:bg-teal-800/30 hover:text-teal-700 dark:hover:text-teal-400 whitespace-nowrap border-b border-gray-200 dark:border-gray-600">
-                                                                                            <span class="mr-1">↻</span> Ajukan Kembali
-                                                                                        </button>
+                                                                                @can('acceptDL', $penugasan)
+                                                                                    @if ($penugasan->status_dl === 'ACC')
+                                                                                        @if ($penugasan->sudahMasukKalenderDL())
+                                                                                            <span class="px-2 py-0.5 text-[9px] font-bold text-teal-600 bg-teal-50 dark:bg-teal-900/20 rounded border border-teal-200 dark:border-teal-800 uppercase tracking-tighter">KALENDER OK</span>
+                                                                                            @if (Auth::user()->active_role === 'Pimpinan')
+                                                                                                <form id="del-dl-{{ $penugasan->id_penugasan }}" action="{{ route('kalenderDL.delete', $penugasan->id_penugasan) }}" method="POST" class="inline">@csrf @method('DELETE')
+                                                                                                    <button type="button" onclick="SwalHelper.confirmDelete('del-dl-{{ $penugasan->id_penugasan }}', 'Kalender DL')" class="p-0.5 text-red-500 hover:bg-red-50 rounded" title="Cabut"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
+                                                                                                </form>
+                                                                                            @endif
+                                                                                        @elseif (Auth::user()->active_role === 'Pimpinan')
+                                                                                            <form action="{{ route('kalenderDL.store') }}" method="POST" class="inline">@csrf
+                                                                                                <input type="hidden" name="id_pegawai" value="{{ $penugasan->id_anggota }}"><input type="hidden" name="id_penugasan" value="{{ $penugasan->id_penugasan }}"><input type="hidden" name="tanggal_mulai" value="{{ $penugasan->tanggal_mulai }}"><input type="hidden" name="tanggal_selesai" value="{{ $penugasan->tanggal_selesai }}">
+                                                                                                <button type="submit" class="px-2 py-0.5 text-[9px] font-bold bg-teal-600 text-white rounded hover:bg-teal-700 shadow-sm">+ Kalender DL</button>
+                                                                                            </form>
+                                                                                        @endif
+                                                                                    @elseif (Auth::user()->active_role === 'Pimpinan' && $penugasan->status_dl === 'Menunggu')
+                                                                                        <button type="button" @click="$dispatch('open-smart-modal', { modalId: 'modal-verifikasi-dl', key: @js($penugasan->id_penugasan), data: { nama_pegawai: @js($penugasan->anggota->nama_pegawai), jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan), tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')), tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')), } })" class="px-2 py-0.5 text-[9px] font-bold bg-orange-500 text-white rounded hover:bg-orange-600 shadow-sm">✓ Verifikasi</button>
                                                                                     @endif
-                                                                                </div>
-                                                                            @endif
+                                                                                @endcan
+                                                                            </div>
                                                                         </div>
+                                                                    @endif
 
-                                                                        @can('acceptTranslok', $penugasan)
-                                                                            @if ($penugasan->status_translok === 'ACC')
-                                                                                @if ($penugasan->sudahMasukKalenderDL())
-                                                                                    <span class="items-center px-2 py-1 text-[8px] cursor-not-allowed font-medium bg-teal-100/50 dark:bg-teal-900/20 text-teal-600/50 dark:text-teal-500/50 flex whitespace-nowrap border-b border-teal-200 dark:border-teal-800">
-                                                                                        ✓ Sudah masuk kalender
-                                                                                    </span>
-                                                                                    <form id="delete-kalender-translok-{{ $penugasan->id_penugasan }}" action="{{ route('kalenderDL.delete', $penugasan->id_penugasan) }}" method="POST" class="inline">
-                                                                                        @csrf
-                                                                                        @method('DELETE')
-                                                                                        <button type="button" onclick="SwalHelper.confirmDelete('delete-kalender-translok-{{ $penugasan->id_penugasan }}', 'Data Kalender DL {{ addslashes($penugasan->anggota->nama_pegawai ?? '') }}')" class="items-center px-2 py-1 text-[8px] font-medium bg-red-100/80 dark:bg-red-900/40 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800/60 flex whitespace-nowrap border-b border-red-200 dark:border-red-800">
-                                                                                            ✕ Cabut
-                                                                                        </button>
-                                                                                    </form>
-                                                                                @else
-                                                                                    <form action="{{ route('kalenderDL.store') }}" method="POST" class="inline">
-                                                                                        @csrf
-                                                                                        <input type="hidden" name="id_pegawai" value="{{ $penugasan->id_anggota }}">
-                                                                                        <input type="hidden" name="id_penugasan" value="{{ $penugasan->id_penugasan }}">
-                                                                                        <input type="hidden" name="tanggal_mulai" value="{{ $penugasan->tanggal_mulai }}">
-                                                                                        <input type="hidden" name="tanggal_selesai" value="{{ $penugasan->tanggal_selesai }}">
-                                                                                        <!-- NOTE: Kita buat tombol generic "Masukkan Kalender" -->
-                                                                                        <button type="submit" class="items-center px-2 py-1 text-[8px] font-medium bg-gray-100/80 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-teal-200 dark:hover:bg-teal-800/30 flex whitespace-nowrap border-b border-gray-200 dark:border-gray-600">
-                                                                                            Masukkan Kalender Translok
-                                                                                        </button>
-                                                                                    </form>
+                                                                    {{-- BLOK TRANSLOK --}}
+                                                                    @if($penugasan->butuh_translok)
+                                                                        <div class="grid grid-cols-[45px_1fr] items-start gap-2 pt-2 border-t border-gray-100 dark:border-gray-700/50">
+                                                                            <span class="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase mt-1 tracking-widest border-r border-gray-200 dark:border-gray-700 pr-1">TRL</span>
+                                                                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                                {{-- BADGE STATUS TRANSLOK --}}
+                                                                                @if ($penugasan->status_translok === 'Menunggu')
+                                                                                    <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-full border border-yellow-200 dark:border-yellow-800">MENUNGGU</span>
+                                                                                @elseif ($penugasan->status_translok === 'ACC')
+                                                                                    @if ($penugasan->sudahMasukKalenderDL())
+                                                                                        <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 rounded-full border border-teal-200 dark:border-teal-800 uppercase tracking-tighter">Diterima</span>
+                                                                                    @else
+                                                                                        <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full border border-orange-200 dark:border-orange-800">Diterima (Belum masuk kalender)</span>
+                                                                                    @endif
+                                                                                @elseif ($penugasan->status_translok === 'Ditolak')
+                                                                                    <div class="flex flex-wrap items-center gap-1.5 w-full">
+                                                                                        <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full border border-red-200 dark:border-red-800">DITOLAK</span>
+                                                                                        @if (Auth::user()->active_role === 'Ketua Tim' && Auth::user()->id_pegawai === $penugasan->subKegiatan->kegiatan->id_penanggung_jawab)
+                                                                                            <button type="button" @click="$dispatch('open-smart-modal', { modalId: 'modal-verifikasi-translok', key: @js($penugasan->id_penugasan), data: { nama_pegawai: @js($penugasan->anggota->nama_pegawai), jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan), tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')), tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')), } })" class="px-2 py-0.5 text-[9px] font-bold bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors shadow-sm">↻ Ajukan Kembali</button>
+                                                                                        @endif
+                                                                                        @if (Auth::user()->active_role === 'Pimpinan')
+                                                                                            <span class="px-2 py-0.5 text-[9px] font-bold bg-red-50 dark:bg-red-900/10 text-red-400 border border-red-100 dark:border-red-900/30 rounded cursor-not-allowed">Tunggu Pengajuan</span>
+                                                                                        @endif
+                                                                                    </div>
                                                                                 @endif
-                                                                            @elseif ($penugasan->status_translok === 'Ditolak')
-                                                                                <span class="items-center px-2 py-1 text-[8px] font-medium cursor-not-allowed bg-red-100/50 dark:bg-red-900/20 text-red-600/50 dark:text-red-500/50 flex whitespace-nowrap border-b border-red-200 dark:border-red-800">
-                                                                                    Tunggu Perubahan
-                                                                                </span>
-                                                                            @else
-                                                                                <button type="button" @click="$dispatch('open-smart-modal', {
-                                                                                        modalId: 'modal-verifikasi-translok',
-                                                                                        key: @js($penugasan->id_penugasan),
-                                                                                        data: {
-                                                                                            nama_pegawai: @js($penugasan->anggota->nama_pegawai),
-                                                                                            jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
-                                                                                            tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')),
-                                                                                            tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')),
-                                                                                        }
-                                                                                    })"
-                                                                                    class="items-center px-2 py-1 text-[8px] font-medium bg-gray-100/80 dark:bg-gray-700 text-gray-700 dark:text-gray-300 flex whitespace-nowrap border-b border-gray-200 dark:border-gray-600 hover:bg-orange-200 dark:hover:bg-orange-800/30">
-                                                                                    ✓ Verifikasi
-                                                                                </button>
-                                                                            @endif
-                                                                        @endcan
-                                                                    </div>
-                                                                @endif
+
+                                                                                @can('acceptTranslok', $penugasan)
+                                                                                    @if ($penugasan->status_translok === 'ACC')
+                                                                                        @if ($penugasan->sudahMasukKalenderDL())
+                                                                                            <span class="px-2 py-0.5 text-[9px] font-bold text-teal-600 bg-teal-50 dark:bg-teal-900/20 rounded border border-teal-200 dark:border-teal-800 tracking-tighter uppercase">KALENDER OK</span>
+                                                                                            @if (Auth::user()->active_role === 'Pimpinan')
+                                                                                                <form id="del-trl-{{ $penugasan->id_penugasan }}" action="{{ route('kalenderDL.delete', $penugasan->id_penugasan) }}" method="POST" class="inline">@csrf @method('DELETE')
+                                                                                                    <button type="button" onclick="SwalHelper.confirmDelete('del-trl-{{ $penugasan->id_penugasan }}', 'Kalender Translok')" class="p-0.5 text-red-500 hover:bg-red-50 rounded" title="Cabut"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
+                                                                                                </form>
+                                                                                            @endif
+                                                                                        @elseif (Auth::user()->active_role === 'Pimpinan')
+                                                                                            <form action="{{ route('kalenderDL.store') }}" method="POST" class="inline">@csrf
+                                                                                                <input type="hidden" name="id_pegawai" value="{{ $penugasan->id_anggota }}"><input type="hidden" name="id_penugasan" value="{{ $penugasan->id_penugasan }}"><input type="hidden" name="tanggal_mulai" value="{{ $penugasan->tanggal_mulai }}"><input type="hidden" name="tanggal_selesai" value="{{ $penugasan->tanggal_selesai }}">
+                                                                                                <button type="submit" class="px-2 py-0.5 text-[9px] font-bold bg-teal-600 text-white rounded hover:bg-teal-700 shadow-sm">+ Kalender Trl</button>
+                                                                                            </form>
+                                                                                        @endif
+                                                                                    @elseif (Auth::user()->active_role === 'Pimpinan' && $penugasan->status_translok === 'Menunggu')
+                                                                                        <button type="button" @click="$dispatch('open-smart-modal', { modalId: 'modal-verifikasi-translok', key: @js($penugasan->id_penugasan), data: { nama_pegawai: @js($penugasan->anggota->nama_pegawai), jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan), tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')), tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')), } })" class="px-2 py-0.5 text-[9px] font-bold bg-orange-500 text-white rounded hover:bg-orange-600 shadow-sm">✓ Verifikasi</button>
+                                                                                    @endif
+                                                                                @endcan
+                                                                            </div>
+                                                                        </div>
+                                                                    @endif
+                                                                </div>
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -579,7 +459,7 @@
 
                                             @if ($bidang->kegiatans->count() === 0)
                                                 <tr>
-                                                    <td colspan="6"
+                                                    <td colspan="7"
                                                         class="px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
                                                         Belum ada kegiatan untuk bidang ini
                                                     </td>
@@ -590,7 +470,8 @@
                                 </div>
                             @else
                                 <div class="p-4 text-center border border-gray-200 dark:border-gray-700 border-t-0">
-                                    <p class="text-sm text-gray-500 dark:text-gray-400 italic">Belum ada kegiatan untuk fungsi ini</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 italic">Belum ada kegiatan untuk fungsi ini
+                                    </p>
                                 </div>
                             @endif
                         </div>
@@ -598,9 +479,12 @@
                 @endforeach
 
                 @if ($bidangs->count() === 0)
-                    <div class="text-center py-8 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
-                        <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 mb-3">
-                            <svg class="h-6 w-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div
+                        class="text-center py-8 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                        <div
+                            class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 mb-3">
+                            <svg class="h-6 w-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                             </svg>
@@ -613,4 +497,3 @@
     </div>
 
 @endsection
-
