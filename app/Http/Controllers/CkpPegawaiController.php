@@ -395,7 +395,10 @@ class CkpPegawaiController extends Controller
         $namaPegawai = $pegawai->nama_pegawai ?? '';
         $jabatan = $pegawai->jabatan ?? '';
         $satuanOrganisasi = $pegawai->satuan_organisasi ?? 'BPS Kabupaten';
-        $nipPegawai = '';
+        // Ambil NIP dari kolom nip, fallback ke 18 nol jika kosong
+        $nipPegawai = !empty($pegawai->nip) ? $pegawai->nip : str_repeat('0', 18);
+        // Ambil NIP BPS untuk nama file
+        $nipBps = !empty($pegawai->nip_bps) ? $pegawai->nip_bps : str_repeat('0', 9);
         $namaPejabat = 'Sukendro Suryo Wiguno, SST, M.Ec.Dev';
         $nipPejabat = '';
 
@@ -768,7 +771,8 @@ class CkpPegawaiController extends Controller
         $sheet->getRowDimension($nipRow)->setRowHeight(18);
 
         // ── Output ───────────────────────────────────────────────
-        $namaFile = 'CKP-R_' . ($bulan === 'all' ? 'Semua_Bulan' : $namaBulan) . '_' . $tahun . '.xlsx';
+        // Format: {nip_bps}_CKP_R_{angkabulan}_{tahun}.xlsx
+        $namaFile = $nipBps . '_CKP_R_' . $bulan . '_' . $tahun . '.xlsx';
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $namaFile . '"');
