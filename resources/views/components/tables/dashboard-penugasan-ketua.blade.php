@@ -1,99 +1,122 @@
 @props(['penugasans', 'showDlStatus' => false])
 
-<div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 shadow-sm overflow-hidden">
+<div class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-800">
-                <tr>
-                    <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-16 dark:text-gray-400">No.</th>
-                    <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-32 dark:text-gray-400">Bidang</th>
-                    <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Penugasan</th>
-                    <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Anggota</th>
-                    <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-32 dark:text-gray-400">Target</th>
-                    <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-32 dark:text-gray-400">Deadline</th>
-                    <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-40 dark:text-gray-400">Status Penugasannya</th>
+        <table class="min-w-full">
+            <thead>
+                <tr class="border-b border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/50">
+                    <th scope="col" class="px-4 py-3.5 text-left text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest w-12">No.</th>
+                    <th scope="col" class="px-4 py-3.5 text-left text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest w-28">Bidang</th>
+                    <th scope="col" class="px-4 py-3.5 text-left text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Penugasan</th>
+                    <th scope="col" class="px-4 py-3.5 text-left text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Anggota</th>
+                    <th scope="col" class="px-4 py-3.5 text-left text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest w-28">Target</th>
+                    <th scope="col" class="px-4 py-3.5 text-left text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest w-32">Deadline</th>
+                    <th scope="col" class="px-4 py-3.5 text-left text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest w-40">Status</th>
                     @if($showDlStatus)
-                    <th scope="col" class="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-36 dark:text-gray-400">Status DL / Translok</th>
+                        <th scope="col" class="px-4 py-3.5 text-left text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest w-36">Status DL/Translok</th>
                     @endif
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+            <tbody class="divide-y divide-gray-50 dark:divide-gray-800/70">
                 @foreach ($penugasans as $index => $penugasan)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150 cursor-pointer"
+                    @php
+                        $deadlineDate = \Carbon\Carbon::parse($penugasan->tanggal_selesai)->endOfDay();
+                        $todayDate = now()->startOfDay();
+                        $diffInDays = (int) $todayDate->diffInDays($deadlineDate->copy()->startOfDay(), false);
+
+                        $isUrgent = $diffInDays >= 0 && $diffInDays <= 3;
+                        $isOverdue = $diffInDays < 0;
+
+                        if ($diffInDays > 3) {
+                            $countdownText = $diffInDays . ' hari lagi';
+                            $countdownClass = 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400';
+                        } elseif ($diffInDays >= 0) {
+                            $countdownText = $diffInDays === 0 ? 'Hari ini' : $diffInDays . ' hari lagi';
+                            $countdownClass = 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400';
+                        } else {
+                            $countdownText = 'Terlewat ' . abs($diffInDays) . ' hari';
+                            $countdownClass = 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400';
+                        }
+                    @endphp
+                    <tr
+                        class="group cursor-pointer transition-all duration-150
+                            {{ $isOverdue ? 'bg-red-50/30 dark:bg-red-900/5 hover:bg-red-50/60 dark:hover:bg-red-900/10' : ($isUrgent ? 'bg-orange-50/30 dark:bg-orange-900/5 hover:bg-orange-50/60 dark:hover:bg-orange-900/10' : 'hover:bg-gray-50/80 dark:hover:bg-gray-800/40') }}"
                         onclick="window.location.href='{{ route('sub.kegiatan.show', ['kegiatan' => $penugasan->subKegiatan->id_kegiatan, 'subKegiatan' => $penugasan->id_sub_kegiatan]) }}#penugasan-{{ $penugasan->id_penugasan }}'">
-                        <td class="px-4 py-4 text-sm text-gray-600 font-medium text-center dark:text-gray-400">
-                            {{ method_exists($penugasans, 'firstItem') ? $penugasans->firstItem() + $index : $index + 1 }}
-                        </td>
-                        <td class="px-4 py-4">
-                            <span class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">
-                                {{ $penugasan->subKegiatan->kegiatan->bidang->nama_bidang ?? '-' }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-4">
-                            <div class="flex flex-col gap-1">
-                                <span class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2 p-0 w-80 md:w-full break-words">
-                                    {{ $penugasan->subKegiatan->nama_sub_kegiatan ?? '-' }}
-                                </span>
-                                <span class="text-xs text-brand-600 font-medium dark:text-brand-400 line-clamp-2">
-                                    Jenis: {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? '-' }}
+
+                        {{-- Indikator urgensi kiri --}}
+                        <td class="pl-0 pr-4 py-3.5">
+                            <div class="flex items-center">
+                                <div class="w-0.5 h-10 rounded-r-full mr-4 {{ $isOverdue ? 'bg-red-400 dark:bg-red-500' : ($isUrgent ? 'bg-orange-400 dark:bg-orange-500' : 'bg-transparent group-hover:bg-gray-200 dark:group-hover:bg-gray-600') }} transition-colors duration-150"></div>
+                                <span class="text-xs font-medium text-gray-400 dark:text-gray-500 tabular-nums">
+                                    {{ method_exists($penugasans, 'firstItem') ? $penugasans->firstItem() + $index : $index + 1 }}
                                 </span>
                             </div>
                         </td>
-                        <td class="px-4 py-4">
-                            <span class="text-sm font-semibold text-gray-900 dark:text-white whitespace-nowrap">
-                                {{ $penugasan->anggota->nama_pegawai ?? '-' }}
+
+                        <td class="px-4 py-3.5">
+                            <span class="text-xs font-medium text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
+                                {{ $penugasan->subKegiatan->kegiatan->bidang->nama_bidang ?? '-' }}
                             </span>
                         </td>
-                        <td class="px-4 py-4">
-                            <span class="inline-flex py-1 px-3 rounded-md bg-gray-100 text-gray-800 text-xs font-bold dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
-                                {{ $penugasan->target }} {{ $penugasan->satuan_target }}
+
+                        <td class="px-4 py-3.5">
+                            <div class="flex flex-col gap-0.5">
+                                <span class="text-sm font-semibold text-gray-800 dark:text-gray-100 line-clamp-2 w-80 md:w-full break-words leading-snug group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors duration-150">
+                                    {{ $penugasan->subKegiatan->nama_sub_kegiatan ?? '-' }}
+                                </span>
+                                <span class="text-[11px] text-gray-400 dark:text-gray-500 font-medium">
+                                    {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? '-' }}
+                                </span>
+                            </div>
+                        </td>
+
+                        <td class="px-4 py-3.5">
+                            <div class="flex items-center gap-2">
+                                <div class="h-7 w-7 rounded-full bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-900/40 dark:to-brand-800/40 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-[10px] font-bold text-brand-700 dark:text-brand-300 uppercase">
+                                        {{ strtoupper(substr($penugasan->anggota->nama_pegawai ?? '-', 0, 1)) }}
+                                    </span>
+                                </div>
+                                <span class="text-xs font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap line-clamp-1">
+                                    {{ $penugasan->anggota->nama_pegawai ?? '-' }}
+                                </span>
+                            </div>
+                        </td>
+
+                        <td class="px-4 py-3.5">
+                            <span class="inline-flex items-center gap-1 py-1 px-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-semibold border border-gray-200/60 dark:border-gray-700/60">
+                                {{ $penugasan->target }} <span class="font-normal text-gray-400">{{ $penugasan->satuan_target }}</span>
                             </span>
                         </td>
-                        <td class="px-4 py-4 whitespace-nowrap">
-                            @php
-                                $deadlineDate = \Carbon\Carbon::parse($penugasan->tanggal_selesai)->endOfDay();
-                                $todayDate = now()->startOfDay();
-                                $diffInDays = (int) $todayDate->diffInDays($deadlineDate->copy()->startOfDay(), false);
-                                
-                                $countdownText = '';
-                                $countdownClass = '';
-                                
-                                if ($diffInDays > 0) {
-                                    $countdownText = $diffInDays . ' hari lagi';
-                                    $countdownClass = $diffInDays <= 3 ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700';
-                                } elseif ($diffInDays === 0) {
-                                    $countdownText = 'Hari ini';
-                                    $countdownClass = 'bg-orange-100 text-orange-700 font-bold';
-                                } else {
-                                    $countdownText = 'Terlewat ' . abs($diffInDays) . ' hari';
-                                    $countdownClass = 'bg-red-200 text-red-800 font-bold';
-                                }
-                            @endphp
+
+                        <td class="px-4 py-3.5 whitespace-nowrap">
                             <div class="flex flex-col gap-1">
-                                <span class="text-xs text-gray-500 font-medium dark:text-gray-400">
+                                <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">
                                     {{ \Carbon\Carbon::parse($penugasan->tanggal_selesai)->format('d M Y') }}
                                 </span>
-                                <span class="inline-flex w-fit px-2 py-1 text-[10px] font-bold rounded {{ $countdownClass }}">
+                                <span class="inline-flex w-fit items-center px-2 py-0.5 text-[10px] font-bold rounded-md {{ $countdownClass }}">
                                     {{ $countdownText }}
                                 </span>
                             </div>
                         </td>
-                        <td class="px-4 py-4 whitespace-nowrap">
-                            @php
-                                $statusInfo = $penugasan->statusPenugasan();
-                            @endphp
-                            <span class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full {{ $statusInfo['class'] ?? 'bg-gray-100 text-gray-600' }}">
+
+                        <td class="px-4 py-3.5 whitespace-nowrap">
+                            @php $statusInfo = $penugasan->statusPenugasan(); @endphp
+                            <span class="inline-flex items-center px-2.5 py-1 text-[11px] font-semibold rounded-full {{ $statusInfo['class'] ?? 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400' }}">
                                 {{ $statusInfo['label'] ?? 'Tidak Diketahui' }}
                             </span>
                         </td>
+
                         @if($showDlStatus)
-                            <td class="px-4 py-4 whitespace-nowrap">
+                            <td class="px-4 py-3.5 whitespace-nowrap">
                                 @php
-                                    $dlStatus = $penugasan->status_dl === 'Ditolak' ? ['label' => 'DL Ditolak', 'class' => 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400']
-                                        : ($penugasan->status_translok === 'Ditolak' ? ['label' => 'Translok Ditolak', 'class' => 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400']
-                                        : ['label' => '-', 'class' => 'bg-gray-100 text-gray-400']);
+                                    $dlStatus = $penugasan->status_dl === 'Ditolak'
+                                        ? ['label' => 'DL Ditolak', 'class' => 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400']
+                                        : ($penugasan->status_translok === 'Ditolak'
+                                            ? ['label' => 'Translok Ditolak', 'class' => 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400']
+                                            : ['label' => '-', 'class' => 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500']);
                                 @endphp
-                                <span class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full {{ $dlStatus['class'] }}">
+                                <span class="inline-flex items-center px-2.5 py-1 text-[11px] font-semibold rounded-full {{ $dlStatus['class'] }}">
                                     {{ $dlStatus['label'] }}
                                 </span>
                             </td>
@@ -103,9 +126,10 @@
             </tbody>
         </table>
     </div>
+
     @if (method_exists($penugasans, 'hasPages') && $penugasans->hasPages())
-    <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
-        {{ $penugasans->links() }}
-    </div>
+        <div class="px-4 py-3 border-t border-gray-100 dark:border-gray-800">
+            {{ $penugasans->links() }}
+        </div>
     @endif
 </div>

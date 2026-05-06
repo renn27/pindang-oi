@@ -35,5 +35,9 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('kelola-master-data', function ($user) {
             return in_array($user->active_role, ['Admin', 'Pimpinan']);
         });
+
+        Gate::define('view-ckp', function ($user) {
+            return !$user->isActiveRole('Admin');
+        });
     }
 }

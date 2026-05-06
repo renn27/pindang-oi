@@ -76,13 +76,12 @@ class MenuHelper
 
         // ADMIN dan PIMPINAN → semua menu kecuali CKP Saya
         if ($user->isActiveRole('Admin')) {
-            return array_map(
+            return array_values(array_map(
                 fn($menu) => self::normalizeMenuItem($menu),
                 array_filter($menus, fn($menu) => $menu['name'] !== "CKP Saya")
-            );
+            ));
         }
 
-        // ADMIN dan PIMPINAN → semua menu kecuali CKP Saya
         if ($user->isActiveRole('Pimpinan')) {
             return array_map(
                 fn($menu) => self::normalizeMenuItem($menu),
@@ -127,7 +126,7 @@ class MenuHelper
                     ],
                     [
                         'icon' => 'mangcek',
-                        'name' => 'SE2026',
+                        'name' => 'MANGCEK SE2026',
                         'path' => 'https://mangcek.bpsoganilir.com/admin',
                         'is_external' => true,
                     ],

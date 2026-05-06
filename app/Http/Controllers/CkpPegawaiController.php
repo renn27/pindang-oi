@@ -18,6 +18,11 @@ class CkpPegawaiController extends Controller
         $bulan  = $request->get('bulan', 'all');
         $tahun  = $request->get('tahun', date('Y'));
         $user   = Auth::user();
+        
+        if ($user->isActiveRole('Admin')) {
+            abort(403, 'Admin tidak memiliki menu CKP.');
+        }
+
         $userId = $user->id_pegawai;
 
         // ✅ Filter berdasarkan kolom bulan_ckp (format "YYYY-MM") — universal untuk semua tipe CKP

@@ -197,24 +197,26 @@ Route::middleware('auth')->group(function () {
         ->name('kegiatan.export-mph-all');
 
     // route CKP
-    Route::get('ckp-pegawai/export', [CkpPegawaiController::class, 'exportExcel'])->name('ckp.pegawai.export');
+    Route::middleware('can:view-ckp')->group(function () {
+        Route::get('ckp-pegawai/export', [CkpPegawaiController::class, 'exportExcel'])->name('ckp.pegawai.export');
 
-    // Route untuk CKP dari Penugasan (Anggota Tim) 
-    Route::post('/ckp/from-penugasan/{penugasan}', [CkpPegawaiController::class, 'storeFromPenugasan'])
-        ->name('ckp.from.penugasan');
+        // Route untuk CKP dari Penugasan (Anggota Tim) 
+        Route::post('/ckp/from-penugasan/{penugasan}', [CkpPegawaiController::class, 'storeFromPenugasan'])
+            ->name('ckp.from.penugasan');
 
-    // Route untuk CKP dari Sub Kegiatan (Ketua Tim) 
-    Route::post('/ckp/from-sub-kegiatan/{subKegiatan}', [CkpPegawaiController::class, 'storeFromSubKegiatan'])
-        ->name('ckp.from.sub-kegiatan');
+        // Route untuk CKP dari Sub Kegiatan (Ketua Tim) 
+        Route::post('/ckp/from-sub-kegiatan/{subKegiatan}', [CkpPegawaiController::class, 'storeFromSubKegiatan'])
+            ->name('ckp.from.sub-kegiatan');
 
-    // Route untuk CKP dari Agenda Pimpinan (Pimpinan) 
-    Route::post('/ckp/from-agenda-pimpinan/{agendaPimpinan}', [CkpPegawaiController::class, 'storeFromAgendaPimpinan'])
-        ->name('ckp.from.agenda-pimpinan');
+        // Route untuk CKP dari Agenda Pimpinan (Pimpinan) 
+        Route::post('/ckp/from-agenda-pimpinan/{agendaPimpinan}', [CkpPegawaiController::class, 'storeFromAgendaPimpinan'])
+            ->name('ckp.from.agenda-pimpinan');
 
-    // Route untuk halaman CKP pegawai
-    Route::get('/ckp-pegawai', [CkpPegawaiController::class, 'index'])->name('ckp.pegawai.index');
-    Route::put('/ckp-pegawai/{ckp}', [CkpPegawaiController::class, 'update'])->name('ckp.pegawai.update');
-    Route::delete('/ckp-pegawai/{ckp}', [CkpPegawaiController::class, 'delete'])->name('ckp.pegawai.delete');
+        // Route untuk halaman CKP pegawai
+        Route::get('/ckp-pegawai', [CkpPegawaiController::class, 'index'])->name('ckp.pegawai.index');
+        Route::put('/ckp-pegawai/{ckp}', [CkpPegawaiController::class, 'update'])->name('ckp.pegawai.update');
+        Route::delete('/ckp-pegawai/{ckp}', [CkpPegawaiController::class, 'delete'])->name('ckp.pegawai.delete');
+    });
 });
 
 

@@ -110,7 +110,7 @@
 
                     {{-- ===== DAFTAR PENUGASAN BELUM SELESAI SBG ANGGOTA ===== --}}
                     @php $revisiCount = isset($revisiAsAnggota) ? $revisiAsAnggota->count() : 0; @endphp
-                    <div class="mb-8 p-5 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-700/50 rounded-2xl shadow-sm relative overflow-hidden ring-1 ring-yellow-400 dark:ring-yellow-600" x-data="{ 
+                    <div class="mb-8 p-5 rounded-2xl border border-gray-200 dark:border-orange-800 bg-white dark:bg-gray-900 shadow-sm" x-data="{ 
                         activeTabAnggota: (new URLSearchParams(window.location.search).has('anggota_terlewat_page') ? 'terlewat' : (new URLSearchParams(window.location.search).has('anggota_berjalan_page') ? 'berjalan' : 'revisi')),
                         async fetchTab(e, containerId) {
                             let link = e.target.closest('nav[role=\'navigation\'] a');
@@ -130,15 +130,12 @@
                             }
                         }
                     }">
-                        <!-- Decorative accent border on the left -->
-                        <div class="absolute top-0 left-0 w-2 h-full bg-yellow-400 dark:bg-yellow-500"></div>
-                        
-                        <div class="flex items-center gap-3 mb-5 ml-2">
-                            <span class="p-2 bg-yellow-200 dark:bg-yellow-800 rounded-lg shadow-sm">
-                                <svg class="w-6 h-6 text-yellow-700 dark:text-yellow-300 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <div class="flex items-center gap-3 mb-5">
+                            <span class="p-2 bg-orange-50 dark:bg-orange-900/30 rounded-lg">
+                                <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                             </span>
-                            <h3 class="text-xl font-extrabold text-yellow-700 dark:text-yellow-400 animate-pulse tracking-wide">TO DO LIST ANGGOTA</h3>
-                            <span class="bg-orange-100 text-orange-800 text-xs font-bold px-3 py-1 rounded-full border border-orange-200 shadow-sm dark:bg-orange-900 dark:text-orange-300 dark:border-orange-700">Harus Diselesaikan!</span>
+                            <h3 class="text-lg font-bold text-orange-500 dark:text-orange-400 animate-pulse tracking-wide">TO DO LIST ANGGOTA</h3>
+                            <span class="bg-orange-100 dark:bg-orange-800 text-orange-600 dark:text-orange-400 text-xs font-semibold px-3 py-1 rounded-full">Harus Diselesaikan!</span>
                         </div>
 
                         <!-- Tabs -->
@@ -234,7 +231,7 @@
 
                     {{-- ===== DAFTAR PENUGASAN BELUM SELESAI SBG KETUA ===== --}}
                     @php $revisiDlCount = isset($revisiDlAsKetua) ? $revisiDlAsKetua->count() : 0; @endphp
-                    <div class="mb-8 p-5 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700/50 rounded-2xl shadow-sm relative overflow-hidden ring-1 ring-amber-400 dark:ring-amber-600" x-data="{ 
+                    <div class="mb-8 p-5 rounded-2xl border border-gray-800 dark:border-orange-800 bg-white dark:bg-gray-900 shadow-sm" x-data="{ 
                         activeTabKetua: (new URLSearchParams(window.location.search).has('ketua_terlewat_page') ? 'terlewat' : (new URLSearchParams(window.location.search).has('ketua_berjalan_page') ? 'berjalan' : 'revisi-dl')),
                         async fetchTab(e, containerId) {
                             let link = e.target.closest('nav[role=\'navigation\'] a');
@@ -254,14 +251,12 @@
                             }
                         }
                     }">
-                        <div class="absolute top-0 left-0 w-2 h-full bg-amber-400 dark:bg-amber-500"></div>
-
-                        <div class="flex items-center gap-3 mb-5 ml-2">
-                            <span class="p-2 bg-amber-200 dark:bg-amber-800 rounded-lg shadow-sm">
-                                <svg class="w-6 h-6 text-amber-700 dark:text-amber-300 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <div class="flex items-center gap-3 mb-5">
+                            <span class="p-2 bg-orange-50 dark:bg-orange-900/30 rounded-lg">
+                                <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </span>
-                            <h3 class="text-xl font-extrabold text-amber-700 dark:text-amber-400 animate-pulse tracking-wide">TO DO LIST KETUA TIM</h3>
-                            <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full border border-amber-200 shadow-sm dark:bg-amber-900 dark:text-amber-300 dark:border-amber-700">Wajib Diperiksa!</span>
+                            <h3 class="text-lg font-bold text-orange-500 dark:text-orange-400 animate-pulse tracking-wide">TO DO LIST KETUA TIM</h3>
+                            <span class="bg-orange-100 dark:bg-orange-800 text-orange-600 dark:text-orange-400 text-xs font-semibold px-3 py-1 rounded-full">Wajib Diperiksa!</span>
                         </div>
 
                         <!-- Tabs -->

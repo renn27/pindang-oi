@@ -122,11 +122,8 @@ window.addEventListener('resize', checkMobile);">
                 'xl:ml-[90px]': !$store.sidebar.isExpanded && !$store.sidebar.isHovered,
                 'ml-0': $store.sidebar.isMobileOpen
             }">
-            <!-- app header start -->
             @include('layouts.app-header')
-            <!-- app header end -->
-            <!-- app header border -->
-            <div x-data="{ showFeatureBanner: true }" 
+            <!-- <div x-data="{ showFeatureBanner: true }" 
                  x-show="showFeatureBanner" x-transition
                  class="sticky top-[73px] z-40 mx-4 mt-4 md:mx-6 md:mt-6 rounded-xl border border-brand-500/30 bg-brand-50/80 p-4 shadow-sm backdrop-blur-md dark:border-brand-500/30 dark:bg-brand-900/40 font-medium text-brand-800 dark:text-brand-200">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -149,7 +146,7 @@ window.addEventListener('resize', checkMobile);">
                         </svg>
                     </button>
                 </div>
-            </div>
+            </div> -->
 
             <div class="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
                 @yield('content')
