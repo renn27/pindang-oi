@@ -400,7 +400,7 @@ class CkpPegawaiController extends Controller
         // Ambil NIP BPS untuk nama file
         $nipBps = !empty($pegawai->nip_bps) ? $pegawai->nip_bps : str_repeat('0', 9);
         $namaPejabat = 'Sukendro Suryo Wiguno, SST, M.Ec.Dev';
-        $nipPejabat = '';
+        $nipPejabat = '198211122006021001';
 
         // ─────────────────────────────────────────────────────────
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
