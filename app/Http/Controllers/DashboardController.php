@@ -88,8 +88,12 @@ class DashboardController extends Controller
         $selectedYear = request('year', now()->year);
         $stats = $analytics->getDashboardStats($selectedMonth, $selectedYear);
 
-        $bestEmployee = $analytics->rankPegawai(1, $selectedMonth, $selectedYear)->first();
-        $rankPegawai = $analytics->rankPegawai(5, $selectedMonth, $selectedYear);
+        // Gunakan rankPegawaiAll() — Collection tanpa paginator, aman untuk client-side pagination Alpine.js
+        $rankPegawaiAll = $analytics->rankPegawaiAll($selectedMonth, $selectedYear);
+        $bestEmployee   = $rankPegawaiAll->first();
+
+        // Rekap penugasan anggota difilter per bulan yang dipilih
+        $rekapAnggota = $analytics->getRekapPenugasanPegawai($selectedMonth, $selectedYear);
 
         return view('pages.dashboard', [
             'title'                       => 'Dashboard',
@@ -103,7 +107,8 @@ class DashboardController extends Controller
             'selectedMonth'               => $selectedMonth,
             'selectedYear'                => $selectedYear,
             'bestEmployee'                => $bestEmployee,
-            'rankPegawai'                 => $rankPegawai,
+            'rankPegawaiAll'              => $rankPegawaiAll,
+            'rekapAnggota'                => $rekapAnggota,
         ]);
     }
 }

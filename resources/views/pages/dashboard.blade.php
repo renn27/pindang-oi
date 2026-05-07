@@ -63,28 +63,45 @@
         @endauth
     </div>
 
-    {{-- ===== FILTER BULAN ===== --}}
-    <div class="mb-6">
-        <div class="flex items-center justify-center gap-4 rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+    {{-- ===== FILTER BULAN GLOBAL ===== --}}
+    <div class="mb-0">
+        <div class="rounded-t-2xl border border-b-0 border-brand-200 bg-gradient-to-r from-brand-50 to-blue-50 px-6 py-4 dark:border-brand-800/40 dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
 
-            <button
-                @click="prevMonth()"
-                class="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800">
-                ←
-            </button>
+                <div class="flex items-center gap-2">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-900/40">
+                        <svg class="h-4 w-4 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-brand-600 dark:text-brand-400 uppercase tracking-wider">Filter Periode Global</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Memfilter semua statistik &amp; data di bawah ini</p>
+                    </div>
+                </div>
 
-            <div class="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                <span x-text="months[selectedMonth - 1]"></span>
-                <span x-text="selectedYear"></span>
+                <div class="flex items-center gap-3">
+                    <button
+                        @click="prevMonth()"
+                        class="flex h-9 w-9 items-center justify-center rounded-lg border border-brand-200 bg-white text-brand-600 hover:bg-brand-50 dark:border-brand-700/50 dark:bg-gray-800 dark:text-brand-400 dark:hover:bg-gray-700 transition-colors shadow-sm">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+
+                    <div class="min-w-[140px] text-center">
+                        <span class="text-base font-bold text-gray-800 dark:text-white" x-text="months[selectedMonth - 1] + ' ' + selectedYear"></span>
+                        <p x-show="isCurrentMonth()" class="text-xs text-green-600 dark:text-green-400 font-medium mt-0.5">● Bulan Ini</p>
+                    </div>
+
+                    <button
+                        @click="nextMonth()"
+                        class="flex h-9 w-9 items-center justify-center rounded-lg border border-brand-200 bg-white text-brand-600 hover:bg-brand-50 dark:border-brand-700/50 dark:bg-gray-800 dark:text-brand-400 dark:hover:bg-gray-700 transition-colors shadow-sm">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
             </div>
-
-            <button
-                @click="nextMonth()"
-                class="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800">
-                →
-            </button>
-
         </div>
+        {{-- Koneksi visual ke section analytics --}}
+        <div class="border-x border-brand-200/60 dark:border-brand-800/30 bg-gradient-to-b from-brand-50/60 to-transparent dark:from-gray-800/30 dark:to-transparent h-4"></div>
     </div>
 
     @if (!auth()->user()->isSuperUser())
@@ -370,7 +387,7 @@
     @else()
         {{-- ===== CARD BESAR ANALYTICS DASHBOARD ===== --}}
         <div class="mb-8">
-            <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+            <div class="rounded-t-none rounded-b-2xl border border-t-0 border-brand-200/60 bg-white p-6 dark:border-brand-800/30 dark:bg-gray-900">
 
                 @php
                     $hasData = $stats['total_kegiatan'] > 0 || $stats['total_sub_kegiatan'] > 0 || $stats['total_penugasan'] > 0;
@@ -396,9 +413,9 @@
 
                         <div class="mb-6 flex items-center justify-between">
                             <h3 class="text-xl font-bold text-gray-800 dark:text-white">Statistik Kegiatan</h3>
-                            <div class="rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                                <span x-text="months[selectedMonth - 1]"></span>
-                                <span x-text="selectedYear"></span>
+                            <div class="flex items-center gap-1.5 rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-sm font-semibold text-brand-700 dark:border-brand-800/40 dark:bg-brand-900/20 dark:text-brand-300">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span x-text="months[selectedMonth - 1] + ' ' + selectedYear"></span>
                             </div>
                         </div>
 
@@ -504,9 +521,9 @@
                     <div class="mb-10">
                         <div class="mb-6 flex items-center justify-between">
                             <h3 class="text-xl font-bold text-gray-800 dark:text-white">Best Employee</h3>
-                            <div class="rounded-full bg-amber-50 px-3 py-1 text-sm font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
-                                <span x-text="months[selectedMonth - 1]"></span>
-                                <span x-text="selectedYear"></span>
+                            <div class="flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700 dark:border-amber-800/40 dark:bg-amber-900/20 dark:text-amber-300">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span x-text="months[selectedMonth - 1] + ' ' + selectedYear"></span>
                             </div>
                         </div>
 
@@ -515,28 +532,10 @@
                     </div>
 
                     {{-- ===== RANK EMPLOYEE ===== --}}
-                    <div id="container-rank-pegawai" x-data="{
-                        async fetchTab(e, containerId) {
-                            let link = e.target.closest('a');
-                            if (link && link.href) {
-                                e.preventDefault();
-                                let container = document.getElementById(containerId);
-                                container.style.opacity = '0.5';
-                                try {
-                                    let res = await fetch(link.href);
-                                    let text = await res.text();
-                                    let doc = new DOMParser().parseFromString(text, 'text/html');
-                                    container.innerHTML = doc.getElementById(containerId).innerHTML;
-                                    window.history.pushState({}, '', link.href);
-                                } finally {
-                                    container.style.opacity = '1';
-                                }
-                            }
-                        }
-                    }" @click="fetchTab($event, 'container-rank-pegawai')" class="transition-opacity duration-200">
+                    <div id="container-rank-pegawai">
                         @auth
                             <x-dashboard.vis-rank-pegawai
-                                :rankPegawai="$rankPegawai"
+                                :rankPegawaiAll="$rankPegawaiAll"
                                 :perPage="5" />
                         @endauth
                     </div>
@@ -550,7 +549,10 @@
 
     @if(auth()->user()->isSuperUser())
         <div class="mb-8">
-            <x-dashboard.vis-rekap-penugasan-pegawai />
+            <x-dashboard.vis-rekap-penugasan-pegawai
+                :rekapAnggota="$rekapAnggota"
+                :selectedMonth="$selectedMonth"
+                :selectedYear="$selectedYear" />
         </div>
     @endif
 

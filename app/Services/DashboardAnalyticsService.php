@@ -13,12 +13,12 @@ class DashboardAnalyticsService {
 
     public function getRekapPenugasanPegawai($bulan, $tahun) {
         $pegawai = Pegawai::withCount([
-            // 1. Rekap seluruh penugasan dia bulan ini
+            // 1. Jumlah penugasan (COUNT baris penugasan)
             'penugasanSebagaiAnggota as total_penugasan' => function ($q) use ($bulan, $tahun) {
                 $q->whereMonth('created_at', $bulan)
                   ->whereYear('created_at', $tahun);
             },
-            
+
             // 2. Rekap penugasan yang sudah disubmit/dikirim (punya pengiriman)
             'penugasanSebagaiAnggota as total_dikirim' => function ($q) use ($bulan, $tahun) {
                 $q->whereMonth('created_at', $bulan)
@@ -35,7 +35,7 @@ class DashboardAnalyticsService {
                   });
             },
 
-            // 4. Rekap penugasan yang sudah diperiksa & terverifikasi "Diterima"
+            // 4. Rekap penugasan yang sudah diperiksa & terverifikasi "Revisi"
             'penugasanSebagaiAnggota as total_revisi' => function ($q) use ($bulan, $tahun) {
                 $q->whereMonth('created_at', $bulan)
                   ->whereYear('created_at', $tahun)
@@ -54,10 +54,157 @@ class DashboardAnalyticsService {
                   });
             }
         ])
+        // SUM kolom target → total akumulasi target penugasan (bukan jumlah baris)
+        ->withSum(['penugasanSebagaiAnggota as total_target' => function ($q) use ($bulan, $tahun) {
+            $q->whereMonth('created_at', $bulan)
+              ->whereYear('created_at', $tahun);
+        }], 'target')
         ->orderBy('nama_pegawai', 'asc')
         ->get();
 
         return $pegawai;
+    }
+
+    /**
+     * Ambil semua data ranking pegawai tanpa pagination (untuk client-side pagination Alpine.js).
+     * Ini menghindari konflik URL parameter antara filter bulan dan pagination.
+     */
+    public function rankPegawaiAll($month = null, $year = null): \Illuminate\Support\Collection
+    {
+        $month = $month ?? now()->month;
+        $year  = $year  ?? now()->year;
+
+        $bulanFilter = sprintf('%04d-%02d', $year, $month);
+
+        $latestDiterima = Pengiriman::query()
+            ->select('pengirimans.*')
+            ->joinSub(
+                Pengiriman::selectRaw(
+                    'id_penugasan,
+                    bulan_pengiriman,
+                    MAX(created_at) as latest_created'
+                )->groupBy('id_penugasan', 'bulan_pengiriman'),
+                'latest',
+                function ($join) {
+                    $join
+                        ->on('pengirimans.id_penugasan',     '=', 'latest.id_penugasan')
+                        ->on('pengirimans.bulan_pengiriman', '=', 'latest.bulan_pengiriman')
+                        ->on('pengirimans.created_at',      '=', 'latest.latest_created');
+                }
+            )
+            ->join('penerimaans',
+                'penerimaans.id_pengiriman', '=', 'pengirimans.id_pengiriman')
+            ->where('penerimaans.status', 'Diterima')
+            ->whereIn('pengirimans.tipe_pengiriman', ['Cicilan', 'Pelunasan'])
+            ->whereNull('pengirimans.deleted_at');
+
+        $allData = Penugasan::query()
+            ->joinSub($latestDiterima, 'lp', function ($join) {
+                $join->on('penugasans.id_penugasan', '=', 'lp.id_penugasan');
+            })
+            ->join('pegawais',
+                'pegawais.id_pegawai', '=', 'penugasans.id_anggota')
+            ->where('lp.bulan_pengiriman', $bulanFilter)
+            ->selectRaw('
+                pegawais.id_pegawai,
+                pegawais.nama_pegawai,
+                COUNT(DISTINCT penugasans.id_penugasan) AS total_penugasan,
+                COUNT(lp.id_pengiriman) AS total_kiriman,
+                COALESCE(AVG(lp.rr_kirim), 0) as rr_kirim,
+                COALESCE(AVG(lp.rating_kirim), 0) as rating_kirim,
+                COALESCE(AVG(lp.rating_kirim) * 20, 0) as rating_persen,
+                COALESCE(AVG(
+                    (1.0 - (
+                        CASE 
+                            WHEN DATEDIFF(lp.tanggal_pengiriman, penugasans.tanggal_mulai) <= 0 THEN 0.0
+                            WHEN DATEDIFF(penugasans.tanggal_selesai, penugasans.tanggal_mulai) <= 0 THEN 0.0
+                            ELSE LEAST(CAST(DATEDIFF(lp.tanggal_pengiriman, penugasans.tanggal_mulai) AS DECIMAL(10,4)) / CAST(DATEDIFF(penugasans.tanggal_selesai, penugasans.tanggal_mulai) AS DECIMAL(10,4)), 1.0)
+                        END
+                    )) * (CAST(lp.jumlah_dikirim AS DECIMAL(10,4)) / COALESCE(NULLIF(CAST(penugasans.target AS DECIMAL(10,4)), 0.0), 1.0)) * 100.0
+                ), 0) as avg_skor_cepat,
+                (COALESCE(AVG(lp.rr_kirim), 0) * 0.40) +
+                (COALESCE(AVG(lp.rating_kirim) * 20, 0) * 0.35) +
+                (COALESCE(AVG(
+                    (1.0 - (
+                        CASE 
+                            WHEN DATEDIFF(lp.tanggal_pengiriman, penugasans.tanggal_mulai) <= 0 THEN 0.0
+                            WHEN DATEDIFF(penugasans.tanggal_selesai, penugasans.tanggal_mulai) <= 0 THEN 0.0
+                            ELSE LEAST(CAST(DATEDIFF(lp.tanggal_pengiriman, penugasans.tanggal_mulai) AS DECIMAL(10,4)) / CAST(DATEDIFF(penugasans.tanggal_selesai, penugasans.tanggal_mulai) AS DECIMAL(10,4)), 1.0)
+                        END
+                    )) * (CAST(lp.jumlah_dikirim AS DECIMAL(10,4)) / COALESCE(NULLIF(CAST(penugasans.target AS DECIMAL(10,4)), 0.0), 1.0)) * 100.0
+                ), 0) * 0.25) as rata_rata,
+                STDDEV(lp.rr_kirim) AS stddev_rr
+            ')
+            ->groupBy('pegawais.id_pegawai', 'pegawais.nama_pegawai')
+            ->orderByDesc('rata_rata')
+            ->orderByDesc('total_penugasan')
+            ->orderByRaw('COALESCE(STDDEV(lp.rr_kirim), 0) ASC')
+            ->orderBy('pegawais.nama_pegawai')
+            ->get();
+
+        $pegawaiIds = $allData->pluck('id_pegawai');
+
+        $details = Penugasan::query()
+            ->joinSub($latestDiterima, 'lp', function ($join) {
+                $join->on('penugasans.id_penugasan', '=', 'lp.id_penugasan');
+            })
+            ->join('sub_kegiatans', 'sub_kegiatans.id_sub_kegiatan', '=', 'penugasans.id_sub_kegiatan')
+            ->whereIn('penugasans.id_anggota', $pegawaiIds)
+            ->where('lp.bulan_pengiriman', $bulanFilter)
+            ->selectRaw('
+                penugasans.id_anggota,
+                sub_kegiatans.nama_sub_kegiatan,
+                penugasans.tanggal_mulai,
+                penugasans.tanggal_selesai,
+                penugasans.target,
+                lp.tanggal_pengiriman,
+                lp.jumlah_dikirim,
+                lp.rr_kirim,
+                lp.rating_kirim
+            ')
+            ->get()
+            ->map(function ($item) {
+                $start = \Carbon\Carbon::parse($item->tanggal_mulai);
+                $end = \Carbon\Carbon::parse($item->tanggal_selesai);
+                $delivered = \Carbon\Carbon::parse($item->tanggal_pengiriman);
+
+                $diffKirimMulai = $start->diffInDays($delivered, false);
+                $diffSelesaiMulai = $start->diffInDays($end, false);
+                if ($diffSelesaiMulai == 0) $diffSelesaiMulai = 1;
+
+                $ratio = $diffKirimMulai / $diffSelesaiMulai;
+                $clamped = max(0, min($ratio, 1));
+                $scoreTime = 1 - $clamped;
+
+                $target = $item->target ?: 1;
+                $scoreVol = $item->jumlah_dikirim / $target;
+
+                $item->diffKirimMulai  = $diffKirimMulai;
+                $item->diffSelesaiMulai = $diffSelesaiMulai;
+                $item->ratio            = $ratio;
+                $item->clamped_ratio    = $clamped;
+                $item->scoreTime        = $scoreTime;
+                $item->scoreVol         = $scoreVol;
+                $item->skor_cepat       = $scoreTime * $scoreVol * 100;
+
+                return $item;
+            })
+            ->groupBy('id_anggota');
+
+        return $allData->map(function ($item) use ($details) {
+            $rating = round($item->rating_kirim, 1);
+            $full   = floor($rating);
+            $half   = ($rating - $full) >= 0.5 ? 1 : 0;
+            $empty  = 5 - ($full + $half);
+
+            $item->star_full  = $full;
+            $item->star_half  = $half;
+            $item->star_empty = $empty;
+            $item->rata_rata  = round($item->rata_rata, 2);
+            $item->details    = $details->get($item->id_pegawai, collect())->values();
+
+            return $item;
+        });
     }
 
     public function rankPegawai(int $perPage = 5, $month = null, $year = null)
