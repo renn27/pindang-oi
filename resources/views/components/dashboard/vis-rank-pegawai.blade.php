@@ -225,7 +225,8 @@
                                     rating_persen: Number(pegawai.rating_persen ?? 0),
                                     skor_cepat: Number(pegawai.avg_skor_cepat ?? 0),
                                     rata_rata: Number(pegawai.rata_rata ?? 0),
-                                    details: pegawai.details ?? []
+                                    details: pegawai.details ?? [],
+                                    breakdown: pegawai.breakdown_formula ?? null
                                 })"
                                 class="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 transition-colors"
                             >

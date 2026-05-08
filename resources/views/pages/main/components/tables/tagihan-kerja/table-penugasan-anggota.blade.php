@@ -203,7 +203,8 @@
                                             } elseif ($dl === 'Menunggu' || $translok === 'Menunggu') {
                                                 $statusClass = 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
                                                 $statusLabel = 'Menunggu';
-                                            } else {
+                                            } elseif ($dl === 'ACC' || $translok === 'ACC') {
+                                                // Hanya masuk sini jika benar-benar sudah di-ACC oleh pimpinan
                                                 if ($penugasan->sudahMasukKalenderDL()) {
                                                     $statusClass = 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
                                                     $statusLabel = 'ACC';
@@ -211,6 +212,10 @@
                                                     $statusClass = 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400 border border-green-200 dark:border-green-800';
                                                     $statusLabel = 'ACC (belum masuk kalender)';
                                                 }
+                                            } else {
+                                                // status_dl = null atau nilai tidak dikenal → belum diajukan/data tidak konsisten
+                                                $statusClass = 'bg-gray-100 text-gray-500 dark:bg-gray-700/50 dark:text-gray-400 border border-gray-200 dark:border-gray-600';
+                                                $statusLabel = 'Perlu Verifikasi';
                                             }
                                         @endphp
 

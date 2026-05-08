@@ -195,10 +195,12 @@ class Penugasan extends Model
         $latestPengiriman = $this->latestPengiriman;
 
         // Tidak ada pengiriman → tidak bisa terima
-        if (!$latestPengiriman) return false;
+        if (!$latestPengiriman)
+            return false;
 
         // Sudah ada penerimaan untuk pengiriman terbaru → tidak bisa terima lagi
-        if ($latestPengiriman->penerimaan) return false;
+        if ($latestPengiriman->penerimaan)
+            return false;
 
         // Sudah ada pelunasan diterima → tugas selesai
         $adaPelunasanDiterima = $this->pengirimans()
@@ -206,7 +208,8 @@ class Penugasan extends Model
             ->whereHas('penerimaan', fn($q) => $q->where('status', 'Diterima'))
             ->exists();
 
-        if ($adaPelunasanDiterima) return false;
+        if ($adaPelunasanDiterima)
+            return false;
 
         return true;
     }
@@ -248,7 +251,8 @@ class Penugasan extends Model
             ->whereHas('penerimaan', fn($q) => $q->where('status', 'Diterima'))
             ->exists();
 
-        if (!$adaPelunasanDiterima) return 'info|Tunggu  anggota tim mengirimkan Pelunasannya';
+        if (!$adaPelunasanDiterima)
+            return 'info|Tunggu  anggota tim mengirimkan Pelunasannya';
 
         // // ⚠️ DEADLINE LEWAT, SUDAH ADA PENGIRIMAN, BELUM DIPERIKSA
         // if  ($latestPengiriman && (! $latestPenerimaan ||
@@ -271,10 +275,12 @@ class Penugasan extends Model
     public function bolehKirimPenugasan(): bool
     {
         // 1️⃣ BELUM DIMULAI → TUTUP BUTTON
-        if (!$this->isStarted()) return false;
+        if (!$this->isStarted())
+            return false;
 
         // 2️⃣ Jenis DL tapi belum masuk kalender DL
-        if ($this->isDinasLuar() && !$this->sudahMasukKalenderDL()) return false;
+        if ($this->isDinasLuar() && !$this->sudahMasukKalenderDL())
+            return false;
 
         $latestPengiriman = $this->latestPengiriman;
         $latestPenerimaan = $this->latestPenerimaan;
@@ -374,7 +380,7 @@ class Penugasan extends Model
                         'label' => 'Diterima (Cicilan)',
                         'class' => 'bg-blue-100 text-blue-700',
                     ];
-                }                
+                }
 
                 return [
                     'label' => 'Diterima (Pelunasan)',

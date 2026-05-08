@@ -6,11 +6,10 @@
             <div class="flex w-full flex-col items-center gap-6 xl:flex-row">
 
                 {{-- Avatar --}}
-                <div
-                    class="h-20 w-20 overflow-hidden rounded-full border border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-800">
-                    <img src="{{ $bestEmployee->photo ? asset('storage/' . $bestEmployee->photo) : asset('images/user/userlogodefault.png') }}"
-                        class="h-full w-full object-cover" alt="Foto {{ $bestEmployee->nama_pegawai }}" />
+                <div class="h-20 w-20 overflow-hidden rounded-full border border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-800">
+                    <img src="{{ ($bestEmployee->photo ?? null) ? asset('storage/' . $bestEmployee->photo) : asset('images/user/userlogodefault.png') }}" class="h-full w-full object-cover" alt="Foto {{ $bestEmployee->nama_pegawai }}" />
                 </div>
+
 
                 {{-- Info --}}
                 <div class="order-3 xl:order-2">

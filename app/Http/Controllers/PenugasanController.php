@@ -20,20 +20,23 @@ class PenugasanController extends Controller
         $this->authorize('create', [Penugasan::class, $subKegiatan]);
 
         $validated = $request->validate([
-            'id_anggota' => ['required', 'exists:pegawais,id_pegawai'],
-            'id_jenis_kegiatan' => ['required'],
+            'id_anggota'          => ['required', 'exists:pegawais,id_pegawai'],
+            'id_jenis_kegiatan'   => ['required'],
             'jenis_kegiatan_baru' => ['nullable', 'string'],
-            'target' => ['required', 'integer', 'min:1'],
-            'satuan_target' => ['required', 'string', 'max:50'],
+            'target'              => ['required', 'integer', 'min:1'],
+            'satuan_target'       => ['required', 'string', 'max:50'],
 
-            'butuh_dl' => ['nullable', 'boolean'],
-            'butuh_translok' => ['nullable', 'boolean'],
-            'tanggal_mulai' => ['required', 'date'],
-            'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
+            // butuh_dl dan butuh_translok harus 0 atau 1 (boolean)
+            'butuh_dl'      => ['nullable', 'boolean'],
+            'butuh_translok'=> ['nullable', 'boolean'],
 
-            'tanggal_mulai_list' => ['nullable', 'array'],
+            // Tanggal WAJIB ada saat create
+            'tanggal_mulai'  => ['required', 'date'],
+            'tanggal_selesai'=> ['required', 'date', 'after_or_equal:tanggal_mulai'],
+
+            'tanggal_mulai_list'   => ['nullable', 'array'],
             'tanggal_mulai_list.*' => ['nullable', 'date'],
-            'tanggal_selesai_list' => ['nullable', 'array'],
+            'tanggal_selesai_list'   => ['nullable', 'array'],
             'tanggal_selesai_list.*' => ['nullable', 'date'],
         ]);
 
@@ -69,18 +72,19 @@ class PenugasanController extends Controller
             } elseif ($requestButuhTranslok) {
                 $butuhTranslok = true;
             } else {
-                $butuhDl = true; // default ke DL (sesuai UI kamu)
+                $butuhDl = true; 
             }
         } else {
             $butuhDl = false;
             $butuhTranslok = false;
         }
 
-        $validated['butuh_dl'] = $butuhDl;
-        $validated['status_dl'] = $butuhDl ? 'Menunggu' : null;
+        // Pastikan nilai butuh_dl/translok selalu integer 0 atau 1 (tinyint safe)
+        $validated['butuh_dl']       = $butuhDl ? 1 : 0;
+        $validated['status_dl']      = $butuhDl ? 'Menunggu' : null;
 
-        $validated['butuh_translok'] = $butuhTranslok;
-        $validated['status_translok'] = $butuhTranslok ? 'Menunggu' : null;
+        $validated['butuh_translok']    = $butuhTranslok ? 1 : 0;
+        $validated['status_translok']   = $butuhTranslok ? 'Menunggu' : null;
 
         $validated['status'] = 'Belum Dikirim';
 
@@ -99,7 +103,7 @@ class PenugasanController extends Controller
                 $validated['tanggal_selesai'] = $tgl['selesai'];
 
                 // Create terpisah untuk masing-masing tanggal sesuai request
-                $penugasan = $subKegiatan->penugasans()->create($validated);
+                $subKegiatan->penugasans()->create($validated);
             }
 
             DB::commit();
@@ -132,21 +136,24 @@ class PenugasanController extends Controller
         $this->authorize('update', $penugasan);
 
         $validated = $request->validate([
-            'id_anggota' => ['required', 'exists:pegawais,id_pegawai'],
-            'id_jenis_kegiatan' => ['required'],
+            'id_anggota'          => ['required', 'exists:pegawais,id_pegawai'],
+            'id_jenis_kegiatan'   => ['required'],
             'jenis_kegiatan_baru' => ['nullable', 'string', 'max:100'],
-            'target' => ['required', 'integer', 'min:1'],
-            'satuan_target' => ['required', 'string', 'max:50'],
+            'target'              => ['required', 'integer', 'min:1'],
+            'satuan_target'       => ['required', 'string', 'max:50'],
 
-            'tanggal_mulai' => ['nullable', 'date'],
-            'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
-            'butuh_dl' => ['nullable', 'boolean'],
-            'butuh_translok' => ['nullable', 'boolean'],
+            // Tanggal WAJIB ada saat update juga (penugasan harus punya rentang waktu)
+            'tanggal_mulai'  => ['required', 'date'],
+            'tanggal_selesai'=> ['required', 'date', 'after_or_equal:tanggal_mulai'],
+
+            // butuh_dl dan butuh_translok harus 0 atau 1 (boolean)
+            'butuh_dl'      => ['nullable', 'boolean'],
+            'butuh_translok'=> ['nullable', 'boolean'],
 
             // tanggal tambahan (OPSIONAL)
-            'tanggal_mulai_list' => ['nullable', 'array'],
+            'tanggal_mulai_list'   => ['nullable', 'array'],
             'tanggal_mulai_list.*' => ['nullable', 'date'],
-            'tanggal_selesai_list' => ['nullable', 'array'],
+            'tanggal_selesai_list'   => ['nullable', 'array'],
             'tanggal_selesai_list.*' => ['nullable', 'date'],
         ]);
 
@@ -200,17 +207,18 @@ class PenugasanController extends Controller
             $butuhTranslok = false;
         }
 
-        $validated['butuh_dl'] = $butuhDl;
-        $validated['butuh_translok'] = $butuhTranslok;
+        // Pastikan nilai butuh_dl/translok selalu integer 0 atau 1 (tinyint safe)
+        $validated['butuh_dl']    = $butuhDl ? 1 : 0;
+        $validated['butuh_translok'] = $butuhTranslok ? 1 : 0;
 
-        // HANDLE STATUS DL
+        // HANDLE STATUS DL — preserve nilai yang sudah ada; jika baru aktif → 'Menunggu'; jika dimatikan → null
         $validated['status_dl'] = $validated['butuh_dl']
-            ? ($penugasan->status_dl ?? 'Menunggu')
+            ? (in_array($penugasan->status_dl, ['Menunggu', 'ACC', 'Ditolak']) ? $penugasan->status_dl : 'Menunggu')
             : null;
 
-        // HANDLE STATUS TRANSLOK
+        // HANDLE STATUS TRANSLOK — idem
         $validated['status_translok'] = $validated['butuh_translok']
-            ? ($penugasan->status_translok ?? 'Menunggu')
+            ? (in_array($penugasan->status_translok, ['Menunggu', 'ACC', 'Ditolak']) ? $penugasan->status_translok : 'Menunggu')
             : null;
 
         $updateData = $validated;
@@ -232,19 +240,21 @@ class PenugasanController extends Controller
             );
 
             foreach ($validDatesToSave as $tgl) {
-                if (!empty($tgl['mulai']) || !empty($tgl['selesai'])) {
+                // Keduanya harus ada (&&), bukan salah satu — mencegah penugasan dengan tanggal null
+                if (!empty($tgl['mulai']) && !empty($tgl['selesai'])) {
                     Penugasan::create([
-                        'id_anggota' => $validated['id_anggota'],
-                        'id_sub_kegiatan' => $penugasan->id_sub_kegiatan,
-                        'id_jenis_kegiatan' => $validated['id_jenis_kegiatan'],
-                        'target' => $validated['target'],
-                        'satuan_target' => $validated['satuan_target'],
-                        'tanggal_mulai' => $tgl['mulai'],
-                        'tanggal_selesai' => $tgl['selesai'],
-                        'status' => $penugasan->status,
-                        'status_dl' => $validated['status_dl'] ?? null,
-                        'butuh_dl' => $validated['butuh_dl'],
-                        'butuh_translok' => $validated['butuh_translok'],
+                        'id_anggota'       => $validated['id_anggota'],
+                        'id_sub_kegiatan'  => $penugasan->id_sub_kegiatan,
+                        'id_jenis_kegiatan'=> $validated['id_jenis_kegiatan'],
+                        'target'           => $validated['target'],
+                        'satuan_target'    => $validated['satuan_target'],
+                        'tanggal_mulai'    => $tgl['mulai'],
+                        'tanggal_selesai'  => $tgl['selesai'],
+                        'status'           => $penugasan->status,
+                        'butuh_dl'         => $validated['butuh_dl'],
+                        'status_dl'        => $validated['butuh_dl'] ? 'Menunggu' : null,
+                        'butuh_translok'   => $validated['butuh_translok'],
+                        'status_translok'  => $validated['butuh_translok'] ? 'Menunggu' : null,
                     ]);
                 }
             }
@@ -476,8 +486,8 @@ class PenugasanController extends Controller
             $m = $tgl['mulai'];
             $s = $tgl['selesai'];
 
-            if (empty($m) && empty($s)) {
-                $validDatesToSave[] = ['mulai' => null, 'selesai' => null];
+            // Jika salah satu atau keduanya kosong → skip, jangan buat penugasan dengan tanggal null
+            if (empty($m) || empty($s)) {
                 continue;
             }
 
