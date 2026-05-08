@@ -8,6 +8,7 @@ use App\Models\Kegiatan;
 use App\Models\SubKegiatan;
 use App\Models\Pegawai;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class DashboardAnalyticsService {
 
@@ -69,7 +70,7 @@ class DashboardAnalyticsService {
     // RANKING ENGINE — F1 Penyelesaian · F2 Kecepatan · F3 RR · F4 Rating
     // =========================================================================
 
-    public function rankPegawaiAll($month = null, $year = null): \Illuminate\Support\Collection
+    public function rankPegawaiAll($month = null, $year = null): Collection
     {
         [$month, $year, $bf, $gs] = $this->rankInit($month, $year);
         $allData = $this->buildRankBaseQuery($bf, $year, $month, $gs)->get();
@@ -151,10 +152,10 @@ class DashboardAnalyticsService {
                 COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Cicilan'   THEN lp.jumlah_dikirim ELSE 0 END),0) AS progress_cicilan,
                 COALESCE(AVG(CASE WHEN lp.tipe_pengiriman IS NOT NULL  THEN lp.rating_kirim  END),0) AS rating_kirim_avg,
                 CASE WHEN COALESCE(SUM(penugasans.target),0)=0 OR ?=0 THEN 0.0
-                ELSE GREATEST(0.0, ? - (COALESCE(SUM(penugasans.target),0)-(
+                ELSE GREATEST(0.0, ? - COALESCE(SUM(penugasans.target),0) + (
                         COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN lp.jumlah_dikirim ELSE 0 END),0)
                         +COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Cicilan' THEN lp.jumlah_dikirim ELSE 0 END),0)*0.5
-                    ))) / NULLIF(?,0)
+                    )) / NULLIF(?,0)
                     *(COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN lp.jumlah_dikirim ELSE 0 END),0)
                       +COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Cicilan' THEN lp.jumlah_dikirim ELSE 0 END),0)*0.5)
                     / NULLIF(COALESCE(SUM(penugasans.target),0),0) * 100.0
@@ -308,147 +309,6 @@ class DashboardAnalyticsService {
         return $item;
     }
 
-
-    // public function rankPegawai(int $perPage = 5, $month = null, $year = null) {
-    //     $month = $month ?? now()->month;
-    //     $year  = $year  ?? now()->year;
-
-    //     $startOfMonth = Carbon::create($year, $month, 1)->startOfMonth();
-    //     $endOfMonth   = Carbon::create($year, $month, 1)->endOfMonth();
-
-    //     /**
-    //      * Subquery:
-    //      * Ambil pengiriman TERAKHIR per penugasan
-    //      * yang status penerimaannya sudah 'Diterima'
-    //      * Kalau latestPengiriman masih 'Revisi' → tidak masuk
-    //      */
-    //     $latestPengirimanDiterima = Pengiriman::query()
-    //         ->select('pengirimans.*')
-    //         ->joinSub(
-    //             Pengiriman::selectRaw('id_penugasan, MAX(created_at) as latest_created')
-    //                 ->groupBy('id_penugasan'),
-    //             'latest',
-    //             function ($join) {
-    //                 $join->on('pengirimans.id_penugasan', '=', 'latest.id_penugasan')
-    //                     ->on('pengirimans.created_at', '=', 'latest.latest_created');
-    //             }
-    //         )
-    //         // ✅ Join ke penerimaans — hanya yang Diterima
-    //         ->join('penerimaans', 'penerimaans.id_pengiriman', '=', 'pengirimans.id_pengiriman')
-    //         ->where('penerimaans.status', 'Diterima')
-    //         ->whereNull('pengirimans.deleted_at');
-
-    //     $query = Penugasan::query()
-    //         // ✅ Pakai irisan rentang tanggal, bukan created_at
-    //         ->where('penugasans.tanggal_mulai', '<=', $endOfMonth)
-    //         ->where('penugasans.tanggal_selesai', '>=', $startOfMonth)
-
-    //         // ✅ Join hanya ke pengiriman yang sudah Diterima
-    //         ->joinSub($latestPengirimanDiterima, 'latest_pengiriman', function ($join) {
-    //             $join->on('penugasans.id_penugasan', '=', 'latest_pengiriman.id_penugasan');
-    //         })
-    //         ->join('pegawais', 'pegawais.id_pegawai', '=', 'penugasans.id_anggota')
-
-    //         ->selectRaw('
-    //             pegawais.id_pegawai,
-    //             pegawais.nama_pegawai,
-
-    //             COUNT(penugasans.id_penugasan)          as total_penugasan,
-    //             AVG(latest_pengiriman.rr_kirim)         as rr_kirim,
-    //             AVG(latest_pengiriman.rating_kirim)     as rating_kirim,
-    //             (AVG(latest_pengiriman.rating_kirim) * 20) as rating_persen,
-    //             STDDEV(latest_pengiriman.rr_kirim) as stddev_rr,
-    //             (
-    //                 AVG(latest_pengiriman.rr_kirim)
-    //                 + (AVG(latest_pengiriman.rating_kirim) * 20)
-    //             ) / 2 as rata_rata
-    //         ')
-    //         ->groupBy('pegawais.id_pegawai', 'pegawais.nama_pegawai')
-    //         ->orderByDesc('rata_rata')
-    //         ->orderByDesc('total_penugasan')   // ← tiebreaker 1
-    //         ->orderByRaw('COALESCE(STDDEV(latest_pengiriman.rr_kirim), 0) ASC') // ← tiebreaker 2 (stddev rendah = konsisten)
-    //         ->orderBy('pegawais.nama_pegawai'); // ← tiebreaker final (alphabetical);
-
-    //     return $query->paginate($perPage)
-    //         ->through(function ($item) {
-    //             $rating = round($item->rating_kirim, 1);
-
-    //             $full  = floor($rating);
-    //             $half  = ($rating - $full) >= 0.5 ? 1 : 0;
-    //             $empty = 5 - ($full + $half);
-
-    //             $item->star_full  = $full;
-    //             $item->star_half  = $half;
-    //             $item->star_empty = $empty;
-
-    //             return $item;
-    //         });
-    // }
-
-    // public function rankPegawai(int $perPage = 5, $month = null, $year = null)
-    // {
-    //     $month = $month ?? now()->month;
-    //     $year = $year ?? now()->year;
-
-    //     /**
-    //      * Subquery:
-    //      * ambil pengiriman TERAKHIR per penugasan
-    //      */
-    //     $latestPengiriman = Pengiriman::query()
-    //         ->select('pengirimans.*')
-    //         ->joinSub(
-    //             Pengiriman::
-    //                 selectRaw('id_penugasan, MAX(created_at) as latest_created')->groupBy('id_penugasan'),
-    //                 'latest', function ($join) {
-    //                 $join->on('pengirimans.id_penugasan', '=', 'latest.id_penugasan')
-    //                     ->on('pengirimans.created_at', '=', 'latest.latest_created');
-    //             }
-    //         );
-
-    //     $query = Penugasan::query()
-    //         ->whereMonth('penugasans.created_at', $month)
-    //         ->whereYear('penugasans.created_at', $year)
-    //         ->joinSub($latestPengiriman, 'latest_pengiriman', function ($join) {
-    //             $join->on('penugasans.id_penugasan', '=', 'latest_pengiriman.id_penugasan');
-    //         })
-    //         ->join('pegawais', 'pegawais.id_pegawai', '=', 'penugasans.id_anggota')
-
-    //         ->selectRaw('
-    //         pegawais.id_pegawai,
-    //         pegawais.nama_pegawai,
-
-    //         AVG(latest_pengiriman.rr_kirim)      as rr_kirim,
-    //         AVG(latest_pengiriman.rating_kirim) as rating_kirim,
-
-    //         (AVG(latest_pengiriman.rating_kirim) * 20) as rating_persen,
-
-    //         (
-    //             AVG(latest_pengiriman.rr_kirim)
-    //             + (AVG(latest_pengiriman.rating_kirim) * 20)
-    //         ) / 2 as rata_rata
-    //     ')
-    //         ->groupBy('pegawais.id_pegawai', 'pegawais.nama_pegawai')
-    //         ->orderByDesc('rata_rata');
-
-    //     // Return pagination result
-    //     return $query->paginate($perPage)
-    //         ->through(function ($item) {
-    //             $rating = round($item->rating_kirim, 1);
-
-    //             $full  = floor($rating);
-    //             $half  = ($rating - $full) >= 0.5 ? 1 : 0;
-    //             $empty = 5 - ($full + $half);
-
-    //             $item->star_full  = $full;
-    //             $item->star_half  = $half;
-    //             $item->star_empty = $empty;
-
-    //             return $item;
-    //         });
-    // }
-
-    
-    
     public function summaryPenugasanAnggota(string $idPegawai): array
     {
         $today = now()->startOfDay();
@@ -510,7 +370,6 @@ class DashboardAnalyticsService {
             'sudah_selesai'   => $sudahSelesai,
         ];
     }
-
     public function summaryKegiatanKetua(string $idPegawai): array
     {
         $today = now()->startOfDay();
