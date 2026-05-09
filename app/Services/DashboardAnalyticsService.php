@@ -101,12 +101,26 @@ class DashboardAnalyticsService {
             ->whereNull('deleted_at')
             ->whereRaw('(YEAR(tanggal_mulai)*12+MONTH(tanggal_mulai)) <= ?', [$am])
             ->whereRaw('(YEAR(tanggal_selesai)*12+MONTH(tanggal_selesai)) >= ?', [$am])
-            ->selectRaw('COUNT(DISTINCT id_penugasan) as tot, COALESCE(SUM(target),0) as sumT')
+            ->selectRaw('
+                COUNT(DISTINCT id_penugasan) as tot,
+                COALESCE(SUM(target), 0) as sumT,
+                COUNT(DISTINCT id_anggota) as tot_pegawai
+            ')
             ->first();
-        $tot = (int)($r->tot ?? 0);
-        $sum = (float)($r->sumT ?? 0);
-        $avg = $tot > 0 ? max(1.0, $sum / $tot) : 1.0;
-        return ['total_penugasan_semua' => $tot, 'sum_target_semua' => $sum, 'avg_target_bulan' => $avg];
+
+        $tot        = (int)($r->tot         ?? 0);
+        $sum        = (float)($r->sumT      ?? 0);
+        $totPegawai = (int)($r->tot_pegawai ?? 0);
+
+        // avg = total target seluruh tim / jumlah pegawai aktif
+        // sehingga koefisien = target_pegawai / avg = perbandingan apple-to-apple
+        $avg = $totPegawai > 0 ? max(1.0, $sum / $totPegawai) : 1.0;
+
+        return [
+            'total_penugasan_semua' => $tot,
+            'sum_target_semua'      => $sum,
+            'avg_target_bulan'      => $avg,
+        ];
     }
 
     private function buildLatestDiterimaSubquery(string $bf)
