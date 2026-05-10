@@ -167,14 +167,30 @@ class DashboardAnalyticsService {
                 COALESCE(SUM(penugasans.target),0) AS target_pegawai,
                 COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN lp.jumlah_dikirim ELSE 0 END),0) AS progress_pelunasan,
                 COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Cicilan'   THEN lp.jumlah_dikirim ELSE 0 END),0) AS progress_cicilan,
+                COALESCE(SUM(CASE
+                    WHEN lp.tipe_pengiriman='Cicilan' AND penugasans.target>0
+                        THEN CAST(lp.jumlah_dikirim AS DECIMAL(10,4))
+                            *CAST(lp.jumlah_dikirim AS DECIMAL(10,4))
+                            /CAST(penugasans.target AS DECIMAL(10,4))
+                    ELSE 0 END),0) AS b_efektif_cicilan,
                 COALESCE(AVG(CASE WHEN lp.tipe_pengiriman IS NOT NULL  THEN lp.rating_kirim  END),0) AS rating_kirim_avg,
                 CASE WHEN COALESCE(SUM(penugasans.target),0)=0 OR ?=0 THEN 0.0
                 ELSE GREATEST(0.0, ? - COALESCE(SUM(penugasans.target),0) + (
                         COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN lp.jumlah_dikirim ELSE 0 END),0)
-                        +COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Cicilan' THEN lp.jumlah_dikirim ELSE 0 END),0)*0.5
+                        +COALESCE(SUM(CASE
+                            WHEN lp.tipe_pengiriman='Cicilan' AND penugasans.target>0
+                                THEN CAST(lp.jumlah_dikirim AS DECIMAL(10,4))
+                                    *CAST(lp.jumlah_dikirim AS DECIMAL(10,4))
+                                    /CAST(penugasans.target AS DECIMAL(10,4))
+                            ELSE 0 END),0)
                     )) / NULLIF(?,0)
                     *(COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN lp.jumlah_dikirim ELSE 0 END),0)
-                      +COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Cicilan' THEN lp.jumlah_dikirim ELSE 0 END),0)*0.5)
+                      +COALESCE(SUM(CASE
+                            WHEN lp.tipe_pengiriman='Cicilan' AND penugasans.target>0
+                                THEN CAST(lp.jumlah_dikirim AS DECIMAL(10,4))
+                                    *CAST(lp.jumlah_dikirim AS DECIMAL(10,4))
+                                    /CAST(penugasans.target AS DECIMAL(10,4))
+                            ELSE 0 END),0))
                     / NULLIF(COALESCE(SUM(penugasans.target),0),0) * 100.0
                 END AS f1_penyelesaian,
                 COALESCE(AVG(CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN
@@ -285,16 +301,18 @@ class DashboardAnalyticsService {
         $item->total_penugasan_dikerjakan = (int)($item->total_penugasan_dikerjakan ?? 0);
         $det = $details->get($item->id_pegawai, collect())->values();
         $item->details = $det;
-        $a=$c=$pp=$pc=0.0;
-        $a  = (float)($item->target_pegawai    ?? 0);
-        $c  = (float) $gs['sum_target_semua'];
-        $pp = (float)($item->progress_pelunasan ?? 0);
-        $pc = (float)($item->progress_cicilan   ?? 0);
-        $be = $pp + $pc * 0.5;
-        $d  = max(0.0, $c - ($a - $be));
+        $a=$c=$pp=$pc=$bec=0.0;
+        $a   = (float)($item->target_pegawai      ?? 0);
+        $c   = (float) $gs['sum_target_semua'];
+        $pp  = (float)($item->progress_pelunasan  ?? 0);
+        $pc  = (float)($item->progress_cicilan    ?? 0);
+        $bec = (float)($item->b_efektif_cicilan   ?? 0); // SUM(jumlah²/target) per penugasan
+        $be  = $pp + $bec;                               // b_efektif proporsional
+        $d   = max(0.0, $c - ($a - $be));
         $item->breakdown_formula = [
             'f1' => ['nilai'=>round((float)($item->f1_penyelesaian??0),2),
                 'progress_pelunasan'=>$pp,'progress_cicilan'=>$pc,
+                'b_efektif_cicilan'=>round($bec,4),
                 'b_efektif'=>round($be,2),'a'=>$a,'c'=>$c,'d'=>round($d,2)],
             'f2' => ['nilai'=>round((float)($item->f2_kecepatan??0),2),
                 'detail'=>$det->filter(fn($r)=>$r->is_pelunasan&&$r->skor_f2!==null)
