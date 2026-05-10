@@ -11,6 +11,10 @@ class DashboardController extends Controller
     public function index(Request $request, DashboardAnalyticsService $analytics)
     {
         $user = auth()->user();
+        $rankPegawaiPerPageOptions = [5, 10, 25, 50];
+        $rekapPenugasanPerPageOptions = [10, 25, 50, 100];
+        $rankPegawaiPerPage = $this->resolvePerPage($request, 'rank_per_page', 5, $rankPegawaiPerPageOptions);
+        $rekapPenugasanPerPage = $this->resolvePerPage($request, 'rekap_per_page', 10, $rekapPenugasanPerPageOptions);
 
         $unfinishedTerlewatAsAnggota = null;
         $unfinishedBerjalanAsAnggota = null;
@@ -109,6 +113,17 @@ class DashboardController extends Controller
             'bestEmployee'                => $bestEmployee,
             'rankPegawaiAll'              => $rankPegawaiAll,
             'rekapAnggota'                => $rekapAnggota,
+            'rankPegawaiPerPage'          => $rankPegawaiPerPage,
+            'rekapPenugasanPerPage'       => $rekapPenugasanPerPage,
+            'rankPegawaiPerPageOptions'   => $rankPegawaiPerPageOptions,
+            'rekapPerPageOptions'         => $rekapPenugasanPerPageOptions,
         ]);
+    }
+
+    private function resolvePerPage(Request $request, string $key, int $default, array $allowedOptions): int
+    {
+        $perPage = (int) $request->query($key, $default);
+
+        return in_array($perPage, $allowedOptions, true) ? $perPage : $default;
     }
 }

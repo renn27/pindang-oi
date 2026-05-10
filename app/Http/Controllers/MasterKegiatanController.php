@@ -77,6 +77,13 @@ class MasterKegiatanController extends Controller
     {
         $this->authorize('create', Kegiatan::class);
         try {
+            $user = $request->user();
+            if ($user?->isKetuaTim()) {
+                $request->merge([
+                    'id_penanggung_jawab' => $user->id_pegawai,
+                ]);
+            }
+
             $validated = $request->validate([
                 'id_bidang' => ['required', 'exists:bidangs,id_bidang'],
                 'nama_rk_kegiatan' => ['required', 'string'],
@@ -128,13 +135,13 @@ class MasterKegiatanController extends Controller
                 }
             }
 
-            DB::transaction(function () use ($request) {
+            DB::transaction(function () use ($request, $validated) {
                 $kegiatan = Kegiatan::create([
                     'id_bidang' => $request->id_bidang,
                     'nama_rk_kegiatan' => $request->nama_rk_kegiatan,
                     'rk_jpt' => $request->rk_jpt,
                     'iki_jpt' => $request->iki_jpt,
-                    'id_penanggung_jawab' => $request->id_penanggung_jawab,
+                    'id_penanggung_jawab' => $validated['id_penanggung_jawab'],
                     'tahun_kegiatan' => $request->tahun_kegiatan,
                 ]);
 

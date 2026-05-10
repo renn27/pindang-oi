@@ -1,11 +1,12 @@
 {{-- resources/views/components/dashboard/vis-rank-pegawai.blade.php --}}
-@props(['rankPegawaiAll', 'perPage' => 5])
+@props(['rankPegawaiAll', 'perPage' => 5, 'perPageOptions' => [5, 10, 25, 50]])
 
 <div
     x-data="{
         rawData: {{ Js::from($rankPegawaiAll) }},
         currentPage: 1,
-        perPage: {{ $perPage }},
+        perPage: {{ (int) $perPage }},
+        perPageOptions: {{ Js::from($perPageOptions) }},
         isLoading: false,
 
         get totalPages() {
@@ -33,6 +34,18 @@
                 this.currentPage = page;
                 this.isLoading = false;
             }, 200);
+        },
+
+        updatePerPage(value) {
+            this.perPage = Number(value);
+            this.currentPage = 1;
+            this.syncPerPageToUrl('rank_per_page', this.perPage);
+        },
+
+        syncPerPageToUrl(key, value) {
+            const url = new URL(window.location.href);
+            url.searchParams.set(key, value);
+            window.history.replaceState({}, '', `${url.pathname}?${url.searchParams.toString()}${url.hash}`);
         },
 
         getRankBadge(rankNumber) {
@@ -64,13 +77,28 @@
     class="bg-white rounded-2xl shadow p-6 dark:bg-gray-900 dark:border dark:border-gray-800"
 >
     <div class="mb-6">
-        <div class="flex items-center justify-between mb-2">
+        <div class="flex flex-col gap-3 mb-2 sm:flex-row sm:items-center sm:justify-between">
             <h2 class="text-xl font-bold text-gray-800 dark:text-white">
                 Penilaian Kinerja Pegawai
             </h2>
-            <span class="text-xs text-gray-400 dark:text-gray-500"
-                x-text="rawData.length + ' pegawai'"
-            ></span>
+            <div class="flex flex-wrap items-center gap-3">
+                <label class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+                    <span>Tampilkan</span>
+                    <select
+                        x-model.number="perPage"
+                        @change="updatePerPage($event.target.value)"
+                        class="rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-semibold text-gray-700 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                    >
+                        @foreach($perPageOptions as $option)
+                            <option value="{{ $option }}">{{ $option }}</option>
+                        @endforeach
+                    </select>
+                    <span>data</span>
+                </label>
+                <span class="text-xs text-gray-400 dark:text-gray-500"
+                    x-text="rawData.length + ' pegawai'"
+                ></span>
+            </div>
         </div>
     </div>
 

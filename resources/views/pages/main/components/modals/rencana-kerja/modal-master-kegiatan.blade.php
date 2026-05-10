@@ -1,4 +1,9 @@
 {{-- Modal Master Kegiatan --}}
+@php
+    $loggedInPegawai = auth()->user();
+    $isLoggedInAsKetuaTim = $loggedInPegawai?->isKetuaTim() ?? false;
+@endphp
+
 <x-ui.smart-modal id="modal-master-kegiatan" class="max-w-4xl" x-data="{
     formData: { id_bidang: '', nama_bidang: '', rk_jpt: '', iki_jpt: '', ikiOptions: [] },
     search: '',
@@ -297,71 +302,87 @@
                     </div>
 
                     {{-- Nama Ketua / Penanggung Jawab --}}
-                    <div x-data="{
-                        open: false,
-                        search: '',
-                        selectedId: '',
-                        highlightedIndex: -1,
-                        ketuaTims: @js($ketuaTims),
-                    
-                        filtered() {
-                            if (this.search.length === 0) return [];
-                            return this.ketuaTims.filter(p => p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase()));
-                        },
-                    
-                        selectPegawai(p) {
-                            this.search = p.nama_pegawai;
-                            this.selectedId = p.id_pegawai;
-                            this.open = false;
-                            this.highlightedIndex = -1;
-                        },
-                    
-                        highlightNext() { if (this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++; },
-                        highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
-                        selectHighlighted() { if (this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]); }
-                    }" class="flex flex-col gap-2 md:flex-row md:items-start">
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
-                            Nama Ketua
-                        </label>
+                    @if ($isLoggedInAsKetuaTim)
+                        <div class="flex flex-col gap-2 md:flex-row md:items-start">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
+                                Nama Ketua
+                            </label>
 
-                        <div class="relative md:w-3/4 w-full">
-                            <input type="text" x-model="search" placeholder="Ketik untuk cari nama"
-                                id="ketuaSearchInput"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10"
-                                @focus="open = !!search" @input="open = search.length > 0; selectedId = ''"
-                                @keydown.arrow-down.prevent="highlightedIndex++"
-                                @keydown.arrow-up.prevent="highlightedIndex--"
-                                @keydown.enter.prevent="
-                                    if (highlightedIndex >= 0) {
-                                        search = filtered()[highlightedIndex].nama_pegawai;
-                                        selectedId = filtered()[highlightedIndex].id_pegawai;
-                                        open = false;
-                                    }
-                                ">
-                            <input type="hidden" name="id_penanggung_jawab" :value="selectedId" required>
-
-                            <div x-show="open" x-transition
-                                class="absolute left-0 top-full z-50 mt-1 w-full
-                                    rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg
-                                    max-h-60 overflow-y-auto">
-                                <template x-for="(pegawai, index) in filtered()" :key="pegawai.id_pegawai">
-                                    <div @click="selectPegawai(pegawai)"
-                                        class="cursor-pointer px-4 py-2 text-sm dark:text-gray-300"
-                                        :class="{
-                                            'bg-blue-100 dark:bg-blue-900/30': highlightedIndex === index,
-                                            'hover:bg-gray-100 dark:hover:bg-gray-700': highlightedIndex !== index
-                                        }"
-                                        x-text="pegawai.nama_pegawai"></div>
-                                </template>
-
-                                <template x-if="filtered().length === 0 && search.length > 0">
-                                    <div class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
-                                        Nama Ketua tidak ditemukan
-                                    </div>
-                                </template>
+                            <div class="relative md:w-3/4 w-full">
+                                <input type="text" id="ketuaSearchInput"
+                                    value="{{ $loggedInPegawai->nama_pegawai }}"
+                                    readonly
+                                    class="h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:bg-gray-700/70" />
+                                <input type="hidden" name="id_penanggung_jawab" value="{{ $loggedInPegawai->id_pegawai }}" required>
                             </div>
                         </div>
-                    </div>
+                    @else
+                        <div x-data="{
+                            open: false,
+                            search: '',
+                            selectedId: '',
+                            highlightedIndex: -1,
+                            ketuaTims: @js($ketuaTims),
+                        
+                            filtered() {
+                                if (this.search.length === 0) return [];
+                                return this.ketuaTims.filter(p => p.nama_pegawai.toLowerCase().includes(this.search.toLowerCase()));
+                            },
+                        
+                            selectPegawai(p) {
+                                this.search = p.nama_pegawai;
+                                this.selectedId = p.id_pegawai;
+                                this.open = false;
+                                this.highlightedIndex = -1;
+                            },
+                        
+                            highlightNext() { if (this.highlightedIndex < this.filtered().length - 1) this.highlightedIndex++; },
+                            highlightPrev() { if (this.highlightedIndex > 0) this.highlightedIndex--; },
+                            selectHighlighted() { if (this.highlightedIndex >= 0) this.selectPegawai(this.filtered()[this.highlightedIndex]); }
+                        }" class="flex flex-col gap-2 md:flex-row md:items-start">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 md:w-1/4">
+                                Nama Ketua
+                            </label>
+
+                            <div class="relative md:w-3/4 w-full">
+                                <input type="text" x-model="search" placeholder="Ketik untuk cari nama"
+                                    id="ketuaSearchInput"
+                                    class="h-11 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10"
+                                    @focus="open = !!search" @input="open = search.length > 0; selectedId = ''"
+                                    @keydown.arrow-down.prevent="highlightedIndex++"
+                                    @keydown.arrow-up.prevent="highlightedIndex--"
+                                    @keydown.enter.prevent="
+                                        if (highlightedIndex >= 0) {
+                                            search = filtered()[highlightedIndex].nama_pegawai;
+                                            selectedId = filtered()[highlightedIndex].id_pegawai;
+                                            open = false;
+                                        }
+                                    ">
+                                <input type="hidden" name="id_penanggung_jawab" :value="selectedId" required>
+
+                                <div x-show="open" x-transition
+                                    class="absolute left-0 top-full z-50 mt-1 w-full
+                                        rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg
+                                        max-h-60 overflow-y-auto">
+                                    <template x-for="(pegawai, index) in filtered()" :key="pegawai.id_pegawai">
+                                        <div @click="selectPegawai(pegawai)"
+                                            class="cursor-pointer px-4 py-2 text-sm dark:text-gray-300"
+                                            :class="{
+                                                'bg-blue-100 dark:bg-blue-900/30': highlightedIndex === index,
+                                                'hover:bg-gray-100 dark:hover:bg-gray-700': highlightedIndex !== index
+                                            }"
+                                            x-text="pegawai.nama_pegawai"></div>
+                                    </template>
+
+                                    <template x-if="filtered().length === 0 && search.length > 0">
+                                        <div class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+                                            Nama Ketua tidak ditemukan
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
 
                     <!-- Kolom Nama Kegiatan -->
                     <div class="flex flex-col gap-2 md:flex-row md:items-center">

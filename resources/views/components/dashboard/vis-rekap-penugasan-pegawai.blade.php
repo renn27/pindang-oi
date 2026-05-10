@@ -1,4 +1,4 @@
-@props(['rekapAnggota', 'selectedMonth', 'selectedYear'])
+@props(['rekapAnggota', 'selectedMonth', 'selectedYear', 'perPage' => 10, 'perPageOptions' => [10, 25, 50, 100]])
 
 <div class="bg-white rounded-2xl shadow p-6 dark:bg-gray-900 dark:border dark:border-gray-800">
     <div x-data="{
@@ -6,7 +6,8 @@
             sortCol: 'nama_pegawai',
             sortAsc: true,
             currentPage: 1,
-            perPage: 10,
+            perPage: {{ (int) $perPage }},
+            perPageOptions: {{ Js::from($perPageOptions) }},
             rawData: {{ Js::from($rekapAnggota) }},
             
             get filteredData() {
@@ -53,6 +54,18 @@
                     // Urutan default: Teks = A ke Z, Angka = Besar ke Kecil
                     this.sortAsc = (col === 'nama_pegawai');
                 }
+            },
+
+            updatePerPage(value) {
+                this.perPage = Number(value);
+                this.currentPage = 1;
+                this.syncPerPageToUrl('rekap_per_page', this.perPage);
+            },
+
+            syncPerPageToUrl(key, value) {
+                const url = new URL(window.location.href);
+                url.searchParams.set(key, value);
+                window.history.replaceState({}, '', `${url.pathname}?${url.searchParams.toString()}${url.hash}`);
             }
         }">
         <!-- Header Tabel & Search Bar -->
@@ -67,16 +80,32 @@
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Data periode: <span class="font-semibold text-brand-600 dark:text-brand-400">{{ $namaBulan[$selectedMonth - 1] }} {{ $selectedYear }}</span></p>
             </div>
             
-            <!-- Search Input -->
-            <div class="relative w-full sm:w-64">
-                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+            <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+                <label class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+                    <span>Tampilkan</span>
+                    <select
+                        x-model.number="perPage"
+                        @change="updatePerPage($event.target.value)"
+                        class="rounded-md border border-gray-300 bg-white px-2 py-1.5 text-xs font-semibold text-gray-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+                    >
+                        @foreach($perPageOptions as $option)
+                            <option value="{{ $option }}">{{ $option }}</option>
+                        @endforeach
+                    </select>
+                    <span>data</span>
+                </label>
+
+                <!-- Search Input -->
+                <div class="relative w-full sm:w-64">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input x-model="search" type="text" 
+                        class="block w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-3 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400" 
+                        placeholder="Cari nama pegawai...">
                 </div>
-                <input x-model="search" type="text" 
-                    class="block w-full rounded-md border border-gray-300 bg-white py-1.5 pl-10 pr-3 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400" 
-                    placeholder="Cari nama pegawai...">
             </div>
         </div>
 

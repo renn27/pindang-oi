@@ -21,7 +21,7 @@
             }else{
                 this.selectedMonth--
             }
-            window.location.href = `?month=${this.selectedMonth}&year=${this.selectedYear}`;
+            this.goToSelectedPeriod()
         },
 
         nextMonth(){
@@ -31,7 +31,14 @@
             }else{
                 this.selectedMonth++
             }
-            window.location.href = `?month=${this.selectedMonth}&year=${this.selectedYear}`;
+            this.goToSelectedPeriod()
+        },
+
+        goToSelectedPeriod(){
+            const url = new URL(window.location.href)
+            url.searchParams.set('month', this.selectedMonth)
+            url.searchParams.set('year', this.selectedYear)
+            window.location.href = `${url.pathname}?${url.searchParams.toString()}${url.hash}`
         },
 
         isCurrentMonth(){
@@ -536,7 +543,8 @@
                         @auth
                             <x-dashboard.vis-rank-pegawai
                                 :rankPegawaiAll="$rankPegawaiAll"
-                                :perPage="5" />
+                                :perPage="$rankPegawaiPerPage"
+                                :perPageOptions="$rankPegawaiPerPageOptions" />
                         @endauth
                     </div>
 
@@ -552,7 +560,9 @@
             <x-dashboard.vis-rekap-penugasan-pegawai
                 :rekapAnggota="$rekapAnggota"
                 :selectedMonth="$selectedMonth"
-                :selectedYear="$selectedYear" />
+                :selectedYear="$selectedYear"
+                :perPage="$rekapPenugasanPerPage"
+                :perPageOptions="$rekapPerPageOptions" />
         </div>
     @endif
 
