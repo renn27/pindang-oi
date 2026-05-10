@@ -63,12 +63,15 @@ class PengirimanController extends Controller
 
                 // Deadline = TANGGAL selesai (bukan endOfDay)
                 $tanggalDeadline = Carbon::parse($penugasan->tanggal_selesai)->startOfDay();
+                $deadlineEfektif = $this->hasDeadlineGracePeriod($penugasan)
+                    ? $tanggalDeadline->copy()->addDay()
+                    : $tanggalDeadline;
 
                 // Hitung hari keterlambatan
-                if ($tanggalPengiriman->lte($tanggalDeadline)) {
+                if ($tanggalPengiriman->lte($deadlineEfektif)) {
                     $hariTelat = 0;
                 } else {
-                    $hariTelat = (int) $tanggalDeadline->diffInDays($tanggalPengiriman);
+                    $hariTelat = (int) $deadlineEfektif->diffInDays($tanggalPengiriman);
                     // dd($hariTelat);
                 }
 
@@ -150,6 +153,17 @@ class PengirimanController extends Controller
                 ->back()
                 ->with('error', 'Gagal membatalkan pengiriman. Silakan coba lagi.');
         }
+    }
+
+    private function hasDeadlineGracePeriod(Penugasan $penugasan): bool
+    {
+        $jenisKegiatan = strtolower($penugasan->jenisKegiatan?->jenis_kegiatan ?? '');
+
+        return in_array($jenisKegiatan, [
+            'pengawasan',
+            'supervisi',
+            'perjalanan dinas',
+        ], true);
     }
 
 }
