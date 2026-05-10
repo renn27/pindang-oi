@@ -149,16 +149,19 @@ class DashboardAnalyticsService {
         $avg = (float) $gs['avg_target_bulan'];
         $ld  = $this->buildLatestDiterimaSubquery($bf);
 
-        $inner = \DB::table('penugasans')
-            ->join('pegawais', 'pegawais.id_pegawai', '=', 'penugasans.id_anggota')
+        $inner = \DB::table('pegawais')
+            ->leftJoin('penugasans', function($join) use ($am) {
+                $join->on('pegawais.id_pegawai', '=', 'penugasans.id_anggota')
+                     ->whereNull('penugasans.deleted_at')
+                     ->whereRaw('(YEAR(penugasans.tanggal_mulai)*12+MONTH(penugasans.tanggal_mulai)) <= ?', [$am])
+                     ->whereRaw('(YEAR(penugasans.tanggal_selesai)*12+MONTH(penugasans.tanggal_selesai)) >= ?', [$am]);
+            })
             ->leftJoinSub($ld, 'lp', fn($j) => $j->on('penugasans.id_penugasan', '=', 'lp.id_penugasan'))
-            ->whereNull('penugasans.deleted_at')
-            ->whereRaw('(YEAR(penugasans.tanggal_mulai)*12+MONTH(penugasans.tanggal_mulai)) <= ?', [$am])
-            ->whereRaw('(YEAR(penugasans.tanggal_selesai)*12+MONTH(penugasans.tanggal_selesai)) >= ?', [$am])
             ->groupBy('pegawais.id_pegawai', 'pegawais.nama_pegawai', 'pegawais.photo')
             ->selectRaw("
                 pegawais.id_pegawai, pegawais.nama_pegawai, pegawais.photo,
                 COUNT(DISTINCT penugasans.id_penugasan) AS total_penugasan,
+                COUNT(DISTINCT lp.id_penugasan) AS total_penugasan_dikerjakan,
                 COUNT(DISTINCT CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN penugasans.id_penugasan END) AS total_selesai,
                 COUNT(DISTINCT CASE WHEN lp.tipe_pengiriman='Cicilan'   THEN penugasans.id_penugasan END) AS total_cicilan_diterima,
                 COALESCE(SUM(penugasans.target),0) AS target_pegawai,
@@ -186,21 +189,21 @@ class DashboardAnalyticsService {
                            /GREATEST(1,DATEDIFF(penugasans.tanggal_selesai,penugasans.tanggal_mulai))*10.0))
                     END
                 ELSE NULL END),0) AS f2_kecepatan,
-                CASE WHEN COUNT(DISTINCT penugasans.id_penugasan)=0 THEN 0.0
+                CASE WHEN COUNT(DISTINCT lp.id_penugasan)=0 THEN 0.0
                 ELSE COALESCE(SUM(CASE
                     WHEN lp.tipe_pengiriman='Pelunasan' THEN lp.rr_kirim*1.0
                     WHEN lp.tipe_pengiriman='Cicilan'   THEN lp.rr_kirim
                         *CASE WHEN penugasans.target=0 THEN 0.0
                           ELSE CAST(lp.jumlah_dikirim AS DECIMAL(10,4))/CAST(penugasans.target AS DECIMAL(10,4)) END
-                    ELSE 0.0 END),0)/COUNT(DISTINCT penugasans.id_penugasan) END AS f3_rr_kirim,
-                CASE WHEN COUNT(DISTINCT penugasans.id_penugasan)=0 THEN 0.0
+                    ELSE 0.0 END),0)/COUNT(DISTINCT lp.id_penugasan) END AS f3_rr_kirim,
+                CASE WHEN COUNT(DISTINCT lp.id_penugasan)=0 THEN 0.0
                 ELSE COALESCE(SUM(CASE
                     WHEN lp.tipe_pengiriman='Pelunasan' THEN lp.rating_kirim*20.0*1.0
                     WHEN lp.tipe_pengiriman='Cicilan'   THEN lp.rating_kirim*20.0
                         *CASE WHEN penugasans.target=0 THEN 0.0
                           ELSE CAST(lp.jumlah_dikirim AS DECIMAL(10,4))/CAST(penugasans.target AS DECIMAL(10,4)) END
-                    ELSE 0.0 END),0)/COUNT(DISTINCT penugasans.id_penugasan) END AS f4_rating_kirim,
-                CASE WHEN ?=0 THEN 1.0
+                    ELSE 0.0 END),0)/COUNT(DISTINCT lp.id_penugasan) END AS f4_rating_kirim,
+                CASE WHEN ?=0 OR COUNT(DISTINCT penugasans.id_penugasan)=0 THEN 1.0
                 ELSE LEAST(1.15,GREATEST(0.85,COALESCE(SUM(penugasans.target),0)/?))
                 END AS koefisien_beban
             ", [$c, $c, $c, $avg, $avg]);
@@ -216,7 +219,11 @@ class DashboardAnalyticsService {
                            )
                     ELSE GREATEST(0.0, (f1_penyelesaian+f2_kecepatan+f3_rr_kirim+f4_rating_kirim)/4.0 * koefisien_beban)
                 END AS rata_rata_final')
-            ->orderByDesc('rata_rata_final')->orderByDesc('total_selesai')->orderBy('nama_pegawai');
+            // Prioritas: pegawai TANPA penugasan aktif selalu di bawah pegawai yang punya penugasan
+            ->orderByRaw('CASE WHEN total_penugasan = 0 THEN 1 ELSE 0 END')
+            ->orderByDesc('rata_rata_final')
+            ->orderByDesc('total_selesai')
+            ->orderBy('nama_pegawai');
 
     }
 
@@ -274,6 +281,8 @@ class DashboardAnalyticsService {
         $item->rating_persen  = round((float)($item->f4_rating_kirim ?? 0), 2);
         $item->avg_skor_cepat = round((float)($item->f2_kecepatan    ?? 0), 2);
         $item->rata_rata      = round((float)($item->rata_rata_final  ?? 0), 2);
+        $item->has_penugasan_aktif = ((int)($item->total_penugasan ?? 0)) > 0;
+        $item->total_penugasan_dikerjakan = (int)($item->total_penugasan_dikerjakan ?? 0);
         $det = $details->get($item->id_pegawai, collect())->values();
         $item->details = $det;
         $a=$c=$pp=$pc=0.0;
@@ -302,10 +311,11 @@ class DashboardAnalyticsService {
                 'detail'=>$det->map(fn($r)=>['nama_sub_kegiatan'=>$r->nama_sub_kegiatan,
                     'rating_kirim'=>$r->rating_kirim,'bobot_parsial'=>round($r->bobot_parsial,4),
                     'kontribusi_rating'=>round($r->kontribusi_rating,4),'tipe_pengiriman'=>$r->tipe_pengiriman])->values()],
-            'koefisien_beban'    =>round((float)($item->koefisien_beban??1.0),4),
-            'target_pegawai'     =>$a,
-            'avg_target_bulan'   =>round($gs['avg_target_bulan'],2),
-            'total_penugasan_dia'=>(int)($item->total_penugasan??0),
+            'koefisien_beban'            => round((float)($item->koefisien_beban??1.0),4),
+            'target_pegawai'             => $a,
+            'avg_target_bulan'           => round($gs['avg_target_bulan'],2),
+            'total_penugasan_dia'        => (int)($item->total_penugasan??0),
+            'total_penugasan_dikerjakan' => (int)($item->total_penugasan_dikerjakan??0),
             'rata_rata_base'     =>round((float)($item->rata_rata_base??0),2),
             'rata_rata_final'    =>round((float)($item->rata_rata_final??0),2),
             'bonus_aktual'       =>(function() use ($item) {

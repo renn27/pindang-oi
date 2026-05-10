@@ -155,7 +155,20 @@
 
                         {{-- Nama --}}
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="font-medium text-gray-800 dark:text-white" x-text="pegawai.nama_pegawai || 'N/A'"></div>
+                            <div class="flex flex-col gap-1">
+                                <div class="font-medium text-gray-800 dark:text-white" x-text="pegawai.nama_pegawai || 'N/A'"></div>
+                                <template x-if="!pegawai.has_penugasan_aktif">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 w-fit">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                        Tidak ada penugasan bulan ini
+                                    </span>
+                                </template>
+                                <template x-if="pegawai.has_penugasan_aktif">
+                                    <span class="text-xs text-gray-400 dark:text-gray-500"
+                                        x-text="(pegawai.total_penugasan_dikerjakan ?? 0) + ' dari ' + (pegawai.total_penugasan ?? 0) + ' penugasan dikerjakan'"
+                                    ></span>
+                                </template>
+                            </div>
                         </td>
 
                         {{-- RR Kirim --}}
@@ -218,23 +231,33 @@
 
                         {{-- Aksi --}}
                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <button
-                                @click="$dispatch('open-calc-modal', {
-                                    nama: pegawai.nama_pegawai,
-                                    rr_kirim: Number(pegawai.rr_kirim ?? 0),
-                                    rating_persen: Number(pegawai.rating_persen ?? 0),
-                                    skor_cepat: Number(pegawai.avg_skor_cepat ?? 0),
-                                    rata_rata: Number(pegawai.rata_rata ?? 0),
-                                    details: pegawai.details ?? [],
-                                    breakdown: pegawai.breakdown_formula ?? null
-                                })"
-                                class="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 transition-colors"
-                            >
-                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                </svg>
-                                Rumus
-                            </button>
+                            <template x-if="pegawai.has_penugasan_aktif">
+                                <button
+                                    @click="$dispatch('open-calc-modal', {
+                                        nama: pegawai.nama_pegawai,
+                                        rr_kirim: Number(pegawai.rr_kirim ?? 0),
+                                        rating_persen: Number(pegawai.rating_persen ?? 0),
+                                        skor_cepat: Number(pegawai.avg_skor_cepat ?? 0),
+                                        rata_rata: Number(pegawai.rata_rata ?? 0),
+                                        details: pegawai.details ?? [],
+                                        breakdown: pegawai.breakdown_formula ?? null
+                                    })"
+                                    class="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 transition-colors"
+                                >
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    </svg>
+                                    Rumus
+                                </button>
+                            </template>
+                            <template x-if="!pegawai.has_penugasan_aktif">
+                                <span class="inline-flex items-center gap-1 rounded-lg bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-400 dark:bg-gray-800 dark:text-gray-500 cursor-not-allowed">
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    </svg>
+                                    —
+                                </span>
+                            </template>
                         </td>
                     </tr>
                 </template>
