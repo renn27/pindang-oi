@@ -68,19 +68,36 @@ class KalenderDLController extends Controller
                 $validated['tanggal_selesai']
             );
 
+            $dates = [];
             foreach ($period as $date) {
-                // 🔒 Cek duplikat per tanggal
-                $exists = KalenderDL::where('id_pegawai', $validated['id_pegawai'])
-                    ->where('tanggal_dl', $date)
-                    ->exists();
+                $dates[] = $date->format('Y-m-d');
+            }
 
-                if (!$exists) {
-                    KalenderDL::create([
-                        'id_pegawai' => $validated['id_pegawai'],
-                        'id_penugasan' => $validated['id_penugasan'],
-                        'tanggal_dl' => $date,
-                    ]);
-                }
+            // 1. Cek Bentrok (Apakah ada tanggal yang sudah dipakai?)
+            $adaBentrok = KalenderDL::where('id_pegawai', $validated['id_pegawai'])
+                ->whereIn('tanggal_dl', $dates)
+                ->exists();
+
+            if ($adaBentrok) {
+                return redirect()->back()
+                    ->with('error', 'Gagal: Pegawai sudah memiliki jadwal DL pada rentang tanggal tersebut.')
+                    ->withInput();
+            }
+
+            // 2. Siapkan data untuk bulk insert
+            $dataToInsert = [];
+            foreach ($dates as $d) {
+                $dataToInsert[] = [
+                    'id_pegawai'   => $validated['id_pegawai'],
+                    'id_penugasan' => $validated['id_penugasan'],
+                    'tanggal_dl'   => $d,
+                    'created_at'   => now(),
+                    'updated_at'   => now(),
+                ];
+            }
+
+            if (!empty($dataToInsert)) {
+                KalenderDL::insert($dataToInsert);
             }
 
             return redirect()

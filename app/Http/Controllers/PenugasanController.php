@@ -229,7 +229,8 @@ class PenugasanController extends Controller
             $validated,
             $subKegiatan->tanggal_mulai,
             $subKegiatan->tanggal_selesai,
-            true // skip main date — updateData sudah menangani tanggal utama
+            true, // skip main date — updateData sudah menangani tanggal utama
+            $penugasan->id_penugasan
         );
 
         try {
@@ -376,69 +377,82 @@ class PenugasanController extends Controller
 
         $duplicates = [];
 
-        foreach ($dates as $index => $date) {
-            $mulai = $date['tanggal_mulai'] ?? null;
-            $selesai = $date['tanggal_selesai'] ?? null;
+        // Bangun 1 Query raksasa untuk mengecek semua rentang tanggal sekaligus (Mencegah N+1)
+        $query = Penugasan::where('id_anggota', $idAnggota)
+            ->where(function($q) {
+                $q->where('butuh_dl', 1)->orWhere('butuh_translok', 1);
+            });
 
-            if (!$mulai || !$selesai) continue;
+        if (!empty($excludeId)) {
+            $query->where('id_penugasan', '!=', $excludeId);
+        }
 
-            $query = Penugasan::where('id_anggota', $idAnggota)
-                ->where(function($q) {
-                    $q->where('butuh_dl', 1)
-                    ->orWhere('butuh_translok', 1);
-                })
-                ->where('tanggal_mulai', '<=', $selesai)
-                ->where('tanggal_selesai', '>=', $mulai);
-
-            if (!empty($excludeId)) {
-                $query->where('id_penugasan', '!=', $excludeId);
+        $query->where(function($q) use ($dates) {
+            foreach ($dates as $date) {
+                $m = $date['tanggal_mulai'] ?? null;
+                $s = $date['tanggal_selesai'] ?? null;
+                if ($m && $s) {
+                    $q->orWhere(function($subQ) use ($m, $s) {
+                        $subQ->where('tanggal_mulai', '<=', $s)
+                             ->where('tanggal_selesai', '>=', $m);
+                    });
+                }
             }
+        });
 
-            $conflict = $query->first(['tanggal_mulai', 'tanggal_selesai']);
+        $conflictRecords = $query->get(['tanggal_mulai', 'tanggal_selesai']);
 
-            if ($conflict) {
-                $cMulai = $conflict->tanggal_mulai;
-                $cSelesai = $conflict->tanggal_selesai;
+        if ($conflictRecords->isNotEmpty()) {
+            foreach ($dates as $index => $date) {
+                $mulai = $date['tanggal_mulai'] ?? null;
+                $selesai = $date['tanggal_selesai'] ?? null;
+                if (!$mulai || !$selesai) continue;
 
                 $reqM = \Carbon\Carbon::parse($mulai)->startOfDay();
                 $reqS = \Carbon\Carbon::parse($selesai)->startOfDay();
-                $dbM = \Carbon\Carbon::parse($cMulai)->startOfDay();
-                $dbS = \Carbon\Carbon::parse($cSelesai)->startOfDay();
 
-                $dbMulaiStr = $dbM->translatedFormat('d M Y');
-                $dbSelesaiStr = $dbS->translatedFormat('d M Y');
+                foreach ($conflictRecords as $conflict) {
+                    $dbM = \Carbon\Carbon::parse($conflict->tanggal_mulai)->startOfDay();
+                    $dbS = \Carbon\Carbon::parse($conflict->tanggal_selesai)->startOfDay();
 
-                $isMulaiHit = $reqM->greaterThanOrEqualTo($dbM) && $reqM->lessThanOrEqualTo($dbS);
-                $isSelesaiHit = $reqS->greaterThanOrEqualTo($dbM) && $reqS->lessThanOrEqualTo($dbS);
+                    // Cek Irisan (Overlap) di RAM
+                    if ($reqM->lessThanOrEqualTo($dbS) && $reqS->greaterThanOrEqualTo($dbM)) {
+                        $dbMulaiStr = $dbM->translatedFormat('d M Y');
+                        $dbSelesaiStr = $dbS->translatedFormat('d M Y');
 
-                // Penentuan elemen form mana yang akan difokuskan
-                if (!$isMulaiHit && $isSelesaiHit) {
-                    $focusEl = ($index === 0) ? 'tanggal_selesai' : "tanggal_selesai_$index";
-                } else {
-                    $focusEl = ($index === 0) ? 'tanggal_mulai' : "tanggal_mulai_$index";
-                }
+                        $isMulaiHit = $reqM->greaterThanOrEqualTo($dbM) && $reqM->lessThanOrEqualTo($dbS);
+                        $isSelesaiHit = $reqS->greaterThanOrEqualTo($dbM) && $reqS->lessThanOrEqualTo($dbS);
 
-                // Penentuan string pesan error (berdasarkan DB range 1 hari atau rentang hari)
-                if ($dbMulaiStr === $dbSelesaiStr) {
-                    if ($isMulaiHit && !$isSelesaiHit) {
-                        $msg = "Tanggal mulai {$dbMulaiStr} untuk {$namaAnggota} sudah ada di penugasan lain.";
-                    } elseif ($isSelesaiHit && !$isMulaiHit) {
-                        $msg = "Tanggal selesai {$dbSelesaiStr} untuk {$namaAnggota} sudah ada di penugasan lain.";
-                    } else {
-                        $msg = "Tanggal {$dbMulaiStr} untuk {$namaAnggota} sudah ada di penugasan lain.";
+                        if (!$isMulaiHit && $isSelesaiHit) {
+                            $focusEl = ($index === 0) ? 'tanggal_selesai' : "tanggal_selesai_$index";
+                        } else {
+                            $focusEl = ($index === 0) ? 'tanggal_mulai' : "tanggal_mulai_$index";
+                        }
+
+                        if ($dbMulaiStr === $dbSelesaiStr) {
+                            if ($isMulaiHit && !$isSelesaiHit) {
+                                $msg = "Tanggal mulai {$dbMulaiStr} untuk {$namaAnggota} sudah ada di penugasan lain.";
+                            } elseif ($isSelesaiHit && !$isMulaiHit) {
+                                $msg = "Tanggal selesai {$dbSelesaiStr} untuk {$namaAnggota} sudah ada di penugasan lain.";
+                            } else {
+                                $msg = "Tanggal {$dbMulaiStr} untuk {$namaAnggota} sudah ada di penugasan lain.";
+                            }
+                        } else {
+                            $msg = "Tanggal mulai {$dbMulaiStr} sampai dengan Tanggal selesai {$dbSelesaiStr} untuk {$namaAnggota} sudah ada di penugasan lain.";
+                        }
+
+                        $duplicates[] = [
+                            'message' => $msg,
+                            'focus_el' => $focusEl,
+                            'index' => $index,
+                            'requested_mulai' => $mulai,
+                            'requested_selesai' => $selesai,
+                            'is_selesai' => (!$isMulaiHit && $isSelesaiHit)
+                        ];
+
+                        break; // Lanjut ke rentang input berikutnya
                     }
-                } else {
-                    $msg = "Tanggal mulai {$dbMulaiStr} sampai dengan Tanggal selesai {$dbSelesaiStr} untuk {$namaAnggota} sudah ada di penugasan lain.";
                 }
-
-                $duplicates[] = [
-                    'message' => $msg,
-                    'focus_el' => $focusEl,
-                    'index' => $index,
-                    'requested_mulai' => $mulai,
-                    'requested_selesai' => $selesai,
-                    'is_selesai' => (!$isMulaiHit && $isSelesaiHit) // flag to determine which side of the date triggered it
-                ];
             }
         }
 
@@ -452,15 +466,16 @@ class PenugasanController extends Controller
      * Helper to extract flat dates array from main and additional dates,
      * and validate them against SubKegiatan bounds.
      */
-    private function extractAndValidateDates(Request $request, array $validated, $subKegiatanMulai, $subKegiatanSelesai, $skipMain = false): array
+    private function extractAndValidateDates(Request $request, array $validated, $subKegiatanMulai, $subKegiatanSelesai, $skipMain = false, $penugasanIdToExclude = null): array
     {
         $allDates = [];
 
-        if (!$skipMain) {
-            $allDates[] = [
-                'mulai' => $validated['tanggal_mulai'] ?? null,
-                'selesai' => $validated['tanggal_selesai'] ?? null
-            ];
+        // Selalu ambil main date untuk dievaluasi
+        $mainMulai = $validated['tanggal_mulai'] ?? null;
+        $mainSelesai = $validated['tanggal_selesai'] ?? null;
+
+        if ($mainMulai && $mainSelesai) {
+            $allDates[] = ['mulai' => $mainMulai, 'selesai' => $mainSelesai, 'is_main' => true];
         }
 
         $mulaiList = $request->tanggal_mulai_list ?? [];
@@ -468,7 +483,7 @@ class PenugasanController extends Controller
         foreach ($mulaiList as $index => $tglMulai) {
             $tglSelesai = $selesaiList[$index] ?? null;
             if ($tglMulai && $tglSelesai) {
-                $allDates[] = ['mulai' => $tglMulai, 'selesai' => $tglSelesai];
+                $allDates[] = ['mulai' => $tglMulai, 'selesai' => $tglSelesai, 'is_main' => false];
             }
         }
 
@@ -478,31 +493,71 @@ class PenugasanController extends Controller
         $validDatesToSave = [];
         $existing = [];
 
+        $idAnggota = $validated['id_anggota'] ?? null;
+        $butuhDl = $validated['butuh_dl'] ?? 0;
+        $butuhTranslok = $validated['butuh_translok'] ?? 0;
+        $wajibCekBentrok = ($butuhDl == 1 || $butuhTranslok == 1);
+
+        // 0. Cek Bentrok Backend Sekaligus (Mencegah N+1 Loop)
+        if ($wajibCekBentrok && $idAnggota && count($allDates) > 0) {
+            $query = \App\Models\Penugasan::where('id_anggota', $idAnggota)
+                ->where(function($q) {
+                    $q->where('butuh_dl', 1)->orWhere('butuh_translok', 1);
+                });
+
+            if ($penugasanIdToExclude) {
+                $query->where('id_penugasan', '!=', $penugasanIdToExclude);
+            }
+
+            $query->where(function($q) use ($allDates) {
+                foreach ($allDates as $tgl) {
+                    $m = $tgl['mulai'] ?? null;
+                    $s = $tgl['selesai'] ?? null;
+                    if ($m && $s) {
+                        $q->orWhere(function($subQ) use ($m, $s) {
+                            $subQ->where('tanggal_mulai', '<=', $s)
+                                 ->where('tanggal_selesai', '>=', $m);
+                        });
+                    }
+                }
+            });
+
+            if ($query->exists()) {
+                throw ValidationException::withMessages([
+                    'tanggal_mulai' => 'Gagal: Pegawai sudah memiliki jadwal DL/Translok di penugasan lain pada rentang tanggal tersebut.'
+                ]);
+            }
+        }
+
         foreach ($allDates as $tgl) {
             $m = $tgl['mulai'];
             $s = $tgl['selesai'];
+            $isMain = $tgl['is_main'];
 
-            // Jika salah satu atau keduanya kosong → skip, jangan buat penugasan dengan tanggal null
             if (empty($m) || empty($s)) {
                 continue;
             }
 
-            // Hindari duplikat
+            // Hindari duplikat input array
             $key = $m . '|' . $s;
-            if (in_array($key, $existing))
+            if (in_array($key, $existing)) {
                 continue;
+            }
             $existing[] = $key;
 
             $cm = \Carbon\Carbon::parse($m)->startOfDay();
             $cs = \Carbon\Carbon::parse($s)->startOfDay();
 
+            // 1. Validasi Rentang Sub Kegiatan
             if ($cs->lt($cm) || ($min && $cm->lt($min)) || ($max && $cs->gt($max))) {
                 throw ValidationException::withMessages([
                     'tanggal_mulai' => 'Tanggal penugasan tidak valid atau di luar rentang sub kegiatan.'
                 ]);
             }
 
-            $validDatesToSave[] = ['mulai' => $m, 'selesai' => $s];
+            if (!$skipMain || !$isMain) {
+                $validDatesToSave[] = ['mulai' => $m, 'selesai' => $s];
+            }
         }
 
         return $validDatesToSave;

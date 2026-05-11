@@ -19,7 +19,7 @@ class DashboardController extends Controller
         $unfinishedTerlewatAsAnggota = null;
         $unfinishedBerjalanAsAnggota = null;
         if ($user && $user->isAnggotaTim()) {
-            $baseQuery = Penugasan::with(['subKegiatan.kegiatan.bidang', 'jenisKegiatan', 'anggota'])
+            $baseQuery = Penugasan::with(['subKegiatan.kegiatan.bidang', 'jenisKegiatan', 'anggota', 'kalenderDLs', 'pengirimans.penerimaan'])
                 ->where('id_anggota', $user->id_pegawai)
                 ->whereDoesntHave('pengirimans.penerimaan', function ($q) {
                     $q->where('status', 'Diterima');
@@ -37,7 +37,7 @@ class DashboardController extends Controller
 
             // Penugasan yang pengiriman terbarunya sudah ada penerimaan berstatus 'Revisi'
             // (belum kirim ulang setelah revisi)
-            $revisiAsAnggota = Penugasan::with(['subKegiatan.kegiatan.bidang', 'jenisKegiatan', 'anggota', 'latestPengiriman.penerimaan'])
+            $revisiAsAnggota = Penugasan::with(['subKegiatan.kegiatan.bidang', 'jenisKegiatan', 'anggota', 'latestPengiriman.penerimaan', 'kalenderDLs', 'pengirimans.penerimaan'])
                 ->where('id_anggota', $user->id_pegawai)
                 ->whereHas('pengirimans.penerimaan', function ($q) {
                     $q->where('status', 'Revisi');
@@ -57,7 +57,7 @@ class DashboardController extends Controller
         $unfinishedTerlewatAsKetua = null;
         $unfinishedBerjalanAsKetua = null;
         if ($user && $user->isKetuaTim()) {
-            $baseQueryKetua = \App\Models\Penugasan::with(['subKegiatan.kegiatan.bidang', 'jenisKegiatan', 'anggota'])
+            $baseQueryKetua = \App\Models\Penugasan::with(['subKegiatan.kegiatan.bidang', 'jenisKegiatan', 'anggota', 'kalenderDLs', 'pengirimans.penerimaan'])
                 ->whereHas('subKegiatan.kegiatan', function ($q) use ($user) {
                     $q->where('id_penanggung_jawab', $user->id_pegawai);
                 })
@@ -76,7 +76,7 @@ class DashboardController extends Controller
                 ->paginate(5, ['*'], 'ketua_berjalan_page');
 
             // Penugasan DL / Translok milik anggota tim yg ditolak (Revisi) oleh Pimpinan
-            $revisiDlAsKetua = Penugasan::with(['subKegiatan.kegiatan.bidang', 'jenisKegiatan', 'anggota'])
+            $revisiDlAsKetua = Penugasan::with(['subKegiatan.kegiatan.bidang', 'jenisKegiatan', 'anggota', 'kalenderDLs', 'pengirimans.penerimaan'])
                 ->whereHas('subKegiatan.kegiatan', function ($q) use ($user) {
                     $q->where('id_penanggung_jawab', $user->id_pegawai);
                 })

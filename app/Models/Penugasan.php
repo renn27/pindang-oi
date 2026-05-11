@@ -177,7 +177,7 @@ class Penugasan extends Model
 
     public function sudahMasukKalenderDL()
     {
-        return $this->kalenderDLs()->exists();
+        return $this->kalenderDLs->isNotEmpty();
     }
 
     public function isStarted(): bool
@@ -203,10 +203,9 @@ class Penugasan extends Model
             return false;
 
         // Sudah ada pelunasan diterima → tugas selesai
-        $adaPelunasanDiterima = $this->pengirimans()
-            ->where('tipe_pengiriman', 'Pelunasan')
-            ->whereHas('penerimaan', fn($q) => $q->where('status', 'Diterima'))
-            ->exists();
+        $adaPelunasanDiterima = $this->pengirimans->contains(function ($p) {
+            return $p->tipe_pengiriman === 'Pelunasan' && $p->penerimaan && $p->penerimaan->status === 'Diterima';
+        });
 
         if ($adaPelunasanDiterima)
             return false;
@@ -246,10 +245,9 @@ class Penugasan extends Model
         }
 
         // Sudah ada pelunasan diterima → tugas selesai
-        $adaPelunasanDiterima = $this->pengirimans()
-            ->where('tipe_pengiriman', 'Pelunasan')
-            ->whereHas('penerimaan', fn($q) => $q->where('status', 'Diterima'))
-            ->exists();
+        $adaPelunasanDiterima = $this->pengirimans->contains(function ($p) {
+            return $p->tipe_pengiriman === 'Pelunasan' && $p->penerimaan && $p->penerimaan->status === 'Diterima';
+        });
 
         if (!$adaPelunasanDiterima)
             return 'info|Tunggu  anggota tim mengirimkan Pelunasannya';
@@ -291,10 +289,9 @@ class Penugasan extends Model
         }
 
         // 3️⃣ BARU: Jika sudah ada pelunasan yang diterima, blokir pengiriman
-        $adaPelunasanDiterima = $this->pengirimans()
-            ->where('tipe_pengiriman', 'Pelunasan')
-            ->whereHas('penerimaan', fn($q) => $q->where('status', 'Diterima'))
-            ->exists();
+        $adaPelunasanDiterima = $this->pengirimans->contains(function ($p) {
+            return $p->tipe_pengiriman === 'Pelunasan' && $p->penerimaan && $p->penerimaan->status === 'Diterima';
+        });
 
         if ($adaPelunasanDiterima) {
             return false;
