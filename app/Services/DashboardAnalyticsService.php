@@ -13,42 +13,41 @@ use Illuminate\Support\Collection;
 class DashboardAnalyticsService {
 
     public function getRekapPenugasanPegawai($bulan, $tahun) {
+        // Gunakan range tanggal eksplisit agar index kolom created_at dapat dipakai database
+        $startOfMonth = Carbon::create($tahun, $bulan, 1)->startOfMonth();
+        $endOfMonth   = Carbon::create($tahun, $bulan, 1)->endOfMonth();
+
         $pegawai = Pegawai::withCount([
             // 1. Jumlah penugasan (COUNT baris penugasan)
-            'penugasanSebagaiAnggota as total_penugasan' => function ($q) use ($bulan, $tahun) {
-                $q->whereMonth('created_at', $bulan)
-                  ->whereYear('created_at', $tahun);
+            'penugasanSebagaiAnggota as total_penugasan' => function ($q) use ($startOfMonth, $endOfMonth) {
+                $q->whereBetween('created_at', [$startOfMonth, $endOfMonth]);
             },
 
             // 2. Rekap penugasan yang sudah disubmit/dikirim (punya pengiriman)
-            'penugasanSebagaiAnggota as total_dikirim' => function ($q) use ($bulan, $tahun) {
-                $q->whereMonth('created_at', $bulan)
-                  ->whereYear('created_at', $tahun)
+            'penugasanSebagaiAnggota as total_dikirim' => function ($q) use ($startOfMonth, $endOfMonth) {
+                $q->whereBetween('created_at', [$startOfMonth, $endOfMonth])
                   ->has('pengirimans'); // ada datanya di tabel pengiriman
             },
 
             // 3. Rekap penugasan yang sudah diperiksa & terverifikasi "Diterima"
-            'penugasanSebagaiAnggota as total_diterima' => function ($q) use ($bulan, $tahun) {
-                $q->whereMonth('created_at', $bulan)
-                  ->whereYear('created_at', $tahun)
+            'penugasanSebagaiAnggota as total_diterima' => function ($q) use ($startOfMonth, $endOfMonth) {
+                $q->whereBetween('created_at', [$startOfMonth, $endOfMonth])
                   ->whereHas('pengirimans.penerimaan', function ($q2) {
                       $q2->where('status', 'Diterima');
                   });
             },
 
             // 4. Rekap penugasan yang sudah diperiksa & terverifikasi "Revisi"
-            'penugasanSebagaiAnggota as total_revisi' => function ($q) use ($bulan, $tahun) {
-                $q->whereMonth('created_at', $bulan)
-                  ->whereYear('created_at', $tahun)
+            'penugasanSebagaiAnggota as total_revisi' => function ($q) use ($startOfMonth, $endOfMonth) {
+                $q->whereBetween('created_at', [$startOfMonth, $endOfMonth])
                   ->whereHas('pengirimans.penerimaan', function ($q2) {
                       $q2->where('status', 'Revisi');
                   });
             },
 
             // 5. Rekap penugasan yang sudah dikirim TAPI belum diterima (Sedang Diperiksa)
-            'penugasanSebagaiAnggota as total_diperiksa' => function ($q) use ($bulan, $tahun) {
-                $q->whereMonth('created_at', $bulan)
-                  ->whereYear('created_at', $tahun)
+            'penugasanSebagaiAnggota as total_diperiksa' => function ($q) use ($startOfMonth, $endOfMonth) {
+                $q->whereBetween('created_at', [$startOfMonth, $endOfMonth])
                   ->has('pengirimans')
                   ->whereDoesntHave('pengirimans.penerimaan', function ($q2) {
                       $q2->where('status', 'Diterima');
@@ -56,9 +55,8 @@ class DashboardAnalyticsService {
             }
         ])
         // SUM kolom target → total akumulasi target penugasan (bukan jumlah baris)
-        ->withSum(['penugasanSebagaiAnggota as total_target' => function ($q) use ($bulan, $tahun) {
-            $q->whereMonth('created_at', $bulan)
-              ->whereYear('created_at', $tahun);
+        ->withSum(['penugasanSebagaiAnggota as total_target' => function ($q) use ($startOfMonth, $endOfMonth) {
+            $q->whereBetween('created_at', [$startOfMonth, $endOfMonth]);
         }], 'target')
         ->orderBy('nama_pegawai', 'asc')
         ->get();
@@ -72,35 +70,38 @@ class DashboardAnalyticsService {
 
     public function rankPegawaiAll($month = null, $year = null): Collection
     {
-        [$month, $year, $bf, $gs] = $this->rankInit($month, $year);
-        $allData = $this->buildRankBaseQuery($bf, $year, $month, $gs)->get();
-        $details = $this->buildDetailsQuery($bf, $year, $month, $allData->pluck('id_pegawai'));
+        [$month, $year, $bf, $gs, $startOfMonth, $endOfMonth] = $this->rankInit($month, $year);
+        $allData = $this->buildRankBaseQuery($bf, $gs, $startOfMonth, $endOfMonth)->get();
+        $details = $this->buildDetailsQuery($bf, $allData->pluck('id_pegawai'), $startOfMonth, $endOfMonth);
         return $allData->map(fn($item) => $this->decorateRankItem($item, $details, $gs));
     }
 
     public function rankPegawai(int $perPage = 5, $month = null, $year = null)
     {
-        [$month, $year, $bf, $gs] = $this->rankInit($month, $year);
-        $paginated = $this->buildRankBaseQuery($bf, $year, $month, $gs)->paginate($perPage);
-        $details   = $this->buildDetailsQuery($bf, $year, $month, $paginated->pluck('id_pegawai'));
+        [$month, $year, $bf, $gs, $startOfMonth, $endOfMonth] = $this->rankInit($month, $year);
+        $paginated = $this->buildRankBaseQuery($bf, $gs, $startOfMonth, $endOfMonth)->paginate($perPage);
+        $details   = $this->buildDetailsQuery($bf, $paginated->pluck('id_pegawai'), $startOfMonth, $endOfMonth);
         return $paginated->through(fn($item) => $this->decorateRankItem($item, $details, $gs));
     }
 
     private function rankInit($month, $year): array
     {
-        $month = $month ?? now()->month;
-        $year  = $year  ?? now()->year;
-        $bf    = sprintf('%04d-%02d', $year, $month);
-        return [$month, $year, $bf, $this->getGlobalStats($bf, $year, $month)];
+        $month        = $month ?? now()->month;
+        $year         = $year  ?? now()->year;
+        $bf           = sprintf('%04d-%02d', $year, $month);
+        $startOfMonth = Carbon::create($year, $month, 1)->startOfMonth();
+        $endOfMonth   = Carbon::create($year, $month, 1)->endOfMonth();
+        return [$month, $year, $bf, $this->getGlobalStats($bf, $startOfMonth, $endOfMonth), $startOfMonth, $endOfMonth];
     }
 
-    private function getGlobalStats(string $bf, int $year, int $month): array
+    private function getGlobalStats(string $bf, Carbon $startOfMonth, Carbon $endOfMonth): array
     {
-        $am = $year * 12 + $month;
+        // Filter penugasan yang aktif/berlangsung di bulan target menggunakan range tanggal
+        // (lebih efisien dari YEAR()*12+MONTH() karena index kolom dapat dipakai)
         $r  = \DB::table('penugasans')
             ->whereNull('deleted_at')
-            ->whereRaw('(YEAR(tanggal_mulai)*12+MONTH(tanggal_mulai)) <= ?', [$am])
-            ->whereRaw('(YEAR(tanggal_selesai)*12+MONTH(tanggal_selesai)) >= ?', [$am])
+            ->where('tanggal_mulai', '<=', $endOfMonth->toDateString())
+            ->where('tanggal_selesai', '>=', $startOfMonth->toDateString())
             ->selectRaw('
                 COUNT(DISTINCT id_penugasan) as tot,
                 COALESCE(SUM(target), 0) as sumT,
@@ -142,19 +143,20 @@ class DashboardAnalyticsService {
             ->whereNull('pengirimans.deleted_at');
     }
 
-    private function buildRankBaseQuery(string $bf, int $year, int $month, array $gs)
+    private function buildRankBaseQuery(string $bf, array $gs, Carbon $startOfMonth, Carbon $endOfMonth)
     {
-        $am  = $year * 12 + $month;
         $c   = (float) $gs['sum_target_semua'];
         $avg = (float) $gs['avg_target_bulan'];
         $ld  = $this->buildLatestDiterimaSubquery($bf);
+        $som = $startOfMonth->toDateString();
+        $eom = $endOfMonth->toDateString();
 
         $inner = \DB::table('pegawais')
-            ->leftJoin('penugasans', function($join) use ($am) {
+            ->leftJoin('penugasans', function($join) use ($som, $eom) {
                 $join->on('pegawais.id_pegawai', '=', 'penugasans.id_anggota')
                      ->whereNull('penugasans.deleted_at')
-                     ->whereRaw('(YEAR(penugasans.tanggal_mulai)*12+MONTH(penugasans.tanggal_mulai)) <= ?', [$am])
-                     ->whereRaw('(YEAR(penugasans.tanggal_selesai)*12+MONTH(penugasans.tanggal_selesai)) >= ?', [$am]);
+                     ->where('penugasans.tanggal_mulai', '<=', $eom)
+                     ->where('penugasans.tanggal_selesai', '>=', $som);
             })
             ->leftJoinSub($ld, 'lp', fn($j) => $j->on('penugasans.id_penugasan', '=', 'lp.id_penugasan'))
             ->groupBy('pegawais.id_pegawai', 'pegawais.nama_pegawai', 'pegawais.photo')
@@ -243,17 +245,16 @@ class DashboardAnalyticsService {
 
     }
 
-    private function buildDetailsQuery(string $bf, int $year, int $month, $ids)
+    private function buildDetailsQuery(string $bf, $ids, Carbon $startOfMonth, Carbon $endOfMonth)
     {
-        $am = $year * 12 + $month;
         $ld = $this->buildLatestDiterimaSubquery($bf);
         return \DB::table('penugasans')
             ->join('pegawais',      'pegawais.id_pegawai',           '=', 'penugasans.id_anggota')
             ->join('sub_kegiatans', 'sub_kegiatans.id_sub_kegiatan', '=', 'penugasans.id_sub_kegiatan')
             ->leftJoinSub($ld, 'lp', fn($j) => $j->on('penugasans.id_penugasan', '=', 'lp.id_penugasan'))
             ->whereNull('penugasans.deleted_at')
-            ->whereRaw('(YEAR(penugasans.tanggal_mulai)*12+MONTH(penugasans.tanggal_mulai)) <= ?', [$am])
-            ->whereRaw('(YEAR(penugasans.tanggal_selesai)*12+MONTH(penugasans.tanggal_selesai)) >= ?', [$am])
+            ->where('penugasans.tanggal_mulai', '<=', $endOfMonth->toDateString())
+            ->where('penugasans.tanggal_selesai', '>=', $startOfMonth->toDateString())
             ->whereIn('penugasans.id_anggota', $ids)
             ->selectRaw('penugasans.id_anggota, sub_kegiatans.nama_sub_kegiatan,
                 penugasans.tanggal_mulai, penugasans.tanggal_selesai, penugasans.target,
@@ -519,18 +520,19 @@ class DashboardAnalyticsService {
     public function totalKegiatan(): int
     {
         return Penugasan::query()
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
+            ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
             ->count();
     }
 
     public function kegiatanSelesai(): int
     {
+        $startOfMonth = now()->startOfMonth();
+        $endOfMonth   = now()->endOfMonth();
+
         return Penugasan::query()
-            ->whereHas('pengirimans.penerimaan', function ($query) {
+            ->whereHas('pengirimans.penerimaan', function ($query) use ($startOfMonth, $endOfMonth) {
                 $query->where('status', 'Diterima')
-                    ->whereMonth('penerimaans.created_at', now()->month)
-                    ->whereYear('penerimaans.created_at', now()->year);
+                    ->whereBetween('penerimaans.created_at', [$startOfMonth, $endOfMonth]);
             })
             ->orWhereHas('pengirimans', function ($query) {
                 // Jika ada pengiriman terakhir dengan penerimaan diterima
