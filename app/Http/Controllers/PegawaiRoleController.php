@@ -89,8 +89,8 @@ class PegawaiRoleController extends Controller
         $currentRoleNames = $pegawai->roles->pluck('nama_role')->toArray();
 
         if ($previousActiveRole && in_array($previousActiveRole, $currentRoleNames)) {
-            // 1️⃣ Jika active_role lama masih ada → BIARKAN
-            return;
+            // 1️⃣ Jika active_role lama masih ada → BIARKAN, tapi tetap redirect
+            return back()->with('success', 'Role pegawai berhasil diperbarui');
         } elseif (! empty($currentRoleNames)) {
             // 2️⃣ Jika masih ada role struktural lain → pakai itu
             $pegawai->update([

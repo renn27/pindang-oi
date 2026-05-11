@@ -87,12 +87,15 @@
                         <input
                             type="text"
                             x-model="search"
-                            @click="mode === 'create' && (open = true)"
-                            @input="mode === 'create' && (open = true)"
+                            @click="mode === 'create' && ketuaTims.length > 1 && (open = true)"
+                            @input="mode === 'create' && ketuaTims.length > 1 && (open = true)"
                             @keydown.escape="open = false"
-                            :readonly="mode === 'edit'"
+                            :readonly="mode === 'edit' || ketuaTims.length === 1"
                             placeholder="Pilih Ketua Kegiatan..."
-                            class="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors">
+                            class="w-full rounded-lg border px-4 py-2.5 text-sm transition-colors"
+                            :class="(mode === 'edit' || ketuaTims.length === 1)
+                                ? 'bg-gray-50 border-gray-300 text-gray-800 cursor-not-allowed dark:bg-gray-700/70 dark:border-gray-600 dark:text-gray-300'
+                                : 'bg-white border-gray-300 text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'">
 
                         <!-- Dropdown -->
                         <div x-show="open && mode === 'create'"

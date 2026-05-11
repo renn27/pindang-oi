@@ -17,6 +17,21 @@ class PenerimaanController extends Controller
     public function store(Request $request, SubKegiatan $subKegiatan, Penugasan $penugasan, Pengiriman $pengirimans) {
         $this->authorize('receive', $penugasan);
 
+        // Guard kepemilikan: pastikan pengiriman ini benar milik penugasan ini
+        if ($pengirimans->id_penugasan !== $penugasan->id_penugasan) {
+            abort(403, 'Pengiriman ini tidak termasuk dalam penugasan yang dimaksud.');
+        }
+
+        // Guard double-submit: pastikan pengiriman ini belum pernah diterima
+        if ($pengirimans->penerimaan()->exists()) {
+            return redirect()
+                ->route('sub.kegiatan.show', [
+                    'kegiatan'    => $penugasan->subKegiatan->kegiatan->id_kegiatan,
+                    'subKegiatan' => $penugasan->subKegiatan->id_sub_kegiatan,
+                ])
+                ->with('error', 'Penerimaan untuk pengiriman ini sudah dilakukan sebelumnya.');
+        }
+
         // Validasi
         $validated = $request->validate([
             'tanggal_penerimaan' => ['required', 'date', 'date_format:Y-m-d'],
@@ -56,17 +71,22 @@ class PenerimaanController extends Controller
                 // Deadline penugasan (tanggal selesai, awal hari)
                 $tanggalDeadline = Carbon::parse($penugasan->tanggal_selesai)->startOfDay();
 
+                // Grace period: jenis kegiatan tertentu mendapat kelonggaran H+1
+                $deadlineEfektif = $this->hasDeadlineGracePeriod($penugasan)
+                    ? $tanggalDeadline->copy()->addDay()
+                    : $tanggalDeadline;
+
                 /*
                 |--------------------------------------------------------------------------
                 | Hitung hari keterlambatan penerimaan (INTEGER)
                 |--------------------------------------------------------------------------
-                | - Terima <= deadline → 0 hari telat
-                | - Terima H+1 → 1 hari telat
+                | - Terima <= deadline efektif → 0 hari telat
+                | - Terima H+1 setelah deadline efektif → 1 hari telat
                 */
-                if ($tanggalPenerimaan->lte($tanggalDeadline)) {
+                if ($tanggalPenerimaan->lte($deadlineEfektif)) {
                     $hariTelat = 0;
                 } else {
-                    $hariTelat = (int) $tanggalDeadline->diffInDays($tanggalPenerimaan);
+                    $hariTelat = (int) $deadlineEfektif->diffInDays($tanggalPenerimaan);
                 }
 
                 /*
@@ -159,4 +179,16 @@ class PenerimaanController extends Controller
                 ->with('error', 'Gagal membatalkan penerimaan. Silakan coba lagi.');
         }
     }
+    
+    private function hasDeadlineGracePeriod(Penugasan $penugasan): bool
+    {
+        $jenisKegiatan = strtolower($penugasan->jenisKegiatan?->jenis_kegiatan ?? '');
+    
+        return in_array($jenisKegiatan, [
+            'pengawasan',
+            'supervisi',
+            'perjalanan dinas',
+        ], true);
+    }
 }
+

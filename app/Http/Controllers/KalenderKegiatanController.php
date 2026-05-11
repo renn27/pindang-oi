@@ -30,7 +30,7 @@ class KalenderKegiatanController extends Controller
                 $pegawaiId && $pegawaiId !== 'all',
                 function ($query) use ($pegawaiId) {
                     $query->whereHas('penugasans', function ($q) use ($pegawaiId) {
-                        $q->where('id_pegawai', $pegawaiId);
+                        $q->where('id_anggota', $pegawaiId);
                     });
                 }
             )

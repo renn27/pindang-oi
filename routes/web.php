@@ -154,9 +154,12 @@ Route::middleware('auth')->group(function () {
             Route::prefix('{penugasan:id_penugasan}/pengirimans')->group(function () {
                 Route::post('/', [PengirimanController::class, 'store'])->name('pengiriman.store')->middleware('can:send,penugasan'); // create pengiriman
 
-                Route::prefix('{pengirimans:id_pengiriman}/penerimaan')->middleware('can:receive,penugasan')->group(function () {
-                    Route::post('/', [PenerimaanController::class, 'store'])->name('penerimaan.store'); // create penerimaan
-                });
+                Route::prefix('{pengirimans:id_pengiriman}/penerimaan')
+                    ->middleware('can:receive,penugasan')
+                    ->scopeBindings() // Pastikan $pengirimans adalah milik $penugasan (via Penugasan::pengirimans())
+                    ->group(function () {
+                        Route::post('/', [PenerimaanController::class, 'store'])->name('penerimaan.store'); // create penerimaan
+                    });
             });
         });
     });
@@ -176,8 +179,8 @@ Route::middleware('auth')->group(function () {
     // ROUTE KALENDER DL
     Route::prefix('/kalender-dl')->group(function () {
         Route::get('/', [KalenderDLController::class, 'index'])->name('kalenderDL.index');
-        Route::post('/', [KalenderDLController::class, 'store'])->name('kalenderDL.store');
-        Route::delete('/{id_penugasan}', [KalenderDLController::class, 'delete'])->name('kalenderDL.delete');
+        Route::post('/', [KalenderDLController::class, 'store'])->name('kalenderDL.store')->middleware('can:manage-kalender-dl');
+        Route::delete('/{id_penugasan}', [KalenderDLController::class, 'delete'])->name('kalenderDL.delete')->middleware('can:manage-kalender-dl');
     });
     // END ROUTE KALENDER DL
 

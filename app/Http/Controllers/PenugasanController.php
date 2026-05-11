@@ -95,32 +95,30 @@ class PenugasanController extends Controller
             $subKegiatan->tanggal_selesai
         );
 
-        DB::beginTransaction();
-
         try {
-            foreach ($validDatesToSave as $tgl) {
-                $validated['tanggal_mulai'] = $tgl['mulai'];
-                $validated['tanggal_selesai'] = $tgl['selesai'];
+            DB::transaction(function () use ($subKegiatan, $validated, $validDatesToSave) {
+                foreach ($validDatesToSave as $tgl) {
+                    $validated['tanggal_mulai']  = $tgl['mulai'];
+                    $validated['tanggal_selesai'] = $tgl['selesai'];
 
-                // Create terpisah untuk masing-masing tanggal sesuai request
-                $subKegiatan->penugasans()->create($validated);
-            }
-
-            DB::commit();
+                    // Create terpisah untuk masing-masing tanggal sesuai request
+                    $subKegiatan->penugasans()->create($validated);
+                }
+            });
 
             $isSelfAssign = $validated['id_anggota'] == auth()->user()?->id_pegawai;
-            
+
             $response = redirect()
                 ->route('sub.kegiatan.show', [
-                    'kegiatan' => $subKegiatan->kegiatan->id_kegiatan,
-                    'subKegiatan' => $subKegiatan->id_sub_kegiatan
+                    'kegiatan'    => $subKegiatan->kegiatan->id_kegiatan,
+                    'subKegiatan' => $subKegiatan->id_sub_kegiatan,
                 ])
                 ->with('success', 'Penugasan kepada anggota berhasil dilakukan.');
-                
+
             if ($isSelfAssign) {
                 $response->with('info', 'Anda menambahkan diri anda sendiri di penugasan sub kegiatan ini.');
             }
-            
+
             return $response;
         } catch (\Exception $e) {
             Log::error('Gagal membuat penugasan: ' . $e->getMessage());
@@ -225,52 +223,50 @@ class PenugasanController extends Controller
         unset($updateData['tanggal_mulai_list']);
         unset($updateData['tanggal_selesai_list']);
 
-        DB::beginTransaction();
+        // Hitung tanggal tambahan di LUAR transaction — agar ValidationException ditangani Laravel secara alami
+        $validDatesToSave = $this->extractAndValidateDates(
+            $request,
+            $validated,
+            $subKegiatan->tanggal_mulai,
+            $subKegiatan->tanggal_selesai,
+            true // skip main date — updateData sudah menangani tanggal utama
+        );
+
         try {
-            // Update data parent (utama)
-            $penugasan->update($updateData);
+            DB::transaction(function () use ($penugasan, $updateData, $validated, $validDatesToSave) {
+                // Update data parent (utama)
+                $penugasan->update($updateData);
 
-            // Jika ada tanggal tambahan, buat row baru
-            $validDatesToSave = $this->extractAndValidateDates(
-                $request,
-                $validated,
-                $subKegiatan->tanggal_mulai,
-                $subKegiatan->tanggal_selesai,
-                true // skip main date extraction because updateData already handles main date update
-            );
-
-            foreach ($validDatesToSave as $tgl) {
-                // Keduanya harus ada (&&), bukan salah satu — mencegah penugasan dengan tanggal null
-                if (!empty($tgl['mulai']) && !empty($tgl['selesai'])) {
-                    Penugasan::create([
-                        'id_anggota'       => $validated['id_anggota'],
-                        'id_sub_kegiatan'  => $penugasan->id_sub_kegiatan,
-                        'id_jenis_kegiatan'=> $validated['id_jenis_kegiatan'],
-                        'target'           => $validated['target'],
-                        'satuan_target'    => $validated['satuan_target'],
-                        'tanggal_mulai'    => $tgl['mulai'],
-                        'tanggal_selesai'  => $tgl['selesai'],
-                        'status'           => $penugasan->status,
-                        'butuh_dl'         => $validated['butuh_dl'],
-                        'status_dl'        => $validated['butuh_dl'] ? 'Menunggu' : null,
-                        'butuh_translok'   => $validated['butuh_translok'],
-                        'status_translok'  => $validated['butuh_translok'] ? 'Menunggu' : null,
-                    ]);
+                // Jika ada tanggal tambahan, buat row baru
+                foreach ($validDatesToSave as $tgl) {
+                    // Keduanya harus ada (&&) — mencegah penugasan dengan tanggal null
+                    if (!empty($tgl['mulai']) && !empty($tgl['selesai'])) {
+                        Penugasan::create([
+                            'id_anggota'        => $validated['id_anggota'],
+                            'id_sub_kegiatan'   => $penugasan->id_sub_kegiatan,
+                            'id_jenis_kegiatan' => $validated['id_jenis_kegiatan'],
+                            'target'            => $validated['target'],
+                            'satuan_target'     => $validated['satuan_target'],
+                            'tanggal_mulai'     => $tgl['mulai'],
+                            'tanggal_selesai'   => $tgl['selesai'],
+                            'status'            => $penugasan->status,
+                            'butuh_dl'          => $validated['butuh_dl'],
+                            'status_dl'         => $validated['butuh_dl'] ? 'Menunggu' : null,
+                            'butuh_translok'    => $validated['butuh_translok'],
+                            'status_translok'   => $validated['butuh_translok'] ? 'Menunggu' : null,
+                        ]);
+                    }
                 }
-            }
-
-            DB::commit();
+            });
 
             return redirect()
                 ->route('sub.kegiatan.show', [
-                    'kegiatan' => $subKegiatan->kegiatan->id_kegiatan,
-                    'subKegiatan' => $subKegiatan->id_sub_kegiatan
+                    'kegiatan'    => $subKegiatan->kegiatan->id_kegiatan,
+                    'subKegiatan' => $subKegiatan->id_sub_kegiatan,
                 ])
                 ->with('success', 'Data Penugasan kepada anggota berhasil diperbarui.');
         } catch (\Exception $e) {
-            DB::rollBack();
             Log::error('Update error: ' . $e->getMessage());
-
             return redirect()->back()
                 ->with('error', 'Gagal memperbarui data penugasan kepada anggota. Silakan coba lagi.')
                 ->withInput();

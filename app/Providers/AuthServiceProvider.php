@@ -39,5 +39,10 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('view-ckp', function ($user) {
             return !$user->isActiveRole('Admin');
         });
+
+        // 🔥 Gate untuk kelola Kalender DL (Hanya Pimpinan)
+        Gate::define('manage-kalender-dl', function ($user) {
+            return $user->isActiveRole('Pimpinan');
+        });
     }
 }

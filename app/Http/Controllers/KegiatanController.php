@@ -80,6 +80,14 @@ class KegiatanController extends Controller
     {
         // dd($request->all());
         $this->authorize('create', Kegiatan::class);
+
+        $user = $request->user();
+        if ($user?->isKetuaTim()) {
+            $request->merge([
+                'id_penanggung_jawab' => $user->id_pegawai,
+            ]);
+        }
+
         $validated = $request->validate([
             'nama_rk_kegiatan' => ['required', 'string', 'max:255'],
             'rk_jpt' => ['required', 'exists:rencana_jpts,id'],
@@ -115,6 +123,13 @@ class KegiatanController extends Controller
     {
         // dd($request->all());
         $this->authorize('update', $kegiatan);
+
+        $user = $request->user();
+        if ($user?->isKetuaTim()) {
+            $request->merge([
+                'id_penanggung_jawab' => $user->id_pegawai,
+            ]);
+        }
 
         // ✅ Validasi
         $validated = $request->validate([

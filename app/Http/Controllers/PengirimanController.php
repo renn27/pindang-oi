@@ -28,24 +28,28 @@ class PengirimanController extends Controller
             'catatan'            => ['nullable', 'string', 'max:255'],
         ]);
 
+        // ── Guard 1: Cek bulan ini belum punya pengiriman "Diterima" ──────────────
+        $sudahAdaDiBulanIni = $penugasan->pengirimans()
+            ->where('bulan_pengiriman', $validated['bulan_pengiriman'])
+            ->whereHas('penerimaan', fn($q) => $q->where('status', 'Diterima'))
+            ->exists();
+
+        if ($sudahAdaDiBulanIni) {
+            return back()
+                ->with('error', 'Bulan ini sudah memiliki pengiriman yang diterima.')
+                ->withInput();
+        }
+
+        // ── Guard 2: Cegah Cicilan di bulan terakhir rentang penugasan ──────────
+        $bulanTerakhir = Carbon::parse($penugasan->tanggal_selesai)->format('Y-m');
+        if ($validated['tipe_pengiriman'] === 'Cicilan' && $validated['bulan_pengiriman'] === $bulanTerakhir) {
+            return back()
+                ->with('error', 'Tidak bisa memilih Cicilan di bulan terakhir penugasan. Gunakan Pelunasan.')
+                ->withInput();
+        }
+
         try {
             DB::transaction(function () use ($penugasan, $validated) {
-
-                // Cek bulan ini belum pernah punya pengiriman "Diterima"
-                $sudahAdaDiBulanIni = $penugasan->pengirimans()
-                    ->where('bulan_pengiriman', $validated['bulan_pengiriman'])
-                    ->whereHas('penerimaan', fn($q) => $q->where('status', 'Diterima'))
-                    ->exists();
-                    
-                if ($sudahAdaDiBulanIni) {
-                    return back()->with('error', 'Bulan ini sudah memiliki pengiriman yang diterima.');
-                }
-
-                // Cegah Cicilan di bulan terakhir rentang penugasan
-                $bulanTerakhir = Carbon::parse($penugasan->tanggal_selesai)->format('Y-m');
-                if ($validated['tipe_pengiriman'] === 'Cicilan' && $validated['bulan_pengiriman'] === $bulanTerakhir) {
-                    return back()->with('error', 'Tidak bisa memilih Cicilan di bulan terakhir penugasan. Gunakan Pelunasan.');
-                }
 
                 // 1️⃣ HITUNG RR KIRIM (PERSEN)
                 $targetPenugasan = (int) $penugasan->target;
@@ -111,9 +115,8 @@ class PengirimanController extends Controller
                 ->with('success', 'Pengiriman hasil kerja berhasil dilakukan.');
 
         } catch (\Exception $e) {
-            dd($e->getMessage());
-            return redirect()
-                ->back()
+            \Illuminate\Support\Facades\Log::error('Store pengiriman error: ' . $e->getMessage());
+            return back()
                 ->with('error', 'Gagal mengirimkan hasil kerja. Silakan coba lagi.')
                 ->withInput();
         }
