@@ -383,6 +383,30 @@ class CkpPegawaiController extends Controller
 
         $bulanFilter = $tahun . '-' . str_pad($bulan, 2, '0', STR_PAD_LEFT);
 
+        // ── TRACKING: Catat aksi download CKP ──────────────────────
+        // Best Practice: Cek cooldown 1 menit untuk menghindari spam klik/double count
+        $recentLog = DB::table('ckp_download_logs')
+            ->where('id_pegawai', $userId)
+            ->where('bulan_ckp', $bulanFilter)
+            ->where('downloaded_at', '>', now()->subMinute())
+            ->exists();
+
+        if (!$recentLog) {
+            try {
+                DB::table('ckp_download_logs')->insert([
+                    'id_pegawai'    => $userId,
+                    'bulan_ckp'     => $bulanFilter,
+                    'ip_address'    => $request->ip(),
+                    'user_agent'    => $request->userAgent(),
+                    'downloaded_at' => now(),
+                ]);
+            } catch (\Exception $e) {
+                // Log error tapi jangan hentikan proses export
+                \Log::error("Gagal mencatat log download CKP: " . $e->getMessage());
+            }
+        }
+        // ──────────────────────────────────────────────────────────
+
         // Ambil semua tipe CKP (Anggota, Ketua Tim, Pimpinan) berdasarkan bulan_ckp
         $ckpList = CkpPegawai::with(['pegawai', 'ckpable'])
             ->where('id_pegawai', $userId)
