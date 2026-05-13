@@ -6,7 +6,9 @@ use App\Models\JenisKegiatan;
 use App\Models\Pegawai;
 use App\Models\Penugasan;
 use App\Models\SubKegiatan;
+use App\Models\KalenderDL;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -310,17 +312,23 @@ class PenugasanController extends Controller
         }
 
         try {
-            $penugasan->update([
-                'status_dl' => $validated['status_dl'],
-            ]);
+            DB::transaction(function () use ($penugasan, $validated) {
+                $penugasan->update([
+                    'status_dl' => $validated['status_dl'],
+                ]);
+
+                if ($validated['status_dl'] === 'ACC') {
+                    $this->insertKalenderDL($penugasan);
+                }
+            });
 
             return redirect()->back()
-                ->with('success', 'Status Dinas Luar berhasil diperbarui.');
+                ->with('success', 'Status Dinas Luar berhasil diperbarui dan dimasukkan ke Kalender.');
         } catch (\Exception $e) {
             Log::error('Update error: ' . $e->getMessage());
 
             return redirect()->back()
-                ->with('error', 'Gagal memperbarui data status Dinas Luar. Silakan coba lagi.')
+                ->with('error', 'Gagal memperbarui data status Dinas Luar: ' . $e->getMessage())
                 ->withInput();
         }
     }
@@ -344,18 +352,61 @@ class PenugasanController extends Controller
         }
 
         try {
-            $penugasan->update([
-                'status_translok' => $validated['status_translok'],
-            ]);
+            DB::transaction(function () use ($penugasan, $validated) {
+                $penugasan->update([
+                    'status_translok' => $validated['status_translok'],
+                ]);
+
+                if ($validated['status_translok'] === 'ACC') {
+                    $this->insertKalenderDL($penugasan);
+                }
+            });
 
             return redirect()->back()
-                ->with('success', 'Status Translok berhasil diperbarui.');
+                ->with('success', 'Status Translok berhasil diperbarui dan dimasukkan ke Kalender.');
         } catch (\Exception $e) {
             Log::error('Update error: ' . $e->getMessage());
 
             return redirect()->back()
-                ->with('error', 'Gagal memperbarui data status Translok. Silakan coba lagi.')
+                ->with('error', 'Gagal memperbarui data status Translok: ' . $e->getMessage())
                 ->withInput();
+        }
+    }
+
+    private function insertKalenderDL(Penugasan $penugasan)
+    {
+        $period = CarbonPeriod::create(
+            $penugasan->tanggal_mulai,
+            $penugasan->tanggal_selesai
+        );
+
+        $dates = [];
+        foreach ($period as $date) {
+            $dates[] = $date->format('Y-m-d');
+        }
+
+        // Cek Bentrok
+        $adaBentrok = KalenderDL::where('id_pegawai', $penugasan->id_anggota)
+            ->whereIn('tanggal_dl', $dates)
+            ->exists();
+
+        if ($adaBentrok) {
+            throw new \Exception('Pegawai sudah memiliki jadwal Kalender DL pada rentang tanggal tersebut.');
+        }
+
+        $dataToInsert = [];
+        foreach ($dates as $d) {
+            $dataToInsert[] = [
+                'id_pegawai'   => $penugasan->id_anggota,
+                'id_penugasan' => $penugasan->id_penugasan,
+                'tanggal_dl'   => $d,
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ];
+        }
+
+        if (!empty($dataToInsert)) {
+            KalenderDL::insert($dataToInsert);
         }
     }
 

@@ -271,11 +271,7 @@
                                                     {{ $bidang->menungguCount }} Menunggu
                                                 </span>
                                             @endif
-                                            @if($bidang->accBelumMasukKalenderCount > 0)
-                                                <span class="animate-pulse inline-flex items-center justify-center px-2 py-0.5 text-[10px] font-bold text-orange-800 dark:text-orange-300 bg-orange-100 dark:bg-orange-900/30 rounded-full uppercase tracking-tighter shadow-sm border border-orange-200 dark:border-orange-800">
-                                                    {{ $bidang->accBelumMasukKalenderCount }} Blm Kalender
-                                                </span>
-                                            @endif
+
                                         @endif
 
                                         {{-- Untuk Ketua Tim --}}
@@ -400,11 +396,7 @@
                                                                                 @if ($penugasan->status_dl === 'Menunggu')
                                                                                     <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-full border border-yellow-200 dark:border-yellow-800">MENUNGGU</span>
                                                                                 @elseif ($penugasan->status_dl === 'ACC')
-                                                                                    @if ($penugasan->sudahMasukKalenderDL())
-                                                                                        <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 rounded-full border border-teal-200 dark:border-teal-800 uppercase tracking-tighter">SUDAH DI KALENDER</span>
-                                                                                    @else
-                                                                                        <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full border border-orange-200 dark:border-orange-800">DITERIMA (BLM KALENDER)</span>
-                                                                                    @endif
+                                                                                    <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 rounded-full border border-teal-200 dark:border-teal-800 uppercase tracking-tighter">SUDAH DI KALENDER</span>
                                                                                 @elseif ($penugasan->status_dl === 'Ditolak')
                                                                                     <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full border border-red-200 dark:border-red-800">DITOLAK</span>
                                                                                 @else
@@ -422,11 +414,7 @@
                                                                                 @if ($penugasan->status_translok === 'Menunggu')
                                                                                     <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-full border border-yellow-200 dark:border-yellow-800">MENUNGGU</span>
                                                                                 @elseif ($penugasan->status_translok === 'ACC')
-                                                                                    @if ($penugasan->sudahMasukKalenderDL())
-                                                                                        <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 rounded-full border border-teal-200 dark:border-teal-800 uppercase tracking-tighter">SUDAH DI KALENDER</span>
-                                                                                    @else
-                                                                                        <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full border border-orange-200 dark:border-orange-800">DITERIMA (BLM KALENDER)</span>
-                                                                                    @endif
+                                                                                    <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 rounded-full border border-teal-200 dark:border-teal-800 uppercase tracking-tighter">SUDAH DI KALENDER</span>
                                                                                 @elseif ($penugasan->status_translok === 'Ditolak')
                                                                                     <span class="inline-flex px-2 py-0.5 text-[9px] font-bold bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full border border-red-200 dark:border-red-800">DITOLAK</span>
                                                                                 @else
@@ -455,19 +443,12 @@
 
                                                                             @can('acceptDL', $penugasan)
                                                                                 @if ($penugasan->status_dl === 'ACC')
-                                                                                    @if ($penugasan->sudahMasukKalenderDL())
-                                                                                        @if (Auth::user()->active_role === 'Pimpinan')
-                                                                                            <form id="del-dl-{{ $penugasan->id_penugasan }}" action="{{ route('kalenderDL.delete', $penugasan->id_penugasan) }}" method="POST" class="w-full">@csrf @method('DELETE')
-                                                                                                <button type="button" onclick="SwalHelper.confirmDelete('del-dl-{{ $penugasan->id_penugasan }}', 'Kalender DL milik {{ $penugasan->anggota->nama_pegawai }}')" class="w-full flex items-center justify-center gap-1 px-2.5 py-1 text-[10px] font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded transition-colors shadow-sm" title="Hapus Kalender DL">
-                                                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                                                                                    HAPUS
-                                                                                                </button>
-                                                                                            </form>
-                                                                                        @endif
-                                                                                    @elseif (Auth::user()->active_role === 'Pimpinan')
-                                                                                        <form action="{{ route('kalenderDL.store') }}" method="POST" class="w-full">@csrf
-                                                                                            <input type="hidden" name="id_pegawai" value="{{ $penugasan->id_anggota }}"><input type="hidden" name="id_penugasan" value="{{ $penugasan->id_penugasan }}"><input type="hidden" name="tanggal_mulai" value="{{ $penugasan->tanggal_mulai }}"><input type="hidden" name="tanggal_selesai" value="{{ $penugasan->tanggal_selesai }}">
-                                                                                            <button type="submit" class="w-full px-2.5 py-1 text-[10px] font-bold bg-teal-600 text-white rounded hover:bg-teal-700 transition-colors shadow-sm">+ Msk Kalender</button>
+                                                                                    @if (Auth::user()->active_role === 'Pimpinan')
+                                                                                        <form id="del-dl-{{ $penugasan->id_penugasan }}" action="{{ route('kalenderDL.delete', $penugasan->id_penugasan) }}" method="POST" class="w-full">@csrf @method('DELETE')
+                                                                                            <button type="button" onclick="SwalHelper.confirmDelete('del-dl-{{ $penugasan->id_penugasan }}', 'Kalender DL milik {{ $penugasan->anggota->nama_pegawai }}')" class="w-full flex items-center justify-center gap-1 px-2.5 py-1 text-[10px] font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded transition-colors shadow-sm" title="Hapus Kalender DL">
+                                                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                                                                HAPUS
+                                                                                            </button>
                                                                                         </form>
                                                                                     @endif
                                                                                 @elseif (Auth::user()->active_role === 'Pimpinan' && in_array($penugasan->status_dl, ['Menunggu', null]))
@@ -491,19 +472,12 @@
 
                                                                             @can('acceptTranslok', $penugasan)
                                                                                 @if ($penugasan->status_translok === 'ACC')
-                                                                                    @if ($penugasan->sudahMasukKalenderDL())
-                                                                                        @if (Auth::user()->active_role === 'Pimpinan')
-                                                                                            <form id="del-trl-{{ $penugasan->id_penugasan }}" action="{{ route('kalenderDL.delete', $penugasan->id_penugasan) }}" method="POST" class="w-full">@csrf @method('DELETE')
-                                                                                                <button type="button" onclick="SwalHelper.confirmDelete('del-trl-{{ $penugasan->id_penugasan }}', 'Kalender Translok milik {{ $penugasan->anggota->nama_pegawai }}')" class="w-full flex items-center justify-center gap-1 px-2.5 py-1 text-[10px] font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded transition-colors shadow-sm" title="Hapus Kalender Translok">
-                                                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                                                                                    HAPUS
-                                                                                                </button>
-                                                                                            </form>
-                                                                                        @endif
-                                                                                    @elseif (Auth::user()->active_role === 'Pimpinan')
-                                                                                        <form action="{{ route('kalenderDL.store') }}" method="POST" class="w-full">@csrf
-                                                                                            <input type="hidden" name="id_pegawai" value="{{ $penugasan->id_anggota }}"><input type="hidden" name="id_penugasan" value="{{ $penugasan->id_penugasan }}"><input type="hidden" name="tanggal_mulai" value="{{ $penugasan->tanggal_mulai }}"><input type="hidden" name="tanggal_selesai" value="{{ $penugasan->tanggal_selesai }}">
-                                                                                            <button type="submit" class="w-full px-2.5 py-1 text-[10px] font-bold bg-teal-600 text-white rounded hover:bg-teal-700 transition-colors shadow-sm">+ Msk Kalender</button>
+                                                                                    @if (Auth::user()->active_role === 'Pimpinan')
+                                                                                        <form id="del-trl-{{ $penugasan->id_penugasan }}" action="{{ route('kalenderDL.delete', $penugasan->id_penugasan) }}" method="POST" class="w-full">@csrf @method('DELETE')
+                                                                                            <button type="button" onclick="SwalHelper.confirmDelete('del-trl-{{ $penugasan->id_penugasan }}', 'Kalender Translok milik {{ $penugasan->anggota->nama_pegawai }}')" class="w-full flex items-center justify-center gap-1 px-2.5 py-1 text-[10px] font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded transition-colors shadow-sm" title="Hapus Kalender Translok">
+                                                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                                                                HAPUS
+                                                                                            </button>
                                                                                         </form>
                                                                                     @endif
                                                                                 @elseif (Auth::user()->active_role === 'Pimpinan' && in_array($penugasan->status_translok, ['Menunggu', null]))

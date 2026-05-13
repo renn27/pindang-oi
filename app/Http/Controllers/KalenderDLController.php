@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\KalenderDL;
 use Illuminate\Http\Request;
 use App\Models\Pegawai;
+use App\Models\Penugasan;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -52,74 +53,29 @@ class KalenderDLController extends Controller
         ]);
     }
 
-    public function store(Request $request)
-    {
-        // dd($request->all());
-        $validated = $request->validate([
-            'id_pegawai'      => ['required', 'exists:pegawais,id_pegawai'],
-            'id_penugasan'    => ['required', 'exists:penugasans,id_penugasan'],
-            'tanggal_mulai'   => ['required', 'date'],
-            'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
-            ]);
 
-        try {
-            $period = CarbonPeriod::create(
-                $validated['tanggal_mulai'],
-                $validated['tanggal_selesai']
-            );
-
-            $dates = [];
-            foreach ($period as $date) {
-                $dates[] = $date->format('Y-m-d');
-            }
-
-            // 1. Cek Bentrok (Apakah ada tanggal yang sudah dipakai?)
-            $adaBentrok = KalenderDL::where('id_pegawai', $validated['id_pegawai'])
-                ->whereIn('tanggal_dl', $dates)
-                ->exists();
-
-            if ($adaBentrok) {
-                return redirect()->back()
-                    ->with('error', 'Gagal: Pegawai sudah memiliki jadwal DL pada rentang tanggal tersebut.')
-                    ->withInput();
-            }
-
-            // 2. Siapkan data untuk bulk insert
-            $dataToInsert = [];
-            foreach ($dates as $d) {
-                $dataToInsert[] = [
-                    'id_pegawai'   => $validated['id_pegawai'],
-                    'id_penugasan' => $validated['id_penugasan'],
-                    'tanggal_dl'   => $d,
-                    'created_at'   => now(),
-                    'updated_at'   => now(),
-                ];
-            }
-
-            if (!empty($dataToInsert)) {
-                KalenderDL::insert($dataToInsert);
-            }
-
-            return redirect()
-                ->route('master-kegiatan.index_rk_dl')
-                ->with('success', 'Berhasil memasukkan DL sesuai range tanggal.');
-
-        } catch (\Exception $e) {
-            Log::error('Gagal simpan Kalender DL: ' . $e->getMessage());
-
-            return redirect()->back()
-                ->with('error', 'Gagal memasukkan ke Kalender DL.')
-                ->withInput();
-        }
-    }
     public function delete($id_penugasan)
     {
         try {
             KalenderDL::where('id_penugasan', $id_penugasan)->delete();
             
+            $penugasan = Penugasan::find($id_penugasan);
+            if ($penugasan) {
+                $updateData = [];
+                if ($penugasan->status_dl === 'ACC') {
+                    $updateData['status_dl'] = 'Menunggu';
+                }
+                if ($penugasan->status_translok === 'ACC') {
+                    $updateData['status_translok'] = 'Menunggu';
+                }
+                if (!empty($updateData)) {
+                    $penugasan->update($updateData);
+                }
+            }
+            
             return redirect()
                 ->route('master-kegiatan.index_rk_dl')
-                ->with('success', 'Berhasil mencabut DL dari Kalender.');
+                ->with('success', 'Berhasil mencabut DL dari Kalender dan status dikembalikan ke Menunggu.');
         } catch (\Exception $e) {
             Log::error('Gagal hapus Kalender DL: ' . $e->getMessage());
 

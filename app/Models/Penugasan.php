@@ -190,6 +190,13 @@ class Penugasan extends Model
         return now()->gt($this->tanggal_selesai->copy()->endOfDay());
     }
 
+    public function isTugasSelesai(): bool
+    {
+        return $this->pengirimans->contains(function ($p) {
+            return $p->tipe_pengiriman === 'Pelunasan' && $p->penerimaan && $p->penerimaan->status === 'Diterima';
+        });
+    }
+
     public function bolehTerimaPenugasan(): bool
     {
         $latestPengiriman = $this->latestPengiriman;
@@ -203,11 +210,7 @@ class Penugasan extends Model
             return false;
 
         // Sudah ada pelunasan diterima → tugas selesai
-        $adaPelunasanDiterima = $this->pengirimans->contains(function ($p) {
-            return $p->tipe_pengiriman === 'Pelunasan' && $p->penerimaan && $p->penerimaan->status === 'Diterima';
-        });
-
-        if ($adaPelunasanDiterima)
+        if ($this->isTugasSelesai())
             return false;
 
         return true;
@@ -245,11 +248,7 @@ class Penugasan extends Model
         }
 
         // Sudah ada pelunasan diterima → tugas selesai
-        $adaPelunasanDiterima = $this->pengirimans->contains(function ($p) {
-            return $p->tipe_pengiriman === 'Pelunasan' && $p->penerimaan && $p->penerimaan->status === 'Diterima';
-        });
-
-        if (!$adaPelunasanDiterima)
+        if (!$this->isTugasSelesai())
             return 'info|Tunggu  anggota tim mengirimkan Pelunasannya';
 
         // // ⚠️ DEADLINE LEWAT, SUDAH ADA PENGIRIMAN, BELUM DIPERIKSA
@@ -289,11 +288,7 @@ class Penugasan extends Model
         }
 
         // 3️⃣ BARU: Jika sudah ada pelunasan yang diterima, blokir pengiriman
-        $adaPelunasanDiterima = $this->pengirimans->contains(function ($p) {
-            return $p->tipe_pengiriman === 'Pelunasan' && $p->penerimaan && $p->penerimaan->status === 'Diterima';
-        });
-
-        if ($adaPelunasanDiterima) {
+        if ($this->isTugasSelesai()) {
             return false;
         }
 

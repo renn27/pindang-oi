@@ -98,18 +98,7 @@ class PenugasanPolicy
             return false;
         }
 
-        // Block hanya jika sudah ada PELUNASAN yang diterima (tugas selesai)
-        $adaPelunasanDiterima = $penugasan->pengirimans()
-            ->where('tipe_pengiriman', 'Pelunasan')
-            ->whereHas('penerimaan', fn($q) => $q->where('status', 'Diterima'))
-            ->exists();
-
-        if ($adaPelunasanDiterima) {
-            return false;
-        }
-
-        // ✅ masih cicilan / revisi / menunggu → boleh muncul
-        return true;
+        return $penugasan->bolehKirimPenugasan();
     }
 
     public function cancelSend(Pegawai $pegawai, Penugasan $penugasan): bool
@@ -124,17 +113,7 @@ class PenugasanPolicy
             return false;
         }
 
-        // Block hanya jika sudah ada PELUNASAN yang diterima (tugas selesai)
-        $adaPelunasanDiterima = $penugasan->pengirimans()
-            ->where('tipe_pengiriman', 'Pelunasan')
-            ->whereHas('penerimaan', fn($q) => $q->where('status', 'Diterima'))
-            ->exists();
-
-        if ($adaPelunasanDiterima) {
-            return false;
-        }
-
-        return true;
+        return $penugasan->bolehTerimaPenugasan();
     }
 
     public function cancelReceive(Pegawai $pegawai, Penugasan $penugasan): bool

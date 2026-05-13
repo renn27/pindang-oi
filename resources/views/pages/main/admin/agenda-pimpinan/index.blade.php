@@ -479,17 +479,17 @@
                                                     @click="$dispatch('open-smart-modal', {
                                                         modalId: 'modal-ckp-universal',
                                                         data : {
-                                                            id_agenda: '{{ $agenda->id_agenda }}',
-                                                            nama_pegawai: '{{ Auth::user()->nama_pegawai ?? '' }}',
-                                                            nama_agenda: '{{ $agenda->nama_agenda }}',
-                                                            uraian: 'Melaksanakan dan Menyelesaikan {{ addslashes($agenda->nama_agenda) }} dengan target {{ $realisasi }} dari total target {{ $target }}',
+                                                            id_agenda: @js($agenda->id_agenda),
+                                                            nama_pegawai: @js(Auth::user()->nama_pegawai ?? ''),
+                                                            nama_agenda: @js($agenda->nama_agenda),
+                                                            uraian: @js('Melaksanakan dan Menyelesaikan ' . $agenda->nama_agenda . ' dengan target ' . $realisasi . ' dari total target ' . $target),
                                                             target_kuantitas: {{ $agenda->target }},
                                                             realisasi_kuantitas: {{ $realisasi }},
-                                                            satuan: '{{ $agenda->satuan_target }}',
+                                                            satuan: @js($agenda->satuan_target),
                                                             is_pimpinan: true,
-                                                            tanggal_mulai: '{{ $agenda->tanggal_mulai }}',
-                                                            tanggal_selesai: '{{ $agenda->tanggal_selesai }}',
-                                                            bulanSudahCkp : @js($agenda->ckpBulanan->pluck('bulan_ckp')->toArray())
+                                                            tanggal_mulai: @js($agenda->tanggal_mulai),
+                                                            tanggal_selesai: @js($agenda->tanggal_selesai),
+                                                            bulanSudahCkp : @js($agenda->ckpBulanan->pluck('bulan_ckp')->values()->toArray())
                                                         }
                                                     })"
                                                     class="border-t border-gray-100 dark:border-gray-700 w-full text-left px-4 py-3 text-sm flex items-center gap-2 text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20"
@@ -520,7 +520,7 @@
         </table>
     </div>
 
-    {{-- MODAL CKP (Universal, dipakai untuk CKP Pegawai dan CKP Ketua Tim) --}}
+    {{-- MODAL CKP (Universal: Anggota Tim, Ketua Tim, dan Pimpinan) --}}
     @include('pages.main.components.modals.tagihan-kerja.modal-ckp-universal')
 
     <script>

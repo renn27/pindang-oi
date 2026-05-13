@@ -1,86 +1,6 @@
-<!-- Modal CKP Universal (untuk CKP Pegawai dan CKP Ketua Tim) -->
+<!-- Modal CKP Universal (Anggota Tim, Ketua Tim, dan Pimpinan) -->
 <div x-data="ckpUniversalModal()"
-    @open-smart-modal.window="
-        if ($event.detail.modalId !== 'modal-ckp-universal') return;
-        
-        const d = $event.detail.data || {};
-        ckpData = {
-            id_penugasan: d.id_penugasan || null,
-            id_sub_kegiatan: d.id_sub_kegiatan || null,
-            id_agenda: d.id_agenda || null,
-            nama_pegawai: d.nama_pegawai || '',
-            nama_sub_kegiatan: d.nama_sub_kegiatan || '',
-            nama_agenda: d.nama_agenda || '',
-            uraian: d.uraian || '',
-            base_uraian: d.uraian || '',
-            satuan: d.satuan || '',
-            target_kuantitas: d.target_kuantitas || 0,
-            realisasi_kuantitas: d.realisasi_kuantitas || 0,
-            keterangan: d.keterangan || '',
-            is_ketua_tim: d.is_ketua_tim || false,
-            is_pimpinan: d.is_pimpinan || false,
-            tanggal_mulai: d.tanggal_mulai || '',
-            tanggal_selesai: d.tanggal_selesai || '',
-            bulanDiterima: d.bulanDiterima || [],
-            bulanSudahCkp: d.bulanSudahCkp || [],
-        };
-        bulanCkp = '';
-
-        // Auto-set bulan CKP
-        $nextTick(() => {
-            const isAnggota = !ckpData.is_ketua_tim && !ckpData.is_pimpinan;
-            if (isAnggota) {
-                // Anggota Tim: hanya bulan yang sudah ada pengiriman Diterima
-                const accepted = ckpData.bulanDiterima || [];
-                const sudahCkp = ckpData.bulanSudahCkp || [];
-                if (accepted.length === 1 && !sudahCkp.includes(accepted[0])) {
-                    bulanCkp = accepted[0];
-                }
-            } else if (bulanOptions.length === 1 && !bulanOptions[0].disabled) {
-                bulanCkp = bulanOptions[0].value;
-            }
-        });
-        
-        showCkpModal = true;"
-    @open-ckp-modal.window="
-        if ($event.detail.modalId !== 'modal-ckp') return;
-        
-        ckpData = {
-            id_penugasan: $event.detail.id_penugasan || null,
-            id_sub_kegiatan: $event.detail.id_sub_kegiatan || null,
-            id_agenda: $event.detail.id_agenda || null,
-            nama_pegawai: $event.detail.nama_pegawai || '',
-            nama_sub_kegiatan: $event.detail.nama_sub_kegiatan || '',
-            nama_agenda: $event.detail.nama_agenda || '',
-            uraian: $event.detail.uraian || '',
-            base_uraian: $event.detail.uraian || '',
-            satuan: $event.detail.satuan || '',
-            target_kuantitas: $event.detail.target_kuantitas || 0,
-            realisasi_kuantitas: $event.detail.realisasi_kuantitas || 0,
-            keterangan: $event.detail.keterangan || '',
-            is_ketua_tim: $event.detail.is_ketua_tim || false,
-            is_pimpinan: $event.detail.is_pimpinan || false,
-            tanggal_mulai: $event.detail.tanggal_mulai || '',
-            tanggal_selesai: $event.detail.tanggal_selesai || '',
-            bulanDiterima: $event.detail.bulanDiterima || [],
-            bulanSudahCkp: $event.detail.bulanSudahCkp || [],
-        };
-        bulanCkp = '';
-
-        $nextTick(() => {
-            const isAnggota = !ckpData.is_ketua_tim && !ckpData.is_pimpinan;
-            if (isAnggota) {
-                const accepted = ckpData.bulanDiterima || [];
-                const sudahCkp = ckpData.bulanSudahCkp || [];
-                if (accepted.length === 1 && !sudahCkp.includes(accepted[0])) {
-                    bulanCkp = accepted[0];
-                }
-            } else if (bulanOptions.length === 1 && !bulanOptions[0].disabled) {
-                bulanCkp = bulanOptions[0].value;
-            }
-        });
-        
-        showCkpModal = true;">
+    @open-smart-modal.window="openFromSmartModal($event)">
 
     <div x-show="showCkpModal"
         x-cloak
@@ -140,6 +60,7 @@
                             ? `{{ url('ckp/from-agenda-pimpinan') }}/${ckpData.id_agenda}`
                             : `{{ url('ckp/from-penugasan') }}/${ckpData.id_penugasan}`"
                         method="POST"
+                        x-ref="form"
                         id="ckpUniversalForm">
                         @csrf
 
@@ -327,29 +248,40 @@
 
 <script>
     function ckpUniversalModal() {
+        const defaultCkpData = () => ({
+            id_penugasan: null,
+            id_sub_kegiatan: null,
+            id_agenda: null,
+            nama_pegawai: '',
+            nama_sub_kegiatan: '',
+            nama_agenda: '',
+            uraian: '',
+            base_uraian: '',
+            satuan: '',
+            target_kuantitas: 0,
+            realisasi_kuantitas: 0,
+            keterangan: '',
+            is_ketua_tim: false,
+            is_pimpinan: false,
+            tanggal_mulai: '',
+            tanggal_selesai: '',
+            bulanDiterima: [],
+            bulanSudahCkp: [],
+        });
+
+        const normalizeArray = (value) => {
+            if (Array.isArray(value)) return value;
+            if (typeof value === 'string') return value ? [value] : [];
+            if (!value) return [];
+            return Object.values(value);
+        };
+
+        const normalizeBool = (value) => value === true || value === 'true' || value === 1 || value === '1';
+
         return {
             showCkpModal: false,
             bulanCkp: '',
-            ckpData: {
-                id_penugasan: null,
-                id_sub_kegiatan: null,
-                id_agenda: null,
-                nama_pegawai: '',
-                nama_sub_kegiatan: '',
-                nama_agenda: '',
-                uraian: '',
-                base_uraian: '',
-                satuan: '',
-                target_kuantitas: 0,
-                realisasi_kuantitas: 0,
-                keterangan: '',
-                is_ketua_tim: false,
-                is_pimpinan: false,
-                tanggal_mulai: '',
-                tanggal_selesai: '',
-                bulanDiterima: [],
-                bulanSudahCkp: [],
-            },
+            ckpData: defaultCkpData(),
 
             init() {
                 this.$watch('bulanCkp', (value) => {
@@ -362,6 +294,46 @@
                         this.ckpData.uraian = this.ckpData.base_uraian;
                     }
                 });
+            },
+
+            openFromSmartModal(event) {
+                if (event.detail?.modalId !== 'modal-ckp-universal') return;
+                this.openWithData(event.detail?.data || {});
+            },
+
+            openWithData(data = {}) {
+                this.ckpData = {
+                    ...defaultCkpData(),
+                    id_penugasan: data.id_penugasan ?? null,
+                    id_sub_kegiatan: data.id_sub_kegiatan ?? null,
+                    id_agenda: data.id_agenda ?? null,
+                    nama_pegawai: data.nama_pegawai ?? '',
+                    nama_sub_kegiatan: data.nama_sub_kegiatan ?? '',
+                    nama_agenda: data.nama_agenda ?? '',
+                    uraian: data.uraian ?? '',
+                    base_uraian: data.uraian ?? '',
+                    satuan: data.satuan ?? '',
+                    target_kuantitas: Number(data.target_kuantitas ?? 0),
+                    realisasi_kuantitas: Number(data.realisasi_kuantitas ?? 0),
+                    keterangan: data.keterangan ?? '',
+                    is_ketua_tim: normalizeBool(data.is_ketua_tim),
+                    is_pimpinan: normalizeBool(data.is_pimpinan),
+                    tanggal_mulai: data.tanggal_mulai ?? '',
+                    tanggal_selesai: data.tanggal_selesai ?? '',
+                    bulanDiterima: normalizeArray(data.bulanDiterima),
+                    bulanSudahCkp: normalizeArray(data.bulanSudahCkp),
+                };
+                this.bulanCkp = '';
+                this.showCkpModal = true;
+                this.$nextTick(() => this.autoSelectBulanCkp());
+            },
+
+            autoSelectBulanCkp() {
+                const availableOptions = this.bulanOptions.filter((option) => !option.disabled);
+
+                if (availableOptions.length === 1) {
+                    this.bulanCkp = availableOptions[0].value;
+                }
             },
 
             // Helper: apakah ini mode Anggota Tim (dari penugasan)?
@@ -431,9 +403,8 @@
                     alert('Pilih bulan CKP terlebih dahulu');
                     return;
                 }
-                const form = document.getElementById('ckpUniversalForm');
-                if (form) {
-                    form.submit();
+                if (this.$refs.form) {
+                    this.$refs.form.submit();
                 }
             }
         }

@@ -185,7 +185,6 @@ Route::middleware('auth')->group(function () {
     // ROUTE KALENDER DL
     Route::prefix('/kalender-dl')->group(function () {
         Route::get('/', [KalenderDLController::class, 'index'])->name('kalenderDL.index');
-        Route::post('/', [KalenderDLController::class, 'store'])->name('kalenderDL.store')->middleware('can:manage-kalender-dl');
         Route::delete('/{id_penugasan}', [KalenderDLController::class, 'delete'])->name('kalenderDL.delete')->middleware('can:manage-kalender-dl');
     });
     // END ROUTE KALENDER DL

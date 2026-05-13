@@ -467,16 +467,16 @@
                                                             @click="$dispatch('open-smart-modal', {
                                                                 modalId: 'modal-ckp-universal',
                                                                 data: {
-                                                                    id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                                    nama_pegawai: {{ json_encode($penugasan->anggota->nama_pegawai) }},
-                                                                    uraian: {{ json_encode('Melaksanakan ' . $penugasan->jenisKegiatan->jenis_kegiatan . ' pada ' . $penugasan->subKegiatan->nama_sub_kegiatan . ' dengan target ' . ($penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim')) . ' dari total target ' . $penugasan->target) }},
+                                                                    id_penugasan: @js($penugasan->id_penugasan),
+                                                                    nama_pegawai: @js($penugasan->anggota->nama_pegawai),
+                                                                    uraian: @js('Melaksanakan ' . $penugasan->jenisKegiatan->jenis_kegiatan . ' pada ' . $penugasan->subKegiatan->nama_sub_kegiatan . ' dengan target ' . ($penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim')) . ' dari total target ' . $penugasan->target),
                                                                     target_kuantitas: {{ $penugasan->target }},
                                                                     realisasi_kuantitas: {{ $penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim') }},
-                                                                    satuan: '{{ $penugasan->satuan_target }}',
-                                                                    tanggal_mulai: '{{ optional($penugasan->tanggal_mulai)->format('Y-m-d') }}',
-                                                                    tanggal_selesai: '{{ optional($penugasan->tanggal_selesai)->format('Y-m-d') }}',
-                                                                    bulanDiterima: @js($penugasan->bulanCkpBelumDibuat()),
-                                                                    bulanSudahCkp: @js($penugasan->ckpBulanan->pluck('bulan_ckp')->unique()->values()),
+                                                                    satuan: @js($penugasan->satuan_target),
+                                                                    tanggal_mulai: @js(optional($penugasan->tanggal_mulai)->format('Y-m-d')),
+                                                                    tanggal_selesai: @js(optional($penugasan->tanggal_selesai)->format('Y-m-d')),
+                                                                    bulanDiterima: @js($penugasan->bulanCkpBelumDibuat()->values()->toArray()),
+                                                                    bulanSudahCkp: @js($penugasan->ckpBulanan->pluck('bulan_ckp')->unique()->values()->toArray()),
                                                                 }
                                                             })"
                                                             class="w-full text-left px-4 py-3 text-sm flex items-center gap-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 border-b border-gray-100 dark:border-gray-700">
@@ -1435,16 +1435,16 @@
                                                             @click="$dispatch('open-smart-modal', {
                                                                 modalId: 'modal-ckp-universal',
                                                                 data: {
-                                                                    id_penugasan: '{{ $penugasan->id_penugasan }}',
-                                                                    nama_pegawai: {{ json_encode($penugasan->anggota->nama_pegawai) }},
-                                                                    uraian: {{ json_encode('Melaksanakan ' . $penugasan->jenisKegiatan->jenis_kegiatan . ' pada ' . $penugasan->subKegiatan->nama_sub_kegiatan . ' dengan target ' . ($penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim')) . ' dari total target ' . $penugasan->target . ' '. $penugasan->satuan_target) }},
+                                                                    id_penugasan: @js($penugasan->id_penugasan),
+                                                                    nama_pegawai: @js($penugasan->anggota->nama_pegawai),
+                                                                    uraian: @js('Melaksanakan ' . $penugasan->jenisKegiatan->jenis_kegiatan . ' pada ' . $penugasan->subKegiatan->nama_sub_kegiatan . ' dengan target ' . ($penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim')) . ' dari total target ' . $penugasan->target . ' '. $penugasan->satuan_target),
                                                                     target_kuantitas: {{ $penugasan->target }},
                                                                     realisasi_kuantitas: {{ $penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim') }},
-                                                                    satuan: '{{ $penugasan->satuan_target }}',
-                                                                    tanggal_mulai: '{{ optional($penugasan->tanggal_mulai)->format('Y-m-d') }}',
-                                                                    tanggal_selesai: '{{ optional($penugasan->tanggal_selesai)->format('Y-m-d') }}',
-                                                                    bulanDiterima: @js($penugasan->bulanCkpBelumDibuat()),
-                                                                    bulanSudahCkp: @js($penugasan->ckpBulanan->pluck('bulan_ckp')->unique()->values()),
+                                                                    satuan: @js($penugasan->satuan_target),
+                                                                    tanggal_mulai: @js(optional($penugasan->tanggal_mulai)->format('Y-m-d')),
+                                                                    tanggal_selesai: @js(optional($penugasan->tanggal_selesai)->format('Y-m-d')),
+                                                                    bulanDiterima: @js($penugasan->bulanCkpBelumDibuat()->values()->toArray()),
+                                                                    bulanSudahCkp: @js($penugasan->ckpBulanan->pluck('bulan_ckp')->unique()->values()->toArray()),
                                                                 }
                                                             })"
                                                             class="w-full text-left px-4 py-3 text-sm flex items-center gap-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 border-b border-gray-100 dark:border-gray-700">
@@ -2049,4 +2049,3 @@
         </div>
     </div>
 </div>
-

@@ -255,7 +255,7 @@
     {{-- MODAL SUB KEGIATAN --}}
     @include('pages.main.components.modals.tagihan-kerja.modal-sub-kegiatan')
 
-    {{-- MODAL CKP (Universal, dipakai untuk CKP Pegawai dan CKP Ketua Tim) --}}
+    {{-- MODAL CKP (Universal: Anggota Tim, Ketua Tim, dan Pimpinan) --}}
     @include('pages.main.components.modals.tagihan-kerja.modal-ckp-universal')
 
     <style>
