@@ -77,6 +77,12 @@ Route::middleware('auth')->group(function () {
     });
     // END AGENDA PIMPINAN BY PIMPINAN
 
+    // LAPORAN CKP PEGAWAI BY PIMPINAN
+    Route::prefix('laporan-ckp-pegawai')->middleware('can:kelola-master-data')->group(function () {
+        Route::get('/', [CkpPegawaiController::class, 'laporanRekap'])->name('pimpinan.laporan-ckp.index');
+    });
+    // END LAPORAN CKP PEGAWAI BY PIMPINAN
+
     // CRUD JENIS KEGIATAN BY ADMIN
     Route::prefix('jenis-kegiatan')->middleware('can:kelola-master-data')->group(function () {
         Route::get('/', [JenisKegiatanController::class, 'index'])->name('jenis-kegiatan.index');

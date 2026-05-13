@@ -808,4 +808,58 @@ class CkpPegawaiController extends Controller
         $writer->save('php://output');
         exit;
     }
+
+    /**
+     * Menampilkan rekapan laporan download CKP Pegawai untuk Pimpinan
+     */
+    public function laporanRekap(Request $request)
+    {
+        $tahun = $request->get('tahun', date('Y'));
+
+        // Ambil semua pegawai yang aktif, urutkan berdasarkan nama
+        $pegawais = Pegawai::orderBy('nama_pegawai', 'asc')->get();
+
+        // Ambil data download log untuk tahun yang dipilih
+        $logs = DB::table('ckp_download_logs')
+            ->select('id_pegawai', 'bulan_ckp', DB::raw('COUNT(*) as total_download'))
+            ->where('bulan_ckp', 'like', $tahun . '-%')
+            ->groupBy('id_pegawai', 'bulan_ckp')
+            ->get();
+
+        // Mapping ke array untuk kemudahan akses di view
+        $downloadData = [];
+        foreach ($logs as $log) {
+            // Ambil 2 digit bulan dari format "YYYY-MM"
+            $bulan = substr($log->bulan_ckp, 5, 2);
+            $downloadData[$log->id_pegawai][$bulan] = $log->total_download;
+        }
+
+        $bulanList = [
+            '01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr',
+            '05' => 'Mei', '06' => 'Jun', '07' => 'Jul', '08' => 'Agu',
+            '09' => 'Sep', '10' => 'Okt', '11' => 'Nov', '12' => 'Des'
+        ];
+
+        // List tahun dari log untuk filter (jika ada data lama), default ke tahun ini
+        $tahunList = DB::table('ckp_download_logs')
+            ->selectRaw('DISTINCT SUBSTRING(bulan_ckp, 1, 4) as tahun')
+            ->orderBy('tahun', 'desc')
+            ->pluck('tahun')
+            ->toArray();
+        
+        if (empty($tahunList)) {
+            $tahunList = [date('Y')];
+        }
+        if (!in_array(date('Y'), $tahunList)) {
+            array_unshift($tahunList, date('Y'));
+        }
+        sort($tahunList);
+        $tahunList = array_reverse($tahunList);
+
+        $title = 'Rekapitulasi Download CKP Pegawai';
+
+        return view('pages.main.pimpinan.laporan-ckp-pegawai.index', compact(
+            'title', 'pegawais', 'downloadData', 'tahun', 'bulanList', 'tahunList'
+        ));
+    }
 }

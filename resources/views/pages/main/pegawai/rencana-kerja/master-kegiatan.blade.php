@@ -5,42 +5,41 @@
 
     <div id="app" data-pegawais='@json($pegawais)'></div>
 
-    <div class="space-y-6">
-        <x-common.component-card title="Master Kegiatan">
-            <div class="flex justify-end">
-                @can('create', App\Models\Kegiatan::class)
-                    <button
-                        class="flex items-center gap-2 rounded-full border border-gray-300 dark:border-gray-600
-                        bg-white dark:bg-gray-800 px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300
-                        shadow-theme-xs hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200"
-                        @click="$dispatch('open-smart-modal', {
-                            modalId: 'modal-master-kegiatan',
-                    })">
-                        <!-- icon -->
-                        <svg class="fill-current" width="18" height="18" viewBox="0 0 18 18" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z"
-                                fill="" />
-                        </svg>
-                        Tambah Master Kegiatan
-                    </button>
-                @endcan
-            </div>
-        </x-common.component-card>
+    <!-- Quick Action / Hero Bar -->
+    <div class="mb-6 flex flex-col md:flex-row items-center justify-between bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5 lg:p-6 shadow-sm">
+        <div class="w-full md:w-auto text-center md:text-left">
+            <h2 class="text-lg lg:text-xl font-bold text-gray-800 dark:text-white mb-1">Manajemen Rencana Kerja</h2>
+            <p class="text-gray-500 dark:text-gray-400 text-sm max-w-lg">
+                Buat dan distribusikan kegiatan, sub-kegiatan, hingga penugasan spesifik untuk seluruh pegawai.
+            </p>
+        </div>
+        
+        <div class="mt-4 md:mt-0 w-full md:w-auto flex justify-center md:justify-end">
+            @can('create', App\Models\Kegiatan::class)
+                <button
+                    class="flex items-center justify-center gap-2 rounded-lg bg-brand-500 text-white px-5 py-4 font-medium shadow-theme-xs hover:bg-brand-600 transition-colors w-full sm:w-auto text-base"
+                    @click="$dispatch('open-smart-modal', { modalId: 'modal-master-kegiatan' })">
+                    <svg class="fill-current w-4 h-4" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z" fill=""/>
+                    </svg>
+                    Buat Kegiatan dan Penugasan Sekaligus
+                </button>
+            @endcan
+        </div>
+    </div>
 
+    <div class="space-y-6">
         <!-- Tampilan Card Fungsi dengan Accordion -->
         <x-common.component-card title="Matriks Peran Hasil">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold text-gray-800 dark:text-white"></h2>
-                <div class="flex items-center gap-2">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Kelola dan pantau seluruh matriks peran hasil berdasarkan fungsi bidang.
+                </p>
+                <div class="flex flex-wrap items-center gap-3">
                     <a href="{{ route('kegiatan.export-mph-all') }}"
-                        class="flex items-center gap-2 rounded-lg border border-green-500 dark:border-green-600
-                            bg-green-50 dark:bg-green-900/30 px-4 py-2 text-sm font-medium text-green-700 dark:text-green-400
-                            hover:bg-green-100 dark:hover:bg-green-800/30 hover:text-green-800 dark:hover:text-green-300 transition-colors">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 384 512">
-                            <path
-                                d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c-8.1-10.5-6.3-25.5-4.2-33.7s-23.2-12.3-33.7-4.2L192 280.9l-37.1-47.6z" />
+                        class="flex items-center gap-2 rounded-lg border border-green-500 dark:border-green-600 bg-green-50 dark:bg-green-900/30 px-4 py-2 text-sm font-medium text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-800/30 hover:text-green-800 dark:hover:text-green-300 transition-colors">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 384 512">
+                            <path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c-8.1-10.5-6.3-25.5-4.2-33.7s-23.2-12.3-33.7-4.2L192 280.9l-37.1-47.6z" />
                         </svg>
                         Export Excel
                     </a>
@@ -49,25 +48,42 @@
 
             <div class="space-y-4">
                 @foreach ($bidangs as $bidang)
-                    <div x-data="{ open: false }"
-                        class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                    @php
+                        $totalKegiatan = $bidang->kegiatans->count();
+                        $totalSub = $bidang->kegiatans->sum(fn($k) => $k->subKegiatans ? $k->subKegiatans->count() : 0);
+                        $totalPenugasan = $bidang->kegiatans->sum(fn($k) => $k->subKegiatans ? $k->subKegiatans->sum(fn($s) => $s->penugasans ? $s->penugasans->count() : 0) : 0);
+                    @endphp
+
+                    <div x-data="{ open: false }" class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md">
 
                         <!-- Header Fungsi -->
                         <button @click="open = !open"
-                            class="flex w-full items-center justify-between p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-700">
-                            <div>
-                                <h3 class="text-sm font-semibold text-gray-800 dark:text-white">{{ $bidang->nama_bidang }}
-                                </h3>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">
-                                    Total {{ $bidang->kegiatans->count() }} kegiatan
-                                </p>
+                            class="flex w-full flex-col md:flex-row md:items-center justify-between p-4 md:p-5 text-left bg-gray-50/50 hover:bg-blue-50/50 dark:bg-gray-800 dark:hover:bg-gray-700/80 transition-colors">
+                            <div class="flex-1 mb-4 md:mb-0">
+                                <h3 class="text-base font-bold text-gray-800 dark:text-white tracking-wide">{{ $bidang->nama_bidang }}</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Fungsi / Bidang Pimpinan</p>
                             </div>
 
-                            <svg :class="{ 'rotate-180': open }"
-                                class="h-5 w-5 text-gray-500 dark:text-gray-400 transition-transform" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
+                            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto md:mr-6">
+                                <div class="flex-1 md:flex-none bg-blue-50 dark:bg-blue-900/30 px-4 py-2 rounded-lg border border-blue-100 dark:border-blue-800/50 text-center min-w-[100px]">
+                                    <span class="block text-[10px] uppercase tracking-wider text-blue-600 dark:text-blue-400 font-semibold mb-0.5">Kegiatan</span>
+                                    <span class="block text-xl font-bold text-blue-700 dark:text-blue-300">{{ $totalKegiatan }}</span>
+                                </div>
+                                <div class="flex-1 md:flex-none bg-teal-50 dark:bg-teal-900/30 px-4 py-2 rounded-lg border border-teal-100 dark:border-teal-800/50 text-center min-w-[100px]">
+                                    <span class="block text-[10px] uppercase tracking-wider text-teal-600 dark:text-teal-400 font-semibold mb-0.5">Sub Kegiatan</span>
+                                    <span class="block text-xl font-bold text-teal-700 dark:text-teal-300">{{ $totalSub }}</span>
+                                </div>
+                                <div class="flex-1 md:flex-none bg-purple-50 dark:bg-purple-900/30 px-4 py-2 rounded-lg border border-purple-100 dark:border-purple-800/50 text-center min-w-[100px]">
+                                    <span class="block text-[10px] uppercase tracking-wider text-purple-600 dark:text-purple-400 font-semibold mb-0.5">Penugasan</span>
+                                    <span class="block text-xl font-bold text-purple-700 dark:text-purple-300">{{ $totalPenugasan }}</span>
+                                </div>
+                            </div>
+
+                            <div class="hidden md:flex items-center justify-center h-10 w-10 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-sm text-gray-500 dark:text-gray-400">
+                                <svg :class="{ 'rotate-180': open }" class="h-5 w-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
                         </button>
 
                         <!-- Accordion -->

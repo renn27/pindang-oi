@@ -40,7 +40,7 @@ class MenuHelper
                 'subItems' => [
                     ['icon' => 'pimpinan', 'name' => 'RK & IKI Pimpinan', 'path' => '/rencana-indikator-jpt/rencana'],
                     ['icon' => 'pimpinan', 'name' => 'Agenda Pimpinan', 'path' => '/agenda-pimpinan'],
-
+                    ['icon' => 'pimpinan', 'name' => 'Laporan CKP Pegawai', 'path' => '/laporan-ckp-pegawai'],
                 ],
             ],
             [
