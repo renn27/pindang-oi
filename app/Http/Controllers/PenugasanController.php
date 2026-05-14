@@ -276,8 +276,9 @@ class PenugasanController extends Controller
         }
     }
 
-    public function updateJenisKegiatan(Request $request, Penugasan $penugasan)
+    public function updateJenisKegiatan(Request $request, SubKegiatan $subKegiatan, Penugasan $penugasan)
     {
+        // Izinkan jika user bisa update penugasan secara umum ATAU bisa update jenis kegiatan secara khusus
         $this->authorize('updateJenisKegiatan', $penugasan);
 
         $validated = $request->validate([
@@ -320,8 +321,6 @@ class PenugasanController extends Controller
             return redirect()->back()
                 ->with('success', 'Penugasan Anggota berhasil dihapus');
         } catch (\Exception $e) {
-            dd($e->getMessage());
-
             return redirect()->back()
                 ->with('error', 'Gagal menghapus Penugasan Anggota. Silakan coba lagi.');
         }

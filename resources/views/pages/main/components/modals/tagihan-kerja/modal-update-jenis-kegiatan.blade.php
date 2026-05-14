@@ -5,13 +5,14 @@
         
         formData = $event.detail.data ?? {
             id_penugasan: '',
+            id_sub_kegiatan: '',
             id_jenis_kegiatan: '',
             jenis_kegiatan: ''
         };
     ">
     
     <form id="updateJenisKegiatanForm"
-        :action="`/penugasan/${formData.id_penugasan}/jenis-kegiatan`"
+        :action="`/sub-kegiatan/${formData.id_sub_kegiatan}/penugasan/${formData.id_penugasan}/jenis-kegiatan`"
         method="POST" class="grid grid-cols-1 gap-y-5">
         @csrf
         @method('PUT')
