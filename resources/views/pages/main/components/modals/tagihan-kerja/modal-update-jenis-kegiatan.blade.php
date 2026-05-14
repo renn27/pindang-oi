@@ -7,7 +7,8 @@
             id_penugasan: '',
             id_sub_kegiatan: '',
             id_jenis_kegiatan: '',
-            jenis_kegiatan: ''
+            jenis_kegiatan: '',
+            butuh_dl_atau_translok: 0
         };
     ">
     
@@ -40,18 +41,25 @@
                             {
                                 id: '{{ $jenis->id }}',
                                 text: '{{ addslashes($jenis->jenis_kegiatan) }} ({{ $jenis->kategori }})',
-                                style: '{{ $jenis->kategori === 'Utama' ? 'text-green-700 font-medium dark:text-green-300' : 'text-orange-700 dark:text-orange-300' }}'
+                                style: '{{ $jenis->kategori === 'Utama' ? 'text-green-700 font-medium dark:text-green-300' : 'text-orange-700 dark:text-orange-300' }}',
+                                butuh_dl_atau_translok: {{ $jenis->butuh_dl_atau_translok }}
                             },
                         @endforeach
                         {
                             id: 'LAINNYA',
                             text: '➕ Lainnya',
-                            style: 'text-blue-700 font-medium dark:text-blue-300'
+                            style: 'text-blue-700 font-medium dark:text-blue-300',
+                            butuh_dl_atau_translok: null
                         }
                     ],
                     get filteredOptions() {
-                        if (!this.search) return this.options;
-                        return this.options.filter(o => o.text.toLowerCase().includes(this.search.toLowerCase()));
+                        let filtered = this.options.filter(o => 
+                            o.id === 'LAINNYA' || 
+                            o.butuh_dl_atau_translok == formData.butuh_dl_atau_translok
+                        );
+
+                        if (!this.search) return filtered;
+                        return filtered.filter(o => o.text.toLowerCase().includes(this.search.toLowerCase()));
                     },
                     get selectText() {
                         if (!formData.id_jenis_kegiatan) return '-- Pilih Jenis Kegiatan --';

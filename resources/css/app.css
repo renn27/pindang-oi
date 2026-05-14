@@ -1027,7 +1027,8 @@ tr.ckp-completed-row td:first-child::before {
     transform: translate(-50%, -50%);
     background: linear-gradient(135deg, rgba(25, 255, 109, 0.95), rgba(21, 128, 61, 0.95));
     color: white;
-    padding: 6px 40px;
+    width: 350px;
+    padding: 6px 20px;
     border-radius: 4px;
     font-size: 13px;
     font-weight: 600;
@@ -1088,7 +1089,8 @@ tr.ckp-siap-row td:first-child::before {
     transform: translate(-50%, -50%);
     background: linear-gradient(135deg, rgba(251, 146, 60, 0.95), rgba(194, 65, 12, 0.95));
     color: white;
-    padding: 6px 40px;
+    width: 350px;
+    padding: 6px 20px;
     border-radius: 4px;
     font-size: 13px;
     font-weight: 600;
