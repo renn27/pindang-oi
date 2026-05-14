@@ -5,7 +5,6 @@ namespace App\Policies;
 use App\Models\Pegawai;
 use App\Models\SubKegiatan;
 use App\Models\Penugasan;
-
 class PenugasanPolicy
 {
 
@@ -60,6 +59,30 @@ class PenugasanPolicy
     /**
      * Determine whether the user can update the model.
      */
+    public function updateJenisKegiatan(Pegawai $pegawai, Penugasan $penugasan): bool
+    {
+        // 1️⃣ Tidak berhak kelola
+        if (! $this->canManagePenugasan($pegawai, $penugasan)) {
+            return false;
+        }
+
+        // 2️⃣ Hanya boleh jika id_jenis_kegiatan kosong (null, 0, '')
+        if (!empty($penugasan->id_jenis_kegiatan)) {
+            return false;
+        }
+
+        // 3️⃣ Hanya boleh diakses jika tombol Edit Penugasan normal sudah hidden/terkunci
+        // Tombol normal terkunci jika:
+        // a) Sudah diterima
+        // b) Sudah masuk kalender DL (ACC)
+        $isLocked = ($penugasan->latestPenerimaan?->status === 'Diterima') || $penugasan->sudahMasukKalenderDL();
+
+        return $isLocked;
+    }
+
+    /**
+     * Determine whether the user can update the model.
+     */
     public function update(Pegawai $pegawai, Penugasan $penugasan): bool
     {
         // 1️⃣ Tidak berhak kelola
@@ -94,11 +117,10 @@ class PenugasanPolicy
     // === PENGIRIMAN ===
     public function send(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        if (!$this->isAssignedAnggota($pegawai, $penugasan)) {
-            return false;
-        }
-
-        return $penugasan->bolehKirimPenugasan();
+        // Hanya cek identitas: apakah user adalah anggota yang ditugaskan?
+        // Pengecekan boleh/tidaknya kirim (disabled state + tooltip) dilakukan di view
+        // via bolehKirimPenugasan() agar button tetap muncul dengan pesan informatif.
+        return $this->isAssignedAnggota($pegawai, $penugasan);
     }
 
     public function cancelSend(Pegawai $pegawai, Penugasan $penugasan): bool
@@ -109,11 +131,10 @@ class PenugasanPolicy
     // === PENERIMAAN ===
     public function receive(Pegawai $pegawai, Penugasan $penugasan): bool
     {
-        if (!$this->canManagePenugasan($pegawai, $penugasan)) {
-            return false;
-        }
-
-        return $penugasan->bolehTerimaPenugasan();
+        // Hanya cek identitas: apakah user berhak mengelola penugasan ini?
+        // Disabled state + tooltip "Buat Penerimaan" diurus di view via bolehTerimaPenugasan()
+        // agar button tetap muncul dengan pesan informatif (misal: belum ada pengiriman).
+        return $this->canManagePenugasan($pegawai, $penugasan);
     }
 
     public function cancelReceive(Pegawai $pegawai, Penugasan $penugasan): bool

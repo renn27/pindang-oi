@@ -14,6 +14,9 @@ const toastConfig = {
 }
 
 const SwalHelper = {
+    fire: (...args) => Swal.fire(...args),
+    close: () => Swal.close(),
+    
     confirmDelete(formId, itemName) {
         Swal.fire({
             html: `

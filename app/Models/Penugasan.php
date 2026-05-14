@@ -172,7 +172,9 @@ class Penugasan extends Model
 
     public function isDinasLuar()
     {
-        return $this->jenisKegiatan?->butuh_dl_atau_translok == 1;
+        // Gunakan field langsung di penugasan agar tetap akurat
+        // meski id_jenis_kegiatan kosong (null)
+        return $this->butuh_dl == 1 || $this->butuh_translok == 1;
     }
 
     public function sudahMasukKalenderDL()
@@ -232,14 +234,19 @@ class Penugasan extends Model
         $latestPengiriman = $this->latestPengiriman;
         $latestPenerimaan = $this->latestPenerimaan;
 
-        // ❌ BELUM ADA PENGIRIMAN
+        // ❌ BELUM ADA PENGIRIMAN SAMA SEKALI
         if (!$latestPengiriman) {
             return 'info|Belum ada pengiriman dari anggota tim';
         }
 
+        // ⚠️ SUDAH ADA PENGIRIMAN, BELUM ADA PENERIMAAN (sedang menunggu diperiksa)
+        // bolehTerimaPenugasan() = true di sini, jadi seharusnya button aktif → return null
+        if (!$latestPengiriman->penerimaan) {
+            return null; // button aktif, boleh terima
+        }
+
         // ⚠️ SUDAH REVISI, TAPI BELUM ADA PENGIRIMAN ULANG
         if (
-            $latestPengiriman &&
             $latestPenerimaan &&
             $latestPenerimaan->status === 'Revisi' &&
             $latestPenerimaan->id_pengiriman === $latestPengiriman->id_pengiriman
@@ -247,12 +254,18 @@ class Penugasan extends Model
             return 'warning|Tunggu anggota tim mengirimkan perbaikan';
         }
 
-        // Sudah ada pelunasan diterima → tugas selesai
-        if (!$this->isTugasSelesai())
-            return 'info|Tunggu  anggota tim mengirimkan Pelunasannya';
+        // ✅ TUGAS SELESAI (sudah ada Pelunasan Diterima)
+        if ($this->isTugasSelesai()) {
+            return 'success|Penugasan sudah selesai dan diterima';
+        }
+
+        // 🟡 Cicilan sudah diterima, tapi belum ada Pelunasan
+        if ($latestPenerimaan?->status === 'Diterima') {
+            return 'info|Tunggu anggota tim mengirimkan Pelunasannya';
+        }
 
         // // ⚠️ DEADLINE LEWAT, SUDAH ADA PENGIRIMAN, BELUM DIPERIKSA
-        // if  ($latestPengiriman && (! $latestPenerimaan ||
+        // if ($latestPengiriman && (!$latestPenerimaan ||
         //         $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman)) {
         //     // Telat tapi masih diperiksa
         //     if ($today->gt($selesai)) {
@@ -261,12 +274,7 @@ class Penugasan extends Model
         //     // return 'danger|Pengiriman sudah masuk, namun tidak diperiksa oleh ketua tim';
         // }
 
-        //  // ❌ PENUGASAN BERAKHIR & BELUM ADA PENGIRIMAN
-        // if (! $latestPengiriman && $today->gt($selesai)) {
-        //     return 'danger|Penugasan telah berakhir dan anggota tidak mengirimkannya';
-        // }
-
-        return null; // aktif, tanpa tooltip
+        return null;
     }
 
     public function bolehKirimPenugasan(): bool
@@ -275,24 +283,25 @@ class Penugasan extends Model
         if (!$this->isStarted())
             return false;
 
-        // 2️⃣ Jenis DL tapi belum masuk kalender DL
+        // 2️⃣ Penugasan DL/Translok → hanya boleh kirim jika sudah masuk kalender DL
+        //    (artinya: pimpinan sudah ACC dan memasukkan ke kalender)
         if ($this->isDinasLuar() && !$this->sudahMasukKalenderDL())
             return false;
 
         $latestPengiriman = $this->latestPengiriman;
         $latestPenerimaan = $this->latestPenerimaan;
 
-        // 2️⃣ Ada pengiriman terbaru tapi BELUM ada penerimaan untuk pengiriman tersebut
+        // 3️⃣ Ada pengiriman terbaru tapi BELUM ada penerimaan untuk pengiriman tersebut
         if ($latestPengiriman && (!$latestPenerimaan || $latestPenerimaan->id_pengiriman !== $latestPengiriman->id_pengiriman)) {
             return false; // sedang diperiksa
         }
 
-        // 3️⃣ BARU: Jika sudah ada pelunasan yang diterima, blokir pengiriman
+        // 4️⃣ Sudah ada pelunasan yang diterima → tugas selesai, blokir
         if ($this->isTugasSelesai()) {
             return false;
         }
 
-        // 4️⃣ Selain itu → boleh kirim
+        // 5️⃣ Selain itu → boleh kirim
         return true;
     }
 

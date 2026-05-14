@@ -272,9 +272,10 @@
                                             @method('DELETE')
 
                                             <button type="button"
-                                                onclick="SwalHelper.confirmDelete(
+                                                onclick="confirmDeleteJenisKegiatan(
                                                     'delete-rencana-{{ $jenisKegiatan->id }}',
                                                     {{ json_encode($jenisKegiatan->jenis_kegiatan) }},
+                                                    {{ $jenisKegiatan->penugasans->count() }}
                                                 )"
                                                 class="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2 dark:text-red-400 dark:hover:bg-gray-700">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -293,4 +294,53 @@
             </tbody>
         </table>
     </div>
+
+    @push('scripts')
+    <script>
+        function confirmDeleteJenisKegiatan(formId, namaKegiatan, totalPenugasan) {
+            if (totalPenugasan > 0) {
+                Swal.fire({
+                    html: `
+                        <div class="text-center p-6">
+                            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/10 mb-6">
+                                <svg class="w-8 h-8 text-blue-600 dark:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Informasi</h3>
+                            <p class="text-justify text-gray-600 dark:text-gray-300 mb-6 font-medium text-sm">
+                                Sudah ada <b>${totalPenugasan}</b> penugasan yang dimiliki. Menghapus data ini akan membuat jenis kegiatan kosong di tabel penugasan. Sebaiknya edit dulu data jenis kegiatan di tabel penugasan sebelum menghapus.<br><br>
+                            </p>
+                            <div class="flex gap-3 justify-center">
+                                <button type="button" onclick="Swal.close()"
+                                    class="px-5 py-2.5 rounded-lg font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-colors">
+                                    Oke
+                                </button>
+                                <button type="button" onclick="Swal.close(); setTimeout(() => SwalHelper.confirmDelete('${formId}', '${namaKegiatan.replace(/'/g, "\\'")}'), 200);"
+                                    class="px-5 py-2.5 rounded-lg font-medium bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white transition-colors">
+                                    Tetap Hapus
+                                </button>
+                            </div>
+                        </div>
+                    `,
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                    showCloseButton: false,
+                    allowOutsideClick: true,
+                    allowEscapeKey: true,
+                    customClass: {
+                        popup: '!rounded-3xl !border !border-gray-200 !shadow-2xl !bg-white dark:!border-gray-700 dark:!bg-gray-900 !p-0 !max-w-sm',
+                        title: '!hidden',
+                        htmlContainer: '!p-0 !m-0',
+                        container: '!p-5'
+                    },
+                    backdrop: 'rgba(107, 114, 128, 0.3) dark:rgba(0, 0, 0, 0.5)',
+                    buttonsStyling: false
+                });
+            } else {
+                SwalHelper.confirmDelete(formId, namaKegiatan);
+            }
+        }
+    </script>
+    @endpush
 @endsection

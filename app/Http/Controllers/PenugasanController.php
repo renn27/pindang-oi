@@ -22,23 +22,23 @@ class PenugasanController extends Controller
         $this->authorize('create', [Penugasan::class, $subKegiatan]);
 
         $validated = $request->validate([
-            'id_anggota'          => ['required', 'exists:pegawais,id_pegawai'],
-            'id_jenis_kegiatan'   => ['required'],
+            'id_anggota' => ['required', 'exists:pegawais,id_pegawai'],
+            'id_jenis_kegiatan' => ['required'],
             'jenis_kegiatan_baru' => ['nullable', 'string'],
-            'target'              => ['required', 'integer', 'min:1'],
-            'satuan_target'       => ['required', 'string', 'max:50'],
+            'target' => ['required', 'integer', 'min:1'],
+            'satuan_target' => ['required', 'string', 'max:50'],
 
             // butuh_dl dan butuh_translok harus 0 atau 1 (boolean)
-            'butuh_dl'      => ['nullable', 'boolean'],
-            'butuh_translok'=> ['nullable', 'boolean'],
+            'butuh_dl' => ['nullable', 'boolean'],
+            'butuh_translok' => ['nullable', 'boolean'],
 
             // Tanggal WAJIB ada saat create
-            'tanggal_mulai'  => ['required', 'date'],
-            'tanggal_selesai'=> ['required', 'date', 'after_or_equal:tanggal_mulai'],
+            'tanggal_mulai' => ['required', 'date'],
+            'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
 
-            'tanggal_mulai_list'   => ['nullable', 'array'],
+            'tanggal_mulai_list' => ['nullable', 'array'],
             'tanggal_mulai_list.*' => ['nullable', 'date'],
-            'tanggal_selesai_list'   => ['nullable', 'array'],
+            'tanggal_selesai_list' => ['nullable', 'array'],
             'tanggal_selesai_list.*' => ['nullable', 'date'],
         ]);
 
@@ -74,7 +74,7 @@ class PenugasanController extends Controller
             } elseif ($requestButuhTranslok) {
                 $butuhTranslok = true;
             } else {
-                $butuhDl = true; 
+                $butuhDl = true;
             }
         } else {
             $butuhDl = false;
@@ -82,11 +82,11 @@ class PenugasanController extends Controller
         }
 
         // Pastikan nilai butuh_dl/translok selalu integer 0 atau 1 (tinyint safe)
-        $validated['butuh_dl']       = $butuhDl ? 1 : 0;
-        $validated['status_dl']      = $butuhDl ? 'Menunggu' : null;
+        $validated['butuh_dl'] = $butuhDl ? 1 : 0;
+        $validated['status_dl'] = $butuhDl ? 'Menunggu' : null;
 
-        $validated['butuh_translok']    = $butuhTranslok ? 1 : 0;
-        $validated['status_translok']   = $butuhTranslok ? 'Menunggu' : null;
+        $validated['butuh_translok'] = $butuhTranslok ? 1 : 0;
+        $validated['status_translok'] = $butuhTranslok ? 'Menunggu' : null;
 
         $validated['status'] = 'Belum Dikirim';
 
@@ -100,7 +100,7 @@ class PenugasanController extends Controller
         try {
             DB::transaction(function () use ($subKegiatan, $validated, $validDatesToSave) {
                 foreach ($validDatesToSave as $tgl) {
-                    $validated['tanggal_mulai']  = $tgl['mulai'];
+                    $validated['tanggal_mulai'] = $tgl['mulai'];
                     $validated['tanggal_selesai'] = $tgl['selesai'];
 
                     // Create terpisah untuk masing-masing tanggal sesuai request
@@ -112,7 +112,7 @@ class PenugasanController extends Controller
 
             $response = redirect()
                 ->route('sub.kegiatan.show', [
-                    'kegiatan'    => $subKegiatan->kegiatan->id_kegiatan,
+                    'kegiatan' => $subKegiatan->kegiatan->id_kegiatan,
                     'subKegiatan' => $subKegiatan->id_sub_kegiatan,
                 ])
                 ->with('success', 'Penugasan kepada anggota berhasil dilakukan.');
@@ -136,24 +136,24 @@ class PenugasanController extends Controller
         $this->authorize('update', $penugasan);
 
         $validated = $request->validate([
-            'id_anggota'          => ['required', 'exists:pegawais,id_pegawai'],
-            'id_jenis_kegiatan'   => ['required'],
+            'id_anggota' => ['required', 'exists:pegawais,id_pegawai'],
+            'id_jenis_kegiatan' => ['required'],
             'jenis_kegiatan_baru' => ['nullable', 'string', 'max:100'],
-            'target'              => ['required', 'integer', 'min:1'],
-            'satuan_target'       => ['required', 'string', 'max:50'],
+            'target' => ['required', 'integer', 'min:1'],
+            'satuan_target' => ['required', 'string', 'max:50'],
 
             // Tanggal WAJIB ada saat update juga (penugasan harus punya rentang waktu)
-            'tanggal_mulai'  => ['required', 'date'],
-            'tanggal_selesai'=> ['required', 'date', 'after_or_equal:tanggal_mulai'],
+            'tanggal_mulai' => ['required', 'date'],
+            'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
 
             // butuh_dl dan butuh_translok harus 0 atau 1 (boolean)
-            'butuh_dl'      => ['nullable', 'boolean'],
-            'butuh_translok'=> ['nullable', 'boolean'],
+            'butuh_dl' => ['nullable', 'boolean'],
+            'butuh_translok' => ['nullable', 'boolean'],
 
             // tanggal tambahan (OPSIONAL)
-            'tanggal_mulai_list'   => ['nullable', 'array'],
+            'tanggal_mulai_list' => ['nullable', 'array'],
             'tanggal_mulai_list.*' => ['nullable', 'date'],
-            'tanggal_selesai_list'   => ['nullable', 'array'],
+            'tanggal_selesai_list' => ['nullable', 'array'],
             'tanggal_selesai_list.*' => ['nullable', 'date'],
         ]);
 
@@ -208,7 +208,7 @@ class PenugasanController extends Controller
         }
 
         // Pastikan nilai butuh_dl/translok selalu integer 0 atau 1 (tinyint safe)
-        $validated['butuh_dl']    = $butuhDl ? 1 : 0;
+        $validated['butuh_dl'] = $butuhDl ? 1 : 0;
         $validated['butuh_translok'] = $butuhTranslok ? 1 : 0;
 
         // HANDLE STATUS DL — preserve nilai yang sudah ada; jika baru aktif → 'Menunggu'; jika dimatikan → null
@@ -245,18 +245,18 @@ class PenugasanController extends Controller
                     // Keduanya harus ada (&&) — mencegah penugasan dengan tanggal null
                     if (!empty($tgl['mulai']) && !empty($tgl['selesai'])) {
                         Penugasan::create([
-                            'id_anggota'        => $validated['id_anggota'],
-                            'id_sub_kegiatan'   => $penugasan->id_sub_kegiatan,
+                            'id_anggota' => $validated['id_anggota'],
+                            'id_sub_kegiatan' => $penugasan->id_sub_kegiatan,
                             'id_jenis_kegiatan' => $validated['id_jenis_kegiatan'],
-                            'target'            => $validated['target'],
-                            'satuan_target'     => $validated['satuan_target'],
-                            'tanggal_mulai'     => $tgl['mulai'],
-                            'tanggal_selesai'   => $tgl['selesai'],
-                            'status'            => $penugasan->status,
-                            'butuh_dl'          => $validated['butuh_dl'],
-                            'status_dl'         => $validated['butuh_dl'] ? 'Menunggu' : null,
-                            'butuh_translok'    => $validated['butuh_translok'],
-                            'status_translok'   => $validated['butuh_translok'] ? 'Menunggu' : null,
+                            'target' => $validated['target'],
+                            'satuan_target' => $validated['satuan_target'],
+                            'tanggal_mulai' => $tgl['mulai'],
+                            'tanggal_selesai' => $tgl['selesai'],
+                            'status' => $penugasan->status,
+                            'butuh_dl' => $validated['butuh_dl'],
+                            'status_dl' => $validated['butuh_dl'] ? 'Menunggu' : null,
+                            'butuh_translok' => $validated['butuh_translok'],
+                            'status_translok' => $validated['butuh_translok'] ? 'Menunggu' : null,
                         ]);
                     }
                 }
@@ -264,7 +264,7 @@ class PenugasanController extends Controller
 
             return redirect()
                 ->route('sub.kegiatan.show', [
-                    'kegiatan'    => $subKegiatan->kegiatan->id_kegiatan,
+                    'kegiatan' => $subKegiatan->kegiatan->id_kegiatan,
                     'subKegiatan' => $subKegiatan->id_sub_kegiatan,
                 ])
                 ->with('success', 'Data Penugasan kepada anggota berhasil diperbarui.');
@@ -273,6 +273,40 @@ class PenugasanController extends Controller
             return redirect()->back()
                 ->with('error', 'Gagal memperbarui data penugasan kepada anggota. Silakan coba lagi.')
                 ->withInput();
+        }
+    }
+
+    public function updateJenisKegiatan(Request $request, Penugasan $penugasan)
+    {
+        $this->authorize('updateJenisKegiatan', $penugasan);
+
+        $validated = $request->validate([
+            'id_jenis_kegiatan' => ['required'],
+            'jenis_kegiatan_baru' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        if ($validated['id_jenis_kegiatan'] === 'LAINNYA') {
+            if (empty($validated['jenis_kegiatan_baru'])) {
+                return back()->with('error', 'Jenis kegiatan baru wajib diisi.')->withInput();
+            }
+
+            $jenis = JenisKegiatan::create([
+                'jenis_kegiatan' => $validated['jenis_kegiatan_baru'],
+                'kategori' => 'Tambahan',
+            ]);
+
+            $validated['id_jenis_kegiatan'] = $jenis->id;
+        }
+
+        try {
+            $penugasan->update([
+                'id_jenis_kegiatan' => $validated['id_jenis_kegiatan']
+            ]);
+
+            return redirect()->back()->with('success', 'Jenis kegiatan berhasil diperbarui.');
+        } catch (\Exception $e) {
+            Log::error('Update Jenis Kegiatan error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memperbarui jenis kegiatan.')->withInput();
         }
     }
 
@@ -397,11 +431,11 @@ class PenugasanController extends Controller
         $dataToInsert = [];
         foreach ($dates as $d) {
             $dataToInsert[] = [
-                'id_pegawai'   => $penugasan->id_anggota,
+                'id_pegawai' => $penugasan->id_anggota,
                 'id_penugasan' => $penugasan->id_penugasan,
-                'tanggal_dl'   => $d,
-                'created_at'   => now(),
-                'updated_at'   => now(),
+                'tanggal_dl' => $d,
+                'created_at' => now(),
+                'updated_at' => now(),
             ];
         }
 
@@ -430,7 +464,7 @@ class PenugasanController extends Controller
 
         // Bangun 1 Query raksasa untuk mengecek semua rentang tanggal sekaligus (Mencegah N+1)
         $query = Penugasan::where('id_anggota', $idAnggota)
-            ->where(function($q) {
+            ->where(function ($q) {
                 $q->where('butuh_dl', 1)->orWhere('butuh_translok', 1);
             });
 
@@ -438,14 +472,14 @@ class PenugasanController extends Controller
             $query->where('id_penugasan', '!=', $excludeId);
         }
 
-        $query->where(function($q) use ($dates) {
+        $query->where(function ($q) use ($dates) {
             foreach ($dates as $date) {
                 $m = $date['tanggal_mulai'] ?? null;
                 $s = $date['tanggal_selesai'] ?? null;
                 if ($m && $s) {
-                    $q->orWhere(function($subQ) use ($m, $s) {
+                    $q->orWhere(function ($subQ) use ($m, $s) {
                         $subQ->where('tanggal_mulai', '<=', $s)
-                             ->where('tanggal_selesai', '>=', $m);
+                            ->where('tanggal_selesai', '>=', $m);
                     });
                 }
             }
@@ -457,7 +491,8 @@ class PenugasanController extends Controller
             foreach ($dates as $index => $date) {
                 $mulai = $date['tanggal_mulai'] ?? null;
                 $selesai = $date['tanggal_selesai'] ?? null;
-                if (!$mulai || !$selesai) continue;
+                if (!$mulai || !$selesai)
+                    continue;
 
                 $reqM = \Carbon\Carbon::parse($mulai)->startOfDay();
                 $reqS = \Carbon\Carbon::parse($selesai)->startOfDay();
@@ -552,7 +587,7 @@ class PenugasanController extends Controller
         // 0. Cek Bentrok Backend Sekaligus (Mencegah N+1 Loop)
         if ($wajibCekBentrok && $idAnggota && count($allDates) > 0) {
             $query = \App\Models\Penugasan::where('id_anggota', $idAnggota)
-                ->where(function($q) {
+                ->where(function ($q) {
                     $q->where('butuh_dl', 1)->orWhere('butuh_translok', 1);
                 });
 
@@ -560,14 +595,14 @@ class PenugasanController extends Controller
                 $query->where('id_penugasan', '!=', $penugasanIdToExclude);
             }
 
-            $query->where(function($q) use ($allDates) {
+            $query->where(function ($q) use ($allDates) {
                 foreach ($allDates as $tgl) {
                     $m = $tgl['mulai'] ?? null;
                     $s = $tgl['selesai'] ?? null;
                     if ($m && $s) {
-                        $q->orWhere(function($subQ) use ($m, $s) {
+                        $q->orWhere(function ($subQ) use ($m, $s) {
                             $subQ->where('tanggal_mulai', '<=', $s)
-                                 ->where('tanggal_selesai', '>=', $m);
+                                ->where('tanggal_selesai', '>=', $m);
                         });
                     }
                 }

@@ -138,6 +138,9 @@
     {{-- Modal Histori Pengiriman --}}
     @include('pages.main.components.modals.tagihan-kerja.modal-history-pengiriman')
 
+    {{-- Modal Update Jenis Kegiatan Khusus --}}
+    @include('pages.main.components.modals.tagihan-kerja.modal-update-jenis-kegiatan')
+
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
