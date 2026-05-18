@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\KalenderDL;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Pegawai;
 use App\Models\Penugasan;
 use Illuminate\Support\Facades\Log;
@@ -57,30 +58,31 @@ class KalenderDLController extends Controller
     public function delete($id_penugasan)
     {
         try {
-            KalenderDL::where('id_penugasan', $id_penugasan)->delete();
-            
             $penugasan = Penugasan::find($id_penugasan);
-            if ($penugasan) {
-                $updateData = [];
-                if ($penugasan->status_dl === 'ACC') {
-                    $updateData['status_dl'] = 'Menunggu';
-                }
-                if ($penugasan->status_translok === 'ACC') {
-                    $updateData['status_translok'] = 'Menunggu';
-                }
-                if (!empty($updateData)) {
-                    $penugasan->update($updateData);
-                }
+            
+            // Cek apakah penugasan sudah memiliki CKP sebelum menghapus apapun
+            if ($penugasan && $penugasan->ckp()->exists()) {
+                return redirect()->back()
+                    ->with('error', 'Gagal menghapus! Penugasan ini tidak bisa dicabut karena sudah masuk ke dalam CKP.');
             }
+
+            DB::transaction(function () use ($id_penugasan, $penugasan) {
+                KalenderDL::where('id_penugasan', $id_penugasan)->delete();
+
+                if ($penugasan) {
+                    $penugasan->forceDelete();
+                }
+            });
             
             return redirect()
                 ->route('master-kegiatan.index_rk_dl')
-                ->with('success', 'Berhasil mencabut DL dari Kalender dan status dikembalikan ke Menunggu.');
+                ->with('success', 'Berhasil menghapus DL dari Kalender dan penugasan.');
+            
         } catch (\Exception $e) {
-            Log::error('Gagal hapus Kalender DL: ' . $e->getMessage());
+            Log::error('Gagal hapus data penugasan dan Kalender DL: ' . $e->getMessage());
 
             return redirect()->back()
-                ->with('error', 'Gagal mencabut DL dari Kalender.');
+                ->with('error', 'Terjadi kesalahan. Gagal mencabut DL dari Kalender dan menghapus data penugasan.');
         }
     }
 }

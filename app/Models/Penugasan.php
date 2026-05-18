@@ -130,6 +130,12 @@ class Penugasan extends Model
                 throw new \RuntimeException('Penugasan tidak bisa dihapus karena sudah memiliki CKP.');
             }
         });
+
+        static::forceDeleting(function ($penugasan) {
+            if ($penugasan->ckp()->exists()) {
+                throw new \RuntimeException('Penugasan tidak bisa dihapus karena sudah memiliki CKP.');
+            }
+        });
     }
 
     public function latestPengiriman()
