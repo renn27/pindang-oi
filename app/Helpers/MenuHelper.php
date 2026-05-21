@@ -173,6 +173,12 @@ class MenuHelper
                 ],
                 'is_external' => true,
             ],
+            [
+                'icon' => 'gcpbi',
+                'name' => 'MUSI',
+                'path' => 'https://webapps.bps.go.id/sumsel/musi',
+                'is_external' => true,
+            ],
         ];
     }
 
