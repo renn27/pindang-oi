@@ -112,6 +112,236 @@
     </div>
 
     @if (!auth()->user()->isSuperUser())
+        @php
+            $currentUser = Auth::user();
+            // Get user's task recap
+            $myRekap = $rekapAnggota ? $rekapAnggota->firstWhere('id_pegawai', $currentUser->id_pegawai) : null;
+            
+            // Get user's performance rank & scores
+            $myRankIndex = $rankPegawaiAll ? $rankPegawaiAll->search(fn($item) => $item->id_pegawai == $currentUser->id_pegawai) : false;
+            $myRank = $myRankIndex !== false ? $myRankIndex + 1 : null;
+            $myRankData = $myRankIndex !== false ? $rankPegawaiAll[$myRankIndex] : null;
+            $totalPegawaiRanked = $rankPegawaiAll ? $rankPegawaiAll->count() : 0;
+        @endphp
+
+        {{-- ===== RANGKUMAN KINERJA PEGAWAI ===== --}}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+            <!-- Left Side: Rekap Penugasan Anda -->
+            <div class="lg:col-span-7 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow duration-300">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2 bg-brand-50 dark:bg-brand-900/30 rounded-lg text-brand-600 dark:text-brand-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-white">Rekap Penugasan Anda</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Statistik penugasan & target Anda periode ini</p>
+                        </div>
+                    </div>
+
+                    <!-- 6 Mini Stats Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                        <!-- Jml Penugasan -->
+                        <div class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800">
+                            <p class="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Jml. Penugasan</p>
+                            <p class="text-xl font-bold text-slate-700 dark:text-slate-300 mt-1">{{ $myRekap->total_penugasan ?? 0 }}</p>
+                        </div>
+                        <!-- Total Target -->
+                        <div class="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-100 dark:border-purple-800/40">
+                            <p class="text-[10px] font-semibold text-purple-500 dark:text-purple-400 uppercase tracking-wider">Total Target</p>
+                            <p class="text-xl font-bold text-purple-700 dark:text-purple-300 mt-1">{{ $myRekap->total_target ?? 0 }}</p>
+                        </div>
+                        <!-- Dikirim -->
+                        <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800/40">
+                            <p class="text-[10px] font-semibold text-blue-500 dark:text-blue-400 uppercase tracking-wider">Dikirim</p>
+                            <p class="text-xl font-bold text-blue-700 dark:text-blue-300 mt-1">{{ $myRekap->total_dikirim ?? 0 }}</p>
+                        </div>
+                        <!-- Diperiksa -->
+                        <div class="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100 dark:border-amber-800/40">
+                            <p class="text-[10px] font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-wider">Diperiksa</p>
+                            <p class="text-xl font-bold text-amber-700 dark:text-amber-300 mt-1">{{ $myRekap->total_diperiksa ?? 0 }}</p>
+                        </div>
+                        <!-- Revisi -->
+                        <div class="p-3 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-100 dark:border-red-800/40">
+                            <p class="text-[10px] font-semibold text-red-500 dark:text-red-400 uppercase tracking-wider">Revisi</p>
+                            <p class="text-xl font-bold text-red-700 dark:text-red-300 mt-1">{{ $myRekap->total_revisi ?? 0 }}</p>
+                        </div>
+                        <!-- Diterima -->
+                        <div class="p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-100 dark:border-green-800/40">
+                            <p class="text-[10px] font-semibold text-green-500 dark:text-green-400 uppercase tracking-wider">Diterima</p>
+                            <p class="text-xl font-bold text-green-700 dark:text-green-300 mt-1">{{ $myRekap->total_diterima ?? 0 }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table representation -->
+                <div class="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm mt-2">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-gray-700 dark:text-gray-300">
+                            <thead class="bg-gray-50 text-[9px] font-bold uppercase tracking-wider text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                                <tr>
+                                    <th class="px-3 py-2 text-center">Jml. Penugasan</th>
+                                    <th class="px-3 py-2 text-center border-l border-gray-200 dark:border-gray-800">Total Target</th>
+                                    <th class="px-3 py-2 text-center border-l border-gray-200 dark:border-gray-800">Dikirim</th>
+                                    <th class="px-3 py-2 text-center border-l border-gray-200 dark:border-gray-800">Diperiksa</th>
+                                    <th class="px-3 py-2 text-center border-l border-gray-200 dark:border-gray-800">Revisi</th>
+                                    <th class="px-3 py-2 text-center border-l border-gray-200 dark:border-gray-800">Diterima</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900/50">
+                                <tr>
+                                    <td class="px-3 py-2.5 text-center font-semibold text-sm text-gray-800 dark:text-gray-200">{{ $myRekap->total_penugasan ?? 0 }}</td>
+                                    <td class="px-3 py-2.5 text-center font-semibold text-sm border-l border-gray-100 dark:border-gray-800 text-purple-700 dark:text-purple-400">{{ $myRekap->total_target ?? 0 }}</td>
+                                    <td class="px-3 py-2.5 text-center font-semibold text-sm border-l border-gray-100 dark:border-gray-800 text-blue-700 dark:text-blue-400">{{ $myRekap->total_dikirim ?? 0 }}</td>
+                                    <td class="px-3 py-2.5 text-center font-semibold text-sm border-l border-gray-100 dark:border-gray-800 text-amber-700 dark:text-amber-400">{{ $myRekap->total_diperiksa ?? 0 }}</td>
+                                    <td class="px-3 py-2.5 text-center font-semibold text-sm border-l border-gray-100 dark:border-gray-800 text-red-700 dark:text-red-400">{{ $myRekap->total_revisi ?? 0 }}</td>
+                                    <td class="px-3 py-2.5 text-center font-semibold text-sm border-l border-gray-100 dark:border-gray-800 text-green-700 dark:text-green-400">{{ $myRekap->total_diterima ?? 0 }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Peringkat & Penilaian Kinerja Anda -->
+            <div class="lg:col-span-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow duration-300">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-amber-50 dark:bg-amber-900/30 rounded-lg text-amber-600 dark:text-amber-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5a2 2 0 10-2 2h2zm0 0h4m-4 0H8m12 3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800 dark:text-white">Peringkat & Kinerja</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Evaluasi performa Anda bulan ini</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Rank Badge -->
+                        @if ($myRank)
+                            @php
+                                $rankColors = [
+                                    1 => 'from-yellow-400 to-amber-500 text-white shadow-amber-200/50',
+                                    2 => 'from-gray-300 to-gray-400 text-white shadow-gray-200/50',
+                                    3 => 'from-orange-400 to-amber-600 text-white shadow-orange-200/50',
+                                ];
+                                $badgeStyle = $rankColors[$myRank] ?? 'from-brand-500 to-indigo-600 text-white shadow-brand-200/50';
+                            @endphp
+                            <div class="flex flex-col items-end">
+                                <div class="px-3 py-1 rounded-full bg-gradient-to-r {{ $badgeStyle }} text-xs font-bold shadow-sm uppercase tracking-wider">
+                                    Rank #{{ $myRank }}
+                                </div>
+                                <span class="text-[10px] text-gray-400 mt-1">dari {{ $totalPegawaiRanked }} pegawai</span>
+                            </div>
+                        @else
+                            <span class="px-2.5 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-semibold dark:bg-gray-800 dark:text-gray-400">Belum Ada Rank</span>
+                        @endif
+                    </div>
+
+                    @if ($myRankData)
+                        <!-- Nilai Rata-rata & Stars -->
+                        <div class="mb-5 p-4 rounded-xl bg-gradient-to-r from-brand-50/50 to-blue-50/30 dark:from-gray-800/30 dark:to-gray-800/10 border border-brand-100/50 dark:border-gray-800 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Nilai Akhir (Rata-rata)</span>
+                                <p class="text-3xl font-extrabold text-brand-600 dark:text-brand-400 mt-0.5">{{ number_format($myRankData->rata_rata ?? 0, 2) }}%</p>
+                            </div>
+                            <div class="flex flex-col items-end">
+                                <!-- Rating Stars -->
+                                <div class="flex items-center gap-0.5">
+                                    @for ($i = 0; $i < ($myRankData->star_full ?? 0); $i++)
+                                        <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.173c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.921-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.176 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.393c-.783-.57-.38-1.81.588-1.81h4.173a1 1 0 00.95-.69l1.286-3.966z"/>
+                                        </svg>
+                                    @endfor
+                                    @if (($myRankData->star_half ?? 0) === 1)
+                                        <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 20 20">
+                                            <defs>
+                                                <linearGradient id="hs-my-rank">
+                                                    <stop offset="50%" stop-color="currentColor"/>
+                                                    <stop offset="50%" stop-color="transparent"/>
+                                                </linearGradient>
+                                            </defs>
+                                            <path fill="url(#hs-my-rank)" stroke="currentColor" stroke-width="1" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.173c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.921-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.176 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.393c-.783-.57-.38-1.81.588-1.81h4.173a1 1 0 00.95-.69l1.286-3.966z"/>
+                                        </svg>
+                                    @endif
+                                    @for ($i = 0; $i < ($myRankData->star_empty ?? 5); $i++)
+                                        <svg class="w-4 h-4 text-gray-300 fill-current dark:text-gray-600" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.173c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.921-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.176 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.393c-.783-.57-.38-1.81.588-1.81h4.173a1 1 0 00.95-.69l1.286-3.966z"/>
+                                        </svg>
+                                    @endfor
+                                </div>
+                                <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 mt-1">{{ number_format($myRankData->rating_kirim ?? 0, 1) }} / 5.0</span>
+                            </div>
+                        </div>
+
+                        <!-- Detail Nilai Komponen -->
+                        <div class="grid grid-cols-2 gap-x-4 gap-y-3 mb-5">
+                            <div class="flex justify-between items-center text-xs py-1 border-b border-gray-100 dark:border-gray-800">
+                                <span class="text-gray-500">RR Kirim</span>
+                                <span class="font-bold text-gray-800 dark:text-gray-200">{{ number_format($myRankData->rr_kirim ?? 0, 2) }}%</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs py-1 border-b border-gray-100 dark:border-gray-800">
+                                <span class="text-gray-500">Rating %</span>
+                                <span class="font-bold text-gray-800 dark:text-gray-200">{{ number_format($myRankData->rating_persen ?? 0, 2) }}%</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs py-1 border-b border-gray-100 dark:border-gray-800">
+                                <span class="text-gray-500">Skor Cepat</span>
+                                <span class="font-bold text-gray-800 dark:text-gray-200">{{ number_format($myRankData->avg_skor_cepat ?? 0, 2) }}%</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs py-1 border-b border-gray-100 dark:border-gray-800">
+                                <span class="text-gray-500">Koef. Beban</span>
+                                <span class="font-bold text-gray-800 dark:text-gray-200">{{ number_format($myRankData->koefisien_beban ?? 1.0, 4) }}</span>
+                            </div>
+                        </div>
+                    @else
+                        <!-- Empty State for Rank -->
+                        <div class="my-auto py-8 text-center text-gray-500 dark:text-gray-400">
+                            <p class="text-sm font-semibold">Tidak Ada Penilaian</p>
+                            <p class="text-xs text-gray-400 mt-1">Anda belum memiliki penilaian kinerja pada periode ini.</p>
+                        </div>
+                    @endif
+                </div>
+
+                @if ($myRankData && $myRankData->has_penugasan_aktif)
+                    <!-- Button "Lihat Detail Rumus" -->
+                    <button
+                        @click="$dispatch('open-calc-modal', {
+                            nama: '{{ $currentUser->nama_pegawai }}',
+                            rr_kirim: Number('{{ $myRankData->rr_kirim ?? 0 }}'),
+                            rating_persen: Number('{{ $myRankData->rating_persen ?? 0 }}'),
+                            skor_cepat: Number('{{ $myRankData->avg_skor_cepat ?? 0 }}'),
+                            rata_rata: Number('{{ $myRankData->rata_rata ?? 0 }}'),
+                            details: {{ Js::from($myRankData->details ?? []) }},
+                            breakdown: {{ Js::from($myRankData->breakdown_formula ?? null) }}
+                        })"
+                        class="w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-500/25 hover:bg-brand-700 hover:shadow-brand-600/35 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:bg-brand-50 dark:hover:bg-brand-600 transition-all duration-200 cursor-pointer"
+                    >
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        Detail Rumus Penilaian
+                    </button>
+                @else
+                    <button
+                        disabled
+                        class="w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-gray-100 dark:bg-gray-800 px-4 py-2.5 text-sm font-semibold text-gray-400 dark:text-gray-600 cursor-not-allowed border border-gray-200/50 dark:border-gray-700/50"
+                    >
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        Detail Rumus Penilaian
+                    </button>
+                @endif
+            </div>
+        </div>
+
+        {{-- Modal Perhitungan Rumus Component --}}
+        <x-dashboard.modal-perhitungan-rumus />
+
         @if (auth()->user()->isAnggotaTim() ||
                 (auth()->user()->isKetuaTim() && auth()->user()->kegiatanYangDipimpin()->exists()))
             @auth

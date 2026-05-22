@@ -104,7 +104,7 @@ Route::middleware('auth')->group(function () {
     // END BIDANG KERJA BY ADMIN
 
     // CRUD ANNOUNCEMENT BY ADMIN
-    Route::prefix('announcements')->middleware('can:kelola-master-data')->group(function () {
+    Route::prefix('announcements')->middleware('can:kelola-pengumuman')->group(function () {
         Route::get('/', [AnnouncementController::class, 'index'])
             ->name('announcements.index');
         Route::post('/', [AnnouncementController::class, 'store'])
@@ -120,7 +120,7 @@ Route::middleware('auth')->group(function () {
     // Halaman pengumuman untuk pegawai
     Route::get('/pengumuman', [AnnouncementController::class, 'pegawaiIndex'])->name('announcements.pegawai');
 
-    // END CRUD ANNOUNCEMENT BY ADMIN
+    Route::get('/api/active-announcements', [AnnouncementController::class, 'getActiveAnnouncements']);
 
     // CRUD KEGIATAN & SUB KEGIATAN BY KETUA TIM
     Route::prefix('kegiatan')->group(function () {
@@ -227,9 +227,5 @@ Route::middleware('auth')->group(function () {
         Route::delete('/ckp-pegawai/{ckp}', [CkpPegawaiController::class, 'delete'])->name('ckp.pegawai.delete');
     });
 });
-
-
-Route::get('/api/active-announcements', [AnnouncementController::class, 'getActiveAnnouncements']);
-
 
 require __DIR__ . '/auth.php';

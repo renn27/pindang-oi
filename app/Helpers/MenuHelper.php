@@ -74,6 +74,32 @@ class MenuHelper
             );
         }
 
+        // Filter subItems based on Gates
+        foreach ($menus as &$menu) {
+            if ($menu['name'] === 'Admin' && isset($menu['subItems'])) {
+                $menu['subItems'] = array_values(array_filter($menu['subItems'], function ($sub) {
+                    if ($sub['path'] === '/announcements') {
+                        return \Illuminate\Support\Facades\Gate::allows('kelola-pengumuman');
+                    }
+                    return \Illuminate\Support\Facades\Gate::allows('kelola-master-data');
+                }));
+            }
+            if ($menu['name'] === 'Pimpinan' && isset($menu['subItems'])) {
+                $menu['subItems'] = array_values(array_filter($menu['subItems'], function ($sub) {
+                    return \Illuminate\Support\Facades\Gate::allows('kelola-master-data');
+                }));
+            }
+        }
+        unset($menu);
+
+        // Remove menu groups whose subItems became empty
+        $menus = array_filter($menus, function ($m) {
+            if (isset($m['subItems'])) {
+                return !empty($m['subItems']);
+            }
+            return true;
+        });
+
         // ADMIN dan PIMPINAN → semua menu kecuali CKP Saya
         if ($user->isActiveRole('Admin')) {
             return array_values(array_map(
@@ -93,6 +119,10 @@ class MenuHelper
             ? ['Dashboard', 'Tagihan Kerja', 'Rencana Kinerja', 'Kalender', 'CKP Saya']
             : ['Dashboard', 'Rencana Kinerja', 'Tagihan Kerja', 'Kalender', 'CKP Saya'];
 
+        if (\Illuminate\Support\Facades\Gate::allows('kelola-pengumuman')) {
+            $allowed[] = 'Admin';
+        }
+
         return array_map(
             fn($menu) => self::normalizeMenuItem($menu),
             array_filter($menus, fn($m) => in_array($m['name'], $allowed))
@@ -109,6 +139,50 @@ class MenuHelper
                 'is_special' => true,
             ],
             [
+                'icon' => 'besti',
+                'name' => 'BESTI OGAN ILIR',
+                'path' => 'https://besti.bpsoganilir.com/',
+                'is_external' => true,
+            ],
+            [
+                'icon' => 'gcpbi',
+                'name' => 'GC PBI 2026',
+                'path' => 'https://gcpbi.bpsoganilir.com/',
+                'is_external' => true,
+            ],
+            [
+                'icon' => 'gcpln',
+                'name' => 'GC PLN 2026',
+                'path' => 'https://gcpln.bpsoganilir.com/',
+                'is_external' => true,
+            ],
+            [
+                'icon' => 'musi',
+                'name' => 'MUSI',
+                'path' => 'https://webapps.bps.go.id/sumsel/musi',
+                'is_external' => true,
+            ],
+            [
+                'icon' => 'sakip',
+                'name' => 'SAKIP',
+                'subItems' => [
+                    [
+                        'icon' => 'drive',
+                        'name' => 'Bukti Dukung SAKIP',
+                        'path' => 'https://drive.google.com/drive/folders/1hbkLUr_y6KWMF_Hz2iZibHuyVbC2qiMv?usp=sharing',
+                        'is_external' => true,
+                        ],
+                    [
+                        'icon' => 'sinergi',
+                        'name' => 'SINERGI',
+                        'path' => 'https://sinergi.web.bps.go.id/#/auth/login?next=/',
+                        'is_external' => true,
+                    ],
+
+                ],
+                'is_external' => true,
+            ],
+            [
                 'icon' => 'se-main',
                 'name' => 'SE 2026',
                 'subItems' => [
@@ -119,65 +193,21 @@ class MenuHelper
                         'is_external' => true,
                     ],
                     [
-                        'icon' => 'sempati',
-                        'name' => 'SEMPATI SE2026',
-                        'path' => 'https://se2026.bpssumsel.com/',
-                        'is_external' => true,
-                    ],
-                    [
                         'icon' => 'mangcek',
                         'name' => 'MANGCEK SE2026',
                         'path' => 'https://mangcek.bpsoganilir.com/admin',
                         'is_external' => true,
                     ],
-                    
-                ],
-                'is_external' => true,
-                'is_special_se' => true,
-            ],
-            [
-                'icon' => 'besti',
-                'name' => 'BESTI OGAN ILIR',
-                'path' => 'https://besti.bpsoganilir.com/',
-                'is_external' => true,
-            ],
-            [
-                'icon' => 'gcpln',
-                'name' => 'GC PLN 2026',
-                'path' => 'https://gcpln.bpsoganilir.com/',
-                'is_external' => true,
-            ],
-            [
-                'icon' => 'gcpbi',
-                'name' => 'GC PBI 2026',
-                'path' => 'https://gcpbi.bpsoganilir.com/',
-                'is_external' => true,
-            ],
-            [
-                'icon' => 'sakip',
-                'name' => 'SAKIP',
-                'subItems' => [
                     [
-                        'icon' => 'sinergi',
-                        'name' => 'SINERGI',
-                        'path' => 'https://sinergi.web.bps.go.id/#/auth/login?next=/',
-                        'is_external' => true,
-                    ],
-                    [
-                        'icon' => 'drive',
-                        'name' => 'Bukti Dukung SAKIP',
-                        'path' => 'https://drive.google.com/drive/folders/1hbkLUr_y6KWMF_Hz2iZibHuyVbC2qiMv?usp=sharing',
+                        'icon' => 'sempati',
+                        'name' => 'SEMPATI SE2026',
+                        'path' => 'https://se2026.bpssumsel.com/',
                         'is_external' => true,
                     ],
 
                 ],
                 'is_external' => true,
-            ],
-            [
-                'icon' => 'gcpbi',
-                'name' => 'MUSI',
-                'path' => 'https://webapps.bps.go.id/sumsel/musi',
-                'is_external' => true,
+                'is_special_se' => true,
             ],
         ];
     }
@@ -383,6 +413,17 @@ class MenuHelper
                 <path d="M9 12V13C9 14.5 12 15.5 12 15.5C12 15.5 15 14.5 15 13V12" stroke="currentColor" stroke-width="1.5" fill="none"/>
                 <path d="M12 11V15.5" stroke="currentColor" stroke-width="1.5" stroke-dasharray="1 1"/>
                 <circle cx="12" cy="17" r="1" fill="currentColor"/>
+                <path d="M19 19L21 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M5 19L3 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>',
+            'musi' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M12 6L14 9H10L12 6Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <path d="M8 10H16L15 16H9L8 10Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <rect x="10" y="16" width="4" height="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <path d="M7 19H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M9 13H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="12" cy="12" r="1" fill="currentColor"/>
                 <path d="M19 19L21 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 <path d="M5 19L3 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>',

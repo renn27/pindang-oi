@@ -11,7 +11,7 @@ class AnnouncementController extends Controller
 {
     // Halaman CRUD
     public function index() {
-        $this->authorize('kelola-master-data');
+        $this->authorize('kelola-pengumuman');
         $announcements = Announcement::orderBy('created_at', 'desc')->get();
 
         return view('pages.main.admin.announcements.index', [
@@ -22,7 +22,7 @@ class AnnouncementController extends Controller
 
     // Simpan pengumuman baru
     public function store(Request $request) {
-        $this->authorize('kelola-master-data');
+        $this->authorize('kelola-pengumuman');
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -52,7 +52,7 @@ class AnnouncementController extends Controller
 
     // Update pengumuman
     public function update(Request $request, Announcement $announcement) {
-        $this->authorize('kelola-master-data');
+        $this->authorize('kelola-pengumuman');
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -83,7 +83,7 @@ class AnnouncementController extends Controller
 
     // Hapus pengumuman
     public function delete(Announcement $announcement) {
-        $this->authorize('kelola-master-data');
+        $this->authorize('kelola-pengumuman');
         // Hapus gambar
         if ($announcement->image_path) {
             Storage::disk('public')->delete($announcement->image_path);
@@ -97,7 +97,7 @@ class AnnouncementController extends Controller
 
     // Toggle status aktif
     public function toggleActive(Announcement $announcement) {
-        $this->authorize('kelola-master-data');
+        $this->authorize('kelola-pengumuman');
         $announcement->update([
             'is_active' => !$announcement->is_active
         ]);
@@ -110,7 +110,6 @@ class AnnouncementController extends Controller
 
     // API untuk modal (mengembalikan data pengumuman aktif)
     public function getActiveAnnouncements() {
-        $this->authorize('kelola-master-data');
         $announcements = Announcement::active()
             ->orderBy('created_at', 'desc')
             ->get()

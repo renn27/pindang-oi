@@ -36,6 +36,18 @@ class AuthServiceProvider extends ServiceProvider
             return in_array($user->active_role, ['Admin', 'Pimpinan']);
         });
 
+        // 🔥 Gate untuk kelola pengumuman (Admin, Pimpinan, dan pegawai khusus Astri, A.Md.)
+        Gate::define('kelola-pengumuman', function ($user) {
+            // 1. Admin & Pimpinan selalu diizinkan
+            if (in_array($user->active_role, ['Admin', 'Pimpinan'])) {
+                return true;
+            }
+            // 2. Pengamanan kondisi extra untuk Astri, A.Md.
+            return $user->nama_pegawai === 'Astri, A.Md.'
+                && $user->nip === '198908012011012009'
+                && $user->nip_bps === '340054675';
+        });
+
         Gate::define('view-ckp', function ($user) {
             return !$user->isActiveRole('Admin');
         });
