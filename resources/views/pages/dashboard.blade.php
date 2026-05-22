@@ -621,6 +621,32 @@
                 </div>
             </div>
         @endif
+
+        @if ($bestEmployee)
+            {{-- ===== BEST EMPLOYEE FOR REGULAR EMPLOYEES ===== --}}
+            <div class="mt-8">
+                <div class="mb-6 flex items-center justify-between">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white">Best Employee</h3>
+                    <div class="flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700 dark:border-amber-800/40 dark:bg-amber-900/20 dark:text-amber-300">
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span x-text="months[selectedMonth - 1] + ' ' + selectedYear"></span>
+                    </div>
+                </div>
+
+                <x-profile.employe-rank-card
+                    :bestEmployee="$bestEmployee" />
+            </div>
+        @endif
+
+        {{-- ===== RANK EMPLOYEE FOR REGULAR EMPLOYEES ===== --}}
+        <div id="container-rank-pegawai" class="mt-8">
+            @auth
+                <x-dashboard.vis-rank-pegawai
+                    :rankPegawaiAll="$rankPegawaiAll"
+                    :perPage="$rankPegawaiPerPage"
+                    :perPageOptions="$rankPegawaiPerPageOptions" />
+            @endauth
+        </div>
     @else()
         {{-- ===== CARD BESAR ANALYTICS DASHBOARD ===== --}}
         <div class="mb-8">

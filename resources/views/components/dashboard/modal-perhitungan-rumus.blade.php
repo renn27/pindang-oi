@@ -71,10 +71,35 @@
                                         <span>Bonus: <span class="font-mono"
                                             :class="(calcData.breakdown.bonus_aktual ?? 0) >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
                                             x-text="((calcData.breakdown.bonus_aktual ?? 0) >= 0 ? '+' : '') + (calcData.breakdown.bonus_aktual ?? 0) + '%'"></span></span>
-                                        <br>
-                                        <span class="text-gray-400">Koef: <span class="font-mono" x-text="calcData.breakdown.koefisien_beban + 'x'"></span>
-                                        · Ruang ke 100%: <span class="font-mono" x-text="calcData.breakdown.ruang_ke_100 + '%'"></span></span>
                                     </p>
+                                    <div class="mt-2 text-xs border-t border-brand-200/50 dark:border-gray-800 pt-2 text-gray-600 dark:text-gray-300 space-y-1">
+                                        <!-- Case 1a: ruang_ke_100 is smaller (or equal) -->
+                                        <template x-if="calcData.breakdown.penentu_bonus === 'ruang_ke_100'">
+                                            <div>
+                                                <span class="text-amber-600 dark:text-amber-400 font-bold">Penentu Bonus:</span> Ruang ke 100% (terkecil)
+                                                <br>
+                                                <span class="font-mono text-[11px] text-gray-500 dark:text-gray-400">Rumus: 100% - Base = 100% - <span x-text="calcData.breakdown.rata_rata_base"></span>% = <span x-text="calcData.breakdown.bonus_aktual"></span>%</span>
+                                            </div>
+                                        </template>
+                                        
+                                        <!-- Case 1b: base * (koef - 1) is smaller -->
+                                        <template x-if="calcData.breakdown.penentu_bonus === 'beban_kerja'">
+                                            <div>
+                                                <span class="text-blue-600 dark:text-blue-400 font-bold">Penentu Bonus:</span> Bonus Beban Kerja (terkecil)
+                                                <br>
+                                                <span class="font-mono text-[11px] text-gray-500 dark:text-gray-400">Rumus: Base × (Koef - 1.0) = <span x-text="calcData.breakdown.rata_rata_base"></span>% × (<span x-text="calcData.breakdown.koefisien_beban"></span> - 1.0) = <span x-text="calcData.breakdown.rata_rata_base"></span>% × <span x-text="Number((calcData.breakdown.koefisien_beban - 1.0).toFixed(4))"></span> = <span x-text="calcData.breakdown.bonus_aktual"></span>%</span>
+                                            </div>
+                                        </template>
+
+                                        <!-- Case 2: Koef < 1.0 -->
+                                        <template x-if="calcData.breakdown.penentu_bonus === 'penalty'">
+                                            <div>
+                                                <span class="text-red-600 dark:text-red-400 font-bold">Penentu Penalti:</span> Kurang Beban Kerja (Koef &lt; 1.0)
+                                                <br>
+                                                <span class="font-mono text-[11px] text-gray-500 dark:text-gray-400">Rumus: Base × (Koef - 1.0) = <span x-text="calcData.breakdown.rata_rata_base"></span>% × (<span x-text="calcData.breakdown.koefisien_beban"></span> - 1.0) = <span x-text="calcData.breakdown.rata_rata_base"></span>% × <span x-text="Number((calcData.breakdown.koefisien_beban - 1.0).toFixed(4))"></span> = <span x-text="calcData.breakdown.bonus_aktual"></span>%</span>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </div>
                                 <div class="grid grid-cols-2 gap-2 text-xs">
                                     <div class="rounded-lg bg-white/70 dark:bg-gray-700/50 px-3 py-2 text-center border border-gray-100 dark:border-gray-700">

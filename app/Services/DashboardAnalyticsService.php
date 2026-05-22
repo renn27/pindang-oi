@@ -345,9 +345,19 @@ class DashboardAnalyticsService {
                     $bonusRuang = max(0.0, 100.0 - $base);
                     return round(min($bonusMax, $bonusRuang), 2);
                 }
-                return round($base * $koef - $base, 2); // negatif = penalty
+                return round($base * ($koef - 1.0), 2); // negatif = penalty
             })(),
             'ruang_ke_100'       =>round(max(0.0, 100.0 - (float)($item->rata_rata_base??0)), 2),
+            'penentu_bonus'      =>(function() use ($item) {
+                $base = (float)($item->rata_rata_base ?? 0);
+                $koef = (float)($item->koefisien_beban ?? 1.0);
+                if ($koef < 1.0) {
+                    return 'penalty';
+                }
+                $bonusMax   = round($base * ($koef - 1.0), 2);
+                $bonusRuang = round(max(0.0, 100.0 - $base), 2);
+                return $bonusRuang <= $bonusMax ? 'ruang_ke_100' : 'beban_kerja';
+            })(),
         ];
         return $item;
     }
