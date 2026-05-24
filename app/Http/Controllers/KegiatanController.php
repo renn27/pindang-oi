@@ -21,6 +21,7 @@ class KegiatanController extends Controller
         $this->authorize('viewAny', Kegiatan::class);
         $kegiatanQuery = $bidang->kegiatans()
             ->with([
+                'penanggungJawab',
                 'subKegiatans' => function ($q) use ($pegawai) {
 
                     // MODE ANGGOTA → subkegiatan harus ada penugasan dia
@@ -34,8 +35,9 @@ class KegiatanController extends Controller
 
                     // ✅ Tambahkan eager load ini
                     $q->with([
-                        'ckp',                               // cek $isCkpKetuaTim
-                        'penugasans.latestPengiriman.penerimaan', // cek progress selesai
+                        'ckp',
+                        'ckpBulanan',
+                        'penugasans.pengirimans.penerimaan',
                     ]);
                 },
                 'rencanaJpt',

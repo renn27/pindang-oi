@@ -1,36 +1,43 @@
 import './bootstrap';
 import Alpine from 'alpinejs';
-import ApexCharts from 'apexcharts';
 import SweetAlertHelper from './helpers/sweetalert';
 import { initPushNotifications } from './push-notifications';
 
 // Attach to window object
 window.Swal = SweetAlertHelper;
 
-// flatpickr
-import flatpickr from 'flatpickr';
-import 'flatpickr/dist/flatpickr.min.css';
-// FullCalendar
-import { Calendar } from '@fullcalendar/core';
-
-import $ from 'jquery'
-window.$ = window.jQuery = $
-
-import 'datatables.net-dt'
-
-
-
-
 window.Alpine = Alpine;
-window.ApexCharts = ApexCharts;
-window.flatpickr = flatpickr;
-window.FullCalendar = Calendar;
+window.loadFlatpickr = (() => {
+    let loader = null;
+
+    return async () => {
+        if (window.flatpickr) {
+            return window.flatpickr;
+        }
+
+        loader ??= Promise.all([
+            import('flatpickr'),
+            import('flatpickr/dist/flatpickr.min.css'),
+        ]).then(([module]) => {
+            window.flatpickr = module.default;
+            return window.flatpickr;
+        });
+
+        return loader;
+    };
+})();
 
 Alpine.start();
 
 // Initialize components on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
-    initPushNotifications();
+    const initPush = () => initPushNotifications();
+
+    if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(initPush, { timeout: 2500 });
+    } else {
+        window.setTimeout(initPush, 800);
+    }
 
     // Map imports
     if (document.querySelector('#mapOne')) {

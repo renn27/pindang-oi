@@ -70,19 +70,20 @@
         @endauth
     </div>
 
+    <div class="mb-8 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:p-6">
     {{-- ===== FILTER BULAN GLOBAL ===== --}}
-    <div class="mb-0">
-        <div class="rounded-t-2xl border border-b-0 border-brand-200 bg-gradient-to-r from-brand-50 to-blue-50 px-6 py-4 dark:border-brand-800/40 dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800">
+    <div>
+        <div class="border-b border-gray-100 pb-4 dark:border-gray-800">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
 
                 <div class="flex items-center gap-2">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-100 dark:bg-brand-900/40">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
                         <svg class="h-4 w-4 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                     </div>
                     <div>
-                        <p class="text-xs font-medium text-brand-600 dark:text-brand-400 uppercase tracking-wider">Filter Periode Global</p>
+                        <p class="text-xs font-semibold text-gray-800 dark:text-gray-100 uppercase tracking-wider">Filter Periode Global</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">Memfilter semua statistik &amp; data di bawah ini</p>
                     </div>
                 </div>
@@ -107,8 +108,6 @@
                 </div>
             </div>
         </div>
-        {{-- Koneksi visual ke section analytics --}}
-        <div class="border-x border-brand-200/60 dark:border-brand-800/30 bg-gradient-to-b from-brand-50/60 to-transparent dark:from-gray-800/30 dark:to-transparent h-4"></div>
     </div>
 
     @if (!auth()->user()->isSuperUser())
@@ -125,12 +124,12 @@
         @endphp
 
         {{-- ===== RANGKUMAN KINERJA PEGAWAI ===== --}}
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+        <div class="mt-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
             <!-- Left Side: Rekap Penugasan Anda -->
-            <div class="lg:col-span-7 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow duration-300">
-                <div>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="p-2 bg-brand-50 dark:bg-brand-900/30 rounded-lg text-brand-600 dark:text-brand-400">
+            <div class="lg:col-span-7 h-full rounded-2xl border border-gray-200 bg-gray-50/60 p-5 dark:border-gray-800 dark:bg-gray-900/50 flex flex-col">
+                <div class="flex flex-1 flex-col">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white text-brand-600 dark:border-gray-800 dark:bg-gray-900 dark:text-brand-400">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                             </svg>
@@ -142,75 +141,65 @@
                     </div>
 
                     <!-- 6 Mini Stats Grid -->
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                    <div class="grid flex-1 grid-cols-2 sm:grid-cols-3 gap-3 sm:auto-rows-fr">
                         <!-- Jml Penugasan -->
-                        <div class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <div class="min-h-[90px] p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 border-l-4 border-l-slate-300 dark:border-l-slate-500 flex flex-col justify-between">
                             <p class="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Jml. Penugasan</p>
-                            <p class="text-xl font-bold text-slate-700 dark:text-slate-300 mt-1">{{ $myRekap->total_penugasan ?? 0 }}</p>
+                            <div>
+                                <p class="text-xl font-bold text-gray-800 dark:text-gray-100">{{ $myRekap->total_penugasan ?? 0 }}</p>
+                                <p class="text-[11px] text-gray-400 dark:text-gray-500">Total tugas periode ini</p>
+                            </div>
                         </div>
                         <!-- Total Target -->
-                        <div class="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-100 dark:border-purple-800/40">
-                            <p class="text-[10px] font-semibold text-purple-500 dark:text-purple-400 uppercase tracking-wider">Total Target</p>
-                            <p class="text-xl font-bold text-purple-700 dark:text-purple-300 mt-1">{{ $myRekap->total_target ?? 0 }}</p>
+                        <div class="min-h-[90px] p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 border-l-4 border-l-purple-400 dark:border-l-purple-500 flex flex-col justify-between">
+                            <p class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Target</p>
+                            <div>
+                                <p class="text-xl font-bold text-purple-700 dark:text-purple-300">{{ $myRekap->total_target ?? 0 }}</p>
+                                <p class="text-[11px] text-gray-400 dark:text-gray-500">Akumulasi target</p>
+                            </div>
                         </div>
                         <!-- Dikirim -->
-                        <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800/40">
-                            <p class="text-[10px] font-semibold text-blue-500 dark:text-blue-400 uppercase tracking-wider">Dikirim</p>
-                            <p class="text-xl font-bold text-blue-700 dark:text-blue-300 mt-1">{{ $myRekap->total_dikirim ?? 0 }}</p>
+                        <div class="min-h-[90px] p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 border-l-4 border-l-blue-400 dark:border-l-blue-500 flex flex-col justify-between">
+                            <p class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Dikirim</p>
+                            <div>
+                                <p class="text-xl font-bold text-blue-700 dark:text-blue-300">{{ $myRekap->total_dikirim ?? 0 }}</p>
+                                <p class="text-[11px] text-gray-400 dark:text-gray-500">Sudah dikirim</p>
+                            </div>
                         </div>
                         <!-- Diperiksa -->
-                        <div class="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100 dark:border-amber-800/40">
-                            <p class="text-[10px] font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-wider">Diperiksa</p>
-                            <p class="text-xl font-bold text-amber-700 dark:text-amber-300 mt-1">{{ $myRekap->total_diperiksa ?? 0 }}</p>
+                        <div class="min-h-[90px] p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 border-l-4 border-l-amber-400 dark:border-l-amber-500 flex flex-col justify-between">
+                            <p class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Diperiksa</p>
+                            <div>
+                                <p class="text-xl font-bold text-amber-700 dark:text-amber-300">{{ $myRekap->total_diperiksa ?? 0 }}</p>
+                                <p class="text-[11px] text-gray-400 dark:text-gray-500">Dalam pemeriksaan</p>
+                            </div>
                         </div>
                         <!-- Revisi -->
-                        <div class="p-3 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-100 dark:border-red-800/40">
-                            <p class="text-[10px] font-semibold text-red-500 dark:text-red-400 uppercase tracking-wider">Revisi</p>
-                            <p class="text-xl font-bold text-red-700 dark:text-red-300 mt-1">{{ $myRekap->total_revisi ?? 0 }}</p>
+                        <div class="min-h-[90px] p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 border-l-4 border-l-red-400 dark:border-l-red-500 flex flex-col justify-between">
+                            <p class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Revisi</p>
+                            <div>
+                                <p class="text-xl font-bold text-red-700 dark:text-red-300">{{ $myRekap->total_revisi ?? 0 }}</p>
+                                <p class="text-[11px] text-gray-400 dark:text-gray-500">Perlu perbaikan</p>
+                            </div>
                         </div>
                         <!-- Diterima -->
-                        <div class="p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-100 dark:border-green-800/40">
-                            <p class="text-[10px] font-semibold text-green-500 dark:text-green-400 uppercase tracking-wider">Diterima</p>
-                            <p class="text-xl font-bold text-green-700 dark:text-green-300 mt-1">{{ $myRekap->total_diterima ?? 0 }}</p>
+                        <div class="min-h-[90px] p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 border-l-4 border-l-green-400 dark:border-l-green-500 flex flex-col justify-between">
+                            <p class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Diterima</p>
+                            <div>
+                                <p class="text-xl font-bold text-green-700 dark:text-green-300">{{ $myRekap->total_diterima ?? 0 }}</p>
+                                <p class="text-[11px] text-gray-400 dark:text-gray-500">Selesai diterima</p>
+                            </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Table representation -->
-                <div class="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm mt-2">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs text-gray-700 dark:text-gray-300">
-                            <thead class="bg-gray-50 text-[9px] font-bold uppercase tracking-wider text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-                                <tr>
-                                    <th class="px-3 py-2 text-center">Jml. Penugasan</th>
-                                    <th class="px-3 py-2 text-center border-l border-gray-200 dark:border-gray-800">Total Target</th>
-                                    <th class="px-3 py-2 text-center border-l border-gray-200 dark:border-gray-800">Dikirim</th>
-                                    <th class="px-3 py-2 text-center border-l border-gray-200 dark:border-gray-800">Diperiksa</th>
-                                    <th class="px-3 py-2 text-center border-l border-gray-200 dark:border-gray-800">Revisi</th>
-                                    <th class="px-3 py-2 text-center border-l border-gray-200 dark:border-gray-800">Diterima</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900/50">
-                                <tr>
-                                    <td class="px-3 py-2.5 text-center font-semibold text-sm text-gray-800 dark:text-gray-200">{{ $myRekap->total_penugasan ?? 0 }}</td>
-                                    <td class="px-3 py-2.5 text-center font-semibold text-sm border-l border-gray-100 dark:border-gray-800 text-purple-700 dark:text-purple-400">{{ $myRekap->total_target ?? 0 }}</td>
-                                    <td class="px-3 py-2.5 text-center font-semibold text-sm border-l border-gray-100 dark:border-gray-800 text-blue-700 dark:text-blue-400">{{ $myRekap->total_dikirim ?? 0 }}</td>
-                                    <td class="px-3 py-2.5 text-center font-semibold text-sm border-l border-gray-100 dark:border-gray-800 text-amber-700 dark:text-amber-400">{{ $myRekap->total_diperiksa ?? 0 }}</td>
-                                    <td class="px-3 py-2.5 text-center font-semibold text-sm border-l border-gray-100 dark:border-gray-800 text-red-700 dark:text-red-400">{{ $myRekap->total_revisi ?? 0 }}</td>
-                                    <td class="px-3 py-2.5 text-center font-semibold text-sm border-l border-gray-100 dark:border-gray-800 text-green-700 dark:text-green-400">{{ $myRekap->total_diterima ?? 0 }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             </div>
 
             <!-- Right Side: Peringkat & Penilaian Kinerja Anda -->
-            <div class="lg:col-span-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow duration-300">
+            <div class="lg:col-span-5 h-full rounded-2xl border border-gray-200 bg-gray-50/60 p-5 dark:border-gray-800 dark:bg-gray-900/50 flex flex-col justify-between">
                 <div>
-                    <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center justify-between gap-4 mb-5">
                         <div class="flex items-center gap-3">
-                            <div class="p-2 bg-amber-50 dark:bg-amber-900/30 rounded-lg text-amber-600 dark:text-amber-400">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white text-amber-600 dark:border-gray-800 dark:bg-gray-900 dark:text-amber-400">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5a2 2 0 10-2 2h2zm0 0h4m-4 0H8m12 3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
@@ -244,7 +233,7 @@
 
                     @if ($myRankData)
                         <!-- Nilai Rata-rata & Stars -->
-                        <div class="mb-5 p-4 rounded-xl bg-gradient-to-r from-brand-50/50 to-blue-50/30 dark:from-gray-800/30 dark:to-gray-800/10 border border-brand-100/50 dark:border-gray-800 flex items-center justify-between">
+                        <div class="mb-5 p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex items-center justify-between">
                             <div>
                                 <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Nilai Akhir (Rata-rata)</span>
                                 <p class="text-3xl font-extrabold text-brand-600 dark:text-brand-400 mt-0.5">{{ number_format($myRankData->rata_rata ?? 0, 2) }}%</p>
@@ -279,7 +268,7 @@
                         </div>
 
                         <!-- Detail Nilai Komponen -->
-                        <div class="grid grid-cols-2 gap-x-4 gap-y-3 mb-5">
+                            <div class="grid grid-cols-2 gap-x-4 gap-y-3 mb-5">
                             <div class="flex justify-between items-center text-xs py-1 border-b border-gray-100 dark:border-gray-800">
                                 <span class="text-gray-500">RR Kirim</span>
                                 <span class="font-bold text-gray-800 dark:text-gray-200">{{ number_format($myRankData->rr_kirim ?? 0, 2) }}%</span>
@@ -318,7 +307,7 @@
                             details: {{ Js::from($myRankData->details ?? []) }},
                             breakdown: {{ Js::from($myRankData->breakdown_formula ?? null) }}
                         })"
-                        class="w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-500/25 hover:bg-brand-700 hover:shadow-brand-600/35 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:bg-brand-50 dark:hover:bg-brand-600 transition-all duration-200 cursor-pointer"
+                        class="w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-500/25 hover:bg-brand-700 hover:shadow-brand-600/35 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 transition-all duration-200 cursor-pointer dark:bg-brand-600 dark:text-white dark:hover:bg-brand-500 dark:shadow-brand-900/30 dark:focus:ring-offset-gray-900"
                     >
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -338,7 +327,10 @@
                 @endif
             </div>
         </div>
+    @endif
+    </div>
 
+    @if (!auth()->user()->isSuperUser())
         {{-- Modal Perhitungan Rumus Component --}}
         <x-dashboard.modal-perhitungan-rumus />
 
@@ -364,7 +356,7 @@
 
                     {{-- ===== DAFTAR PENUGASAN BELUM SELESAI SBG ANGGOTA ===== --}}
                     @php $revisiCount = isset($revisiAsAnggota) ? $revisiAsAnggota->count() : 0; @endphp
-                    <div class="mb-8 p-5 rounded-2xl border border-gray-200 dark:border-orange-800 bg-white dark:bg-gray-900 shadow-sm" x-data="{ 
+                    <div class="mb-8 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm" x-data="{ 
                         activeTabAnggota: (new URLSearchParams(window.location.search).has('anggota_terlewat_page') ? 'terlewat' : (new URLSearchParams(window.location.search).has('anggota_berjalan_page') ? 'berjalan' : 'revisi')),
                         async fetchTab(e, containerId) {
                             let link = e.target.closest('nav[role=\'navigation\'] a');
@@ -485,7 +477,7 @@
 
                     {{-- ===== DAFTAR PENUGASAN BELUM SELESAI SBG KETUA ===== --}}
                     @php $revisiDlCount = isset($revisiDlAsKetua) ? $revisiDlAsKetua->count() : 0; @endphp
-                    <div class="mb-8 p-5 rounded-2xl border border-gray-800 dark:border-orange-800 bg-white dark:bg-gray-900 shadow-sm" x-data="{ 
+                    <div class="mb-8 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm" x-data="{ 
                         activeTabKetua: (new URLSearchParams(window.location.search).has('ketua_terlewat_page') ? 'terlewat' : (new URLSearchParams(window.location.search).has('ketua_berjalan_page') ? 'berjalan' : 'revisi-dl')),
                         async fetchTab(e, containerId) {
                             let link = e.target.closest('nav[role=\'navigation\'] a');

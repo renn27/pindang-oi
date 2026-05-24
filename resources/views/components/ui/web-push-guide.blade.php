@@ -28,7 +28,15 @@
             this.pushEnabled = Boolean(subscription);
         }
     }"
-    x-init="refreshPushStatus(); window.addEventListener('push-status-updated', () => refreshPushStatus())"
+    x-init="
+        const runRefreshPushStatus = () => refreshPushStatus();
+        if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(runRefreshPushStatus, { timeout: 2500 });
+        } else {
+            setTimeout(runRefreshPushStatus, 800);
+        }
+        window.addEventListener('push-status-updated', () => refreshPushStatus())
+    "
     @open-web-push-guide.window="open = true"
 >
     <div

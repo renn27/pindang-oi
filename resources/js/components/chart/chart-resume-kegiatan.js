@@ -1,3 +1,5 @@
+import ApexCharts from 'apexcharts';
+
 export const initChartResumeKegiatan = () => {
     const chartElement = document.querySelector("#chartResumeKegiatan")
 

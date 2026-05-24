@@ -1,4 +1,6 @@
 
+import ApexCharts from 'apexcharts';
+
 export function initChartThirteen() {
     const chartThirteenEl = document.querySelector("#chartThirteen");
     if (chartThirteenEl) {

@@ -29,16 +29,23 @@
         }
     },
 
-    init() {
+    async init() {
 
         this.$nextTick(() => {
+            const setupFlatpickr = async () => {
+                const flatpickrFactory = window.flatpickr || (window.loadFlatpickr ? await window.loadFlatpickr() : null);
+
+                if (!flatpickrFactory) {
+                    return;
+                }
+
             let initialMin = this.$el.getAttribute('mindate') || this.$el.getAttribute('minDate');
             let initialMax = this.$el.getAttribute('maxdate') || this.$el.getAttribute('maxDate');
 
             if (initialMin && initialMin.length <= 10) initialMin += ' 00:00:00';
             if (initialMax && initialMax.length <= 10) initialMax += ' 23:59:59';
 
-            this.flatpickrInstance = flatpickr(this.$refs.dateInput, {
+            this.flatpickrInstance = flatpickrFactory(this.$refs.dateInput, {
                 mode: '{{ $mode }}',
                 position: 'auto',
                 monthSelectorType: 'static',
@@ -62,7 +69,7 @@
                 }
             });
 
-            // 🔥 SET DEFAULT VALUE DARI DB
+            // Set default value from DB.
             if (this.value) {
                 this.flatpickrInstance.setDate(this.value, true);
             }
@@ -76,6 +83,9 @@
                 });
             });
             observer.observe(this.$refs.dateInput);
+            };
+
+            setupFlatpickr().catch(() => {});
         });
     },
 }" x-init="init()" x-effect="syncLimits()" x-modelable="value" {{ $attributes }}>

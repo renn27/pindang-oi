@@ -344,10 +344,23 @@ class PushNotificationService
             try {
                 $subscriptionCount = $pegawai->pushSubscriptions()->count();
 
-                Notification::sendNow(
-                    $pegawai,
-                    new GenericWebPushNotification($title, $body, $clickUrl, $tag, $databaseNotificationId)
-                );
+                $notification = new GenericWebPushNotification($title, $body, $clickUrl, $tag, $databaseNotificationId);
+
+                app()->terminating(function () use ($pegawai, $notification, $dispatchId, $title, $tag, $roleContext) {
+                    try {
+                        Notification::sendNow($pegawai, $notification);
+                    } catch (\Throwable $e) {
+                        Log::warning('Web push notification dispatch failed after response.', [
+                            'dispatch_id' => $dispatchId,
+                            'message' => $e->getMessage(),
+                            'pegawai_id' => $pegawai->id_pegawai,
+                            'nama_pegawai' => $pegawai->nama_pegawai,
+                            'title' => $title,
+                            'tag' => $tag,
+                            'role_context' => $roleContext,
+                        ]);
+                    }
+                });
 
                 Log::info('Web push dispatch attempted for recipient.', [
                     'dispatch_id' => $dispatchId,
