@@ -6,6 +6,7 @@ use App\Models\Announcement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use App\Services\PushNotificationService;
 
 class AnnouncementController extends Controller
 {
@@ -37,7 +38,7 @@ class AnnouncementController extends Controller
         }
 
         // Buat pengumuman dengan start_date otomatis hari ini
-        Announcement::create([
+        $announcement = Announcement::create([
             'title' => $validated['title'],
             'content' => $validated['content'],
             'image_path' => $imagePath,
@@ -45,6 +46,8 @@ class AnnouncementController extends Controller
             'end_date' => $validated['end_date'],
             'is_active' => true
         ]);
+
+        app(PushNotificationService::class)->notifyAnnouncementCreated($announcement->title);
 
         return redirect()->route('announcements.index')
             ->with('success', 'Pengumuman berhasil ditambahkan');
@@ -98,9 +101,15 @@ class AnnouncementController extends Controller
     // Toggle status aktif
     public function toggleActive(Announcement $announcement) {
         $this->authorize('kelola-pengumuman');
+        $wasInactive = ! $announcement->is_active;
+
         $announcement->update([
             'is_active' => !$announcement->is_active
         ]);
+
+        if ($wasInactive && $announcement->is_active) {
+            app(PushNotificationService::class)->notifyAnnouncementReactivated($announcement->title);
+        }
 
         $status = $announcement->is_active ? 'diaktifkan' : 'dinonaktifkan';
 

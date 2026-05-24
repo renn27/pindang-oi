@@ -123,6 +123,7 @@ window.addEventListener('resize', checkMobile);">
                 'ml-0': $store.sidebar.isMobileOpen
             }">
             @include('layouts.app-header')
+            <x-ui.web-push-guide />
             <!-- <div x-data="{ showFeatureBanner: true }" 
                  x-show="showFeatureBanner" x-transition
                  class="sticky top-[73px] z-40 mx-4 mt-4 md:mx-6 md:mt-6 rounded-xl border border-brand-500/30 bg-brand-50/80 p-4 shadow-sm backdrop-blur-md dark:border-brand-500/30 dark:bg-brand-900/40 font-medium text-brand-800 dark:text-brand-200">

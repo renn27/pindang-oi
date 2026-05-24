@@ -2,6 +2,7 @@ import './bootstrap';
 import Alpine from 'alpinejs';
 import ApexCharts from 'apexcharts';
 import SweetAlertHelper from './helpers/sweetalert';
+import { initPushNotifications } from './push-notifications';
 
 // Attach to window object
 window.Swal = SweetAlertHelper;
@@ -29,6 +30,8 @@ Alpine.start();
 
 // Initialize components on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
+    initPushNotifications();
+
     // Map imports
     if (document.querySelector('#mapOne')) {
         import('./components/map').then(module => module.initMap());

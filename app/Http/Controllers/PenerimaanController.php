@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 use App\Models\Penerimaan;
+use App\Services\PushNotificationService;
 
 class PenerimaanController extends Controller
 {
@@ -118,6 +119,8 @@ class PenerimaanController extends Controller
                 ]);
             });
 
+            app(PushNotificationService::class)->notifyPenerimaanResponded($penugasan->fresh(), $validated['status']);
+
             return redirect()
                 ->route('sub.kegiatan.show', [
                     'kegiatan'    => $penugasan->subKegiatan->kegiatan->id_kegiatan,
@@ -165,6 +168,8 @@ class PenerimaanController extends Controller
                 $penerimaan->forceDelete();
             });
 
+            app(PushNotificationService::class)->notifyPenerimaanCancelled($penugasan->fresh());
+
             return redirect()
                 ->route('sub.kegiatan.show', [
                     'kegiatan'    => $penugasan->subKegiatan->kegiatan->id_kegiatan,
@@ -191,4 +196,3 @@ class PenerimaanController extends Controller
         ], true);
     }
 }
-

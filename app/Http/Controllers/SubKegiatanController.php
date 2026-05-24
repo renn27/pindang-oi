@@ -9,6 +9,7 @@ use App\Models\SubKegiatan;
 use App\Models\Pegawai;
 use App\Models\Penugasan;
 use Carbon\Carbon;
+use App\Services\PushNotificationService;
 
 class SubKegiatanController extends Controller
 {
@@ -161,7 +162,14 @@ class SubKegiatanController extends Controller
         $this->authorize('delete', $subKegiatan);
 
         try {
+            $subKegiatanForNotification = $subKegiatan->loadMissing([
+                'kegiatan.penanggungJawab',
+                'penugasans.anggota',
+            ]);
+
             $subKegiatan->forceDelete();
+
+            app(PushNotificationService::class)->notifySubKegiatanDeleted($subKegiatanForNotification);
 
             return redirect()->back()->with('success', 'Sub kegiatan berhasil dihapus');
         } catch (\Exception $e) {

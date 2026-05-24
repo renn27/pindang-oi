@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use NotificationChannels\WebPush\HasPushSubscriptions;
 
 class Pegawai extends Authenticatable
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, HasPushSubscriptions, Notifiable, SoftDeletes, HasUuids;
 
     protected $table = 'pegawais';
     protected $primaryKey = 'id_pegawai';

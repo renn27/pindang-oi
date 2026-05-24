@@ -8,6 +8,7 @@ use App\Models\SubKegiatan;
 use App\Models\Pengiriman;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Services\PushNotificationService;
 
 class PengirimanController extends Controller
 {
@@ -107,6 +108,8 @@ class PengirimanController extends Controller
                 ]);
             });
 
+            app(PushNotificationService::class)->notifyPengirimanSubmitted($penugasan->fresh());
+
             return redirect()
                 ->route('sub.kegiatan.show', [
                     'kegiatan'    => $penugasan->subKegiatan->kegiatan->id_kegiatan,
@@ -142,6 +145,8 @@ class PengirimanController extends Controller
                     $penugasan->update(['status' => 'Belum Dikirim']);
                 }
             });
+
+            app(PushNotificationService::class)->notifyPengirimanCancelled($penugasan->fresh());
 
             return redirect()
                 ->route('sub.kegiatan.show', [

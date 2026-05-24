@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use App\Services\PushNotificationService;
 
 class PenugasanController extends Controller
 {
@@ -98,15 +99,21 @@ class PenugasanController extends Controller
         );
 
         try {
-            DB::transaction(function () use ($subKegiatan, $validated, $validDatesToSave) {
+            $createdPenugasans = collect();
+
+            DB::transaction(function () use ($subKegiatan, $validated, $validDatesToSave, $createdPenugasans) {
                 foreach ($validDatesToSave as $tgl) {
                     $validated['tanggal_mulai'] = $tgl['mulai'];
                     $validated['tanggal_selesai'] = $tgl['selesai'];
 
                     // Create terpisah untuk masing-masing tanggal sesuai request
-                    $subKegiatan->penugasans()->create($validated);
+                    $createdPenugasans->push($subKegiatan->penugasans()->create($validated));
                 }
             });
+
+            $createdPenugasans->each(
+                fn ($penugasan) => app(PushNotificationService::class)->notifyPenugasanCreated($penugasan)
+            );
 
             $isSelfAssign = $validated['id_anggota'] == auth()->user()?->id_pegawai;
 
@@ -236,7 +243,9 @@ class PenugasanController extends Controller
         );
 
         try {
-            DB::transaction(function () use ($penugasan, $updateData, $validated, $validDatesToSave) {
+            $createdPenugasans = collect();
+
+            DB::transaction(function () use ($penugasan, $updateData, $validated, $validDatesToSave, $createdPenugasans) {
                 // Update data parent (utama)
                 $penugasan->update($updateData);
 
@@ -244,7 +253,7 @@ class PenugasanController extends Controller
                 foreach ($validDatesToSave as $tgl) {
                     // Keduanya harus ada (&&) — mencegah penugasan dengan tanggal null
                     if (!empty($tgl['mulai']) && !empty($tgl['selesai'])) {
-                        Penugasan::create([
+                        $createdPenugasans->push(Penugasan::create([
                             'id_anggota' => $validated['id_anggota'],
                             'id_sub_kegiatan' => $penugasan->id_sub_kegiatan,
                             'id_jenis_kegiatan' => $validated['id_jenis_kegiatan'],
@@ -257,10 +266,15 @@ class PenugasanController extends Controller
                             'status_dl' => $validated['butuh_dl'] ? 'Menunggu' : null,
                             'butuh_translok' => $validated['butuh_translok'],
                             'status_translok' => $validated['butuh_translok'] ? 'Menunggu' : null,
-                        ]);
+                        ]));
                     }
                 }
             });
+
+            app(PushNotificationService::class)->notifyPenugasanUpdated($penugasan->fresh());
+            $createdPenugasans->each(
+                fn ($createdPenugasan) => app(PushNotificationService::class)->notifyPenugasanCreated($createdPenugasan)
+            );
 
             return redirect()
                 ->route('sub.kegiatan.show', [
@@ -304,6 +318,8 @@ class PenugasanController extends Controller
                 'id_jenis_kegiatan' => $validated['id_jenis_kegiatan']
             ]);
 
+            app(PushNotificationService::class)->notifyPenugasanUpdated($penugasan->fresh());
+
             return redirect()->back()->with('success', 'Jenis kegiatan berhasil diperbarui.');
         } catch (\Exception $e) {
             Log::error('Update Jenis Kegiatan error: ' . $e->getMessage());
@@ -316,7 +332,11 @@ class PenugasanController extends Controller
         $this->authorize('delete', $penugasan);
 
         try {
+            $penugasanForNotification = $penugasan->loadMissing(['anggota', 'subKegiatan.kegiatan']);
+
             $penugasan->forceDelete();
+
+            app(PushNotificationService::class)->notifyPenugasanDeleted($penugasanForNotification);
 
             return redirect()->back()
                 ->with('success', 'Penugasan Anggota berhasil dihapus');
@@ -354,6 +374,12 @@ class PenugasanController extends Controller
                     $this->insertKalenderDL($penugasan);
                 }
             });
+
+            if ($validated['status_dl'] === 'Menunggu') {
+                app(PushNotificationService::class)->notifyPendingTravelApproval($penugasan->fresh(), true);
+            } else {
+                app(PushNotificationService::class)->notifyTravelDecision($penugasan->fresh(), 'dl', $validated['status_dl']);
+            }
 
             return redirect()->back()
                 ->with('success', 'Status Dinas Luar berhasil diperbarui dan dimasukkan ke Kalender.');
@@ -394,6 +420,12 @@ class PenugasanController extends Controller
                     $this->insertKalenderDL($penugasan);
                 }
             });
+
+            if ($validated['status_translok'] === 'Menunggu') {
+                app(PushNotificationService::class)->notifyPendingTravelApproval($penugasan->fresh(), true);
+            } else {
+                app(PushNotificationService::class)->notifyTravelDecision($penugasan->fresh(), 'translok', $validated['status_translok']);
+            }
 
             return redirect()->back()
                 ->with('success', 'Status Translok berhasil diperbarui dan dimasukkan ke Kalender.');

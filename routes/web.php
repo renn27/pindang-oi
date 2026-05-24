@@ -20,6 +20,8 @@ use App\Http\Controllers\AgendaPimpinanController;
 use App\Http\Controllers\CkpPegawaiController;
 use App\Http\Controllers\JenisKegiatanController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PushSubscriptionController;
 use Illuminate\Support\Facades\Auth;
 
 // ROUTE DASHBOARD VISUALISASI DATA
@@ -121,6 +123,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/pengumuman', [AnnouncementController::class, 'pegawaiIndex'])->name('announcements.pegawai');
 
     Route::get('/api/active-announcements', [AnnouncementController::class, 'getActiveAnnouncements']);
+
+    Route::prefix('push-notifications')->name('push-notifications.')->group(function () {
+        Route::get('/public-key', [PushSubscriptionController::class, 'publicKey'])->name('public-key');
+        Route::post('/subscribe', [PushSubscriptionController::class, 'store'])->name('subscribe');
+        Route::delete('/subscribe', [PushSubscriptionController::class, 'destroy'])->name('unsubscribe');
+        Route::post('/test', [PushSubscriptionController::class, 'test'])->name('test');
+    });
+
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+        Route::get('/latest-unread', [NotificationController::class, 'latestUnread'])->name('latest-unread');
+        Route::get('/{notification}/read', [NotificationController::class, 'markAsRead'])->name('read');
+    });
 
     // CRUD KEGIATAN & SUB KEGIATAN BY KETUA TIM
     Route::prefix('kegiatan')->group(function () {

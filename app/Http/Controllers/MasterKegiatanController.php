@@ -16,6 +16,7 @@ use App\Exports\MphAllExport;
 use App\Models\Penugasan;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Services\PushNotificationService;
 
 
 class MasterKegiatanController extends Controller
@@ -135,7 +136,9 @@ class MasterKegiatanController extends Controller
                 }
             }
 
-            DB::transaction(function () use ($request, $validated) {
+            $createdPenugasans = collect();
+
+            DB::transaction(function () use ($request, $validated, $createdPenugasans) {
                 $kegiatan = Kegiatan::create([
                     'id_bidang' => $request->id_bidang,
                     'nama_rk_kegiatan' => $request->nama_rk_kegiatan,
@@ -220,7 +223,7 @@ class MasterKegiatanController extends Controller
                             }
                         }
 
-                        $subKegiatan->penugasans()->create([
+                        $createdPenugasans->push($subKegiatan->penugasans()->create([
                             'id_anggota' => $idAnggota,
                             'id_jenis_kegiatan' => $idJenisKegiatan,
                             'target' => $targets[$i] ?? null,
@@ -232,10 +235,14 @@ class MasterKegiatanController extends Controller
                             'butuh_translok' => $butuhTranslokFinal,
                             'status_translok' => $butuhTranslokFinal ? 'Menunggu' : null,
                             'status' => 'Belum Dikirim', // ✅ DEFAULT
-                        ]);
+                        ]));
                     }
                 }
             });
+
+            $createdPenugasans->each(
+                fn ($penugasan) => app(PushNotificationService::class)->notifyPenugasanCreated($penugasan)
+            );
             
             $response = redirect()->back()->with('success', 'Kegiatan Berhasil Disimpan');
             if ($hasSelfAssign) {

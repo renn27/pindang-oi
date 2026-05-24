@@ -9,6 +9,7 @@ use App\Models\RencanaJPT;
 use App\Models\Pegawai;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
+use App\Services\PushNotificationService;
 use App\Exports\MphExport;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -168,7 +169,14 @@ class KegiatanController extends Controller
         $this->authorize('delete', $kegiatan);
 
         try {
+            $kegiatanForNotification = $kegiatan->loadMissing([
+                'penanggungJawab',
+                'subKegiatans.penugasans.anggota',
+            ]);
+
             $kegiatan->forceDelete();
+
+            app(PushNotificationService::class)->notifyKegiatanDeleted($kegiatanForNotification);
 
             return redirect()
                 ->route('dashboard')
