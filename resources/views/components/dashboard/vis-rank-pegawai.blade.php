@@ -346,6 +346,4 @@
         </div>
     </div>
 
-    {{-- Modal Perhitungan Rumus Component --}}
-    <x-dashboard.modal-perhitungan-rumus />
 </div>

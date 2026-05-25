@@ -17,53 +17,70 @@ class DashboardAnalyticsService {
         $endOfMonth   = Carbon::create($tahun, $bulan, 1)->endOfMonth();
         $som = $startOfMonth->toDateString();
         $eom = $endOfMonth->toDateString();
+        $bf  = sprintf('%04d-%02d', $tahun, $bulan);
+
+        $excludeCompletedBefore = function ($q) use ($bf) {
+            $q->whereDoesntHave('pengirimans', function ($qp) use ($bf) {
+                $qp->where('tipe_pengiriman', 'Pelunasan')
+                   ->where('bulan_pengiriman', '<', $bf)
+                   ->whereHas('penerimaan', function ($qrec) {
+                       $qrec->where('status', 'Diterima');
+                   });
+            });
+        };
 
         $pegawai = Pegawai::withCount([
             // 1. Jumlah penugasan (COUNT baris penugasan)
-            'penugasanSebagaiAnggota as total_penugasan' => function ($q) use ($som, $eom) {
+            'penugasanSebagaiAnggota as total_penugasan' => function ($q) use ($som, $eom, $excludeCompletedBefore) {
                 $q->where('tanggal_mulai', '<=', $eom)
                   ->where('tanggal_selesai', '>=', $som);
+                $excludeCompletedBefore($q);
             },
 
             // 2. Rekap penugasan yang sudah disubmit/dikirim (punya pengiriman)
-            'penugasanSebagaiAnggota as total_dikirim' => function ($q) use ($som, $eom) {
+            'penugasanSebagaiAnggota as total_dikirim' => function ($q) use ($som, $eom, $excludeCompletedBefore) {
                 $q->where('tanggal_mulai', '<=', $eom)
                   ->where('tanggal_selesai', '>=', $som)
                   ->has('pengirimans'); // ada datanya di tabel pengiriman
+                $excludeCompletedBefore($q);
             },
 
             // 3. Rekap penugasan yang sudah diperiksa & terverifikasi "Diterima"
-            'penugasanSebagaiAnggota as total_diterima' => function ($q) use ($som, $eom) {
+            'penugasanSebagaiAnggota as total_diterima' => function ($q) use ($som, $eom, $excludeCompletedBefore) {
                 $q->where('tanggal_mulai', '<=', $eom)
                   ->where('tanggal_selesai', '>=', $som)
                   ->whereHas('pengirimans.penerimaan', function ($q2) {
                       $q2->where('status', 'Diterima');
                   });
+                $excludeCompletedBefore($q);
             },
 
             // 4. Rekap penugasan yang sudah diperiksa & terverifikasi "Revisi"
-            'penugasanSebagaiAnggota as total_revisi' => function ($q) use ($som, $eom) {
+            'penugasanSebagaiAnggota as total_revisi' => function ($q) use ($som, $eom, $excludeCompletedBefore) {
                 $q->where('tanggal_mulai', '<=', $eom)
                   ->where('tanggal_selesai', '>=', $som)
                   ->whereHas('pengirimans.penerimaan', function ($q2) {
                       $q2->where('status', 'Revisi');
                   });
+                $excludeCompletedBefore($q);
             },
 
             // 5. Rekap penugasan yang sudah dikirim TAPI belum diterima (Sedang Diperiksa)
-            'penugasanSebagaiAnggota as total_diperiksa' => function ($q) use ($som, $eom) {
+            'penugasanSebagaiAnggota as total_diperiksa' => function ($q) use ($som, $eom, $excludeCompletedBefore) {
                 $q->where('tanggal_mulai', '<=', $eom)
                   ->where('tanggal_selesai', '>=', $som)
                   ->has('pengirimans')
                   ->whereDoesntHave('pengirimans.penerimaan', function ($q2) {
                       $q2->where('status', 'Diterima');
                   });
+                $excludeCompletedBefore($q);
             }
         ])
         // SUM kolom target → total akumulasi target penugasan (bukan jumlah baris)
-        ->withSum(['penugasanSebagaiAnggota as total_target' => function ($q) use ($som, $eom) {
+        ->withSum(['penugasanSebagaiAnggota as total_target' => function ($q) use ($som, $eom, $excludeCompletedBefore) {
             $q->where('tanggal_mulai', '<=', $eom)
               ->where('tanggal_selesai', '>=', $som);
+            $excludeCompletedBefore($q);
         }], 'target')
         ->orderBy('nama_pegawai', 'asc')
         ->get();
@@ -109,6 +126,16 @@ class DashboardAnalyticsService {
             ->whereNull('deleted_at')
             ->where('tanggal_mulai', '<=', $endOfMonth->toDateString())
             ->where('tanggal_selesai', '>=', $startOfMonth->toDateString())
+            ->whereNotExists(function ($query) use ($bf) {
+                $query->select(\DB::raw(1))
+                      ->from('pengirimans')
+                      ->join('penerimaans', 'penerimaans.id_pengiriman', '=', 'pengirimans.id_pengiriman')
+                      ->whereColumn('pengirimans.id_penugasan', 'penugasans.id_penugasan')
+                      ->where('pengirimans.tipe_pengiriman', 'Pelunasan')
+                      ->where('pengirimans.bulan_pengiriman', '<', $bf)
+                      ->where('penerimaans.status', 'Diterima')
+                      ->whereNull('pengirimans.deleted_at');
+            })
             ->selectRaw('
                 COUNT(DISTINCT id_penugasan) as tot,
                 COALESCE(SUM(target), 0) as sumT,
@@ -150,6 +177,23 @@ class DashboardAnalyticsService {
             ->whereNull('pengirimans.deleted_at');
     }
 
+    private function buildLatestDiterimaAllMonthsSubquery()
+    {
+        return Pengiriman::query()
+            ->select('pengirimans.*', 'penerimaans.status as status_penerimaan')
+            ->joinSub(
+                Pengiriman::selectRaw('id_penugasan, MAX(created_at) as lc')
+                    ->whereNull('deleted_at')->groupBy('id_penugasan'),
+                'lat',
+                fn($j) => $j->on('pengirimans.id_penugasan', '=', 'lat.id_penugasan')
+                             ->on('pengirimans.created_at',    '=', 'lat.lc')
+            )
+            ->join('penerimaans', 'penerimaans.id_pengiriman', '=', 'pengirimans.id_pengiriman')
+            ->where('penerimaans.status', 'Diterima')
+            ->whereIn('pengirimans.tipe_pengiriman', ['Cicilan', 'Pelunasan'])
+            ->whereNull('pengirimans.deleted_at');
+    }
+
     private function buildRankBaseQuery(string $bf, array $gs, Carbon $startOfMonth, Carbon $endOfMonth)
     {
         $c   = (float) $gs['sum_target_semua'];
@@ -159,11 +203,21 @@ class DashboardAnalyticsService {
         $eom = $endOfMonth->toDateString();
 
         $inner = \DB::table('pegawais')
-            ->leftJoin('penugasans', function($join) use ($som, $eom) {
+            ->leftJoin('penugasans', function($join) use ($som, $eom, $bf) {
                 $join->on('pegawais.id_pegawai', '=', 'penugasans.id_anggota')
                      ->whereNull('penugasans.deleted_at')
                      ->where('penugasans.tanggal_mulai', '<=', $eom)
-                     ->where('penugasans.tanggal_selesai', '>=', $som);
+                     ->where('penugasans.tanggal_selesai', '>=', $som)
+                     ->whereNotExists(function ($query) use ($bf) {
+                         $query->select(\DB::raw(1))
+                               ->from('pengirimans')
+                               ->join('penerimaans', 'penerimaans.id_pengiriman', '=', 'pengirimans.id_pengiriman')
+                               ->whereColumn('pengirimans.id_penugasan', 'penugasans.id_penugasan')
+                               ->where('pengirimans.tipe_pengiriman', 'Pelunasan')
+                               ->where('pengirimans.bulan_pengiriman', '<', $bf)
+                               ->where('penerimaans.status', 'Diterima')
+                               ->whereNull('pengirimans.deleted_at');
+                     });
             })
             ->leftJoinSub($ld, 'lp', fn($j) => $j->on('penugasans.id_penugasan', '=', 'lp.id_penugasan'))
             ->groupBy('pegawais.id_pegawai', 'pegawais.nama_pegawai', 'pegawais.photo')
@@ -254,7 +308,7 @@ class DashboardAnalyticsService {
 
     private function buildDetailsQuery(string $bf, $ids, Carbon $startOfMonth, Carbon $endOfMonth)
     {
-        $ld = $this->buildLatestDiterimaSubquery($bf);
+        $ld = $this->buildLatestDiterimaAllMonthsSubquery();
         return \DB::table('penugasans')
             ->join('pegawais',      'pegawais.id_pegawai',           '=', 'penugasans.id_anggota')
             ->join('sub_kegiatans', 'sub_kegiatans.id_sub_kegiatan', '=', 'penugasans.id_sub_kegiatan')
@@ -262,25 +316,42 @@ class DashboardAnalyticsService {
             ->whereNull('penugasans.deleted_at')
             ->where('penugasans.tanggal_mulai', '<=', $endOfMonth->toDateString())
             ->where('penugasans.tanggal_selesai', '>=', $startOfMonth->toDateString())
+            ->whereNotExists(function ($query) use ($bf) {
+                $query->select(\DB::raw(1))
+                      ->from('pengirimans')
+                      ->join('penerimaans', 'penerimaans.id_pengiriman', '=', 'pengirimans.id_pengiriman')
+                      ->whereColumn('pengirimans.id_penugasan', 'penugasans.id_penugasan')
+                      ->where('pengirimans.tipe_pengiriman', 'Pelunasan')
+                      ->where('pengirimans.bulan_pengiriman', '<', $bf)
+                      ->where('penerimaans.status', 'Diterima')
+                      ->whereNull('pengirimans.deleted_at');
+            })
             ->whereIn('penugasans.id_anggota', $ids)
             ->selectRaw('penugasans.id_anggota, sub_kegiatans.nama_sub_kegiatan,
                 penugasans.tanggal_mulai, penugasans.tanggal_selesai, penugasans.target,
                 lp.bulan_pengiriman, lp.tanggal_pengiriman, lp.jumlah_dikirim,
                 lp.rr_kirim, lp.rating_kirim, lp.tipe_pengiriman, lp.status_penerimaan')
             ->get()
-            ->map(function ($row) {
+            ->map(function ($row) use ($bf) {
                 $isPelunasan = $row->tipe_pengiriman === 'Pelunasan';
                 $isCicilan   = $row->tipe_pengiriman === 'Cicilan';
                 $target      = max(0, (int)($row->target ?? 0));
                 $jml         = max(0, (int)($row->jumlah_dikirim ?? 0));
-                $bobot       = $isPelunasan ? 1.0 : ($isCicilan && $target > 0 ? $jml / $target : 0.0);
-                $row->is_pelunasan      = $isPelunasan;
+                
+                $isActiveMonth = $row->bulan_pengiriman === $bf;
+                
+                $bobot = 0.0;
+                if ($isActiveMonth) {
+                    $bobot = $isPelunasan ? 1.0 : ($isCicilan && $target > 0 ? $jml / $target : 0.0);
+                }
+                
+                $row->is_pelunasan      = $isPelunasan && $isActiveMonth;
                 $row->bobot_parsial     = $bobot;
-                $row->kontribusi_rr     = round((float)($row->rr_kirim     ?? 0) * $bobot, 4);
-                $row->kontribusi_rating = round((float)($row->rating_kirim ?? 0) * 20 * $bobot, 4);
+                $row->kontribusi_rr     = $isActiveMonth ? round((float)($row->rr_kirim     ?? 0) * $bobot, 4) : 0.0;
+                $row->kontribusi_rating = $isActiveMonth ? round((float)($row->rating_kirim ?? 0) * 20 * $bobot, 4) : 0.0;
                 $row->skor_f2 = $row->lama_rentang = $row->lama_pengiriman = null;
                 $row->terlambat = false;
-                if ($isPelunasan && $row->tanggal_pengiriman) {
+                if ($row->is_pelunasan && $row->tanggal_pengiriman) {
                     $lr = max(1, Carbon::parse($row->tanggal_mulai)->diffInDays(Carbon::parse($row->tanggal_selesai)));
                     $lp = max(0, Carbon::parse($row->tanggal_mulai)->diffInDays(Carbon::parse($row->tanggal_pengiriman), false));
                     $row->lama_rentang = $lr; $row->lama_pengiriman = $lp; $row->terlambat = $lp > $lr;
@@ -288,6 +359,8 @@ class DashboardAnalyticsService {
                         ? 80.0 + (($lr-$lp)/$lr)*20.0
                         : max(70.0, 80.0 - min(10.0, (($lp-$lr)/$lr)*10.0));
                 }
+                
+                $row->is_active_month = $isActiveMonth;
                 return $row;
             })->groupBy('id_anggota');
     }
@@ -332,11 +405,13 @@ class DashboardAnalyticsService {
             'f3' => ['nilai'=>round((float)($item->f3_rr_kirim??0),2),
                 'detail'=>$det->map(fn($r)=>['nama_sub_kegiatan'=>$r->nama_sub_kegiatan,
                     'rr_kirim'=>$r->rr_kirim,'bobot_parsial'=>round($r->bobot_parsial,4),
-                    'kontribusi_rr'=>round($r->kontribusi_rr,4),'tipe_pengiriman'=>$r->tipe_pengiriman])->values()],
+                    'kontribusi_rr'=>round($r->kontribusi_rr,4),'tipe_pengiriman'=>$r->tipe_pengiriman,
+                    'bulan_pengiriman'=>$r->bulan_pengiriman,'is_active_month'=>$r->is_active_month])->values()],
             'f4' => ['nilai'=>round((float)($item->f4_rating_kirim??0),2),
                 'detail'=>$det->map(fn($r)=>['nama_sub_kegiatan'=>$r->nama_sub_kegiatan,
                     'rating_kirim'=>$r->rating_kirim,'bobot_parsial'=>round($r->bobot_parsial,4),
-                    'kontribusi_rating'=>round($r->kontribusi_rating,4),'tipe_pengiriman'=>$r->tipe_pengiriman])->values()],
+                    'kontribusi_rating'=>round($r->kontribusi_rating,4),'tipe_pengiriman'=>$r->tipe_pengiriman,
+                    'bulan_pengiriman'=>$r->bulan_pengiriman,'is_active_month'=>$r->is_active_month])->values()],
             'koefisien_beban'            => round((float)($item->koefisien_beban??1.0),4),
             'target_pegawai'             => $a,
             'avg_target_bulan'           => round($gs['avg_target_bulan'],2),
@@ -506,12 +581,28 @@ class DashboardAnalyticsService {
                         ->where('tanggal_selesai', '>=', $startOfMonth)
                         ->count();
 
+        $bf = sprintf('%04d-%02d', $year, $month);
+
         $totalPenugasan = Penugasan::where('tanggal_mulai', '<=', $endOfMonth) 
                         ->where('tanggal_selesai', '>=', $startOfMonth)
+                        ->whereDoesntHave('pengirimans', function ($qp) use ($bf) {
+                            $qp->where('tipe_pengiriman', 'Pelunasan')
+                               ->where('bulan_pengiriman', '<', $bf)
+                               ->whereHas('penerimaan', function ($qrec) {
+                                   $qrec->where('status', 'Diterima');
+                               });
+                        })
                         ->count();
                         
         $penugasanSelesai = Penugasan::where('tanggal_mulai', '<=', $endOfMonth) 
                         ->where('tanggal_selesai', '>=', $startOfMonth)
+                        ->whereDoesntHave('pengirimans', function ($qp) use ($bf) {
+                            $qp->where('tipe_pengiriman', 'Pelunasan')
+                               ->where('bulan_pengiriman', '<', $bf)
+                               ->whereHas('penerimaan', function ($qrec) {
+                                   $qrec->where('status', 'Diterima');
+                               });
+                        })
                         ->whereHas('latestPengiriman.penerimaan', function ($query) {
                             $query->where('status', 'Diterima');
                         })->count();

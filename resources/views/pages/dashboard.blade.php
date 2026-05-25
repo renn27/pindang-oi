@@ -361,8 +361,6 @@
     @endif
 
     @if (!auth()->user()->isSuperUser())
-        {{-- Modal Perhitungan Rumus Component --}}
-        <x-dashboard.modal-perhitungan-rumus />
 
         @if (auth()->user()->isAnggotaTim() ||
                 (auth()->user()->isKetuaTim() && auth()->user()->kegiatanYangDipimpin()->exists()))
@@ -811,6 +809,9 @@
                 :perPageOptions="$rekapPerPageOptions" />
         </div>
     @endif
+
+    {{-- Modal Perhitungan Rumus Component --}}
+    <x-dashboard.modal-perhitungan-rumus />
 
 </div>
 

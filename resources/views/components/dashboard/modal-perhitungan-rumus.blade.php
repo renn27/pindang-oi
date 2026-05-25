@@ -1,6 +1,17 @@
 @props(['id' => 'calcModal'])
 
-<div x-data="{ open: false, calcData: {} }"
+<div x-data="{ 
+    open: false, 
+    calcData: {},
+    formatBulan(bulanStr) {
+        if (!bulanStr) return '';
+        const parts = bulanStr.split('-');
+        if (parts.length < 2) return bulanStr;
+        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const mIdx = parseInt(parts[1], 10) - 1;
+        return months[mIdx] + ' ' + parts[0];
+    }
+}"
     x-show="open"
     @open-calc-modal.window="calcData = $event.detail; open = true"
     @keydown.escape.window="open = false"
@@ -131,8 +142,8 @@
                                     <span class="text-lg font-black text-blue-700 dark:text-blue-300" x-text="calcData.breakdown.f1.nilai + '%'"></span>
                                 </div>
                                 <div class="text-xs space-y-1.5 font-mono text-gray-700 dark:text-gray-300 bg-white/60 dark:bg-gray-800/40 rounded-lg p-3">
-                                    <div class="flex justify-between"><span class="text-gray-500">Progress Pelunasan Diterima</span><span x-text="calcData.breakdown.f1.progress_pelunasan"></span></div>
-                                    <div class="flex justify-between"><span class="text-gray-500">Progress Cicilan Diterima</span><span x-text="calcData.breakdown.f1.progress_cicilan"></span></div>
+                                    <div class="flex justify-between"><span class="text-gray-500">Volume Target Pelunasan Diterima</span><span x-text="calcData.breakdown.f1.progress_pelunasan"></span></div>
+                                    <div class="flex justify-between"><span class="text-gray-500">Volume Target Cicilan Diterima</span><span x-text="calcData.breakdown.f1.progress_cicilan"></span></div>
                                     <div class="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-1 mt-1"><span class="text-gray-500">b_efektif = pelunasan + (cicilan × 0.5)</span><span x-text="calcData.breakdown.f1.b_efektif"></span></div>
                                     <div class="flex justify-between"><span class="text-gray-500">a = total_target pegawai</span><span x-text="calcData.breakdown.f1.a"></span></div>
                                     <div class="flex justify-between"><span class="text-gray-500">c = sum_target semua pegawai</span><span x-text="calcData.breakdown.f1.c"></span></div>
@@ -195,15 +206,15 @@
                                         </thead>
                                         <tbody class="font-mono divide-y divide-amber-100 dark:divide-amber-800/20">
                                             <template x-for="(d, i) in calcData.breakdown.f3.detail" :key="i">
-                                                <tr class="text-gray-700 dark:text-gray-300">
+                                                <tr class="text-gray-700 dark:text-gray-300" :class="!d.is_active_month && d.bulan_pengiriman ? 'opacity-60 bg-gray-50/50 dark:bg-gray-800/20' : ''">
                                                     <td class="py-1 pr-2 max-w-[160px] truncate font-sans" x-text="d.nama_sub_kegiatan"></td>
                                                     <td class="py-1 text-center">
-                                                        <span :class="d.tipe_pengiriman === 'Pelunasan' ? 'text-green-700 dark:text-green-400' : (d.tipe_pengiriman === 'Cicilan' ? 'text-blue-700 dark:text-blue-400' : 'text-gray-400')"
-                                                              x-text="d.tipe_pengiriman ?? '—'"></span>
+                                                        <span :class="d.is_active_month ? (d.tipe_pengiriman === 'Pelunasan' ? 'text-green-700 dark:text-green-400' : (d.tipe_pengiriman === 'Cicilan' ? 'text-blue-700 dark:text-blue-400' : 'text-gray-400')) : 'text-gray-400 dark:text-gray-500'"
+                                                              x-text="d.is_active_month ? (d.tipe_pengiriman ?? '—') : (d.tipe_pengiriman ? d.tipe_pengiriman + ' (' + formatBulan(d.bulan_pengiriman) + ')' : '—')"></span>
                                                     </td>
-                                                    <td class="py-1 text-center" x-text="d.rr_kirim !== null ? d.rr_kirim + '%' : '—'"></td>
-                                                    <td class="py-1 text-center" x-text="d.bobot_parsial"></td>
-                                                    <td class="py-1 text-center font-bold text-amber-700 dark:text-amber-300" x-text="d.kontribusi_rr"></td>
+                                                    <td class="py-1 text-center" :class="!d.is_active_month && d.bulan_pengiriman ? 'text-gray-400 dark:text-gray-500' : ''" x-text="d.rr_kirim !== null ? d.rr_kirim + '%' : '—'"></td>
+                                                    <td class="py-1 text-center" :class="!d.is_active_month && d.bulan_pengiriman ? 'text-gray-400 dark:text-gray-500' : ''" x-text="d.bobot_parsial"></td>
+                                                    <td class="py-1 text-center font-bold" :class="d.is_active_month ? 'text-amber-700 dark:text-amber-300' : 'text-gray-400 dark:text-gray-500'" x-text="d.kontribusi_rr"></td>
                                                 </tr>
                                             </template>
                                         </tbody>
@@ -211,6 +222,11 @@
                                 </div>
                                 <div class="mt-2 text-xs font-mono text-amber-700 dark:text-amber-400 border-t border-amber-200 dark:border-amber-800/30 pt-2">
                                     F3 = SUM(kontribusi_rr) / <span x-text="calcData.breakdown.total_penugasan_dia"></span> penugasan = <strong x-text="calcData.breakdown.f3.nilai + '%'"></strong>
+                                    <template x-if="calcData.breakdown.f3.detail.some(d => !d.is_active_month && d.bulan_pengiriman)">
+                                        <div class="mt-1 text-[10px] text-gray-500 dark:text-gray-400 italic font-sans">
+                                            * Catatan: Baris berwarna abu-abu adalah penugasan aktif yang progresnya sudah dilaporkan dan dinilai pada bulan terkait, sehingga bobot dan kontribusinya bernilai 0 pada bulan evaluasi aktif ini.
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
 
@@ -236,15 +252,15 @@
                                         </thead>
                                         <tbody class="font-mono divide-y divide-rose-100 dark:divide-rose-800/20">
                                             <template x-for="(d, i) in calcData.breakdown.f4.detail" :key="i">
-                                                <tr class="text-gray-700 dark:text-gray-300">
+                                                <tr class="text-gray-700 dark:text-gray-300" :class="!d.is_active_month && d.bulan_pengiriman ? 'opacity-60 bg-gray-50/50 dark:bg-gray-800/20' : ''">
                                                     <td class="py-1 pr-2 max-w-[160px] truncate font-sans" x-text="d.nama_sub_kegiatan"></td>
                                                     <td class="py-1 text-center">
-                                                        <span :class="d.tipe_pengiriman === 'Pelunasan' ? 'text-green-700 dark:text-green-400' : (d.tipe_pengiriman === 'Cicilan' ? 'text-blue-700 dark:text-blue-400' : 'text-gray-400')"
-                                                              x-text="d.tipe_pengiriman ?? '—'"></span>
+                                                        <span :class="d.is_active_month ? (d.tipe_pengiriman === 'Pelunasan' ? 'text-green-700 dark:text-green-400' : (d.tipe_pengiriman === 'Cicilan' ? 'text-blue-700 dark:text-blue-400' : 'text-gray-400')) : 'text-gray-400 dark:text-gray-500'"
+                                                              x-text="d.is_active_month ? (d.tipe_pengiriman ?? '—') : (d.tipe_pengiriman ? d.tipe_pengiriman + ' (' + formatBulan(d.bulan_pengiriman) + ')' : '—')"></span>
                                                     </td>
-                                                    <td class="py-1 text-center" x-text="d.rating_kirim !== null ? d.rating_kirim + '⭐' : '—'"></td>
-                                                    <td class="py-1 text-center" x-text="d.bobot_parsial"></td>
-                                                    <td class="py-1 text-center font-bold text-rose-700 dark:text-rose-300" x-text="d.kontribusi_rating"></td>
+                                                    <td class="py-1 text-center" :class="!d.is_active_month && d.bulan_pengiriman ? 'text-gray-400 dark:text-gray-500' : ''" x-text="d.rating_kirim !== null ? d.rating_kirim + '⭐' : '—'"></td>
+                                                    <td class="py-1 text-center" :class="!d.is_active_month && d.bulan_pengiriman ? 'text-gray-400 dark:text-gray-500' : ''" x-text="d.bobot_parsial"></td>
+                                                    <td class="py-1 text-center font-bold" :class="d.is_active_month ? 'text-rose-700 dark:text-rose-300' : 'text-gray-400 dark:text-gray-500'" x-text="d.kontribusi_rating"></td>
                                                 </tr>
                                             </template>
                                         </tbody>
@@ -252,6 +268,11 @@
                                 </div>
                                 <div class="mt-2 text-xs font-mono text-rose-700 dark:text-rose-400 border-t border-rose-200 dark:border-rose-800/30 pt-2">
                                     F4 = SUM(rating×20×bobot) / <span x-text="calcData.breakdown.total_penugasan_dia"></span> penugasan = <strong x-text="calcData.breakdown.f4.nilai + '%'"></strong>
+                                    <template x-if="calcData.breakdown.f4.detail.some(d => !d.is_active_month && d.bulan_pengiriman)">
+                                        <div class="mt-1 text-[10px] text-gray-500 dark:text-gray-400 italic font-sans">
+                                            * Catatan: Baris berwarna abu-abu adalah penugasan aktif yang progresnya sudah dilaporkan dan dinilai pada bulan terkait, sehingga bobot dan kontribusinya bernilai 0 pada bulan evaluasi aktif ini.
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
 
