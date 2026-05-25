@@ -13,41 +13,47 @@ use Illuminate\Support\Collection;
 class DashboardAnalyticsService {
 
     public function getRekapPenugasanPegawai($bulan, $tahun) {
-        // Gunakan range tanggal eksplisit agar index kolom created_at dapat dipakai database
         $startOfMonth = Carbon::create($tahun, $bulan, 1)->startOfMonth();
         $endOfMonth   = Carbon::create($tahun, $bulan, 1)->endOfMonth();
+        $som = $startOfMonth->toDateString();
+        $eom = $endOfMonth->toDateString();
 
         $pegawai = Pegawai::withCount([
             // 1. Jumlah penugasan (COUNT baris penugasan)
-            'penugasanSebagaiAnggota as total_penugasan' => function ($q) use ($startOfMonth, $endOfMonth) {
-                $q->whereBetween('created_at', [$startOfMonth, $endOfMonth]);
+            'penugasanSebagaiAnggota as total_penugasan' => function ($q) use ($som, $eom) {
+                $q->where('tanggal_mulai', '<=', $eom)
+                  ->where('tanggal_selesai', '>=', $som);
             },
 
             // 2. Rekap penugasan yang sudah disubmit/dikirim (punya pengiriman)
-            'penugasanSebagaiAnggota as total_dikirim' => function ($q) use ($startOfMonth, $endOfMonth) {
-                $q->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            'penugasanSebagaiAnggota as total_dikirim' => function ($q) use ($som, $eom) {
+                $q->where('tanggal_mulai', '<=', $eom)
+                  ->where('tanggal_selesai', '>=', $som)
                   ->has('pengirimans'); // ada datanya di tabel pengiriman
             },
 
             // 3. Rekap penugasan yang sudah diperiksa & terverifikasi "Diterima"
-            'penugasanSebagaiAnggota as total_diterima' => function ($q) use ($startOfMonth, $endOfMonth) {
-                $q->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            'penugasanSebagaiAnggota as total_diterima' => function ($q) use ($som, $eom) {
+                $q->where('tanggal_mulai', '<=', $eom)
+                  ->where('tanggal_selesai', '>=', $som)
                   ->whereHas('pengirimans.penerimaan', function ($q2) {
                       $q2->where('status', 'Diterima');
                   });
             },
 
             // 4. Rekap penugasan yang sudah diperiksa & terverifikasi "Revisi"
-            'penugasanSebagaiAnggota as total_revisi' => function ($q) use ($startOfMonth, $endOfMonth) {
-                $q->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            'penugasanSebagaiAnggota as total_revisi' => function ($q) use ($som, $eom) {
+                $q->where('tanggal_mulai', '<=', $eom)
+                  ->where('tanggal_selesai', '>=', $som)
                   ->whereHas('pengirimans.penerimaan', function ($q2) {
                       $q2->where('status', 'Revisi');
                   });
             },
 
             // 5. Rekap penugasan yang sudah dikirim TAPI belum diterima (Sedang Diperiksa)
-            'penugasanSebagaiAnggota as total_diperiksa' => function ($q) use ($startOfMonth, $endOfMonth) {
-                $q->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            'penugasanSebagaiAnggota as total_diperiksa' => function ($q) use ($som, $eom) {
+                $q->where('tanggal_mulai', '<=', $eom)
+                  ->where('tanggal_selesai', '>=', $som)
                   ->has('pengirimans')
                   ->whereDoesntHave('pengirimans.penerimaan', function ($q2) {
                       $q2->where('status', 'Diterima');
@@ -55,8 +61,9 @@ class DashboardAnalyticsService {
             }
         ])
         // SUM kolom target → total akumulasi target penugasan (bukan jumlah baris)
-        ->withSum(['penugasanSebagaiAnggota as total_target' => function ($q) use ($startOfMonth, $endOfMonth) {
-            $q->whereBetween('created_at', [$startOfMonth, $endOfMonth]);
+        ->withSum(['penugasanSebagaiAnggota as total_target' => function ($q) use ($som, $eom) {
+            $q->where('tanggal_mulai', '<=', $eom)
+              ->where('tanggal_selesai', '>=', $som);
         }], 'target')
         ->orderBy('nama_pegawai', 'asc')
         ->get();
@@ -207,20 +214,20 @@ class DashboardAnalyticsService {
                            /GREATEST(1,DATEDIFF(penugasans.tanggal_selesai,penugasans.tanggal_mulai))*10.0))
                     END
                 ELSE NULL END),0) AS f2_kecepatan,
-                CASE WHEN COUNT(DISTINCT lp.id_penugasan)=0 THEN 0.0
+                CASE WHEN COUNT(DISTINCT penugasans.id_penugasan)=0 THEN 0.0
                 ELSE COALESCE(SUM(CASE
                     WHEN lp.tipe_pengiriman='Pelunasan' THEN lp.rr_kirim*1.0
                     WHEN lp.tipe_pengiriman='Cicilan'   THEN lp.rr_kirim
                         *CASE WHEN penugasans.target=0 THEN 0.0
                           ELSE CAST(lp.jumlah_dikirim AS DECIMAL(10,4))/CAST(penugasans.target AS DECIMAL(10,4)) END
-                    ELSE 0.0 END),0)/COUNT(DISTINCT lp.id_penugasan) END AS f3_rr_kirim,
-                CASE WHEN COUNT(DISTINCT lp.id_penugasan)=0 THEN 0.0
+                    ELSE 0.0 END),0)/COUNT(DISTINCT penugasans.id_penugasan) END AS f3_rr_kirim,
+                CASE WHEN COUNT(DISTINCT penugasans.id_penugasan)=0 THEN 0.0
                 ELSE COALESCE(SUM(CASE
                     WHEN lp.tipe_pengiriman='Pelunasan' THEN lp.rating_kirim*20.0*1.0
                     WHEN lp.tipe_pengiriman='Cicilan'   THEN lp.rating_kirim*20.0
                         *CASE WHEN penugasans.target=0 THEN 0.0
                           ELSE CAST(lp.jumlah_dikirim AS DECIMAL(10,4))/CAST(penugasans.target AS DECIMAL(10,4)) END
-                    ELSE 0.0 END),0)/COUNT(DISTINCT lp.id_penugasan) END AS f4_rating_kirim,
+                    ELSE 0.0 END),0)/COUNT(DISTINCT penugasans.id_penugasan) END AS f4_rating_kirim,
                 CASE WHEN ?=0 OR COUNT(DISTINCT penugasans.id_penugasan)=0 THEN 1.0
                 ELSE LEAST(1.15,GREATEST(0.85,COALESCE(SUM(penugasans.target),0)/?))
                 END AS koefisien_beban

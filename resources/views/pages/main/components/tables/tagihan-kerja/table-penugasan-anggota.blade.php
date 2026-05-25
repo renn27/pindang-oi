@@ -180,7 +180,7 @@
                                                                 {{-- Konten Utama --}}
                                                                 <p
                                                                     class="{{ $penugasan->jenisKegiatan ? 'text-sm font-medium text-gray-800 dark:text-gray-200' : 'text-xs italic text-slate-400 dark:text-slate-500' }}">
-                                                                    {{ $penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri' }}
+                                                                    {{ $penugasan->jenisKegiatan?->jenis_kegiatan ?? '(jenis kegiatan telah dihapus)' }}
                                                                 </p>
 
                                                                 {{-- Tombol Edit (Jika punya akses) --}}
@@ -1203,7 +1203,7 @@
                                                                 {{-- Konten Utama --}}
                                                                 <p
                                                                     class="{{ $penugasan->jenisKegiatan ? 'text-sm font-medium text-gray-800 dark:text-gray-200' : 'text-xs italic text-slate-400 dark:text-slate-500' }}">
-                                                                    {{ $penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri' }}
+                                                                    {{ $penugasan->jenisKegiatan?->jenis_kegiatan ?? '(jenis kegiatan telah dihapus)' }}
                                                                 </p>
 
                                                                 {{-- Tombol Edit (Jika punya akses) --}}

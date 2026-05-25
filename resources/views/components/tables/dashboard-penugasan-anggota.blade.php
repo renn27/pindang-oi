@@ -61,7 +61,7 @@
                                     {{ $penugasan->subKegiatan->nama_sub_kegiatan ?? '-' }}
                                 </span>
                                 <span class="text-[11px] text-gray-400 dark:text-gray-500 font-medium">
-                                    {{ $penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri' }}
+                                    {{ $penugasan->jenisKegiatan?->jenis_kegiatan ?? '(jenis kegiatan telah dihapus)' }}
                                 </span>
                             </div>
                         </td>
