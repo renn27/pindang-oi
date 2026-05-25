@@ -180,7 +180,7 @@
                                                                 {{-- Konten Utama --}}
                                                                 <p
                                                                     class="{{ $penugasan->jenisKegiatan ? 'text-sm font-medium text-gray-800 dark:text-gray-200' : 'text-xs italic text-slate-400 dark:text-slate-500' }}">
-                                                                    {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? 'Jenis kegiatan ini sudah dihapus' }}
+                                                                    {{ $penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri' }}
                                                                 </p>
 
                                                                 {{-- Tombol Edit (Jika punya akses) --}}
@@ -325,8 +325,8 @@
                                                                                                                         nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
                                                                                                                         id_anggota: @js($penugasan->id_anggota),
                                                                                                                         nama_anggota: @js($penugasan->anggota?->nama_pegawai),
-                                                                                                                        id_jenis_kegiatan: @js($penugasan->jenisKegiatan->id),
-                                                                                                                        jenis_kegiatan: @js($penugasan->jenisKegiatan->jenis_kegiatan),
+                                                                                                                        id_jenis_kegiatan: @js($penugasan->jenisKegiatan?->id),
+                                                                                                                        jenis_kegiatan: @js($penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri'),
                                                                                                                         target: @js($penugasan->target),
                                                                                                                         satuan_target: @js($penugasan->satuan_target),
                                                                                                                         butuh_dl: @js($penugasan->butuh_dl),
@@ -506,7 +506,7 @@
                                                                                                                         data: {
                                                                                                                             id_penugasan: @js($penugasan->id_penugasan),
                                                                                                                             nama_pegawai: @js($penugasan->anggota->nama_pegawai),
-                                                                                                                            uraian: @js('Melaksanakan ' . $penugasan->jenisKegiatan->jenis_kegiatan . ' pada ' . $penugasan->subKegiatan->nama_sub_kegiatan . ' dengan target ' . ($penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim')) . ' dari total target ' . $penugasan->target),
+                                                                                                                            uraian: @js('Melaksanakan ' . ($penugasan->jenisKegiatan?->jenis_kegiatan ?? '(Isi Sendiri)') . ' pada ' . $penugasan->subKegiatan->nama_sub_kegiatan . ' dengan target ' . ($penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim')) . ' dari total target ' . $penugasan->target),
                                                                                                                             target_kuantitas: {{ $penugasan->target }},
                                                                                                                             realisasi_kuantitas: {{ $penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim') }},
                                                                                                                             satuan: @js($penugasan->satuan_target),
@@ -1203,7 +1203,7 @@
                                                                 {{-- Konten Utama --}}
                                                                 <p
                                                                     class="{{ $penugasan->jenisKegiatan ? 'text-sm font-medium text-gray-800 dark:text-gray-200' : 'text-xs italic text-slate-400 dark:text-slate-500' }}">
-                                                                    {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? 'Jenis kegiatan ini sudah dihapus' }}
+                                                                    {{ $penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri' }}
                                                                 </p>
 
                                                                 {{-- Tombol Edit (Jika punya akses) --}}
@@ -1319,7 +1319,7 @@
                                                                                                                     id_anggota: @js($penugasan->id_anggota),
                                                                                                                     nama_anggota: @js($penugasan->anggota?->nama_pegawai),
                                                                                                                     id_jenis_kegiatan: @js($penugasan->jenisKegiatan?->id),
-                                                                                                                    jenis_kegiatan: @js($penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Jenis Kegiatan Terhapus'),
+                                                                                                                    jenis_kegiatan: @js($penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri'),
                                                                                                                     target: @js($penugasan->target),
                                                                                                                     satuan_target: @js($penugasan->satuan_target),
                                                                                                                     butuh_dl: @js($penugasan->butuh_dl),
@@ -1500,7 +1500,7 @@
                                                                                                                         data: {
                                                                                                                             id_penugasan: @js($penugasan->id_penugasan),
                                                                                                                             nama_pegawai: @js($penugasan->anggota->nama_pegawai),
-                                                                                                                            uraian: @js('Melaksanakan ' . $penugasan->jenisKegiatan->jenis_kegiatan . ' pada ' . $penugasan->subKegiatan->nama_sub_kegiatan . ' dengan target ' . ($penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim')) . ' dari total target ' . $penugasan->target . ' ' . $penugasan->satuan_target),
+                                                                                                                            uraian: @js('Melaksanakan ' . ($penugasan->jenisKegiatan?->jenis_kegiatan ?? '(Isi Sendiri)') . ' pada ' . $penugasan->subKegiatan->nama_sub_kegiatan . ' dengan target ' . ($penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim')) . ' dari total target ' . $penugasan->target . ' ' . $penugasan->satuan_target),
                                                                                                                             target_kuantitas: {{ $penugasan->target }},
                                                                                                                             realisasi_kuantitas: {{ $penugasan->pengirimans->filter(fn($p) => $p->penerimaan && $p->penerimaan->status === 'Diterima')->sum('jumlah_dikirim') }},
                                                                                                                             satuan: @js($penugasan->satuan_target),

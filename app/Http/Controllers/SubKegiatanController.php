@@ -55,7 +55,7 @@ class SubKegiatanController extends Controller
 
     public function show(Kegiatan $kegiatan, SubKegiatan $subKegiatan) {
         // Data referensi untuk dropdown modal
-        $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
+        $pegawais = Pegawai::active()->orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
         $jenisKegiatans = JenisKegiatan::query()
             ->orderByRaw("
                 CASE

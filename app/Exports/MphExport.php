@@ -46,7 +46,7 @@ class MphExport implements FromCollection, WithHeadings, WithMapping, ShouldAuto
                         'kegiatan'       => $kegiatan->nama_rk_kegiatan,
                         'sub_kegiatan'   => $sub->nama_sub_kegiatan,
                         'nama_pegawai'   => $p->anggota->nama_pegawai,
-                        'jenis_kegiatan' => $p->jenisKegiatan->jenis_kegiatan,
+                        'jenis_kegiatan' => $p->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri',
                         'target'         => $p->target,
                         'satuan'         => $p->satuan_target,
                     ]);

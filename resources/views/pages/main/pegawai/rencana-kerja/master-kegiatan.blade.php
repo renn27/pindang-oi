@@ -221,7 +221,7 @@
 
                                                                     <td
                                                                         class="px-4 py-3 border dark:border-gray-700 text-gray-800 dark:text-gray-300">
-                                                                        {{ $penugasan->jenisKegiatan->jenis_kegiatan ?? '-' }}
+                                                                        {{ $penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri' }}
                                                                     </td>
 
                                                                     <td

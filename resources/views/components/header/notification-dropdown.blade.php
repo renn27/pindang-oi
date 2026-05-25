@@ -208,7 +208,7 @@
                             <span class="mb-1 block text-sm font-medium text-gray-800 dark:text-white">
                                 {{ $title }}
                             </span>
-                            <span class="line-clamp-2 block text-xs text-gray-500 dark:text-gray-400">
+                            <span class="line-clamp-3 block text-xs text-gray-500 dark:text-gray-400">
                                 {{ $body }}
                             </span>
                             <span class="mt-1 block text-[11px] text-gray-400">
@@ -266,7 +266,7 @@
                             <span class="mb-1 block text-sm font-medium text-gray-800 dark:text-white">
                                 {{ $title }}
                             </span>
-                            <span class="line-clamp-2 block text-xs text-gray-500 dark:text-gray-400">
+                            <span class="line-clamp-3 block text-xs text-gray-500 dark:text-gray-400">
                                 {{ $body }}
                             </span>
                             <span class="mt-1 block text-[11px] text-gray-400">
@@ -318,6 +318,33 @@
                 <button type="button" data-push-test
                     class="mt-3 rounded-md border border-gray-200 px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:bg-white dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
                     Tes push
+                </button>
+            </div>
+
+            <div class="mt-3 rounded-xl border border-gray-100 bg-gray-50 p-3 dark:border-gray-800 dark:bg-white/[0.03]">
+                <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <p class="text-sm font-medium text-gray-800 dark:text-white">Pengingat To Do List</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400" data-todo-reminder-status>
+                            Harian 08:30 & 15:00, rekap tgl 1 08:00 WIB.
+                        </p>
+                    </div>
+
+                    <button id="todoReminderToggle"
+                        class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full bg-gray-300 transition-colors dark:bg-gray-700 disabled:cursor-wait disabled:opacity-60"
+                        type="button"
+                        title="Aktifkan pengingat To Do List"
+                        aria-label="Aktifkan pengingat To Do List"
+                        data-enabled="false"
+                    >
+                        <span class="pointer-events-none inline-block h-5 w-5 translate-x-0.5 rounded-full bg-white shadow transition-transform"
+                            data-todo-reminder-toggle-thumb></span>
+                    </button>
+                </div>
+
+                <button type="button" data-todo-reminder-test
+                    class="mt-3 rounded-md border border-gray-200 px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:bg-white disabled:cursor-wait disabled:opacity-60 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+                    Tes pengingat To Do List
                 </button>
             </div>
         </div>

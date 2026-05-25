@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rule;
 use App\Services\PushNotificationService;
 
 class PenugasanController extends Controller
@@ -23,7 +24,10 @@ class PenugasanController extends Controller
         $this->authorize('create', [Penugasan::class, $subKegiatan]);
 
         $validated = $request->validate([
-            'id_anggota' => ['required', 'exists:pegawais,id_pegawai'],
+            'id_anggota' => [
+                'required',
+                Rule::exists('pegawais', 'id_pegawai')->where('is_active', true),
+            ],
             'id_jenis_kegiatan' => ['required'],
             'jenis_kegiatan_baru' => ['nullable', 'string'],
             'target' => ['required', 'integer', 'min:1'],
@@ -142,8 +146,18 @@ class PenugasanController extends Controller
         // dd($request->all());
         $this->authorize('update', $penugasan);
 
+        $hasAdditionalDates = collect($request->input('tanggal_mulai_list', []))
+            ->filter()
+            ->isNotEmpty()
+            || collect($request->input('tanggal_selesai_list', []))->filter()->isNotEmpty();
+        $keepsHistoricalAssignee = (string) $request->id_anggota === (string) $penugasan->id_anggota
+            && ! $hasAdditionalDates;
+        $anggotaRule = $keepsHistoricalAssignee
+            ? Rule::exists('pegawais', 'id_pegawai')
+            : Rule::exists('pegawais', 'id_pegawai')->where('is_active', true);
+
         $validated = $request->validate([
-            'id_anggota' => ['required', 'exists:pegawais,id_pegawai'],
+            'id_anggota' => ['required', $anggotaRule],
             'id_jenis_kegiatan' => ['required'],
             'jenis_kegiatan_baru' => ['nullable', 'string', 'max:100'],
             'target' => ['required', 'integer', 'min:1'],

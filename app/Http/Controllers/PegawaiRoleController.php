@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Pegawai;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class PegawaiRoleController extends Controller
 {
@@ -12,9 +14,59 @@ class PegawaiRoleController extends Controller
         $this->authorize('kelola-master-data');
         return view('pages.main.admin.role-pegawai.index', [
             'title'    => 'Manajemen Role Pegawai',
-            'pegawais' => Pegawai::with('roles')->get(),
-            'roles'    => Role::all(),
+            'pegawais' => Pegawai::with('roles')->orderBy('nama_pegawai')->get(),
+            'roles'    => Role::orderBy('nama_role')->get(),
         ]);
+    }
+
+    public function storePegawai(Request $request)
+    {
+        $this->authorize('kelola-master-data');
+
+        $validated = $request->validate([
+            'nama_pegawai' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255', 'unique:pegawais,username'],
+            'email' => ['nullable', 'email', 'max:255', 'unique:pegawais,email'],
+            'jabatan' => ['nullable', 'string', 'max:255'],
+            'alamat' => ['nullable', 'string', 'max:500'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'roles' => ['required', 'array', 'min:1'],
+            'roles.*' => ['exists:roles,id'],
+        ]);
+
+        $roles = Role::whereIn('id', $validated['roles'])->get();
+
+        DB::transaction(function () use ($validated, $roles) {
+            $pegawai = Pegawai::create([
+                'nama_pegawai' => $validated['nama_pegawai'],
+                'username' => $validated['username'],
+                'email' => $validated['email'] ?? null,
+                'jabatan' => $validated['jabatan'] ?? null,
+                'alamat' => $validated['alamat'] ?? null,
+                'password' => Hash::make($validated['password']),
+                'active_role' => $roles->first()?->nama_role,
+                'is_active' => true,
+            ]);
+
+            $pegawai->roles()->sync($roles->pluck('id'));
+        });
+
+        return back()->with('success', 'Pegawai berhasil ditambahkan.');
+    }
+
+    public function toggleActive(Request $request, Pegawai $pegawai)
+    {
+        $this->authorize('kelola-master-data');
+
+        if ($pegawai->id_pegawai === $request->user()->id_pegawai && $pegawai->is_active) {
+            return back()->with('error', 'Akun yang sedang digunakan tidak dapat dinonaktifkan.');
+        }
+
+        $pegawai->update(['is_active' => ! $pegawai->is_active]);
+
+        $status = $pegawai->is_active ? 'diaktifkan kembali' : 'dinonaktifkan';
+
+        return back()->with('success', "Pegawai berhasil {$status}.");
     }
 
     public function store(Request $request) {

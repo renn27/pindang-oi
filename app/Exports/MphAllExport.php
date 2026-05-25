@@ -46,7 +46,7 @@ class MphAllExport implements FromCollection, WithHeadings, WithMapping, ShouldA
                             'nama_ketua'     => $namaKetua,
                             'sub_kegiatan'   => $sub->nama_sub_kegiatan,
                             'nama_pegawai'   => $p->anggota->nama_pegawai ?? '-',
-                            'jenis_kegiatan' => $p->jenisKegiatan->jenis_kegiatan ?? '-',
+                            'jenis_kegiatan' => $p->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri',
                             'target'         => $p->target,
                             'satuan'         => $p->satuan_target,
                         ]);

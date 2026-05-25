@@ -24,7 +24,7 @@ class MasterKegiatanController extends Controller
     public function index()
     {
         // Data referensi untuk dropdown modal
-        $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
+        $pegawais = Pegawai::active()->orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
         $rkJpts = RencanaJPT::orderBy('nama_rencana_jpt')->get(['id', 'nama_rencana_jpt']);
         $jenisKegiatans = JenisKegiatan::query()
             ->orderByRaw("
@@ -39,6 +39,7 @@ class MasterKegiatanController extends Controller
         $ketuaTims = Pegawai::join('pegawai_role', 'pegawais.id_pegawai', '=', 'pegawai_role.pegawai_id')
             ->join('roles', 'pegawai_role.role_id', '=', 'roles.id')
             ->where('roles.nama_role', 'Ketua Tim')
+            ->where('pegawais.is_active', true)
             ->orderBy('pegawais.nama_pegawai')
             ->get([
                 'pegawais.id_pegawai',
@@ -90,7 +91,10 @@ class MasterKegiatanController extends Controller
                 'nama_rk_kegiatan' => ['required', 'string'],
                 'rk_jpt' => ['required', 'exists:rencana_jpts,id'],
                 'iki_jpt' => ['required'],
-                'id_penanggung_jawab' => ['required', 'exists:pegawais,id_pegawai'],
+                'id_penanggung_jawab' => [
+                    'required',
+                    Rule::exists('pegawais', 'id_pegawai')->where('is_active', true),
+                ],
                 'tahun_kegiatan' => ['required', 'digits:4'],
 
                 'rk_anggota' => ['required', 'array', 'min:1'],
@@ -103,7 +107,10 @@ class MasterKegiatanController extends Controller
 
                 'detail_id_anggota' => ['required', 'array'],
                 'detail_id_anggota.*' => ['array'],
-                'detail_id_anggota.*.*' => ['required', 'exists:pegawais,id_pegawai'],
+                'detail_id_anggota.*.*' => [
+                    'required',
+                    Rule::exists('pegawais', 'id_pegawai')->where('is_active', true),
+                ],
 
                 'detail_id_jenis_kegiatan' => ['required', 'array'],
                 'detail_id_jenis_kegiatan.*.*' => ['required'],

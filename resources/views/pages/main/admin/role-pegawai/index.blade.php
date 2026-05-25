@@ -3,6 +3,14 @@
 @section('content')
     <x-common.page-breadcrumb pageTitle="{{ $title }}" />
 
+    <div class="mb-5 flex justify-end">
+        <button type="button"
+            @click="$dispatch('open-smart-modal', { modalId: 'modal-create-pegawai' })"
+            class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700">
+            Tambah Pegawai
+        </button>
+    </div>
+
     <div class="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -15,17 +23,23 @@
                             Nama Pegawai
                         </th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                            Username
+                        </th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
                             Role
                         </th>
-                        <th class="px-4 py-3 w-32 text-center text-xs font-semibold text-gray-500 uppercase dark:text-gray-400">
-                            Edit Role
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase dark:text-gray-400">
+                            Status
+                        </th>
+                        <th class="px-4 py-3 w-64 text-center text-xs font-semibold text-gray-500 uppercase dark:text-gray-400">
+                            Aksi
                         </th>
                     </tr>
                 </thead>
 
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                     @foreach ($pegawais as $i => $pegawai)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition {{ $pegawai->is_active ? '' : 'opacity-70' }}">
                             <td class="px-4 py-3 text-center text-sm text-gray-700 dark:text-gray-300">
                                 {{ $i + 1 }}
                             </td>
@@ -39,6 +53,10 @@
                                         {{ $pegawai->jabatan }}
                                     </span>
                                 </div>
+                            </td>
+
+                            <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                                {{ $pegawai->username }}
                             </td>
 
                             <td class="px-4 py-3">
@@ -78,25 +96,43 @@
                                 </div>
                             </td>
                             <td class="px-4 py-3 text-center">
-                                <button
-                                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white hover:border-brand-400 hover:text-brand-600 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:border-brand-500 dark:hover:text-brand-400"
-                                    @click="$dispatch('open-smart-modal', {
-                                        modalId: 'modal-assign-role',
-                                        mode: 'edit',
-                                        key: '{{ $pegawai->id_pegawai }}',
-                                        data: {
-                                            id_pegawai: '{{ $pegawai->id_pegawai }}',
-                                            nama_pegawai: '{{ $pegawai->nama_pegawai }}',
-                                            roles: @js($pegawai->roles->pluck('id'))
-                                        }
-                                    })">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                        </path>
-                                    </svg>
-                                    Edit
-                                </button>
+                                @if ($pegawai->is_active)
+                                    <span class="inline-flex rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700 dark:border-green-800 dark:bg-green-900/30 dark:text-green-300">
+                                        Aktif
+                                    </span>
+                                @else
+                                    <span class="inline-flex rounded-full border border-gray-300 bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+                                        Nonaktif
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                <div class="flex justify-center gap-2">
+                                    <button
+                                        class="inline-flex items-center rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white hover:border-brand-400 hover:text-brand-600 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"
+                                        @click="$dispatch('open-smart-modal', {
+                                            modalId: 'modal-assign-role',
+                                            mode: 'edit',
+                                            key: '{{ $pegawai->id_pegawai }}',
+                                            data: {
+                                                id_pegawai: '{{ $pegawai->id_pegawai }}',
+                                                nama_pegawai: '{{ $pegawai->nama_pegawai }}',
+                                                roles: @js($pegawai->roles->pluck('id'))
+                                            }
+                                        })">
+                                        Edit Role
+                                    </button>
+
+                                    <form method="POST" action="{{ route('pegawai-role.toggle-active', $pegawai->id_pegawai) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit"
+                                            @disabled($pegawai->is_active && $pegawai->id_pegawai === auth()->user()->id_pegawai)
+                                            class="inline-flex items-center rounded-lg border px-3 py-1.5 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50 {{ $pegawai->is_active ? 'border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-300' : 'border-green-200 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-300' }}">
+                                            {{ $pegawai->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
@@ -104,6 +140,82 @@
             </table>
         </div>
     </div>
+
+    <x-ui.smart-modal id="modal-create-pegawai" class="max-w-2xl">
+        <div class="shrink-0 border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+            <h4 class="text-xl font-semibold text-gray-800 dark:text-white">Tambah Pegawai</h4>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Buat akun pegawai dan tentukan role awalnya.</p>
+        </div>
+
+        <div class="flex-1 overflow-y-auto max-h-[calc(100vh-180px)]">
+            <form action="{{ route('pegawai-role.pegawai-store') }}" method="POST" class="space-y-5 px-6 py-5">
+                @csrf
+
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div class="sm:col-span-2">
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Pegawai</label>
+                        <input type="text" name="nama_pegawai" value="{{ old('nama_pegawai') }}" required
+                            class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
+                        <input type="text" name="username" value="{{ old('username') }}" required
+                            class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                        <input type="email" name="email" value="{{ old('email') }}"
+                            class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Jabatan</label>
+                        <input type="text" name="jabatan" value="{{ old('jabatan') }}"
+                            class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Alamat</label>
+                        <input type="text" name="alamat" value="{{ old('alamat') }}"
+                            class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                        <input type="password" name="password" required
+                            class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Konfirmasi Password</label>
+                        <input type="password" name="password_confirmation" required
+                            class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">Role Pegawai</label>
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        @foreach ($roles as $role)
+                            <label class="flex items-center gap-3 rounded-lg border border-gray-200 px-4 py-3 dark:border-gray-700">
+                                <input type="checkbox" name="roles[]" value="{{ $role->id }}"
+                                    @checked(in_array($role->id, old('roles', [])))
+                                    class="h-5 w-5 rounded border-gray-300 text-blue-600">
+                                <span class="text-sm font-medium text-gray-800 dark:text-gray-300">{{ $role->nama_role }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 border-t border-gray-200 pt-5 dark:border-gray-700">
+                    <button type="button" @click="open=false"
+                        class="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 dark:border-gray-600 dark:text-gray-300">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700">
+                        Simpan Pegawai
+                    </button>
+                </div>
+            </form>
+        </div>
+    </x-ui.smart-modal>
 
     <x-ui.smart-modal id="modal-assign-role" class="max-w-xl"
         @open-smart-modal.window="

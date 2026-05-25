@@ -56,11 +56,12 @@ class KegiatanController extends Controller
         // $subKegiatans = $kegiatans->flatMap->subKegiatans;
 
         // Data referensi untuk dropdown modal
-        $pegawais = Pegawai::orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
+        $pegawais = Pegawai::active()->orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
         $rkJpts   = RencanaJPT::orderBy('nama_rencana_jpt')->get(['id', 'nama_rencana_jpt']);
         $ketuaTims = Pegawai::join('pegawai_role', 'pegawais.id_pegawai', '=', 'pegawai_role.pegawai_id')
             ->join('roles', 'pegawai_role.role_id', '=', 'roles.id')
             ->where('roles.nama_role', 'Ketua Tim')
+            ->where('pegawais.is_active', true)
             ->orderBy('pegawais.nama_pegawai')
             ->get([
                 'pegawais.id_pegawai',
@@ -99,7 +100,10 @@ class KegiatanController extends Controller
                 Rule::exists('indikator_jpts', 'id')
                     ->where('id_rencana_jpt', $request->rk_jpt),
             ],
-            'id_penanggung_jawab' => ['required', 'exists:pegawais,id_pegawai',],
+            'id_penanggung_jawab' => [
+                'required',
+                Rule::exists('pegawais', 'id_pegawai')->where('is_active', true),
+            ],
             'tahun_kegiatan' => ['required'],
         ]);
 
@@ -134,6 +138,10 @@ class KegiatanController extends Controller
             ]);
         }
 
+        $penanggungJawabRule = (string) $request->id_penanggung_jawab === (string) $kegiatan->id_penanggung_jawab
+            ? Rule::exists('pegawais', 'id_pegawai')
+            : Rule::exists('pegawais', 'id_pegawai')->where('is_active', true);
+
         // ✅ Validasi
         $validated = $request->validate([
             'nama_rk_kegiatan' => ['required', 'string', 'max:255'],
@@ -143,7 +151,7 @@ class KegiatanController extends Controller
                 Rule::exists('indikator_jpts', 'id')
                     ->where('id_rencana_jpt', $request->rk_jpt),
             ],
-            'id_penanggung_jawab' => ['required', 'exists:pegawais,id_pegawai'],
+            'id_penanggung_jawab' => ['required', $penanggungJawabRule],
             'tahun_kegiatan' => ['required'],
         ]);
 

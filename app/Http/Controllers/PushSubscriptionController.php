@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Notifications\GenericWebPushNotification;
+use App\Services\TodoReminderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
@@ -32,9 +33,14 @@ class PushSubscriptionController extends Controller
             $validated['contentEncoding'] ?? 'aes128gcm'
         );
 
+        if (is_null($request->user()->todo_reminder_enabled)) {
+            $request->user()->update(['todo_reminder_enabled' => true]);
+        }
+
         return response()->json([
             'success' => true,
             'subscription_count' => $request->user()->pushSubscriptions()->count(),
+            'todo_reminder_enabled' => (bool) $request->user()->todo_reminder_enabled,
         ]);
     }
 
@@ -84,4 +90,50 @@ class PushSubscriptionController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function todoReminderPreference(Request $request): JsonResponse
+    {
+        if (is_null($request->user()->todo_reminder_enabled)
+            && $request->user()->pushSubscriptions()->exists()) {
+            $request->user()->update(['todo_reminder_enabled' => true]);
+        }
+
+        return response()->json([
+            'enabled' => (bool) $request->user()->todo_reminder_enabled,
+        ]);
+    }
+
+    public function updateTodoReminderPreference(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'enabled' => ['required', 'boolean'],
+        ]);
+
+        $request->user()->update([
+            'todo_reminder_enabled' => $validated['enabled'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'enabled' => (bool) $request->user()->todo_reminder_enabled,
+        ]);
+    }
+
+    public function testTodoReminder(Request $request, TodoReminderService $reminders): JsonResponse
+    {
+        $sent = $reminders->sendTestReminder($request->user());
+
+        if ($sent === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda belum memiliki konteks To Do List Anggota Tim atau Ketua Tim.',
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'sent' => $sent,
+        ]);
+    }
+
 }

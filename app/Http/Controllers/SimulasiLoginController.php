@@ -10,7 +10,7 @@ class SimulasiLoginController extends Controller
 {
     public function loginAs($username)
     {
-        $pegawai = Pegawai::where('username', $username)->firstOrFail();
+        $pegawai = Pegawai::active()->where('username', $username)->firstOrFail();
         Auth::login($pegawai); // login userp
         session()->regenerate(); // regenerasi session supaya aman
         return redirect()->route('dashboard');

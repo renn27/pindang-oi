@@ -1,4 +1,5 @@
 const PUSH_BUTTON_ID = 'pushNotificationToggle';
+const TODO_REMINDER_BUTTON_ID = 'todoReminderToggle';
 const POLL_INTERVAL_MS = 15000;
 const SHOWN_STORAGE_KEY = 'pindang_oi_shown_local_notification_ids';
 let latestNotificationPollStarted = false;
@@ -54,6 +55,27 @@ function setButtonState(button, enabled, title) {
     window.dispatchEvent(new CustomEvent('push-status-updated', {
         detail: { enabled, title },
     }));
+}
+
+function setTodoReminderState(button, enabled, statusText) {
+    const thumb = button.querySelector('[data-todo-reminder-toggle-thumb]');
+    const status = document.querySelector('[data-todo-reminder-status]');
+
+    button.dataset.enabled = enabled ? 'true' : 'false';
+    button.title = enabled ? 'Nonaktifkan pengingat To Do List' : 'Aktifkan pengingat To Do List';
+    button.setAttribute('aria-label', button.title);
+    button.classList.toggle('bg-brand-500', enabled);
+    button.classList.toggle('bg-gray-300', !enabled);
+    button.classList.toggle('dark:bg-gray-700', !enabled);
+
+    if (thumb) {
+        thumb.classList.toggle('translate-x-5', enabled);
+        thumb.classList.toggle('translate-x-0.5', !enabled);
+    }
+
+    if (status) {
+        status.textContent = statusText;
+    }
 }
 
 async function getVapidPublicKey() {
@@ -123,6 +145,43 @@ async function sendTest(button) {
     });
 
     setButtonState(button, button.dataset.enabled === 'true', 'Tes push dikirim dari server');
+}
+
+async function hydrateTodoReminder(button) {
+    const response = await window.axios.get('/push-notifications/todo-reminder');
+    const enabled = Boolean(response.data.enabled);
+
+    setTodoReminderState(
+        button,
+        enabled,
+        enabled
+            ? 'Aktif: harian 08:30 & 15:00, rekap tgl 1 08:00 WIB.'
+            : 'Nonaktif: tidak menerima pengingat To Do List terjadwal.'
+    );
+}
+
+async function toggleTodoReminder(button) {
+    const enabled = button.dataset.enabled !== 'true';
+    const response = await window.axios.patch('/push-notifications/todo-reminder', { enabled });
+
+    setTodoReminderState(
+        button,
+        Boolean(response.data.enabled),
+        response.data.enabled
+            ? 'Aktif: harian 08:30 & 15:00, rekap tgl 1 08:00 WIB.'
+            : 'Nonaktif: tidak menerima pengingat To Do List terjadwal.'
+    );
+}
+
+async function sendTodoReminderTest(button) {
+    const response = await window.axios.post('/push-notifications/todo-reminder/test');
+    const sent = Number(response.data.sent || 0);
+
+    setTodoReminderState(
+        button,
+        button.dataset.enabled === 'true',
+        `Tes pengingat dikirim untuk ${sent} konteks To Do List.`
+    );
 }
 
 function shownNotificationIds() {
@@ -243,6 +302,8 @@ async function hydrateButton(button) {
 export function initPushNotifications() {
     const button = document.getElementById(PUSH_BUTTON_ID);
     const testButton = document.querySelector('[data-push-test]');
+    const todoReminderButton = document.getElementById(TODO_REMINDER_BUTTON_ID);
+    const todoReminderTestButton = document.querySelector('[data-todo-reminder-test]');
 
     if (!button || !window.axios) {
         return;
@@ -250,9 +311,20 @@ export function initPushNotifications() {
 
     listenForServiceWorkerNotifications();
 
-    hydrateButton(button).catch(() => {
-        setButtonState(button, false, 'Notifikasi browser belum siap');
-    });
+    hydrateButton(button)
+        .then(() => {
+            if (todoReminderButton) {
+                return hydrateTodoReminder(todoReminderButton);
+            }
+
+            return null;
+        })
+        .catch(() => {
+            setButtonState(button, false, 'Notifikasi browser belum siap');
+            if (todoReminderButton) {
+                setTodoReminderState(todoReminderButton, false, 'Pengaturan pengingat belum dapat dimuat.');
+            }
+        });
 
     button.addEventListener('click', async () => {
         button.disabled = true;
@@ -297,4 +369,44 @@ export function initPushNotifications() {
             }
         });
     }
+
+    if (todoReminderButton) {
+        todoReminderButton.addEventListener('click', async () => {
+            todoReminderButton.disabled = true;
+
+            try {
+                await toggleTodoReminder(todoReminderButton);
+            } catch (error) {
+                setTodoReminderState(
+                    todoReminderButton,
+                    todoReminderButton.dataset.enabled === 'true',
+                    'Gagal menyimpan pengaturan pengingat To Do List.'
+                );
+                console.error('Todo reminder toggle failed:', error);
+            } finally {
+                todoReminderButton.disabled = false;
+            }
+        });
+    }
+
+    if (todoReminderTestButton && todoReminderButton) {
+        todoReminderTestButton.addEventListener('click', async () => {
+            todoReminderTestButton.disabled = true;
+
+            try {
+                await sendTodoReminderTest(todoReminderButton);
+            } catch (error) {
+                const message = error?.response?.data?.message || 'Tes pengingat To Do List gagal.';
+                setTodoReminderState(
+                    todoReminderButton,
+                    todoReminderButton.dataset.enabled === 'true',
+                    message
+                );
+                console.error('Todo reminder test failed:', error);
+            } finally {
+                todoReminderTestButton.disabled = false;
+            }
+        });
+    }
+
 }

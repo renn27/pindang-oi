@@ -238,7 +238,7 @@
                                     
                                     // Data penugasan untuk modal
                                     $penugasanData = $ckp->penugasan ? [
-                                        'jenis_kegiatan' => $ckp->penugasan->jenisKegiatan->jenis_kegiatan ?? '-',
+                                        'jenis_kegiatan' => $ckp->penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri',
                                         'target' => $ckp->penugasan->target,
                                         'satuan_target' => $ckp->penugasan->satuan_target,
                                         'tanggal_mulai' => optional($ckp->penugasan->tanggal_mulai)->translatedFormat('d M Y'),
@@ -406,7 +406,7 @@
                                     
                                     // Data penugasan untuk modal
                                     $penugasanData = $ckp->penugasan ? [
-                                        'jenis_kegiatan' => $ckp->penugasan->jenisKegiatan->jenis_kegiatan ?? '-',
+                                        'jenis_kegiatan' => $ckp->penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri',
                                         'target' => $ckp->penugasan->target,
                                         'satuan_target' => $ckp->penugasan->satuan_target,
                                         'tanggal_mulai' => optional($ckp->penugasan->tanggal_mulai)->translatedFormat('d M Y'),

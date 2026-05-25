@@ -27,11 +27,23 @@ class Pegawai extends Authenticatable
         'jabatan',
         'photo',
         'active_role',
+        'is_active',
+        'todo_reminder_enabled',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'todo_reminder_enabled' => 'boolean',
     ];
 
     protected $hidden = [
         'password',
     ];
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 
     public function isSuperUser(): bool
     {

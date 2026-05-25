@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Auth;
 
 // ROUTE DASHBOARD VISUALISASI DATA
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'active.pegawai'])->group(function () {
     Route::get('/', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -42,6 +42,12 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/role-pegawai', [PegawaiRoleController::class, 'store'])
         ->name('pegawai-role.store');
+
+    Route::post('/role-pegawai/tambah', [PegawaiRoleController::class, 'storePegawai'])
+        ->name('pegawai-role.pegawai-store');
+
+    Route::patch('/role-pegawai/{pegawai:id_pegawai}/status', [PegawaiRoleController::class, 'toggleActive'])
+        ->name('pegawai-role.toggle-active');
 
     Route::post('/role-pegawai/{pegawais:id_pegawai}', [PegawaiRoleController::class, 'update'])
         ->name('pegawai-role.update');
@@ -129,6 +135,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/subscribe', [PushSubscriptionController::class, 'store'])->name('subscribe');
         Route::delete('/subscribe', [PushSubscriptionController::class, 'destroy'])->name('unsubscribe');
         Route::post('/test', [PushSubscriptionController::class, 'test'])->name('test');
+        Route::get('/todo-reminder', [PushSubscriptionController::class, 'todoReminderPreference'])->name('todo-reminder.preference');
+        Route::patch('/todo-reminder', [PushSubscriptionController::class, 'updateTodoReminderPreference'])->name('todo-reminder.update');
+        Route::post('/todo-reminder/test', [PushSubscriptionController::class, 'testTodoReminder'])->name('todo-reminder.test');
     });
 
     Route::prefix('notifications')->name('notifications.')->group(function () {

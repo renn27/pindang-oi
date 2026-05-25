@@ -17,7 +17,7 @@ class PushNotificationService
 {
     public function notifyAnnouncementCreated(string $title): void
     {
-        $pegawais = Pegawai::query()->get();
+        $pegawais = Pegawai::active()->get();
 
         $this->notifyMany(
             $pegawais,
@@ -31,7 +31,7 @@ class PushNotificationService
 
     public function notifyAnnouncementReactivated(string $title): void
     {
-        $pegawais = Pegawai::query()->get();
+        $pegawais = Pegawai::active()->get();
 
         $this->notifyMany(
             $pegawais,
@@ -248,7 +248,7 @@ class PushNotificationService
 
     public function notifyPegawai(?Pegawai $pegawai, string $title, string $body, string $url, string $tag, string $roleContext = 'umum'): void
     {
-        if (!$pegawai) {
+        if (!$pegawai || ! $pegawai->is_active) {
             return;
         }
 
@@ -257,7 +257,7 @@ class PushNotificationService
 
     public function notifyRole(string $roleName, string $title, string $body, string $url, string $tag, string $roleContext = 'umum'): void
     {
-        $pegawais = Pegawai::whereHas('roles', function ($query) use ($roleName) {
+        $pegawais = Pegawai::active()->whereHas('roles', function ($query) use ($roleName) {
             $query->where('nama_role', $roleName);
         })->get();
 
@@ -268,7 +268,7 @@ class PushNotificationService
     {
         $dispatchId = (string) Str::uuid();
         $recipients = $pegawais
-            ->filter(fn ($pegawai) => $pegawai instanceof Pegawai)
+            ->filter(fn ($pegawai) => $pegawai instanceof Pegawai && $pegawai->is_active)
             ->unique('id_pegawai')
             ->values();
 

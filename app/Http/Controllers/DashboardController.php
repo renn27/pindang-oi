@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Penugasan;
 use App\Services\DashboardAnalyticsService;
+use App\Services\TodoListService;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request, DashboardAnalyticsService $analytics)
+    public function index(Request $request, DashboardAnalyticsService $analytics, TodoListService $todoList)
     {
         $user = auth()->user();
         $rankPegawaiPerPageOptions = [5, 10, 25, 50];
@@ -19,73 +19,25 @@ class DashboardController extends Controller
         $unfinishedTerlewatAsAnggota = null;
         $unfinishedBerjalanAsAnggota = null;
         if ($user && $user->isAnggotaTim()) {
-            $baseQuery = Penugasan::with(['subKegiatan.kegiatan.bidang', 'jenisKegiatan', 'anggota', 'kalenderDLs', 'pengirimans.penerimaan'])
-                ->where('id_anggota', $user->id_pegawai)
-                ->whereDoesntHave('pengirimans.penerimaan', function ($q) {
-                    $q->where('status', 'Diterima');
-                });
-                
-            $unfinishedTerlewatAsAnggota = (clone $baseQuery)
-                ->where('tanggal_selesai', '<', now()->format('Y-m-d'))
-                ->orderBy('tanggal_selesai', 'asc')
+            $unfinishedTerlewatAsAnggota = $todoList->terlewatAsAnggota($user)
                 ->paginate(5, ['*'], 'anggota_terlewat_page');
 
-            $unfinishedBerjalanAsAnggota = (clone $baseQuery)
-                ->where('tanggal_selesai', '>=', now()->format('Y-m-d'))
-                ->orderBy('tanggal_selesai', 'asc')
+            $unfinishedBerjalanAsAnggota = $todoList->berjalanAsAnggota($user)
                 ->paginate(5, ['*'], 'anggota_berjalan_page');
 
-            // Penugasan yang pengiriman terbarunya sudah ada penerimaan berstatus 'Revisi'
-            // (belum kirim ulang setelah revisi)
-            $revisiAsAnggota = Penugasan::with(['subKegiatan.kegiatan.bidang', 'jenisKegiatan', 'anggota', 'latestPengiriman.penerimaan', 'kalenderDLs', 'pengirimans.penerimaan'])
-                ->where('id_anggota', $user->id_pegawai)
-                ->whereHas('pengirimans.penerimaan', function ($q) {
-                    $q->where('status', 'Revisi');
-                })
-                ->whereDoesntHave('pengirimans.penerimaan', function ($q) {
-                    $q->where('status', 'Diterima');
-                })
-                ->get()
-                ->filter(function ($penugasan) {
-                    // Pastikan pengiriman TERAKHIR memiliki penerimaan berstatus Revisi
-                    // (bukan pengiriman ulang yang belum direspons)
-                    $latest = $penugasan->latestPengiriman;
-                    return $latest && $latest->penerimaan && $latest->penerimaan->status === 'Revisi';
-                });
+            $revisiAsAnggota = $todoList->revisiAsAnggota($user);
         }
 
         $unfinishedTerlewatAsKetua = null;
         $unfinishedBerjalanAsKetua = null;
         if ($user && $user->isKetuaTim()) {
-            $baseQueryKetua = \App\Models\Penugasan::with(['subKegiatan.kegiatan.bidang', 'jenisKegiatan', 'anggota', 'kalenderDLs', 'pengirimans.penerimaan'])
-                ->whereHas('subKegiatan.kegiatan', function ($q) use ($user) {
-                    $q->where('id_penanggung_jawab', $user->id_pegawai);
-                })
-                ->whereDoesntHave('pengirimans.penerimaan', function ($q) {
-                    $q->where('status', 'Diterima');
-                });
-
-            $unfinishedTerlewatAsKetua = (clone $baseQueryKetua)
-                ->where('tanggal_selesai', '<', now()->format('Y-m-d'))
-                ->orderBy('tanggal_selesai', 'asc')
+            $unfinishedTerlewatAsKetua = $todoList->terlewatAsKetua($user)
                 ->paginate(5, ['*'], 'ketua_terlewat_page');
 
-            $unfinishedBerjalanAsKetua = (clone $baseQueryKetua)
-                ->where('tanggal_selesai', '>=', now()->format('Y-m-d'))
-                ->orderBy('tanggal_selesai', 'asc')
+            $unfinishedBerjalanAsKetua = $todoList->berjalanAsKetua($user)
                 ->paginate(5, ['*'], 'ketua_berjalan_page');
 
-            // Penugasan DL / Translok milik anggota tim yg ditolak (Revisi) oleh Pimpinan
-            $revisiDlAsKetua = Penugasan::with(['subKegiatan.kegiatan.bidang', 'jenisKegiatan', 'anggota', 'kalenderDLs', 'pengirimans.penerimaan'])
-                ->whereHas('subKegiatan.kegiatan', function ($q) use ($user) {
-                    $q->where('id_penanggung_jawab', $user->id_pegawai);
-                })
-                ->where(function ($q) {
-                    $q->where('status_dl', 'Ditolak')
-                      ->orWhere('status_translok', 'Ditolak');
-                })
-                ->orderBy('tanggal_selesai', 'asc')
-                ->get();
+            $revisiDlAsKetua = $todoList->revisiAsKetua($user);
         }
 
         $selectedMonth = request('month', now()->month);

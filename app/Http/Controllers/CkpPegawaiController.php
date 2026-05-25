@@ -77,6 +77,8 @@ class CkpPegawaiController extends Controller
      */
     public function storeFromPenugasan(Request $request, Penugasan $penugasan)
     {
+        $this->authorize('setAsCKP', $penugasan);
+
         $request->validate([
             'uraian' => 'required|string',
             'bulan_ckp' => 'required|string|size:7', // format "2026-01"
