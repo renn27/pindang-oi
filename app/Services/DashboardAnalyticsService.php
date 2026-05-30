@@ -29,7 +29,8 @@ class DashboardAnalyticsService {
             });
         };
 
-        $pegawai = Pegawai::withCount([
+        $pegawai = Pegawai::activeInMonth((int) $bulan, (int) $tahun)
+        ->withCount([
             // 1. Jumlah penugasan (COUNT baris penugasan)
             'penugasanSebagaiAnggota as total_penugasan' => function ($q) use ($som, $eom, $excludeCompletedBefore) {
                 $q->where('tanggal_mulai', '<=', $eom)
@@ -120,10 +121,17 @@ class DashboardAnalyticsService {
 
     private function getGlobalStats(string $bf, Carbon $startOfMonth, Carbon $endOfMonth): array
     {
+        $inactiveCutoff = $startOfMonth->toDateString();
+
         // Filter penugasan yang aktif/berlangsung di bulan target menggunakan range tanggal
         // (lebih efisien dari YEAR()*12+MONTH() karena index kolom dapat dipakai)
         $r  = \DB::table('penugasans')
-            ->whereNull('deleted_at')
+            ->join('pegawais', 'pegawais.id_pegawai', '=', 'penugasans.id_anggota')
+            ->whereNull('penugasans.deleted_at')
+            ->where(function ($query) use ($inactiveCutoff) {
+                $query->whereNull('pegawais.inactive_from_month')
+                    ->orWhere('pegawais.inactive_from_month', '>', $inactiveCutoff);
+            })
             ->where('tanggal_mulai', '<=', $endOfMonth->toDateString())
             ->where('tanggal_selesai', '>=', $startOfMonth->toDateString())
             ->whereNotExists(function ($query) use ($bf) {
@@ -203,6 +211,10 @@ class DashboardAnalyticsService {
         $eom = $endOfMonth->toDateString();
 
         $inner = \DB::table('pegawais')
+            ->where(function ($query) use ($som) {
+                $query->whereNull('pegawais.inactive_from_month')
+                    ->orWhere('pegawais.inactive_from_month', '>', $som);
+            })
             ->leftJoin('penugasans', function($join) use ($som, $eom, $bf) {
                 $join->on('pegawais.id_pegawai', '=', 'penugasans.id_anggota')
                      ->whereNull('penugasans.deleted_at')

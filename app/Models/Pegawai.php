@@ -28,11 +28,13 @@ class Pegawai extends Authenticatable
         'photo',
         'active_role',
         'is_active',
+        'inactive_from_month',
         'todo_reminder_enabled',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'inactive_from_month' => 'date',
         'todo_reminder_enabled' => 'boolean',
     ];
 
@@ -43,6 +45,16 @@ class Pegawai extends Authenticatable
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function scopeActiveInMonth($query, int $month, int $year)
+    {
+        $period = sprintf('%04d-%02d-01', $year, $month);
+
+        return $query->where(function ($q) use ($period) {
+            $q->whereNull('inactive_from_month')
+                ->orWhere('inactive_from_month', '>', $period);
+        });
     }
 
     public function isSuperUser(): bool

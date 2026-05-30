@@ -129,8 +129,8 @@
             <!-- Left Side: Rekap Penugasan Anda -->
             <div class="lg:col-span-7 h-full rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 flex flex-col">
                 <div class="flex flex-1 flex-col">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-brand-600 dark:border-gray-800 dark:bg-gray-900 dark:text-brand-400">
+                    <div class="mb-4 flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-blue-100 bg-blue-50 text-blue-600 dark:border-blue-900/40 dark:bg-blue-900/20 dark:text-blue-300">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                             </svg>
@@ -142,83 +142,77 @@
                     </div>
 
                     <!-- 6 Mini Stats Grid -->
-                    <div class="grid flex-1 grid-cols-2 sm:grid-cols-3 gap-3 sm:auto-rows-fr">
+                    <div class="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-3 sm:auto-rows-fr">
                         <!-- Jml Penugasan -->
-                        <div class="min-h-[102px] rounded-2xl border border-gray-200 bg-white p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900 flex flex-col justify-between">
+                        <div class="rounded-xl border border-gray-100 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-800/45">
                             <div class="flex items-center justify-between gap-2">
-                                <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-[0.12em]">Jml. Penugasan</p>
-                                <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                <p class="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-[0.06em]">Jml. Penugasan</p>
+                                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5h6M9 9h6M9 13h4M6 3h12a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg>
                                 </span>
                             </div>
-                            <div>
-                                <p class="text-xl font-bold tracking-tight text-slate-800 dark:text-gray-100">{{ $myRekap->total_penugasan ?? 0 }}</p>
-                                <p class="text-[11px] text-slate-400 dark:text-gray-500">Total tugas periode ini</p>
+                            <div class="mt-8">
+                                <p class="text-2xl font-extrabold leading-none tracking-tight text-gray-800 dark:text-gray-100">{{ $myRekap->total_penugasan ?? 0 }}</p>
                             </div>
                         </div>
                         <!-- Total Target -->
-                        <div class="min-h-[102px] rounded-2xl border border-gray-200 bg-white p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900 flex flex-col justify-between">
+                        <div class="rounded-xl border border-gray-100 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-800/45">
                             <div class="flex items-center justify-between gap-2">
-                                <p class="text-[11px] font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-[0.12em]">Total Target</p>
-                                <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-900/25 dark:text-purple-300">
+                                <p class="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-[0.06em]">Total Target</p>
+                                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-50 text-purple-600 dark:bg-purple-900/25 dark:text-purple-300">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18m9-9H3"/></svg>
                                 </span>
                             </div>
-                            <div>
-                                <p class="text-xl font-bold tracking-tight text-purple-700 dark:text-purple-300">{{ $myRekap->total_target ?? 0 }}</p>
-                                <p class="text-[11px] text-slate-400 dark:text-gray-500">Akumulasi target</p>
+                            <div class="mt-8">
+                                <p class="text-2xl font-extrabold leading-none tracking-tight text-gray-800 dark:text-gray-100">{{ $myRekap->total_target ?? 0 }}</p>
                             </div>
                         </div>
                         <!-- Dikirim -->
-                        <div class="min-h-[102px] rounded-2xl border border-gray-200 bg-white p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900 flex flex-col justify-between">
+                        <div class="rounded-xl border border-gray-100 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-800/45">
                             <div class="flex items-center justify-between gap-2">
-                                <p class="text-[11px] font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-[0.12em]">Dikirim</p>
-                                <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-900/25 dark:text-blue-300">
+                                <p class="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-[0.06em]">Dikirim</p>
+                                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-900/25 dark:text-blue-300">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                                 </span>
                             </div>
-                            <div>
-                                <p class="text-xl font-bold tracking-tight text-blue-700 dark:text-blue-300">{{ $myRekap->total_dikirim ?? 0 }}</p>
-                                <p class="text-[11px] text-slate-400 dark:text-gray-500">Sudah dikirim</p>
+                            <div class="mt-8">
+                                <p class="text-2xl font-extrabold leading-none tracking-tight text-gray-800 dark:text-gray-100">{{ $myRekap->total_dikirim ?? 0 }}</p>
                             </div>
                         </div>
                         <!-- Diperiksa -->
-                        <div class="min-h-[102px] rounded-2xl border border-gray-200 bg-white p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900 flex flex-col justify-between">
+                        <div class="rounded-xl border border-gray-100 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-800/45">
                             <div class="flex items-center justify-between gap-2">
-                                <p class="text-[11px] font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-[0.12em]">Diperiksa</p>
-                                <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-900/25 dark:text-amber-300">
+                                <p class="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-[0.06em]">Diperiksa</p>
+                                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-900/25 dark:text-amber-300">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 </span>
                             </div>
-                            <div>
-                                <p class="text-xl font-bold tracking-tight text-amber-700 dark:text-amber-300">{{ $myRekap->total_diperiksa ?? 0 }}</p>
-                                <p class="text-[11px] text-slate-400 dark:text-gray-500">Dalam pemeriksaan</p>
+                            <div class="mt-8">
+                                <p class="text-2xl font-extrabold leading-none tracking-tight text-gray-800 dark:text-gray-100">{{ $myRekap->total_diperiksa ?? 0 }}</p>
                             </div>
                         </div>
                         <!-- Revisi -->
-                        <div class="min-h-[102px] rounded-2xl border border-gray-200 bg-white p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900 flex flex-col justify-between">
+                        <div class="rounded-xl border border-gray-100 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-800/45">
                             <div class="flex items-center justify-between gap-2">
-                                <p class="text-[11px] font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-[0.12em]">Revisi</p>
-                                <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-red-50 text-red-600 dark:bg-red-900/25 dark:text-red-300">
+                                <p class="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-[0.06em]">Revisi</p>
+                                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600 dark:bg-red-900/25 dark:text-red-300">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.3 4.3L2.5 18a2 2 0 001.7 3h15.6a2 2 0 001.7-3L13.7 4.3a2 2 0 00-3.4 0z"/></svg>
                                 </span>
                             </div>
-                            <div>
-                                <p class="text-xl font-bold tracking-tight text-red-700 dark:text-red-300">{{ $myRekap->total_revisi ?? 0 }}</p>
-                                <p class="text-[11px] text-slate-400 dark:text-gray-500">Perlu perbaikan</p>
+                            <div class="mt-8">
+                                <p class="text-2xl font-extrabold leading-none tracking-tight {{ ($myRekap->total_revisi ?? 0) > 0 ? 'text-red-700 dark:text-red-300' : 'text-gray-800 dark:text-gray-100' }}">{{ $myRekap->total_revisi ?? 0 }}</p>
                             </div>
                         </div>
                         <!-- Diterima -->
-                        <div class="min-h-[102px] rounded-2xl border border-gray-200 bg-white p-3.5 shadow-sm dark:border-gray-800 dark:bg-gray-900 flex flex-col justify-between">
+                        <div class="rounded-xl border border-gray-100 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-800/45">
                             <div class="flex items-center justify-between gap-2">
-                                <p class="text-[11px] font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-[0.12em]">Diterima</p>
-                                <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-50 text-green-600 dark:bg-green-900/25 dark:text-green-300">
+                                <p class="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-[0.06em]">Diterima</p>
+                                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-green-50 text-green-600 dark:bg-green-900/25 dark:text-green-300">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                 </span>
                             </div>
-                            <div>
-                                <p class="text-xl font-bold tracking-tight text-green-700 dark:text-green-300">{{ $myRekap->total_diterima ?? 0 }}</p>
-                                <p class="text-[11px] text-slate-400 dark:text-gray-500">Selesai diterima</p>
+                            <div class="mt-8">
+                                <p class="text-2xl font-extrabold leading-none tracking-tight text-gray-800 dark:text-gray-100">{{ $myRekap->total_diterima ?? 0 }}</p>
                             </div>
                         </div>
                     </div>
@@ -230,7 +224,7 @@
                 <div>
                     <div class="flex items-start justify-between gap-4 mb-4">
                         <div class="flex items-center gap-3">
-                            <div class="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-brand-600 dark:border-gray-800 dark:bg-gray-900 dark:text-brand-400">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-blue-100 bg-blue-50 text-blue-600 dark:border-blue-900/40 dark:bg-blue-900/20 dark:text-blue-300">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5a2 2 0 10-2 2h2zm0 0h4m-4 0H8m12 3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
@@ -245,17 +239,17 @@
                         @if ($myRank)
                             @php
                                 $rankColors = [
-                                    1 => 'from-yellow-400 to-amber-500 text-white shadow-amber-200/50',
-                                    2 => 'from-gray-300 to-gray-400 text-white shadow-gray-200/50',
-                                    3 => 'from-orange-400 to-amber-600 text-white shadow-orange-200/50',
+                                    1 => 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800/50 dark:bg-amber-900/20 dark:text-amber-300',
+                                    2 => 'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300',
+                                    3 => 'border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-800/50 dark:bg-orange-900/20 dark:text-orange-300',
                                 ];
-                                $badgeStyle = $rankColors[$myRank] ?? 'from-brand-500 to-indigo-600 text-white shadow-brand-200/50';
+                                $badgeStyle = $rankColors[$myRank] ?? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800/50 dark:bg-blue-900/20 dark:text-blue-300';
                             @endphp
                             <div class="flex min-h-10 flex-col items-end justify-center gap-1">
-                                <div class="inline-flex h-8 items-center rounded-full bg-gradient-to-r px-4 {{ $badgeStyle }} text-sm font-bold shadow-sm uppercase tracking-wider">
+                                <div class="inline-flex h-8 items-center rounded-full border px-3.5 {{ $badgeStyle }} text-sm font-bold uppercase tracking-wide">
                                     Rank #{{ $myRank }}
                                 </div>
-                                <span class="pr-1 text-[11px] leading-none text-gray-400">dari {{ $totalPegawaiRanked }} pegawai</span>
+                                <span class="pr-1 text-[11px] leading-none text-gray-500 dark:text-gray-400">dari {{ $totalPegawaiRanked }} pegawai</span>
                             </div>
                         @else
                             <span class="px-2.5 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-semibold dark:bg-gray-800 dark:text-gray-400">Belum Ada Rank</span>
@@ -264,10 +258,13 @@
 
                     @if ($myRankData)
                         <!-- Nilai Rata-rata & Stars -->
-                        <div class="mb-4 p-3.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex items-center justify-between">
+                        <div class="mb-4 rounded-xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-800/45 flex items-center justify-between">
                             <div>
-                                <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Nilai Akhir (Rata-rata)</span>
-                                <p class="text-2xl font-extrabold text-brand-600 dark:text-brand-400 mt-0.5">{{ number_format($myRankData->rata_rata ?? 0, 2) }}%</p>
+                                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Nilai Akhir (Rata-rata)</span>
+                                @php $score = (float) ($myRankData->rata_rata ?? 0); @endphp
+                                <p class="mt-0.5 text-2xl font-extrabold {{ $score <= 0 ? 'text-gray-700 dark:text-gray-200' : 'text-blue-600 dark:text-blue-400' }}">
+                                    {{ number_format($score, 2) }}%
+                                </p>
                             </div>
                             <div class="flex flex-col items-end">
                                 <!-- Rating Stars -->
@@ -299,22 +296,22 @@
                         </div>
 
                         <!-- Detail Nilai Komponen -->
-                            <div class="grid grid-cols-2 gap-x-4 gap-y-2 mb-3">
-                            <div class="flex justify-between items-center text-xs py-1 border-b border-gray-100 dark:border-gray-800">
-                                <span class="text-gray-500">RR Kirim</span>
-                                <span class="font-bold text-gray-800 dark:text-gray-200">{{ number_format($myRankData->rr_kirim ?? 0, 2) }}%</span>
+                        <div class="mb-4 grid grid-cols-2 gap-2">
+                            <div class="rounded-lg border border-gray-100 bg-white px-3 py-2.5 dark:border-gray-800 dark:bg-gray-900">
+                                <span class="block text-[11px] font-medium text-gray-500 dark:text-gray-400">RR Kirim</span>
+                                <span class="mt-1 block text-sm font-bold text-gray-800 dark:text-gray-200">{{ number_format($myRankData->rr_kirim ?? 0, 2) }}%</span>
                             </div>
-                            <div class="flex justify-between items-center text-xs py-1 border-b border-gray-100 dark:border-gray-800">
-                                <span class="text-gray-500">Rating %</span>
-                                <span class="font-bold text-gray-800 dark:text-gray-200">{{ number_format($myRankData->rating_persen ?? 0, 2) }}%</span>
+                            <div class="rounded-lg border border-gray-100 bg-white px-3 py-2.5 dark:border-gray-800 dark:bg-gray-900">
+                                <span class="block text-[11px] font-medium text-gray-500 dark:text-gray-400">Rating %</span>
+                                <span class="mt-1 block text-sm font-bold text-gray-800 dark:text-gray-200">{{ number_format($myRankData->rating_persen ?? 0, 2) }}%</span>
                             </div>
-                            <div class="flex justify-between items-center text-xs py-1 border-b border-gray-100 dark:border-gray-800">
-                                <span class="text-gray-500">Skor Cepat</span>
-                                <span class="font-bold text-gray-800 dark:text-gray-200">{{ number_format($myRankData->avg_skor_cepat ?? 0, 2) }}%</span>
+                            <div class="rounded-lg border border-gray-100 bg-white px-3 py-2.5 dark:border-gray-800 dark:bg-gray-900">
+                                <span class="block text-[11px] font-medium text-gray-500 dark:text-gray-400">Skor Cepat</span>
+                                <span class="mt-1 block text-sm font-bold text-gray-800 dark:text-gray-200">{{ number_format($myRankData->avg_skor_cepat ?? 0, 2) }}%</span>
                             </div>
-                            <div class="flex justify-between items-center text-xs py-1 border-b border-gray-100 dark:border-gray-800">
-                                <span class="text-gray-500">Koef. Beban</span>
-                                <span class="font-bold text-gray-800 dark:text-gray-200">{{ number_format($myRankData->koefisien_beban ?? 1.0, 4) }}</span>
+                            <div class="rounded-lg border border-gray-100 bg-white px-3 py-2.5 dark:border-gray-800 dark:bg-gray-900">
+                                <span class="block text-[11px] font-medium text-gray-500 dark:text-gray-400">Koef. Beban</span>
+                                <span class="mt-1 block text-sm font-bold text-gray-800 dark:text-gray-200">{{ number_format($myRankData->koefisien_beban ?? 1.0, 4) }}</span>
                             </div>
                         </div>
                     @else
@@ -338,7 +335,7 @@
                             details: {{ Js::from($myRankData->details ?? []) }},
                             breakdown: {{ Js::from($myRankData->breakdown_formula ?? null) }}
                         })"
-                        class="w-full mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-brand-500/25 hover:bg-brand-700 hover:shadow-brand-600/35 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 transition-all duration-200 cursor-pointer dark:bg-brand-600 dark:text-white dark:hover:bg-brand-500 dark:shadow-brand-900/30 dark:focus:ring-offset-gray-900"
+                        class="w-full mt-1 inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors cursor-pointer dark:bg-blue-600 dark:text-white dark:hover:bg-blue-500 dark:focus:ring-offset-gray-900"
                     >
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -613,16 +610,9 @@
         @if ($bestEmployee)
             {{-- ===== BEST EMPLOYEE FOR REGULAR EMPLOYEES ===== --}}
             <div class="mt-8">
-                <div class="mb-6 flex items-center justify-between">
-                    <h3 class="text-xl font-bold text-gray-800 dark:text-white">Best Employee</h3>
-                    <div class="flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700 dark:border-amber-800/40 dark:bg-amber-900/20 dark:text-amber-300">
-                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <span x-text="months[selectedMonth - 1] + ' ' + selectedYear"></span>
-                    </div>
-                </div>
-
                 <x-profile.employe-rank-card
-                    :bestEmployee="$bestEmployee" />
+                    :bestEmployee="$bestEmployee"
+                    :showHeader="true" />
             </div>
         @endif
 
@@ -770,16 +760,9 @@
 
                     {{-- ===== BEST EMPLOYEE ===== --}}
                     <div class="mb-10">
-                        <div class="mb-6 flex items-center justify-between">
-                            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Best Employee</h3>
-                            <div class="flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700 dark:border-amber-800/40 dark:bg-amber-900/20 dark:text-amber-300">
-                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                <span x-text="months[selectedMonth - 1] + ' ' + selectedYear"></span>
-                            </div>
-                        </div>
-
                         <x-profile.employe-rank-card
-                            :bestEmployee="$bestEmployee" />
+                            :bestEmployee="$bestEmployee"
+                            :showHeader="true" />
                     </div>
 
                     {{-- ===== RANK EMPLOYEE ===== --}}

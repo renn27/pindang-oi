@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pegawai;
 use App\Models\Role;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -46,6 +47,7 @@ class PegawaiRoleController extends Controller
                 'password' => Hash::make($validated['password']),
                 'active_role' => $roles->first()?->nama_role,
                 'is_active' => true,
+                'inactive_from_month' => null,
             ]);
 
             $pegawai->roles()->sync($roles->pluck('id'));
@@ -62,7 +64,26 @@ class PegawaiRoleController extends Controller
             return back()->with('error', 'Akun yang sedang digunakan tidak dapat dinonaktifkan.');
         }
 
-        $pegawai->update(['is_active' => ! $pegawai->is_active]);
+        $validated = $request->validate([
+            'inactive_from_month' => [
+                $pegawai->is_active ? 'required' : 'nullable',
+                'date_format:Y-m',
+            ],
+        ], [
+            'inactive_from_month.required' => 'Bulan mulai nonaktif wajib dipilih.',
+            'inactive_from_month.date_format' => 'Format bulan mulai nonaktif tidak valid.',
+        ]);
+
+        $pegawai->update($pegawai->is_active
+            ? [
+                'is_active' => false,
+                'inactive_from_month' => Carbon::createFromFormat('Y-m', $validated['inactive_from_month'])->startOfMonth(),
+            ]
+            : [
+                'is_active' => true,
+                'inactive_from_month' => null,
+            ]
+        );
 
         $status = $pegawai->is_active ? 'diaktifkan kembali' : 'dinonaktifkan';
 
