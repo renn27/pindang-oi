@@ -29,8 +29,9 @@ class KalenderDLController extends Controller
 
         $title = 'Kalender Dinas Luar';
 
-        // 🔹 INI YANG DITAMBAHKAN: withCount by month
-        $pegawais = Pegawai::with(['kalenderDls' => function ($q) use ($start, $end) {
+        // 🔹 INI YANG DITAMBAHKAN: withCount by month (dan filter pegawai aktif di bulan ini)
+        $pegawais = Pegawai::activeInMonth((int) $month, (int) $year)
+            ->with(['kalenderDls' => function ($q) use ($start, $end) {
                 $q->whereBetween('tanggal_dl', [
                     $start->toDateString(),
                     $end->toDateString()

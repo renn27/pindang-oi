@@ -161,20 +161,22 @@
                             </td>
                             <td class="px-4 py-3 text-center">
                                 <div class="flex justify-center gap-2">
-                                    <button
-                                        class="inline-flex items-center rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white hover:border-brand-400 hover:text-brand-600 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"
-                                        @click="$dispatch('open-smart-modal', {
-                                            modalId: 'modal-assign-role',
-                                            mode: 'edit',
-                                            key: '{{ $pegawai->id_pegawai }}',
-                                            data: {
-                                                id_pegawai: '{{ $pegawai->id_pegawai }}',
-                                                nama_pegawai: '{{ $pegawai->nama_pegawai }}',
-                                                roles: @js($pegawai->roles->pluck('id'))
-                                            }
-                                        })">
-                                        Edit Role
-                                    </button>
+                                    @if ($pegawai->is_active)
+                                        <button
+                                            class="inline-flex items-center rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white hover:border-brand-400 hover:text-brand-600 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"
+                                            @click="$dispatch('open-smart-modal', {
+                                                modalId: 'modal-assign-role',
+                                                mode: 'edit',
+                                                key: '{{ $pegawai->id_pegawai }}',
+                                                data: {
+                                                    id_pegawai: '{{ $pegawai->id_pegawai }}',
+                                                    nama_pegawai: '{{ $pegawai->nama_pegawai }}',
+                                                    roles: @js($pegawai->roles->pluck('id'))
+                                                }
+                                            })">
+                                            Edit Role
+                                        </button>
+                                    @endif
 
                                     @if ($pegawai->is_active)
                                         <button type="button"

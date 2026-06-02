@@ -30,6 +30,11 @@ class DashboardAnalyticsService {
         };
 
         $pegawai = Pegawai::activeInMonth((int) $bulan, (int) $tahun)
+        ->where(function ($query) {
+            $query->where('nama_pegawai', '!=', 'Sukendro Suryo Wiguno, SST, M.Ec.Dev')
+                  ->orWhere('jabatan', '!=', 'Kepala BPS Ogan Ilir')
+                  ->orWhere('nip_bps', '!=', '340017814');
+        })
         ->withCount([
             // 1. Jumlah penugasan (COUNT baris penugasan)
             'penugasanSebagaiAnggota as total_penugasan' => function ($q) use ($som, $eom, $excludeCompletedBefore) {
@@ -132,6 +137,11 @@ class DashboardAnalyticsService {
                 $query->whereNull('pegawais.inactive_from_month')
                     ->orWhere('pegawais.inactive_from_month', '>', $inactiveCutoff);
             })
+            ->where(function ($query) {
+                $query->where('pegawais.nama_pegawai', '!=', 'Sukendro Suryo Wiguno, SST, M.Ec.Dev')
+                      ->orWhere('pegawais.jabatan', '!=', 'Kepala BPS Ogan Ilir')
+                      ->orWhere('pegawais.nip_bps', '!=', '340017814');
+            })
             ->where('tanggal_mulai', '<=', $endOfMonth->toDateString())
             ->where('tanggal_selesai', '>=', $startOfMonth->toDateString())
             ->whereNotExists(function ($query) use ($bf) {
@@ -214,6 +224,11 @@ class DashboardAnalyticsService {
             ->where(function ($query) use ($som) {
                 $query->whereNull('pegawais.inactive_from_month')
                     ->orWhere('pegawais.inactive_from_month', '>', $som);
+            })
+            ->where(function ($query) {
+                $query->where('pegawais.nama_pegawai', '!=', 'Sukendro Suryo Wiguno, SST, M.Ec.Dev')
+                      ->orWhere('pegawais.jabatan', '!=', 'Kepala BPS Ogan Ilir')
+                      ->orWhere('pegawais.nip_bps', '!=', '340017814');
             })
             ->leftJoin('penugasans', function($join) use ($som, $eom, $bf) {
                 $join->on('pegawais.id_pegawai', '=', 'penugasans.id_anggota')

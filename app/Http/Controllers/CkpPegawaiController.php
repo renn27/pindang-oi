@@ -818,8 +818,13 @@ class CkpPegawaiController extends Controller
     {
         $tahun = $request->get('tahun', date('Y'));
 
-        // Ambil semua pegawai yang aktif, urutkan berdasarkan nama
-        $pegawais = Pegawai::orderBy('nama_pegawai', 'asc')->get();
+        // Ambil semua pegawai yang aktif setidaknya satu bulan di tahun terpilih, urutkan berdasarkan nama
+        $pegawais = Pegawai::where(function ($q) use ($tahun) {
+            $q->whereNull('inactive_from_month')
+              ->orWhere('inactive_from_month', '>', $tahun . '-01-01');
+        })
+        ->orderBy('nama_pegawai', 'asc')
+        ->get();
 
         // Ambil data download log untuk tahun yang dipilih
         $logs = DB::table('ckp_download_logs')

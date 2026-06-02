@@ -76,10 +76,18 @@
                             @foreach($bulanList as $key => $nama)
                                 @php
                                     $count = $downloadData[$pegawai->id_pegawai][$key] ?? 0;
+                                    $bulanFilter = \Carbon\Carbon::create($tahun, $key, 1)->startOfMonth();
+                                    $isInactive = $pegawai->inactive_from_month && $bulanFilter->greaterThanOrEqualTo($pegawai->inactive_from_month->startOfMonth());
                                 @endphp
                                 
                                 <td class="px-2 py-2 text-center border-l border-gray-100 dark:border-gray-800/50">
-                                    @if($count > 0)
+                                    @if($isInactive)
+                                        <div class="flex items-center justify-center">
+                                            <span class="text-xs font-medium text-gray-400 dark:text-gray-500 cursor-default" title="Pegawai Nonaktif sejak {{ $pegawai->inactive_from_month->translatedFormat('F Y') }}">
+                                                Nonaktif
+                                            </span>
+                                        </div>
+                                    @elseif($count > 0)
                                         <div class="flex items-center justify-center">
                                             <span class="inline-flex items-center justify-center min-w-[64px] px-2.5 py-1.5 rounded-md text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400 border border-green-200 dark:border-green-800/50 shadow-sm transition-transform hover:scale-105 cursor-default" title="Didownload {{ $count }} kali pada bulan {{ $nama }} {{ $tahun }}">
                                                 {{ $count }} X

@@ -79,7 +79,8 @@ class KalenderKegiatanController extends Controller
          * DATA DROPDOWN FILTER PEGAWAI
          * =============================
          */
-        $pegawais = Pegawai::select('id_pegawai', 'nama_pegawai')
+        $pegawais = Pegawai::activeInMonth((int) $month, (int) $year)
+            ->select('id_pegawai', 'nama_pegawai')
             ->orderBy('nama_pegawai')
             ->get();
 
