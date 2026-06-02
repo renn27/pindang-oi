@@ -22,6 +22,8 @@ class KegiatanController extends Controller
         $kegiatanQuery = $bidang->kegiatans()
             ->with([
                 'penanggungJawab',
+                'transfer.fromKetua',
+                'transfer.toKetua',
                 'subKegiatans' => function ($q) use ($pegawai) {
 
                     // MODE ANGGOTA → subkegiatan harus ada penugasan dia

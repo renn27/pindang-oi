@@ -150,13 +150,62 @@ class CkpPegawaiController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        // 2. Ambil data kegiatan dan id ketua tim
+        // Load semua penugasan beserta relasi sekaligus — 1 query, dipakai semua step
+        $penugasans = $subKegiatan->penugasans()
+            ->with(['latestPengiriman.penerimaan', 'latestPenerimaan'])
+            ->get();
+
+        // 2. Ambil data kegiatan dan tentukan Ketua Tim yang berhak berdasarkan batas tanggal transfer
         $kegiatan = $subKegiatan->kegiatan;
         $idKetuaTim = $kegiatan->id_penanggung_jawab;
 
-        // 3. Pastikan yang akses adalah Ketua Tim
+        if ($kegiatan->transfer) {
+            $transferredAt = \Carbon\Carbon::parse($kegiatan->transfer->transferred_at);
+
+            $totalTargetPenugasan = $penugasans->sum('target');
+            $penugasanTargetSelesai = $penugasans->sum(function($p) {
+                $adaPelunasan = $p->pengirimans->contains(fn($k) =>
+                    $k->tipe_pengiriman === 'Pelunasan' && $k->penerimaan?->status === 'Diterima'
+                );
+
+                return $p->pengirimans->sum(fn($k) =>
+                    $k->penerimaan?->status === 'Diterima' &&
+                    $k->tipe_pengiriman === ($adaPelunasan ? 'Pelunasan' : 'Cicilan')
+                        ? $k->jumlah_dikirim ?? 0
+                        : 0
+                );
+            });
+
+            $progressPercent = $totalTargetPenugasan ? round(($penugasanTargetSelesai / $totalTargetPenugasan) * 100) : 0;
+
+            $penugasanTargetSelesaiSebelumTransfer = $penugasans->sum(function($p) use ($transferredAt) {
+                $pengirimansSebelumTransfer = $p->pengirimans->filter(function($k) use ($transferredAt) {
+                    return $k->penerimaan &&
+                           $k->penerimaan->status === 'Diterima' &&
+                           \Carbon\Carbon::parse($k->penerimaan->created_at)->lt($transferredAt);
+                });
+
+                $adaPelunasan = $pengirimansSebelumTransfer->contains(fn($k) =>
+                    $k->tipe_pengiriman === 'Pelunasan'
+                );
+
+                return $pengirimansSebelumTransfer->sum(fn($k) =>
+                    $k->tipe_pengiriman === ($adaPelunasan ? 'Pelunasan' : 'Cicilan')
+                        ? $k->jumlah_dikirim ?? 0
+                        : 0
+                );
+            });
+
+            $is100PercentBeforeTransfer = ($totalTargetPenugasan > 0) && ($penugasanTargetSelesaiSebelumTransfer >= $totalTargetPenugasan);
+
+            if ($is100PercentBeforeTransfer) {
+                $idKetuaTim = $kegiatan->transfer->from_ketua_id;
+            }
+        }
+
+        // 3. Pastikan yang akses adalah Ketua Tim yang berhak
         if (Auth::user()->id_pegawai !== $idKetuaTim) {
-            return back()->with('error', 'Hanya Ketua Tim yang dapat membuat CKP Ketua Tim.');
+            return back()->with('error', 'Anda tidak memiliki akses untuk membuat CKP Ketua Tim pada sub kegiatan ini.');
         }
 
         // 4. Cek Duplikat per bulan (bukan secara global)
@@ -167,11 +216,6 @@ class CkpPegawaiController extends Controller
         if ($existing) {
             return back()->with('error', 'Sub kegiatan ini sudah memiliki CKP Ketua Tim untuk bulan tersebut.');
         }
-
-        // 4. Load semua penugasan beserta relasi sekaligus — 1 query, dipakai semua step
-        $penugasans = $subKegiatan->penugasans()
-            ->with(['latestPengiriman.penerimaan', 'latestPenerimaan'])
-            ->get();
 
         // Validasi Bulan Terakhir Khusus Pelunasan (Opsi B)
         $bulanSelesai = $subKegiatan->tanggal_selesai ? $subKegiatan->tanggal_selesai->format('Y-m') : null;

@@ -48,6 +48,21 @@ class Kegiatan extends Model
         return $this->hasMany(SubKegiatan::class, 'id_kegiatan', 'id_kegiatan');
     }
 
+    public function transfer()
+    {
+        return $this->hasOne(KegiatanTransfer::class, 'kegiatan_id', 'id_kegiatan');
+    }
+
+    public function isTransferred()
+    {
+        return $this->transfer()->exists();
+    }
+
+    public function transferredFrom()
+    {
+        return $this->transfer?->from_ketua_id;
+    }
+
     // Untuk Menampilkan data bidang penugasan sesuai dengan yang di assign ke pegawai (baik sebagai ketua ataupun anggota)
     public function scopeForKetua($query, $pegawai)
     {
@@ -55,7 +70,12 @@ class Kegiatan extends Model
             return $query;
         }
 
-        return $query->where('id_penanggung_jawab', $pegawai->id_pegawai);
+        return $query->where(function ($q) use ($pegawai) {
+            $q->where('id_penanggung_jawab', $pegawai->id_pegawai)
+              ->orWhereHas('transfer', function ($t) use ($pegawai) {
+                  $t->where('from_ketua_id', $pegawai->id_pegawai);
+              });
+        });
     }
 
     public function scopeForAnggota($query, $pegawai)

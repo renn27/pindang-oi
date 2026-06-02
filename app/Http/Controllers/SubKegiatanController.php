@@ -76,6 +76,8 @@ class SubKegiatanController extends Controller
                 'anggota',
                 'jenisKegiatan',
                 'subKegiatan.kegiatan.penanggungJawab',
+                'subKegiatan.kegiatan.transfer.fromKetua',
+                'subKegiatan.kegiatan.transfer.toKetua',
                 'pengirimans.penerimaan',
                 'latestPengiriman.penerimaan',
                 'latestPenerimaan',

@@ -168,8 +168,19 @@ class TodoListService
     private function monthlyAsKetua(Pegawai $pegawai, Carbon $periodEnd): Builder
     {
         return $this->tasksDueInMonth($periodEnd)
-            ->whereHas('subKegiatan.kegiatan', function ($query) use ($pegawai) {
-                $query->where('id_penanggung_jawab', $pegawai->id_pegawai);
+            ->where(function ($query) use ($pegawai) {
+                $query->whereHas('subKegiatan.kegiatan', function ($qk) use ($pegawai) {
+                    $qk->where('id_penanggung_jawab', $pegawai->id_pegawai)
+                       ->whereDoesntHave('transfer');
+                })
+                ->orWhereHas('subKegiatan.kegiatan.transfer', function ($qt) use ($pegawai) {
+                    $qt->where('to_ketua_id', $pegawai->id_pegawai)
+                       ->whereColumn('penugasans.tanggal_selesai', '>=', 'kegiatan_transfers.transferred_at');
+                })
+                ->orWhereHas('subKegiatan.kegiatan.transfer', function ($qt) use ($pegawai) {
+                    $qt->where('from_ketua_id', $pegawai->id_pegawai)
+                       ->whereColumn('penugasans.tanggal_selesai', '<', 'kegiatan_transfers.transferred_at');
+                });
             });
     }
 

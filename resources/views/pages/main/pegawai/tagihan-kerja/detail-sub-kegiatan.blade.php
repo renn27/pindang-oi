@@ -42,7 +42,11 @@
                                 Nama Ketua
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-800 dark:text-gray-300">
-                                {{ $subKegiatan->kegiatan->penanggungJawab->nama_pegawai }}
+                                @if($subKegiatan->kegiatan->transfer)
+                                    {{ $subKegiatan->kegiatan->transfer->fromKetua->nama_pegawai }} (Ketua tim lama) dialihkan ke {{ $subKegiatan->kegiatan->transfer->toKetua->nama_pegawai }} (Ketua tim baru)
+                                @else
+                                    {{ $subKegiatan->kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
+                                @endif
                             </td>
                         </tr>
                         <tr>

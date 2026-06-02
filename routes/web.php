@@ -153,6 +153,7 @@ Route::middleware(['auth', 'active.pegawai'])->group(function () {
         Route::post('/bidang/{bidang:slug}', [KegiatanController::class, 'store'])->name('kegiatan.store')->middleware('can:create,App\Models\Kegiatan');
         Route::put('/{kegiatan:id_kegiatan}', [KegiatanController::class, 'update'])->name('kegiatan.update')->middleware('can:update,kegiatan');
         Route::delete('/{kegiatan:id_kegiatan}', [KegiatanController::class, 'delete'])->name('kegiatan.delete')->middleware('can:delete,kegiatan');
+        Route::post('/{kegiatan:id_kegiatan}/transfer', [\App\Http\Controllers\KegiatanTransferController::class, 'transfer'])->name('kegiatan.transfer')->middleware('can:transfer,kegiatan');
 
         // Sub Kegiatan
         Route::prefix('{kegiatan:id_kegiatan}/sub-kegiatan')->group(function () {

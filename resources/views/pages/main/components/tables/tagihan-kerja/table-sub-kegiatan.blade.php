@@ -87,14 +87,20 @@
                         <td class="px-6 py-4 align-top">
                             <div class="flex flex-col gap-2">
                                 {{-- Nama Sub Kegiatan (Font Lebih Besar) --}}
-                                <a href="{{ route('sub.kegiatan.show', [
-                                    'kegiatan' => $kegiatan->id_kegiatan,
-                                    'subKegiatan' => $subKegiatan->id_sub_kegiatan,
-                                ]) }}"
-                                    title="Lihat detail sub kegiatan"
-                                    class="text-sm font-semibold text-gray-600 hover:text-blue-600 dark:text-white dark:hover:text-blue-400 hover:underline transition-colors">
-                                    {{ $subKegiatan->nama_sub_kegiatan }}
-                                </a>
+                                @can('view', $subKegiatan)
+                                    <a href="{{ route('sub.kegiatan.show', [
+                                        'kegiatan' => $kegiatan->id_kegiatan,
+                                        'subKegiatan' => $subKegiatan->id_sub_kegiatan,
+                                    ]) }}"
+                                        title="Lihat detail sub kegiatan"
+                                        class="text-sm font-semibold text-gray-600 hover:text-blue-600 dark:text-white dark:hover:text-blue-400 hover:underline transition-colors">
+                                        {{ $subKegiatan->nama_sub_kegiatan }}
+                                    </a>
+                                @else
+                                    <span class="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                                        {{ $subKegiatan->nama_sub_kegiatan }}
+                                    </span>
+                                @endcan
 
                                 {{-- Badge CKP Ketua Tim --}}
                                 @if($isCkpKetuaTim)
@@ -216,7 +222,47 @@
                                 @endif
 
                                 {{-- Jadikan CKP --}}
-                                @if(auth()->user()->active_role === 'Ketua Tim' && auth()->user()->id_pegawai === $subKegiatan->kegiatan->id_penanggung_jawab)
+                                @php
+                                    $canCreateCkp = false;
+                                    $targetKetuaName = $subKegiatan->kegiatan->penanggungJawab->nama_pegawai ?? '-';
+                                    if (auth()->user()->active_role === 'Ketua Tim') {
+                                        if ($subKegiatan->kegiatan->transfer) {
+                                            $transferredAt = \Carbon\Carbon::parse($subKegiatan->kegiatan->transfer->transferred_at);
+                                            
+                                            // Cek apakah 100% selesai sebelum transfer menggunakan hitungan kuantitas
+                                            $penugasanTargetSelesaiSebelumTransfer = $subKegiatan->penugasans->sum(function($p) use ($transferredAt) {
+                                                $pengirimansSebelumTransfer = $p->pengirimans->filter(function($k) use ($transferredAt) {
+                                                    return $k->penerimaan &&
+                                                           $k->penerimaan->status === 'Diterima' &&
+                                                           \Carbon\Carbon::parse($k->penerimaan->created_at)->lt($transferredAt);
+                                                });
+
+                                                $adaPelunasan = $pengirimansSebelumTransfer->contains(fn($k) =>
+                                                    $k->tipe_pengiriman === 'Pelunasan'
+                                                );
+
+                                                return $pengirimansSebelumTransfer->sum(fn($k) =>
+                                                    $k->tipe_pengiriman === ($adaPelunasan ? 'Pelunasan' : 'Cicilan')
+                                                        ? $k->jumlah_dikirim ?? 0
+                                                        : 0
+                                                );
+                                            });
+
+                                            $is100PercentBeforeTransfer = ($totalTargetPenugasan > 0) && ($penugasanTargetSelesaiSebelumTransfer >= $totalTargetPenugasan);
+                                            
+                                            if ($is100PercentBeforeTransfer) {
+                                                $canCreateCkp = auth()->user()->id_pegawai === $subKegiatan->kegiatan->transfer->from_ketua_id;
+                                                $targetKetuaName = $subKegiatan->kegiatan->transfer->fromKetua->nama_pegawai ?? '-';
+                                            } else {
+                                                $canCreateCkp = auth()->user()->id_pegawai === $subKegiatan->kegiatan->id_penanggung_jawab;
+                                            }
+                                        } else {
+                                            $canCreateCkp = auth()->user()->id_pegawai === $subKegiatan->kegiatan->id_penanggung_jawab;
+                                        }
+                                    }
+                                @endphp
+
+                                @if($canCreateCkp)
                                     @if($isCkpKetuaTim)
                                         {{-- Sudah jadi CKP --}}
                                         <button disabled
@@ -235,7 +281,7 @@
                                                 data: {
                                                     id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
                                                     nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
-                                                    nama_pegawai: @js($subKegiatan->kegiatan->penanggungJawab->nama_pegawai),
+                                                    nama_pegawai: @js($targetKetuaName),
                                                     uraian: @js('Melaksanakan dan Mengetuai ' . $subKegiatan->nama_sub_kegiatan . ' dengan target ' . $penugasanTargetSelesai . ' dari total target ' . $totalTargetPenugasan),
                                                     target_kuantitas: {{ $totalTargetPenugasan }},
                                                     realisasi_kuantitas: {{ $penugasanTargetSelesai }},

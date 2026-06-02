@@ -130,6 +130,19 @@
                                     <p class="text-sm text-gray-600 mt-1 dark:text-gray-300">
                                         Ketua: {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
                                     </p>
+                                    @if ($kegiatan->isTransferred())
+                                        @if ($kegiatan->transferredFrom() === auth()->user()->id_pegawai)
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 mt-2 rounded-full text-xs font-semibold bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                                                Dialihkan dari Anda ke {{ $kegiatan->transfer->toKetua->nama_pegawai }} pada tanggal {{ $kegiatan->transfer->transferred_at->translatedFormat('d M Y') }}
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 mt-2 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                                Diambil alih dari {{ $kegiatan->transfer->fromKetua->nama_pegawai }} ke {{ $kegiatan->transfer->toKetua->nama_pegawai }} pada tanggal {{ $kegiatan->transfer->transferred_at->translatedFormat('d M Y') }}
+                                            </span>
+                                        @endif
+                                    @endif
                                 </div>
                             </button>
                         </div>
@@ -163,6 +176,32 @@
                                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg> Edit
                                 </button>
+                            @endcan
+
+                            @can('transfer', $kegiatan)
+                                @if (!$kegiatan->isTransferred())
+                                    {{-- Transfer --}}
+                                    <button
+                                        class="flex items-center gap-2 rounded-full border border-gray-300
+                                            bg-white px-4 py-3 text-sm font-medium text-gray-700
+                                            shadow-theme-xs hover:bg-blue-50 hover:text-blue-700
+                                            hover:border-blue-300 transition-all duration-200
+                                            dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-blue-900/30 dark:hover:text-blue-400"
+                                        @click.stop="$dispatch('open-smart-modal', {
+                                                modalId: 'modal-transfer-kegiatan',
+                                                data: {
+                                                    id_kegiatan: '{{ $kegiatan->id_kegiatan }}',
+                                                    nama_rk_kegiatan: @js($kegiatan->nama_rk_kegiatan),
+                                                    id_penanggung_jawab: '{{ $kegiatan->id_penanggung_jawab }}',
+                                                    nama_penanggung_jawab: @js($kegiatan->penanggungJawab->nama_pegawai ?? '-')
+                                                }
+                                            })">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                        </svg> Transfer
+                                    </button>
+                                @endif
                             @endcan
 
                             @can('delete', $kegiatan)
@@ -257,6 +296,9 @@
 
     {{-- MODAL CKP (Universal: Anggota Tim, Ketua Tim, dan Pimpinan) --}}
     @include('pages.main.components.modals.tagihan-kerja.modal-ckp-universal')
+
+    {{-- MODAL TRANSFER KEGIATAN --}}
+    @include('pages.main.components.modals.tagihan-kerja.modal-transfer-kegiatan')
 
     <style>
         [x-cloak] {

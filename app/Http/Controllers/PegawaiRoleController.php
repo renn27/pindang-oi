@@ -64,6 +64,17 @@ class PegawaiRoleController extends Controller
             return back()->with('error', 'Akun yang sedang digunakan tidak dapat dinonaktifkan.');
         }
 
+        if ($pegawai->is_active) {
+            // Cek jika pegawai masih memiliki kegiatan aktif yang belum ditransfer
+            $kegiatanCount = \App\Models\Kegiatan::where('id_penanggung_jawab', $pegawai->id_pegawai)
+                ->whereDoesntHave('transfer')
+                ->count();
+
+            if ($kegiatanCount > 0) {
+                return back()->with('error', "Pegawai ini masih memimpin {$kegiatanCount} kegiatan aktif. Silakan lakukan transfer kepemilikan kegiatan terlebih dahulu.");
+            }
+        }
+
         $validated = $request->validate([
             'inactive_from_month' => [
                 $pegawai->is_active ? 'required' : 'nullable',

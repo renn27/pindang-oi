@@ -38,7 +38,12 @@ class KegiatanPolicy
         // KETUA TIM
         if ($pegawai->active_role === 'Ketua Tim') {
             return Kegiatan::where('id_bidang', $bidang->id_bidang)
-                ->where('id_penanggung_jawab', $pegawai->id_pegawai)
+                ->where(function ($q) use ($pegawai) {
+                    $q->where('id_penanggung_jawab', $pegawai->id_pegawai)
+                      ->orWhereHas('transfer', function ($t) use ($pegawai) {
+                          $t->where('from_ketua_id', $pegawai->id_pegawai);
+                      });
+                })
                 ->exists();
         }
 
@@ -117,6 +122,14 @@ class KegiatanPolicy
     public function createSubKegiatan(Pegawai $pegawai, Kegiatan $kegiatan): bool
     {
         return $this->canManageKegiatan($pegawai, $kegiatan);
+    }
+
+    /**
+     * Determine whether the user can transfer the model.
+     */
+    public function transfer(Pegawai $pegawai, Kegiatan $kegiatan): bool
+    {
+        return in_array($pegawai->active_role, ['Admin', 'Pimpinan'], true);
     }
 
     /**
