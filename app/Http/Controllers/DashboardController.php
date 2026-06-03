@@ -45,11 +45,22 @@ class DashboardController extends Controller
         $stats = $analytics->getDashboardStats($selectedMonth, $selectedYear);
 
         // Gunakan rankPegawaiAll() — Collection tanpa paginator, aman untuk client-side pagination Alpine.js
-        $rankPegawaiAll = $analytics->rankPegawaiAll($selectedMonth, $selectedYear);
-        $bestEmployee   = $rankPegawaiAll->first();
+        $rankPegawaiAll = $analytics->rankPegawaiAll($selectedMonth, $selectedYear, false);
+
+        // Filter out Sukendro for the public rank table
+        $rankPegawaiAllTable = $rankPegawaiAll->reject(function ($item) {
+            return $item->nip_bps === '340017814';
+        })->values();
+
+        $bestEmployee = $rankPegawaiAllTable->first();
 
         // Rekap penugasan anggota difilter per bulan yang dipilih
-        $rekapAnggota = $analytics->getRekapPenugasanPegawai($selectedMonth, $selectedYear);
+        $rekapAnggota = $analytics->getRekapPenugasanPegawai($selectedMonth, $selectedYear, false);
+
+        // Filter out Sukendro for the public rekap table
+        $rekapAnggotaTable = $rekapAnggota->reject(function ($item) {
+            return $item->nip_bps === '340017814';
+        })->values();
 
         return view('pages.dashboard', [
             'title'                       => 'Dashboard',
@@ -64,7 +75,9 @@ class DashboardController extends Controller
             'selectedYear'                => $selectedYear,
             'bestEmployee'                => $bestEmployee,
             'rankPegawaiAll'              => $rankPegawaiAll,
+            'rankPegawaiAllTable'         => $rankPegawaiAllTable,
             'rekapAnggota'                => $rekapAnggota,
+            'rekapAnggotaTable'           => $rekapAnggotaTable,
             'rankPegawaiPerPage'          => $rankPegawaiPerPage,
             'rekapPenugasanPerPage'       => $rekapPenugasanPerPage,
             'rankPegawaiPerPageOptions'   => $rankPegawaiPerPageOptions,

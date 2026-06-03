@@ -12,7 +12,7 @@ use Illuminate\Support\Collection;
 
 class DashboardAnalyticsService {
 
-    public function getRekapPenugasanPegawai($bulan, $tahun) {
+    public function getRekapPenugasanPegawai($bulan, $tahun, bool $excludeSpecial = false) {
         $startOfMonth = Carbon::create($tahun, $bulan, 1)->startOfMonth();
         $endOfMonth   = Carbon::create($tahun, $bulan, 1)->endOfMonth();
         $som = $startOfMonth->toDateString();
@@ -29,12 +29,17 @@ class DashboardAnalyticsService {
             });
         };
 
-        $pegawai = Pegawai::activeInMonth((int) $bulan, (int) $tahun)
-        ->where(function ($query) {
-            $query->where('nama_pegawai', '!=', 'Sukendro Suryo Wiguno, SST, M.Ec.Dev')
+        $query = Pegawai::activeInMonth((int) $bulan, (int) $tahun);
+
+        if ($excludeSpecial) {
+            $query->where(function ($q) {
+                $q->where('nama_pegawai', '!=', 'Sukendro Suryo Wiguno, SST, M.Ec.Dev')
                   ->orWhere('jabatan', '!=', 'Kepala BPS Ogan Ilir')
                   ->orWhere('nip_bps', '!=', '340017814');
-        })
+            });
+        }
+
+        $pegawai = $query
         ->withCount([
             // 1. Jumlah penugasan (COUNT baris penugasan)
             'penugasanSebagaiAnggota as total_penugasan' => function ($q) use ($som, $eom, $excludeCompletedBefore) {
@@ -98,51 +103,55 @@ class DashboardAnalyticsService {
     // RANKING ENGINE — F1 Penyelesaian · F2 Kecepatan · F3 RR · F4 Rating
     // =========================================================================
 
-    public function rankPegawaiAll($month = null, $year = null): Collection
+    public function rankPegawaiAll($month = null, $year = null, bool $excludeSpecial = false): Collection
     {
-        [$month, $year, $bf, $gs, $startOfMonth, $endOfMonth] = $this->rankInit($month, $year);
-        $allData = $this->buildRankBaseQuery($bf, $gs, $startOfMonth, $endOfMonth)->get();
+        [$month, $year, $bf, $gs, $startOfMonth, $endOfMonth] = $this->rankInit($month, $year, $excludeSpecial);
+        $allData = $this->buildRankBaseQuery($bf, $gs, $startOfMonth, $endOfMonth, $excludeSpecial)->get();
         $details = $this->buildDetailsQuery($bf, $allData->pluck('id_pegawai'), $startOfMonth, $endOfMonth);
         return $allData->map(fn($item) => $this->decorateRankItem($item, $details, $gs));
     }
 
-    public function rankPegawai(int $perPage = 5, $month = null, $year = null)
+    public function rankPegawai(int $perPage = 5, $month = null, $year = null, bool $excludeSpecial = true)
     {
-        [$month, $year, $bf, $gs, $startOfMonth, $endOfMonth] = $this->rankInit($month, $year);
-        $paginated = $this->buildRankBaseQuery($bf, $gs, $startOfMonth, $endOfMonth)->paginate($perPage);
+        [$month, $year, $bf, $gs, $startOfMonth, $endOfMonth] = $this->rankInit($month, $year, $excludeSpecial);
+        $paginated = $this->buildRankBaseQuery($bf, $gs, $startOfMonth, $endOfMonth, $excludeSpecial)->paginate($perPage);
         $details   = $this->buildDetailsQuery($bf, $paginated->pluck('id_pegawai'), $startOfMonth, $endOfMonth);
         return $paginated->through(fn($item) => $this->decorateRankItem($item, $details, $gs));
     }
 
-    private function rankInit($month, $year): array
+    private function rankInit($month, $year, bool $excludeSpecial = false): array
     {
         $month        = $month ?? now()->month;
         $year         = $year  ?? now()->year;
         $bf           = sprintf('%04d-%02d', $year, $month);
         $startOfMonth = Carbon::create($year, $month, 1)->startOfMonth();
         $endOfMonth   = Carbon::create($year, $month, 1)->endOfMonth();
-        return [$month, $year, $bf, $this->getGlobalStats($bf, $startOfMonth, $endOfMonth), $startOfMonth, $endOfMonth];
+        return [$month, $year, $bf, $this->getGlobalStats($bf, $startOfMonth, $endOfMonth, $excludeSpecial), $startOfMonth, $endOfMonth];
     }
 
-    private function getGlobalStats(string $bf, Carbon $startOfMonth, Carbon $endOfMonth): array
+    private function getGlobalStats(string $bf, Carbon $startOfMonth, Carbon $endOfMonth, bool $excludeSpecial = false): array
     {
         $inactiveCutoff = $startOfMonth->toDateString();
 
         // Filter penugasan yang aktif/berlangsung di bulan target menggunakan range tanggal
         // (lebih efisien dari YEAR()*12+MONTH() karena index kolom dapat dipakai)
-        $r  = \DB::table('penugasans')
+        $query  = \DB::table('penugasans')
             ->join('pegawais', 'pegawais.id_pegawai', '=', 'penugasans.id_anggota')
             ->whereNull('penugasans.deleted_at')
             ->where(function ($query) use ($inactiveCutoff) {
                 $query->whereNull('pegawais.inactive_from_month')
                     ->orWhere('pegawais.inactive_from_month', '>', $inactiveCutoff);
-            })
-            ->where(function ($query) {
-                $query->where('pegawais.nama_pegawai', '!=', 'Sukendro Suryo Wiguno, SST, M.Ec.Dev')
+            });
+
+        if ($excludeSpecial) {
+            $query->where(function ($q) {
+                $q->where('pegawais.nama_pegawai', '!=', 'Sukendro Suryo Wiguno, SST, M.Ec.Dev')
                       ->orWhere('pegawais.jabatan', '!=', 'Kepala BPS Ogan Ilir')
                       ->orWhere('pegawais.nip_bps', '!=', '340017814');
-            })
-            ->where('tanggal_mulai', '<=', $endOfMonth->toDateString())
+            });
+        }
+
+        $r = $query->where('tanggal_mulai', '<=', $endOfMonth->toDateString())
             ->where('tanggal_selesai', '>=', $startOfMonth->toDateString())
             ->whereNotExists(function ($query) use ($bf) {
                 $query->select(\DB::raw(1))
@@ -212,7 +221,7 @@ class DashboardAnalyticsService {
             ->whereNull('pengirimans.deleted_at');
     }
 
-    private function buildRankBaseQuery(string $bf, array $gs, Carbon $startOfMonth, Carbon $endOfMonth)
+    private function buildRankBaseQuery(string $bf, array $gs, Carbon $startOfMonth, Carbon $endOfMonth, bool $excludeSpecial = false)
     {
         $c   = (float) $gs['sum_target_semua'];
         $avg = (float) $gs['avg_target_bulan'];
@@ -220,23 +229,28 @@ class DashboardAnalyticsService {
         $som = $startOfMonth->toDateString();
         $eom = $endOfMonth->toDateString();
 
-        $inner = \DB::table('pegawais')
+        $innerQuery = \DB::table('pegawais')
             ->where(function ($query) use ($som) {
                 $query->whereNull('pegawais.inactive_from_month')
                     ->orWhere('pegawais.inactive_from_month', '>', $som);
-            })
-            ->where(function ($query) {
+            });
+
+        if ($excludeSpecial) {
+            $innerQuery->where(function ($query) {
                 $query->where('pegawais.nama_pegawai', '!=', 'Sukendro Suryo Wiguno, SST, M.Ec.Dev')
                       ->orWhere('pegawais.jabatan', '!=', 'Kepala BPS Ogan Ilir')
                       ->orWhere('pegawais.nip_bps', '!=', '340017814');
-            })
+            });
+        }
+
+        $inner = $innerQuery
             ->leftJoin('penugasans', function($join) use ($som, $eom, $bf) {
                 $join->on('pegawais.id_pegawai', '=', 'penugasans.id_anggota')
                      ->whereNull('penugasans.deleted_at')
                      ->where('penugasans.tanggal_mulai', '<=', $eom)
                      ->where('penugasans.tanggal_selesai', '>=', $som)
                      ->whereNotExists(function ($query) use ($bf) {
-                         $query->select(\DB::raw(1))
+                          $query->select(\DB::raw(1))
                                ->from('pengirimans')
                                ->join('penerimaans', 'penerimaans.id_pengiriman', '=', 'pengirimans.id_pengiriman')
                                ->whereColumn('pengirimans.id_penugasan', 'penugasans.id_penugasan')
@@ -247,9 +261,9 @@ class DashboardAnalyticsService {
                      });
             })
             ->leftJoinSub($ld, 'lp', fn($j) => $j->on('penugasans.id_penugasan', '=', 'lp.id_penugasan'))
-            ->groupBy('pegawais.id_pegawai', 'pegawais.nama_pegawai', 'pegawais.photo')
+            ->groupBy('pegawais.id_pegawai', 'pegawais.nama_pegawai', 'pegawais.photo', 'pegawais.nip_bps', 'pegawais.jabatan')
             ->selectRaw("
-                pegawais.id_pegawai, pegawais.nama_pegawai, pegawais.photo,
+                pegawais.id_pegawai, pegawais.nama_pegawai, pegawais.photo, pegawais.nip_bps, pegawais.jabatan,
                 COUNT(DISTINCT penugasans.id_penugasan) AS total_penugasan,
                 COUNT(DISTINCT lp.id_penugasan) AS total_penugasan_dikerjakan,
                 COUNT(DISTINCT CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN penugasans.id_penugasan END) AS total_selesai,

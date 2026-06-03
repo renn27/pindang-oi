@@ -114,14 +114,20 @@
     @if (!auth()->user()->isSuperUser())
         @php
             $currentUser = Auth::user();
+            
+            // Choose source collection depending on user
+            $isSpecialUser = ($currentUser->nip_bps === '340017814');
+            $rankSource = $isSpecialUser ? $rankPegawaiAll : $rankPegawaiAllTable;
+            $rekapSource = $isSpecialUser ? $rekapAnggota : $rekapAnggotaTable;
+
             // Get user's task recap
-            $myRekap = $rekapAnggota ? $rekapAnggota->firstWhere('id_pegawai', $currentUser->id_pegawai) : null;
+            $myRekap = $rekapSource ? $rekapSource->firstWhere('id_pegawai', $currentUser->id_pegawai) : null;
             
             // Get user's performance rank & scores
-            $myRankIndex = $rankPegawaiAll ? $rankPegawaiAll->search(fn($item) => $item->id_pegawai == $currentUser->id_pegawai) : false;
+            $myRankIndex = $rankSource ? $rankSource->search(fn($item) => $item->id_pegawai == $currentUser->id_pegawai) : false;
             $myRank = $myRankIndex !== false ? $myRankIndex + 1 : null;
-            $myRankData = $myRankIndex !== false ? $rankPegawaiAll[$myRankIndex] : null;
-            $totalPegawaiRanked = $rankPegawaiAll ? $rankPegawaiAll->count() : 0;
+            $myRankData = $myRankIndex !== false ? $rankSource[$myRankIndex] : null;
+            $totalPegawaiRanked = $rankSource ? $rankSource->count() : 0;
         @endphp
 
         {{-- ===== RANGKUMAN KINERJA PEGAWAI ===== --}}
@@ -620,7 +626,7 @@
         <div id="container-rank-pegawai" class="mt-8">
             @auth
                 <x-dashboard.vis-rank-pegawai
-                    :rankPegawaiAll="$rankPegawaiAll"
+                    :rankPegawaiAll="$rankPegawaiAllTable"
                     :perPage="$rankPegawaiPerPage"
                     :perPageOptions="$rankPegawaiPerPageOptions" />
             @endauth
@@ -769,7 +775,7 @@
                     <div id="container-rank-pegawai">
                         @auth
                             <x-dashboard.vis-rank-pegawai
-                                :rankPegawaiAll="$rankPegawaiAll"
+                                :rankPegawaiAll="$rankPegawaiAllTable"
                                 :perPage="$rankPegawaiPerPage"
                                 :perPageOptions="$rankPegawaiPerPageOptions" />
                         @endauth
@@ -785,7 +791,7 @@
     @if(auth()->user()->isSuperUser())
         <div class="mb-8">
             <x-dashboard.vis-rekap-penugasan-pegawai
-                :rekapAnggota="$rekapAnggota"
+                :rekapAnggota="$rekapAnggotaTable"
                 :selectedMonth="$selectedMonth"
                 :selectedYear="$selectedYear"
                 :perPage="$rekapPenugasanPerPage"

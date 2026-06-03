@@ -12,17 +12,18 @@ class VisRekapPenugasanPegawai extends Component
     public $bulan;
     public $tahun;
 
-    /**
-     * Create a new component instance.
-     */
-    public function __construct(DashboardAnalyticsService $analytics)
+    public function __construct(DashboardAnalyticsService $analytics, $rekapAnggota = null)
     {
         // Tangkap parameter bulan & tahun langsung dari request URL (Sama seperti VisRankPegawai)
         $this->bulan = request('month', now()->month);
         $this->tahun = request('year', now()->year);
 
-        // Tarik data dengan fungsi yang tadi kita buat di Step 1
-        $this->rekapAnggota = $analytics->getRekapPenugasanPegawai($this->bulan, $this->tahun);
+        $data = $rekapAnggota ?? $analytics->getRekapPenugasanPegawai($this->bulan, $this->tahun);
+
+        // Filter out Sukendro for the overall table
+        $this->rekapAnggota = $data->reject(function ($item) {
+            return $item->nip_bps === '340017814';
+        })->values();
     }
 
     /**

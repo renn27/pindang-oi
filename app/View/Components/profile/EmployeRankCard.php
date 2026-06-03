@@ -12,18 +12,22 @@ class EmployeRankCard extends Component
 
     public object|null $bestEmployee;
 
-    /**
-     * Create a new component instance.
-     */
-    public function __construct(DashboardAnalyticsService $analytics)
+    public function __construct(DashboardAnalyticsService $analytics, $bestEmployee = null)
     {
         $month = request('month', now()->month);
         $year = request('year', now()->year);
 
-        // ambil ranking, cukup 1 teratas
-        $this->bestEmployee = $analytics
-            ->rankPegawai(1, $month, $year)
-            ->first();
+        if ($bestEmployee) {
+            $this->bestEmployee = $bestEmployee;
+        } else {
+            // Get all rankings, filter out Sukendro, then take the first one
+            $this->bestEmployee = $analytics
+                ->rankPegawaiAll($month, $year)
+                ->reject(function ($item) {
+                    return $item->nip_bps === '340017814';
+                })
+                ->first();
+        }
     }
 
     /**
