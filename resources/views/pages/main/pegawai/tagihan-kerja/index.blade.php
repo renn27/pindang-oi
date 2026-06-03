@@ -84,15 +84,6 @@
 
     <!-- Container untuk Card Kegiatan -->
     <div class="space-y-6">
-        {{-- {{ $kegiatans->last()->nama_rk_kegiatan }}
-        {{ $kegiatans->last()->subKegiatans->sum(function ($sub) {
-            return $sub->penugasans->count();
-        }) }}
-        {{ $kegiatans->last()->subKegiatans->sum(function ($sub) {
-            return $sub->penugasans->filter(function ($p) {
-                return $p->latestPengiriman?->penerimaan?->status === "Diterima";
-            })->count();
-        }) }} --}}
         @foreach ($kegiatans as $kegiatan)
             @php
                 $isKegiatanBerjalan = $kegiatan->subKegiatans->contains(function ($sub) {

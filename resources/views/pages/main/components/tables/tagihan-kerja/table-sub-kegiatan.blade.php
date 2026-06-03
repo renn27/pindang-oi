@@ -25,7 +25,7 @@
                         Tanggal Selesai
                     </th>
                     <th scope="col"
-                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-48">
+                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-56">
                         Progres Tugas
                     </th>
                     @if(auth()->user()->active_role !== 'Anggota Tim')
@@ -136,17 +136,17 @@
                         </td>
 
                         {{-- Progress Bar --}}
-                        <td class="px-6 py-4 whitespace-nowrap text-center align-top">
-                            <div class="flex items-center gap-2">
-                                <div class="flex-1 max-w-[300px] h-1.5 bg-gray-200 rounded-full overflow-hidden dark:bg-gray-700">
+                        <td class="px-6 py-4 whitespace-nowrap align-top">
+                            <div class="flex items-center gap-2 justify-center">
+                                <div class="w-28 h-1.5 bg-gray-200 rounded-full overflow-hidden dark:bg-gray-700 flex-shrink-0">
                                     <div class="h-full {{ $progressColor }} rounded-full transition-all duration-500"
                                         style="width: {{ $progressPercent }}%">
                                     </div>
                                 </div>
-                                <span class="text-xs font-medium {{ $progressTextColor }}">
+                                <span class="text-xs font-medium {{ $progressTextColor }} w-10 text-right flex-shrink-0">
                                     {{ $progressPercent }}%
                                 </span>
-                                <span class="text-xs text-gray-400 dark:text-gray-500">
+                                <span class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">
                                     ({{ $penugasanTargetSelesai }}/{{ $totalTargetPenugasan }})
                                 </span>
                             </div>
