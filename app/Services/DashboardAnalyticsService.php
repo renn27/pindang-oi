@@ -693,12 +693,23 @@ class DashboardAnalyticsService {
             ->get();
 
         // Olah di RAM memory
-        $rekap = $subKegiatans->groupBy(function ($sub) {
+        $rekap = $subKegiatans->groupBy(function ($sub) use ($endOfMonth) {
             if (!$sub->kegiatan) {
                 return 'tanpa-ketua';
             }
             if ($sub->kegiatan->transfer) {
                 $transferredAt = \Carbon\Carbon::parse($sub->kegiatan->transfer->transferred_at);
+                
+                $transferredMonth = $transferredAt->format('Y-m');
+                $filterMonth = $endOfMonth->format('Y-m');
+
+                // Jika bulan filter sebelum bulan transfer, maka sub kegiatan masih milik ketua lama
+                if ($filterMonth < $transferredMonth) {
+                    return $sub->kegiatan->transfer->from_ketua_id ?? 'tanpa-ketua';
+                }
+
+                // Jika bulan filter adalah bulan transfer atau setelahnya,
+                // maka dicek apakah sub kegiatan ini sudah 100% selesai SEBELUM tanggal transfer.
                 $totalTargetPenugasan = $sub->penugasans->sum('target');
                 $penugasanTargetSelesaiSebelumTransfer = $sub->penugasans->sum(function($p) use ($transferredAt) {
                     $pengirimansSebelumTransfer = $p->pengirimans->filter(function($k) use ($transferredAt) {
