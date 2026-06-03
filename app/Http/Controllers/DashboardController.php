@@ -112,7 +112,8 @@ class DashboardController extends Controller
         Request $request,
         Pegawai $pegawai,
         DashboardAnalyticsService $analytics,
-        PushNotificationService $notifications
+        PushNotificationService $notifications,
+        TodoListService $todoList
     ) {
         if (!auth()->user()?->isSuperUser()) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -128,22 +129,16 @@ class DashboardController extends Controller
             return response()->json(['message' => 'Pegawai tidak ditemukan dalam rekap statistik'], 404);
         }
 
-        $totalPenugasan = $pegawaiStats->total_penugasan ?? 0;
-        $totalTarget = $pegawaiStats->total_target ?? 0;
-        $belumDikerjakan = $pegawaiStats->total_belum_dikerjakan ?? 0;
-        $dikirim = $pegawaiStats->total_dikirim ?? 0;
-        $diperiksa = $pegawaiStats->total_diperiksa ?? 0;
-        $revisi = $pegawaiStats->total_revisi ?? 0;
-        $diterima = $pegawaiStats->total_diterima ?? 0;
+        $revisiCount = $todoList->revisiAsAnggota($pegawai)->count();
+        $berjalanCount = $todoList->berjalanAsAnggota($pegawai)->count();
+        $terlewatCount = $todoList->terlewatAsAnggota($pegawai)->count();
 
-        $body = "{$pegawai->nama_pegawai} masih punya:\n" .
-                "  - jml penugasan = {$totalPenugasan}\n" .
-                "  - total target = {$totalTarget}\n" .
-                "  - belum dikerjakan = {$belumDikerjakan}\n" .
-                "  - dikirim = {$dikirim}\n" .
-                "  - diperiksa = {$diperiksa}\n" .
-                "  - revisi = {$revisi}\n" .
-                "  - diterima = {$diterima}";
+        $body = "Halo {$pegawai->nama_pegawai}.\n\n" .
+                "Segera periksa dan selesaikan tugas-tugas Anda yang masih aktif:\n" .
+                "- Revisi Ketua Tim: {$revisiCount} tugas\n" .
+                "- Sedang Berjalan: {$berjalanCount} tugas\n" .
+                "- Sudah Terlewat: {$terlewatCount} tugas\n\n" .
+                "Mohon segera ditindaklanjuti sebelum batas waktu berakhir.";
 
         $tag = 'manual-todo-reminder-' . $pegawai->id_pegawai . '-' . now()->timestamp;
 
