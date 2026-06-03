@@ -9,6 +9,7 @@
                     <th scope="col" class="px-4 py-3.5 text-left text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest w-28">Bidang</th>
                     <th scope="col" class="px-4 py-3.5 text-left text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Penugasan</th>
                     <th scope="col" class="px-4 py-3.5 text-left text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest w-28">Target</th>
+                    <th scope="col" class="px-4 py-3.5 text-left text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest w-32">Mulai</th>
                     <th scope="col" class="px-4 py-3.5 text-left text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest w-32">Deadline</th>
                     <th scope="col" class="px-4 py-3.5 text-left text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest w-40">Status</th>
                 </tr>
@@ -69,6 +70,12 @@
                         <td class="px-4 py-3.5">
                             <span class="inline-flex items-center gap-1 py-1 px-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-semibold border border-gray-200/60 dark:border-gray-700/60">
                                 {{ $penugasan->target }} <span class="font-normal text-gray-400">{{ $penugasan->satuan_target }}</span>
+                            </span>
+                        </td>
+
+                        <td class="px-4 py-3.5 whitespace-nowrap">
+                            <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                {{ $penugasan->tanggal_mulai ? \Carbon\Carbon::parse($penugasan->tanggal_mulai)->format('d M Y') : '-' }}
                             </span>
                         </td>
 
