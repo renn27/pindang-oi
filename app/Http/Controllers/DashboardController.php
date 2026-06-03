@@ -133,12 +133,7 @@ class DashboardController extends Controller
         $berjalanCount = $todoList->berjalanAsAnggota($pegawai)->count();
         $terlewatCount = $todoList->terlewatAsAnggota($pegawai)->count();
 
-        $body = "Halo {$pegawai->nama_pegawai}.\n\n" .
-                "Segera periksa dan selesaikan tugas-tugas Anda yang masih aktif:\n" .
-                "- Revisi Ketua Tim: {$revisiCount} tugas\n" .
-                "- Sedang Berjalan: {$berjalanCount} tugas\n" .
-                "- Sudah Terlewat: {$terlewatCount} tugas\n\n" .
-                "Mohon segera ditindaklanjuti sebelum batas waktu berakhir.";
+        $body = "Halo {$pegawai->nama_pegawai}. Tugas aktif Anda: {$revisiCount} Revisi Ketua Tim, {$berjalanCount} Sedang Berjalan, dan {$terlewatCount} Sudah Terlewat. Mohon segera ditindaklanjuti dan diselesaikan.";
 
         $tag = 'manual-todo-reminder-' . $pegawai->id_pegawai . '-' . now()->timestamp;
 
