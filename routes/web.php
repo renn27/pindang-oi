@@ -142,6 +142,7 @@ Route::middleware(['auth', 'active.pegawai'])->group(function () {
 
     Route::get('/pegawai/{pegawai}/todo-list', [\App\Http\Controllers\DashboardController::class, 'getPegawaiTodoList'])->name('pegawai.todo-list');
     Route::post('/pegawai/{pegawai}/send-todo-reminder', [\App\Http\Controllers\DashboardController::class, 'sendPegawaiTodoReminder'])->name('pegawai.send-todo-reminder');
+    Route::get('/pegawai/{pegawai}/check-kegiatan-belum-transfer', [\App\Http\Controllers\PegawaiRoleController::class, 'checkKegiatanBelumTransfer'])->name('pegawai.check-kegiatan-belum-transfer');
 
     Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('mark-all-read');

@@ -64,6 +64,14 @@ class DashboardController extends Controller
             return $item->nip_bps === '340017814';
         })->values();
 
+        // Rekap sub kegiatan ketua tim difilter per bulan yang dipilih
+        $rekapSubKegiatan = $analytics->getRekapSubKegiatanKetua($selectedMonth, $selectedYear, false);
+
+        // Filter out Sukendro for the public rekap sub kegiatan table
+        $rekapSubKegiatanTable = $rekapSubKegiatan->reject(function ($item) {
+            return $item->nip_bps === '340017814';
+        })->values();
+
         return view('pages.dashboard', [
             'title'                       => 'Dashboard',
             'unfinishedTerlewatAsAnggota' => $unfinishedTerlewatAsAnggota,
@@ -80,6 +88,8 @@ class DashboardController extends Controller
             'rankPegawaiAllTable'         => $rankPegawaiAllTable,
             'rekapAnggota'                => $rekapAnggota,
             'rekapAnggotaTable'           => $rekapAnggotaTable,
+            'rekapSubKegiatan'            => $rekapSubKegiatan,
+            'rekapSubKegiatanTable'       => $rekapSubKegiatanTable,
             'rankPegawaiPerPage'          => $rankPegawaiPerPage,
             'rekapPenugasanPerPage'       => $rekapPenugasanPerPage,
             'rankPegawaiPerPageOptions'   => $rankPegawaiPerPageOptions,

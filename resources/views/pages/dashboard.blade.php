@@ -797,6 +797,15 @@
                 :perPage="$rekapPenugasanPerPage"
                 :perPageOptions="$rekapPerPageOptions" />
         </div>
+
+        <div class="mb-8">
+            <x-dashboard.vis-rekap-sub-kegiatan
+                :rekapSubKegiatan="$rekapSubKegiatanTable"
+                :selectedMonth="$selectedMonth"
+                :selectedYear="$selectedYear"
+                :perPage="10"
+                :perPageOptions="$rekapPerPageOptions" />
+        </div>
     @endif
 
     {{-- Modal Perhitungan Rumus Component --}}

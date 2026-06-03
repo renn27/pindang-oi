@@ -674,6 +674,137 @@ class DashboardAnalyticsService {
         ];
     }
 
+    public function getRekapSubKegiatanKetua($bulan, $tahun, bool $excludeSpecial = false)
+    {
+        $startOfMonth = Carbon::create($tahun, $bulan, 1)->startOfMonth();
+        $endOfMonth   = Carbon::create($tahun, $bulan, 1)->endOfMonth();
+        $som = $startOfMonth->toDateString();
+        $eom = $endOfMonth->toDateString();
+        $bf  = sprintf('%04d-%02d', $tahun, $bulan);
+
+        // Ambil semua SubKegiatan yang aktif di bulan filter beserta relasinya
+        $subKegiatans = SubKegiatan::where('tanggal_mulai', '<=', $eom)
+            ->where('tanggal_selesai', '>=', $som)
+            ->with([
+                'kegiatan.penanggungJawab',
+                'kegiatan.transfer.fromKetua',
+                'penugasans.pengirimans.penerimaan'
+            ])
+            ->get();
+
+        // Olah di RAM memory
+        $rekap = $subKegiatans->groupBy(function ($sub) {
+            if (!$sub->kegiatan) {
+                return 'tanpa-ketua';
+            }
+            if ($sub->kegiatan->transfer) {
+                $transferredAt = \Carbon\Carbon::parse($sub->kegiatan->transfer->transferred_at);
+                $totalTargetPenugasan = $sub->penugasans->sum('target');
+                $penugasanTargetSelesaiSebelumTransfer = $sub->penugasans->sum(function($p) use ($transferredAt) {
+                    $pengirimansSebelumTransfer = $p->pengirimans->filter(function($k) use ($transferredAt) {
+                        return $k->penerimaan &&
+                               $k->penerimaan->status === 'Diterima' &&
+                               \Carbon\Carbon::parse($k->penerimaan->created_at)->lt($transferredAt);
+                    });
+
+                    $adaPelunasan = $pengirimansSebelumTransfer->contains(fn($k) =>
+                        $k->tipe_pengiriman === 'Pelunasan'
+                    );
+
+                    return $pengirimansSebelumTransfer->sum(fn($k) =>
+                        $k->tipe_pengiriman === ($adaPelunasan ? 'Pelunasan' : 'Cicilan')
+                            ? $k->jumlah_dikirim ?? 0
+                            : 0
+                    );
+                });
+
+                $is100PercentBeforeTransfer = ($totalTargetPenugasan > 0) && ($penugasanTargetSelesaiSebelumTransfer >= $totalTargetPenugasan);
+                if ($is100PercentBeforeTransfer) {
+                    return $sub->kegiatan->transfer->from_ketua_id ?? 'tanpa-ketua';
+                }
+            }
+            return $sub->kegiatan->id_penanggung_jawab ?? 'tanpa-ketua';
+        })
+        ->reject(fn($group, $key) => $key === 'tanpa-ketua')
+        ->map(function ($group, $ketuaId) use ($excludeSpecial) {
+            $ketua = null;
+            foreach ($group as $sub) {
+                if ($sub->kegiatan->penanggungJawab && $sub->kegiatan->penanggungJawab->id_pegawai === $ketuaId) {
+                    $ketua = $sub->kegiatan->penanggungJawab;
+                    break;
+                }
+                if ($sub->kegiatan->transfer && $sub->kegiatan->transfer->fromKetua && $sub->kegiatan->transfer->fromKetua->id_pegawai === $ketuaId) {
+                    $ketua = $sub->kegiatan->transfer->fromKetua;
+                    break;
+                }
+            }
+
+            if (!$ketua) {
+                $ketua = \App\Models\Pegawai::find($ketuaId);
+            }
+
+            if (!$ketua) {
+                return null;
+            }
+
+            if ($excludeSpecial && $ketua->nip_bps === '340017814') {
+                return null;
+            }
+
+            $details = $group->map(function ($sub) {
+                $totalTargetPenugasan = $sub->penugasans->sum('target');
+                $penugasanTargetSelesai = $sub->penugasans->sum(function($p) {
+                    $adaPelunasan = $p->pengirimans->contains(fn($k) =>
+                        $k->tipe_pengiriman === 'Pelunasan' && $k->penerimaan?->status === 'Diterima'
+                    );
+
+                    return $p->pengirimans->sum(fn($k) =>
+                        $k->penerimaan?->status === 'Diterima' &&
+                        $k->tipe_pengiriman === ($adaPelunasan ? 'Pelunasan' : 'Cicilan')
+                            ? $k->jumlah_dikirim ?? 0
+                            : 0
+                    );
+                });
+
+                $progressPercent = $totalTargetPenugasan ? round(($penugasanTargetSelesai / $totalTargetPenugasan) * 100) : 0;
+
+                return [
+                    'id_sub_kegiatan' => $sub->id_sub_kegiatan,
+                    'nama_sub_kegiatan' => $sub->nama_sub_kegiatan,
+                    'tanggal_mulai' => $sub->tanggal_mulai,
+                    'tanggal_selesai' => $sub->tanggal_selesai,
+                    'tanggal_mulai_formatted' => $sub->tanggal_mulai ? $sub->tanggal_mulai->translatedFormat('d M Y') : '-',
+                    'tanggal_selesai_formatted' => $sub->tanggal_selesai ? $sub->tanggal_selesai->translatedFormat('d M Y') : '-',
+                    'progress_percent' => $progressPercent,
+                    'total_target' => $totalTargetPenugasan,
+                    'total_realisasi' => $penugasanTargetSelesai,
+                    'id_kegiatan' => $sub->id_kegiatan,
+                ];
+            });
+
+            $totalSub = $details->count();
+            $selesai = $details->filter(fn($d) => $d['progress_percent'] >= 100)->count();
+            $belumSelesai = $totalSub - $selesai;
+            $avgProgress = $totalSub ? round($details->avg('progress_percent'), 2) : 0;
+
+            return (object) [
+                'id_pegawai' => $ketua->id_pegawai,
+                'nama_pegawai' => $ketua->nama_pegawai,
+                'photo' => $ketua->photo,
+                'nip_bps' => $ketua->nip_bps,
+                'total_sub_kegiatan' => $totalSub,
+                'sub_kegiatan_selesai' => $selesai,
+                'sub_kegiatan_belum_selesai' => $belumSelesai,
+                'average_progress' => $avgProgress,
+                'details' => $details->values()->all(),
+            ];
+        })
+        ->filter()
+        ->values();
+
+        return $rekap;
+    }
+
     public function totalKegiatan(): int
     {
         return Penugasan::query()

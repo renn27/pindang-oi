@@ -12,11 +12,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("
-            ALTER TABLE penugasans 
-            MODIFY status ENUM('Belum Dikirim', 'Sudah Dikirim')
-            NOT NULL DEFAULT 'Belum Dikirim'
-        ");
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("
+                ALTER TABLE penugasans 
+                MODIFY status ENUM('Belum Dikirim', 'Sudah Dikirim')
+                NOT NULL DEFAULT 'Belum Dikirim'
+            ");
+        }
     }
     
     /**
@@ -24,15 +26,17 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("
-            ALTER TABLE penugasans 
-            MODIFY status ENUM(
-                'Belum Dikirim',
-                'Sudah Dikirim',
-                'Masih Revisi',
-                'Sudah Diterima'
-            )
-            NOT NULL DEFAULT 'Belum Dikirim'
-        ");
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("
+                ALTER TABLE penugasans 
+                MODIFY status ENUM(
+                    'Belum Dikirim',
+                    'Sudah Dikirim',
+                    'Masih Revisi',
+                    'Sudah Diterima'
+                )
+                NOT NULL DEFAULT 'Belum Dikirim'
+            ");
+        }
     }
 };

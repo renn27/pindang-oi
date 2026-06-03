@@ -181,16 +181,12 @@
                                     @if ($pegawai->is_active)
                                         <button type="button"
                                             @disabled($pegawai->id_pegawai === auth()->user()->id_pegawai)
-                                            @click="$dispatch('open-smart-modal', {
-                                                modalId: 'modal-toggle-active-pegawai',
-                                                key: '{{ $pegawai->id_pegawai }}',
-                                                data: {
-                                                    action: '{{ route('pegawai-role.toggle-active', $pegawai->id_pegawai) }}',
-                                                    nama_pegawai: @js($pegawai->nama_pegawai),
-                                                    inactive_month: {{ now()->month }},
-                                                    inactive_year: {{ now()->year }}
-                                                }
-                                            })"
+                                            @click="checkAndNonaktif(
+                                                '{{ $pegawai->id_pegawai }}',
+                                                @js($pegawai->nama_pegawai),
+                                                '{{ route('pegawai.check-kegiatan-belum-transfer', $pegawai->id_pegawai) }}',
+                                                '{{ route('pegawai-role.toggle-active', $pegawai->id_pegawai) }}'
+                                            )"
                                             class="inline-flex items-center rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-800 dark:text-red-300">
                                             Nonaktifkan
                                         </button>
@@ -279,6 +275,57 @@
             </div>
         </form>
     </x-ui.smart-modal>
+
+    {{-- Modal Peringatan Kegiatan Belum Transfer --}}
+    <x-ui.smart-modal id="modal-kegiatan-belum-transfer" class="max-w-lg" :showCloseButton="true">
+        <div class="shrink-0 border-b border-gray-200 px-6 py-5 dark:border-gray-700">
+            <div class="flex items-start gap-4">
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
+                    <svg class="h-6 w-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white">Kegiatan Belum Ditransfer</h4>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+                        x-text="'Pegawai &quot;' + (formData.nama_pegawai || '') + '&quot; masih memimpin ' + (formData.total || 0) + ' kegiatan yang belum ditransfer. Transfer semua kegiatan terlebih dahulu sebelum menonaktifkan.'">
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-6 py-4">
+            <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Daftar Kegiatan yang Perlu Ditransfer:</p>
+            <ul class="space-y-2 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
+                <template x-for="(kegiatan, i) in (formData.kegiatans || [])" :key="i">
+                    <li class="flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 dark:border-amber-800/30 dark:bg-amber-900/10">
+                        <div class="flex items-start gap-3 min-w-0">
+                            <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-200 text-[10px] font-bold text-amber-700 dark:bg-amber-900/50 dark:text-amber-400" x-text="i + 1"></span>
+                            <div class="min-w-0">
+                                <p class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate" x-text="kegiatan.nama"></p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5" x-text="kegiatan.bidang"></p>
+                            </div>
+                        </div>
+                        <a :href="kegiatan.tagihan_url" x-show="kegiatan.tagihan_url"
+                            class="shrink-0 inline-flex items-center gap-1 rounded-md border border-amber-400 bg-white px-2.5 py-1 text-[11px] font-semibold text-amber-700 hover:bg-amber-50 transition-colors dark:border-amber-700 dark:bg-gray-900 dark:text-amber-400 dark:hover:bg-amber-900/20">
+                            <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            </svg>
+                            Transfer
+                        </a>
+                    </li>
+                </template>
+            </ul>
+        </div>
+
+        <div class="flex justify-end border-t border-gray-200 px-6 py-4 dark:border-gray-700">
+            <button type="button" @click="open = false"
+                class="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800">
+                Mengerti
+            </button>
+        </div>
+    </x-ui.smart-modal>
+
 
     <x-ui.smart-modal id="modal-create-pegawai" class="max-w-2xl">
         <div class="shrink-0 border-b border-gray-200 px-6 py-4 dark:border-gray-700">
@@ -483,6 +530,65 @@
     </x-ui.smart-modal>
 
     <script>
+        async function checkAndNonaktif(idPegawai, namaPegawai, checkUrl, actionUrl) {
+            // Tampilkan loading state pada button (opsional, singkat)
+            try {
+                const response = await fetch(checkUrl, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                    }
+                });
+
+                if (!response.ok) throw new Error('Gagal memeriksa kegiatan.');
+
+                const data = await response.json();
+
+                if (data.total > 0) {
+                    // Masih ada kegiatan yang belum ditransfer → tampilkan modal peringatan
+                    window.dispatchEvent(new CustomEvent('open-smart-modal', {
+                        detail: {
+                            modalId: 'modal-kegiatan-belum-transfer',
+                            data: {
+                                nama_pegawai: namaPegawai,
+                                total: data.total,
+                                kegiatans: data.kegiatans,
+                            }
+                        }
+                    }));
+                } else {
+                    // Semua kegiatan sudah ditransfer → buka modal konfirmasi nonaktif
+                    window.dispatchEvent(new CustomEvent('open-smart-modal', {
+                        detail: {
+                            modalId: 'modal-toggle-active-pegawai',
+                            key: idPegawai,
+                            data: {
+                                action: actionUrl,
+                                nama_pegawai: namaPegawai,
+                                inactive_month: new Date().getMonth() + 1,
+                                inactive_year: new Date().getFullYear()
+                            }
+                        }
+                    }));
+                }
+            } catch (e) {
+                console.error(e);
+                // Fallback: langsung buka modal nonaktif jika ada error pengecekan
+                window.dispatchEvent(new CustomEvent('open-smart-modal', {
+                    detail: {
+                        modalId: 'modal-toggle-active-pegawai',
+                        key: idPegawai,
+                        data: {
+                            action: actionUrl,
+                            nama_pegawai: namaPegawai,
+                            inactive_month: new Date().getMonth() + 1,
+                            inactive_year: new Date().getFullYear()
+                        }
+                    }
+                }));
+            }
+        }
+
         function pegawaiDropdown() {
             return {
                 open: false,

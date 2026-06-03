@@ -101,6 +101,26 @@ class PegawaiRoleController extends Controller
         return back()->with('success', "Pegawai berhasil {$status}.");
     }
 
+    public function checkKegiatanBelumTransfer(Pegawai $pegawai)
+    {
+        $this->authorize('kelola-master-data');
+
+        $kegiatans = \App\Models\Kegiatan::where('id_penanggung_jawab', $pegawai->id_pegawai)
+            ->whereDoesntHave('transfer')
+            ->with('bidang:id_bidang,slug,detail_bidang')
+            ->get(['id_kegiatan', 'nama_rk_kegiatan', 'id_bidang']);
+
+        return response()->json([
+            'total'     => $kegiatans->count(),
+            'kegiatans' => $kegiatans->map(fn($k) => [
+                'id'           => $k->id_kegiatan,
+                'nama'         => $k->nama_rk_kegiatan,
+                'bidang'       => $k->bidang?->detail_bidang ?? '-',
+                'tagihan_url'  => $k->bidang ? route('kegiatan.index', ['bidang' => $k->bidang->slug]) : null,
+            ])->values(),
+        ]);
+    }
+
     public function store(Request $request) {
         $this->authorize('kelola-master-data');
         $validated = $request->validate([
