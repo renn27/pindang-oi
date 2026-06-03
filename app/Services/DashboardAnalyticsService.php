@@ -56,6 +56,14 @@ class DashboardAnalyticsService {
                 $excludeCompletedBefore($q);
             },
 
+            // 2b. Rekap penugasan yang belum dikerjakan (tidak punya pengiriman)
+            'penugasanSebagaiAnggota as total_belum_dikerjakan' => function ($q) use ($som, $eom, $excludeCompletedBefore) {
+                $q->where('tanggal_mulai', '<=', $eom)
+                  ->where('tanggal_selesai', '>=', $som)
+                  ->doesntHave('pengirimans');
+                $excludeCompletedBefore($q);
+            },
+
             // 3. Rekap penugasan yang sudah diperiksa & terverifikasi "Diterima"
             'penugasanSebagaiAnggota as total_diterima' => function ($q) use ($som, $eom, $excludeCompletedBefore) {
                 $q->where('tanggal_mulai', '<=', $eom)

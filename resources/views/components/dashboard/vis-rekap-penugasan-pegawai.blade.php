@@ -145,6 +145,16 @@
                                 </div>
                             </th>
 
+                            <th @click="sortBy('total_belum_dikerjakan')" 
+                                class="cursor-pointer border-b border-l border-gray-300 dark:border-gray-600 px-4 py-2 text-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors select-none whitespace-nowrap group text-gray-500 dark:text-gray-400">
+                                <div class="flex items-center justify-center gap-1">
+                                    Belum Dikerjakan
+                                    <span class="text-gray-300 group-hover:text-gray-500" x-show="sortCol === 'total_belum_dikerjakan'" :class="{'rotate-180': sortAsc, 'text-gray-500 dark:text-gray-300': sortCol === 'total_belum_dikerjakan'}">
+                                        <svg class="w-3.5 h-3.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                                    </span>
+                                </div>
+                            </th>
+
                             <th @click="sortBy('total_dikirim')" 
                                 class="cursor-pointer border-b border-l border-gray-300 dark:border-gray-600 px-4 py-2 text-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors select-none whitespace-nowrap group text-blue-700 dark:text-blue-400">
                                 <div class="flex items-center justify-center gap-1">
@@ -195,6 +205,8 @@
                                 
                                 <td class="border-l border-gray-200 dark:border-gray-700 px-4 py-2 text-center font-semibold text-purple-700 dark:text-purple-400" x-text="pegawai.total_target ?? 0"></td>
                                 
+                                <td class="border-l border-gray-200 dark:border-gray-700 px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-400" x-text="pegawai.total_belum_dikerjakan ?? 0"></td>
+                                
                                 <td class="border-l border-gray-200 dark:border-gray-700 px-4 py-2 text-center font-medium text-blue-700 dark:text-blue-400" x-text="pegawai.total_dikirim"></td>
                                 
                                 <td class="border-l border-gray-200 dark:border-gray-700 px-4 py-2 text-center font-medium text-amber-700 dark:text-amber-400" x-text="pegawai.total_diperiksa"></td>
@@ -206,7 +218,7 @@
                         </template>
                         
                         <tr x-show="filteredData.length === 0" x-cloak>
-                            <td colspan="7" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="8" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                                 <span x-text="search ? 'Tidak ada pegawai yang menggunakan nama tersebut.' : 'Belum ada data rekap penugasan bulan ini.'"></span>
                             </td>
                         </tr>
