@@ -9,6 +9,109 @@
             perPage: {{ (int) $perPage }},
             perPageOptions: {{ Js::from($perPageOptions) }},
             rawData: {{ Js::from($rekapAnggota) }},
+            selectedPegawai: null,
+            todoLoading: false,
+            todoHtml: '',
+            isModalOpen: false,
+            activeTabModal: 'revisi',
+
+            async openTodoModal(pegawai) {
+                this.selectedPegawai = pegawai;
+                this.todoLoading = true;
+                this.todoHtml = '';
+                this.activeTabModal = 'revisi';
+                
+                // Dispatch event untuk membuka smart modal
+                this.$dispatch('open-smart-modal', {
+                    modalId: 'modal-todo-list-anggota',
+                    data: pegawai
+                });
+                
+                try {
+                    let response = await fetch(`/pegawai/${pegawai.id_pegawai}/todo-list`);
+                    if (response.ok) {
+                        this.todoHtml = await response.text();
+                    } else {
+                        this.todoHtml = '<div class=\'text-center text-red-500 py-6 font-semibold\'>Gagal memuat To Do List anggota.</div>';
+                    }
+                } catch (error) {
+                    console.error(error);
+                    this.todoHtml = '<div class=\'text-center text-red-500 py-6 font-semibold\'>Terjadi kesalahan saat memuat data.</div>';
+                } finally {
+                    this.todoLoading = false;
+                }
+            },
+
+            async sendReminder() {
+                if (!this.selectedPegawai) return;
+                
+                if (window.SwalHelper && window.SwalHelper.fire) {
+                    window.SwalHelper.fire({
+                        html: `
+                            <div class='flex items-center gap-3 p-4'>
+                                <div class='flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/30'>
+                                    <svg class='animate-spin h-5 w-5 text-indigo-600 dark:text-indigo-400' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
+                                        <circle class='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' stroke-width='4'></circle>
+                                        <path class='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path>
+                                    </svg>
+                                </div>
+                                <div class='flex-1 min-w-0 text-left'>
+                                    <p class='font-medium text-gray-900 dark:text-white'>Mengirim...</p>
+                                    <p class='mt-1 text-sm text-gray-600 dark:text-gray-300'>Mengirim push notification ke pegawai.</p>
+                                </div>
+                            </div>
+                        `,
+                        showConfirmButton: false,
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        customClass: {
+                            popup: '!rounded-3xl !border !border-gray-200 !shadow-2xl !bg-white dark:!border-gray-700 dark:!bg-gray-900 !p-0 !max-w-sm',
+                            htmlContainer: '!p-0 !m-0',
+                            container: '!p-5'
+                        }
+                    });
+                }
+
+                try {
+                    let response = await fetch(`/pegawai/${this.selectedPegawai.id_pegawai}/send-todo-reminder`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            month: {{ $selectedMonth }},
+                            year: {{ $selectedYear }}
+                        })
+                    });
+
+                    let result = await response.json();
+
+                    if (window.SwalHelper && window.SwalHelper.close) {
+                        window.SwalHelper.close();
+                    }
+
+                    if (response.ok && result.success) {
+                        if (window.SwalHelper && window.SwalHelper.success) {
+                            window.SwalHelper.success(result.message);
+                        }
+                    } else {
+                        let errMsg = result.message || 'Gagal mengirim pengingat.';
+                        if (window.SwalHelper && window.SwalHelper.error) {
+                            window.SwalHelper.error(errMsg);
+                        }
+                    }
+                } catch (error) {
+                    console.error(error);
+                    if (window.SwalHelper && window.SwalHelper.close) {
+                        window.SwalHelper.close();
+                    }
+                    let errMsg = 'Terjadi kesalahan sistem saat mengirim pengingat.';
+                    if (window.SwalHelper && window.SwalHelper.error) {
+                        window.SwalHelper.error(errMsg);
+                    }
+                }
+            },
             
             get filteredData() {
                 let data = this.rawData;
@@ -198,7 +301,15 @@
                     </thead>
                     <tbody>
                         <template x-for="(pegawai, index) in paginatedData" :key="pegawai.id_pegawai">
-                            <tr class="hover:bg-indigo-50 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 last:border-b-0" :class="{'bg-gray-50/70 dark:bg-gray-800/40': index % 2 === 1}">
+                            <tr 
+                                @if(auth()->user()?->isSuperUser())
+                                    @click="openTodoModal(pegawai)"
+                                    class="cursor-pointer hover:bg-indigo-50 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 last:border-b-0"
+                                @else
+                                    class="hover:bg-indigo-50 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 last:border-b-0"
+                                @endif
+                                :class="{'bg-gray-50/70 dark:bg-gray-800/40': index % 2 === 1}"
+                            >
                                 <td class="px-4 py-2 font-medium text-gray-900 dark:text-white" x-text="pegawai.nama_pegawai"></td>
                                 
                                 <td class="border-l border-gray-200 dark:border-gray-700 px-4 py-2 text-center font-semibold bg-gray-50/50 dark:bg-transparent" x-text="pegawai.total_penugasan"></td>
@@ -275,6 +386,55 @@
                     <button @click="if(currentPage < totalPages) currentPage++" :disabled="currentPage === totalPages" class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">Next</button>
                 </div>
             </div>
+
+            <!-- Modal To Do List Anggota -->
+            @if(auth()->user()?->isSuperUser())
+                <x-ui.smart-modal id="modal-todo-list-anggota" class="max-w-5xl" :isOpen="false">
+                    <div class="relative flex max-h-[90vh] w-full flex-col overflow-visible rounded-3xl bg-white dark:bg-gray-900 dark:border dark:border-gray-800">
+                        <!-- HEADER -->
+                        <div class="shrink-0 border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+                            <h4 class="text-xl font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+                                <span class="p-1.5 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                </span>
+                                To Do List: <span class="text-indigo-600 dark:text-indigo-400" x-text="selectedPegawai ? selectedPegawai.nama_pegawai : ''"></span>
+                            </h4>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                Daftar tugas mandiri anggota tim yang belum selesai dikerjakan.
+                            </p>
+                        </div>
+
+                        <!-- BODY -->
+                        <div class="flex-1 overflow-y-auto px-6 py-5 custom-scrollbar dark:bg-gray-900 max-h-[60vh]">
+                            <!-- Loading State -->
+                            <div x-show="todoLoading" class="flex flex-col items-center justify-center py-20 gap-4">
+                                <svg class="animate-spin h-8 w-8 text-indigo-600 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <p class="text-sm font-semibold text-gray-500 dark:text-gray-400">Memuat To Do List...</p>
+                            </div>
+
+                            <!-- Content State -->
+                            <div x-show="!todoLoading" x-html="todoHtml" class="transition-opacity duration-200"></div>
+                        </div>
+
+                        <!-- FOOTER -->
+                        <div class="shrink-0 border-t border-gray-200 px-6 py-4 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50">
+                            <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                                <button @click="open = false" type="button" class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition">
+                                    Batal
+                                </button>
+                                
+                                <button type="button" @click="sendReminder()" class="flex w-full justify-center items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 sm:w-auto transition shadow-sm dark:bg-indigo-500 dark:hover:bg-indigo-600">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                                    Kirim Pengingat Push
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </x-ui.smart-modal>
+            @endif
         </div>
     </div>
 </div>

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\DashboardAnalyticsService;
 use App\Services\TodoListService;
+use App\Models\Pegawai;
+use App\Services\PushNotificationService;
 
 class DashboardController extends Controller
 {
@@ -82,6 +84,81 @@ class DashboardController extends Controller
             'rekapPenugasanPerPage'       => $rekapPenugasanPerPage,
             'rankPegawaiPerPageOptions'   => $rankPegawaiPerPageOptions,
             'rekapPerPageOptions'         => $rekapPenugasanPerPageOptions,
+        ]);
+    }
+
+    public function getPegawaiTodoList(Pegawai $pegawai, TodoListService $todoList)
+    {
+        if (!auth()->user()?->isSuperUser()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $revisiAsAnggota = $todoList->revisiAsAnggota($pegawai);
+        $unfinishedBerjalanAsAnggota = $todoList->berjalanAsAnggota($pegawai)->get();
+        $unfinishedTerlewatAsAnggota = $todoList->terlewatAsAnggota($pegawai)->get();
+        
+        $revisiCount = $revisiAsAnggota->count();
+
+        return view('pages.main.dashboard.partials.pegawai-todo-list', compact(
+            'pegawai',
+            'revisiAsAnggota',
+            'unfinishedBerjalanAsAnggota',
+            'unfinishedTerlewatAsAnggota',
+            'revisiCount'
+        ));
+    }
+
+    public function sendPegawaiTodoReminder(
+        Request $request,
+        Pegawai $pegawai,
+        DashboardAnalyticsService $analytics,
+        PushNotificationService $notifications
+    ) {
+        if (!auth()->user()?->isSuperUser()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $month = (int) $request->input('month', now()->month);
+        $year = (int) $request->input('year', now()->year);
+
+        $rekapCollection = $analytics->getRekapPenugasanPegawai($month, $year, false);
+        $pegawaiStats = $rekapCollection->firstWhere('id_pegawai', $pegawai->id_pegawai);
+
+        if (!$pegawaiStats) {
+            return response()->json(['message' => 'Pegawai tidak ditemukan dalam rekap statistik'], 404);
+        }
+
+        $totalPenugasan = $pegawaiStats->total_penugasan ?? 0;
+        $totalTarget = $pegawaiStats->total_target ?? 0;
+        $belumDikerjakan = $pegawaiStats->total_belum_dikerjakan ?? 0;
+        $dikirim = $pegawaiStats->total_dikirim ?? 0;
+        $diperiksa = $pegawaiStats->total_diperiksa ?? 0;
+        $revisi = $pegawaiStats->total_revisi ?? 0;
+        $diterima = $pegawaiStats->total_diterima ?? 0;
+
+        $body = "{$pegawai->nama_pegawai} masih punya:\n" .
+                "  - jml penugasan = {$totalPenugasan}\n" .
+                "  - total target = {$totalTarget}\n" .
+                "  - belum dikerjakan = {$belumDikerjakan}\n" .
+                "  - dikirim = {$dikirim}\n" .
+                "  - diperiksa = {$diperiksa}\n" .
+                "  - revisi = {$revisi}\n" .
+                "  - diterima = {$diterima}";
+
+        $tag = 'manual-todo-reminder-' . $pegawai->id_pegawai . '-' . now()->timestamp;
+
+        $notifications->notifyPegawai(
+            $pegawai,
+            'Pengingat Penugasan',
+            $body,
+            route('dashboard'),
+            $tag,
+            'umum'
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notifikasi pengingat berhasil dikirim ke ' . $pegawai->nama_pegawai
         ]);
     }
 

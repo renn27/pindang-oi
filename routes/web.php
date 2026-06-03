@@ -140,6 +140,9 @@ Route::middleware(['auth', 'active.pegawai'])->group(function () {
         Route::post('/todo-reminder/test', [PushSubscriptionController::class, 'testTodoReminder'])->name('todo-reminder.test');
     });
 
+    Route::get('/pegawai/{pegawai}/todo-list', [\App\Http\Controllers\DashboardController::class, 'getPegawaiTodoList'])->name('pegawai.todo-list');
+    Route::post('/pegawai/{pegawai}/send-todo-reminder', [\App\Http\Controllers\DashboardController::class, 'sendPegawaiTodoReminder'])->name('pegawai.send-todo-reminder');
+
     Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
         Route::get('/latest-unread', [NotificationController::class, 'latestUnread'])->name('latest-unread');

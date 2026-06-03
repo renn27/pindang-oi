@@ -248,6 +248,8 @@ class TodoListService
             'anggota',
             'kalenderDLs',
             'pengirimans.penerimaan',
+            'latestPengiriman.penerimaan',
+            'latestPenerimaan',
         ];
     }
 }
