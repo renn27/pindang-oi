@@ -189,7 +189,7 @@ class MenuHelper
                     [
                         'icon' => 'dashboardse2026',
                         'name' => 'DASHBOARD SE2026',
-                        'path' => 'https://dashboard-se2026-dev.apps.bps.go.id/se2026',
+                        'path' => 'https://dashboard-se2026.apps.bps.go.id/se2026',
                         'is_external' => true,
                     ],
                     [
