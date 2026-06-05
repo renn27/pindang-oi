@@ -114,7 +114,7 @@ window.addEventListener('resize', checkMobile);">
         @include('layouts.backdrop')
         @include('layouts.sidebar')
 
-        <div class="flex-1 transition-all duration-300 ease-in-out"
+        <div class="flex-1 transition-all duration-300 ease-in-out xl:min-h-screen xl:flex xl:flex-col"
             :class="{
                 'xl:ml-[290px]': $store.sidebar.isExpanded || $store.sidebar.isHovered,
                 'xl:ml-[90px]': !$store.sidebar.isExpanded && !$store.sidebar.isHovered,
@@ -147,9 +147,15 @@ window.addEventListener('resize', checkMobile);">
                 </div>
             </div> -->
 
-            <div class="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+            <div class="flex-1 p-4 mx-auto w-full max-w-(--breakpoint-2xl) md:p-6">
                 @yield('content')
             </div>
+
+            <footer class="border-t border-gray-200 px-4 py-4 dark:border-gray-800 md:px-6">
+                <div class="mx-auto flex w-full max-w-(--breakpoint-2xl) justify-center text-xs text-gray-500 dark:text-gray-400 sm:justify-end">
+                    <p>&copy; {{ date('Y') }} BPS Kabupaten Ogan Ilir. All rights reserved.</p>
+                </div>
+            </footer>
         </div>
 
     </div>

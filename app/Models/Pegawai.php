@@ -40,6 +40,7 @@ class Pegawai extends Authenticatable
 
     protected $hidden = [
         'password',
+        'remember_token',
     ];
 
     public function scopeActive($query)
