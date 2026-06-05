@@ -29,6 +29,7 @@ class LoginRequest extends FormRequest
         return [
             'username' => ['required', 'string'],
             'password' => ['required', 'string'],
+            'remember' => ['nullable', 'boolean'],
         ];
     }
 
@@ -45,6 +46,10 @@ class LoginRequest extends FormRequest
             $this->only('username', 'password'),
             ['is_active' => true]
         );
+
+        if ($this->boolean('remember') && method_exists(Auth::guard(), 'setRememberDuration')) {
+            Auth::guard()->setRememberDuration(60 * 24 * 7);
+        }
 
         if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
