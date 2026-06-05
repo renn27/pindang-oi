@@ -204,6 +204,12 @@ class MenuHelper
                         'path' => 'https://se2026.bpssumsel.com/',
                         'is_external' => true,
                     ],
+                    [
+                        'icon' => 'asisten',
+                        'name' => 'ASISTEN SE2026',
+                        'path' => 'https://asistense2026.bpsoganilir.com/',
+                        'is_external' => true,
+                    ],
 
                 ],
                 'is_external' => true,
@@ -415,6 +421,18 @@ class MenuHelper
                 <circle cx="12" cy="17" r="1" fill="currentColor"/>
                 <path d="M19 19L21 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 <path d="M5 19L3 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>',
+            'asisten' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+                <rect x="8" y="8" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M12 11V13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="12" cy="15" r="0.6" fill="currentColor"/>
+                <path d="M9 5L8 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M15 5L16 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M5 9L3 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M19 9L21 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M5 15L3 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M19 15L21 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>',
             'musi' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
