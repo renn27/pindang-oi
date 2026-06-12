@@ -64,6 +64,11 @@ class MenuHelper
                     ['icon' => 'kalender', 'name' => 'Kalender Kegiatan', 'path' => '/kalender-kegiatan'],
                 ],
             ],
+            [
+                'icon' => 'kalender',
+                'name' => 'Panduan Pengguna',
+                'path' => '/panduan-pengguna',
+            ],
 
         ];
 
@@ -116,8 +121,8 @@ class MenuHelper
         }
 
         $allowed = $user->isActiveRole('Ketua Tim')
-            ? ['Dashboard', 'Tagihan Kerja', 'Rencana Kinerja', 'Kalender', 'CKP Saya']
-            : ['Dashboard', 'Rencana Kinerja', 'Tagihan Kerja', 'Kalender', 'CKP Saya'];
+            ? ['Dashboard', 'Tagihan Kerja', 'Rencana Kinerja', 'Kalender', 'Panduan Pengguna', 'CKP Saya']
+            : ['Dashboard', 'Rencana Kinerja', 'Tagihan Kerja', 'Kalender', 'Panduan Pengguna', 'CKP Saya'];
 
         if (\Illuminate\Support\Facades\Gate::allows('kelola-pengumuman')) {
             $allowed[] = 'Admin';
