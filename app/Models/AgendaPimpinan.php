@@ -27,7 +27,13 @@ class AgendaPimpinan extends Model {
         'realisasi',
         'link_bukti',
         'status',
+        'butuh_dl',
     ];
+
+    public function kalenderDls()
+    {
+        return $this->hasMany(KalenderDL::class, 'id_agenda_pimpinan', 'id_agenda');
+    }
 
     public function rencanaJpt()
     {

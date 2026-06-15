@@ -104,9 +104,13 @@
                                     $isTranslok = false;
                                     $isDL = false;
 
-                                    if ($kalenderItem && $kalenderItem->penugasan) {
-                                        $isTranslok = $kalenderItem->penugasan->butuh_translok;
-                                        $isDL = $kalenderItem->penugasan->butuh_dl;
+                                    if ($kalenderItem) {
+                                        if ($kalenderItem->penugasan) {
+                                            $isTranslok = $kalenderItem->penugasan->butuh_translok;
+                                            $isDL = $kalenderItem->penugasan->butuh_dl;
+                                        } elseif ($kalenderItem->agendaPimpinan) {
+                                            $isDL = $kalenderItem->agendaPimpinan->butuh_dl;
+                                        }
                                     }
                                 @endphp
                                 <td class="border-l border-gray-100 dark:border-gray-800/50 p-0.5 text-center bg-white dark:bg-gray-900 group-hover:bg-blue-50/50 dark:group-hover:bg-gray-800/50">

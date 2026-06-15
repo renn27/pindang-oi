@@ -16,6 +16,7 @@ class KalenderDL extends Model
     protected $fillable = [
         'id_pegawai',
         'id_penugasan',
+        'id_agenda_pimpinan',
         'tanggal_dl',
         'keterangan',
     ];
@@ -28,5 +29,10 @@ class KalenderDL extends Model
     public function penugasan()
     {
         return $this->belongsTo(Penugasan::class, 'id_penugasan');
+    }
+
+    public function agendaPimpinan()
+    {
+        return $this->belongsTo(AgendaPimpinan::class, 'id_agenda_pimpinan', 'id_agenda');
     }
 }

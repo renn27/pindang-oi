@@ -7,6 +7,7 @@ use App\Models\RencanaJPT;
 use App\Models\IndikatorJPT;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 class AgendaPimpinanController extends Controller
 {
@@ -39,6 +40,7 @@ class AgendaPimpinanController extends Controller
             'realisasi' => 'nullable|integer',
             'link_bukti' => 'nullable|url',
             'status' => 'required|in:Selesai,Belum Selesai',
+            'butuh_dl' => 'nullable|in:0,1',
         ]);
 
         try {
@@ -47,7 +49,12 @@ class AgendaPimpinanController extends Controller
                 return back()->with('error', 'IKI tidak sesuai dengan RK');
             }
 
-            AgendaPimpinan::create($validated);
+            $validated['butuh_dl'] = $request->has('butuh_dl') ? (bool)$request->butuh_dl : false;
+
+            DB::transaction(function () use ($validated) {
+                $agenda = AgendaPimpinan::create($validated);
+                $this->syncKalenderDL($agenda);
+            });
 
             // Redirect dengan flash message
             return redirect()
@@ -55,11 +62,9 @@ class AgendaPimpinanController extends Controller
                 ->with('success', 'Kegiatan berhasil ditambahkan.');
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Gagal menambahkan Agenda. Silakan coba lagi.')
+                ->with('error', 'Gagal menambahkan Agenda: ' . $e->getMessage())
                 ->withInput();
         }
-
-
     }
 
     public function update(Request $request, AgendaPimpinan $agenda) {
@@ -79,10 +84,16 @@ class AgendaPimpinanController extends Controller
             'realisasi' => 'nullable|integer',
             'link_bukti' => 'nullable|url',
             'status' => 'required|in:Selesai,Belum Selesai',
+            'butuh_dl' => 'nullable|in:0,1',
         ]);
 
         try {
-            $agenda->update($validated);
+            $validated['butuh_dl'] = $request->has('butuh_dl') ? (bool)$request->butuh_dl : false;
+
+            DB::transaction(function () use ($agenda, $validated) {
+                $agenda->update($validated);
+                $this->syncKalenderDL($agenda);
+            });
 
             // Redirect dengan flash message
             return redirect()
@@ -90,7 +101,7 @@ class AgendaPimpinanController extends Controller
                 ->with('success', 'Agenda berhasil diperbarui.');
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Gagal memperbarui Agenda. Silakan coba lagi.')
+                ->with('error', 'Gagal memperbarui Agenda: ' . $e->getMessage())
                 ->withInput();
         }
     }
@@ -99,5 +110,36 @@ class AgendaPimpinanController extends Controller
         $this->authorize('kelola-master-data');
         $agenda->delete();
         return back()->with('success', 'Agenda berhasil dihapus');
+    }
+
+    private function syncKalenderDL(AgendaPimpinan $agenda)
+    {
+        // Delete existing rows for this agenda
+        \App\Models\KalenderDL::where('id_agenda_pimpinan', $agenda->id_agenda)->delete();
+
+        if ($agenda->butuh_dl) {
+            $pimpinan = \App\Models\Pegawai::where('nama_pegawai', 'Sukendro Suryo Wiguno, SST, M.Ec.Dev')->first();
+            if (!$pimpinan) {
+                throw new \Exception('Pegawai Pimpinan tidak ditemukan.');
+            }
+
+            $period = \Carbon\CarbonPeriod::create($agenda->tanggal_mulai, $agenda->tanggal_selesai);
+            $dataToInsert = [];
+            foreach ($period as $date) {
+                $dataToInsert[] = [
+                    'id_pegawai' => $pimpinan->id_pegawai,
+                    'id_penugasan' => null,
+                    'id_agenda_pimpinan' => $agenda->id_agenda,
+                    'tanggal_dl' => $date->format('Y-m-d'),
+                    'keterangan' => 'DL Pimpinan',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            if (!empty($dataToInsert)) {
+                \App\Models\KalenderDL::insert($dataToInsert);
+            }
+        }
     }
 }
