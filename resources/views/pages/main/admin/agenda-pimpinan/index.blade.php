@@ -195,6 +195,26 @@
                             placeholder="Pilih Tanggal" />
                     </div>
 
+                    <!-- Toggle DL -->
+                    <div class="mb-4">
+                        <label class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                            Kebutuhan Dinas Luar
+                        </label>
+                        <div class="flex items-center gap-3">
+                            <button type="button" @click="formData.butuh_dl = formData.butuh_dl ? 0 : 1"
+                                :class="formData.butuh_dl ? 'bg-blue-500' : 'bg-gray-300'"
+                                class="relative inline-flex h-7 w-14 items-center rounded-full transition">
+                                <span :class="formData.butuh_dl ? 'translate-x-7' : 'translate-x-1'"
+                                    class="inline-block h-5 w-5 bg-white rounded-full transition">
+                                </span>
+                            </button>
+                            <span class="text-sm font-medium" :class="formData.butuh_dl ? 'text-blue-600' : 'text-gray-500'">
+                                Dinas Luar (DL)
+                            </span>
+                        </div>
+                        <input type="hidden" name="butuh_dl" :value="formData.butuh_dl">
+                    </div>
+
                     <!-- Rencana JPT -->
                     <div class="mb-4">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -266,26 +286,6 @@
                         <input type="url" x-model="formData.link_bukti" name="link_bukti" id="link_bukti"
                             placeholder="https://example.com/bukti"
                             class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
-                    </div>
-
-                    <!-- Toggle DL -->
-                    <div class="mb-4">
-                        <label class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                            Kebutuhan Dinas Luar
-                        </label>
-                        <div class="flex items-center gap-3">
-                            <button type="button" @click="formData.butuh_dl = formData.butuh_dl ? 0 : 1"
-                                :class="formData.butuh_dl ? 'bg-blue-500' : 'bg-gray-300'"
-                                class="relative inline-flex h-7 w-14 items-center rounded-full transition">
-                                <span :class="formData.butuh_dl ? 'translate-x-7' : 'translate-x-1'"
-                                    class="inline-block h-5 w-5 bg-white rounded-full transition">
-                                </span>
-                            </button>
-                            <span class="text-sm font-medium" :class="formData.butuh_dl ? 'text-blue-600' : 'text-gray-500'">
-                                Dinas Luar (DL)
-                            </span>
-                        </div>
-                        <input type="hidden" name="butuh_dl" :value="formData.butuh_dl">
                     </div>
 
                     <!-- Status -->
