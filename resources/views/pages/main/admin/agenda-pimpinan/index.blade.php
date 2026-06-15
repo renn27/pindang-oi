@@ -506,7 +506,7 @@
                                                 realisasi: '{{ $agenda->realisasi }}',
                                                 link_bukti: '{{ $agenda->link_bukti }}',
                                                 status: '{{ $agenda->status }}',
-                                                butuh_dl: '{{ $agenda->butuh_dl }}'
+                                                butuh_dl: {{ $agenda->butuh_dl ? 1 : 0 }}
                                             }
                                         })">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
