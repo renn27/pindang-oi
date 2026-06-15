@@ -1,5 +1,37 @@
 @extends('layouts.app')
 
+@php
+  $dataProdusen = [
+    ['tanggal' => '20 Jan 2016', 'target' => 5, 'pengiriman' => 5, 'penerimaan' => 5],
+    ['tanggal' => '20 Jan 2016', 'target' => 5, 'pengiriman' => 5, 'penerimaan' => 5],
+    ['tanggal' => '25 Jan 2016', 'target' => 5, 'pengiriman' => 5, 'penerimaan' => 5],
+    ['tanggal' => '25 Jan 2016', 'target' => 180, 'pengiriman' => 180, 'penerimaan' => 180],
+    ['tanggal' => '25 Jan 2016', 'target' => 60, 'pengiriman' => 60, 'penerimaan' => 60],
+    ['tanggal' => '26 Jan 2016', 'target' => 205, 'pengiriman' => 205, 'penerimaan' => 205],
+    ['tanggal' => '31 Jan 2016', 'target' => 20, 'pengiriman' => 20, 'penerimaan' => 20],
+    ['tanggal' => '31 Jan 2016', 'target' => 10, 'pengiriman' => 10, 'penerimaan' => 10],
+    ['tanggal' => '12 Feb 2016', 'target' => 150, 'pengiriman' => 150, 'penerimaan' => 150],
+    ['tanggal' => '20 Feb 2016', 'target' => 66, 'pengiriman' => 66, 'penerimaan' => 66],
+    ['tanggal' => '20 Feb 2016', 'target' => 66, 'pengiriman' => 0, 'penerimaan' => 'TIDAK DILAKUKAN OPERATOR PROVINSI'],
+    ['tanggal' => '20 Feb 2016', 'target' => 60, 'pengiriman' => 0, 'penerimaan' => 'TIDAK DILAKUKAN OPERATOR PROVINSI'],
+    ['tanggal' => '20 Feb 2016', 'target' => 180, 'pengiriman' => 0, 'penerimaan' => 'TIDAK DILAKUKAN OPERATOR PROVINSI'],
+    ['tanggal' => '20 Feb 2016', 'target' => 5, 'pengiriman' => 5, 'penerimaan' => 5],
+    ['tanggal' => '20 Feb 2016', 'target' => 5, 'pengiriman' => 5, 'penerimaan' => 5],
+    ['tanggal' => '20 Feb 2016', 'target' => 5, 'pengiriman' => 5, 'penerimaan' => 5],
+    ['tanggal' => '25 Feb 2016', 'target' => 205, 'pengiriman' => 205, 'penerimaan' => 48],
+    ['tanggal' => '29 Feb 2016', 'target' => 10, 'pengiriman' => 10, 'penerimaan' => 10],
+    ['tanggal' => '29 Feb 2016', 'target' => 20, 'pengiriman' => 20, 'penerimaan' => 20],
+  ];
+
+  $years = collect($dataProdusen)->map(function($item) {
+      $parts = explode(' ', $item['tanggal']);
+      return end($parts);
+  })->unique()->sort()->values();
+  if ($years->isEmpty()) {
+      $years->push(date('Y'));
+  }
+@endphp
+
 @section('content')
 <x-common.page-breadcrumb pageTitle="Bidang Kerja" />
 
@@ -14,22 +46,14 @@
     </div>
     
     <!-- Dropdown -->
-    <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent w-full sm:w-auto">
-      <select
-        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden"
-        :class="isOptionSelected && 'text-gray-800'" @change="isOptionSelected = true">
-        <option value="" class="text-gray-700">
-          2025
-        </option>
-        <option value="" class="text-gray-700">
-          2024
-        </option>
-        <option value="" class="text-gray-700">
-          2023
-        </option>
-        <option value="" class="text-gray-700">
-          2022
-        </option>
+    <div x-data="{ isOptionSelected: true }" class="relative z-20 bg-transparent w-full sm:w-auto">
+      <select id="tahunFilter"
+        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden">
+        @foreach ($years as $yr)
+            <option value="{{ $yr }}" class="text-gray-700">
+              {{ $yr }}
+            </option>
+        @endforeach
       </select>
       <span
         class="pointer-events-none absolute top-1/2 right-3.5 z-30 -translate-y-1/2 text-gray-500">
@@ -40,13 +64,6 @@
         </svg>
       </span>
     </div>
-
-    <!-- Tombol -->
-    <button
-      type="button"
-      class="flex justify-center items-center rounded-lg bg-brand-500 px-5 py-2 text-sm font-medium text-white hover:bg-brand-600 w-full sm:w-auto h-10 whitespace-nowrap">
-      Tampilkan
-    </button>
   </div>
 </div>
 
@@ -128,33 +145,18 @@
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-        @php
-          $dataProdusen = [
-            ['tanggal' => '20 Jan 2016', 'target' => 5, 'pengiriman' => 5, 'penerimaan' => 5],
-            ['tanggal' => '20 Jan 2016', 'target' => 5, 'pengiriman' => 5, 'penerimaan' => 5],
-            ['tanggal' => '25 Jan 2016', 'target' => 5, 'pengiriman' => 5, 'penerimaan' => 5],
-            ['tanggal' => '25 Jan 2016', 'target' => 180, 'pengiriman' => 180, 'penerimaan' => 180],
-            ['tanggal' => '25 Jan 2016', 'target' => 60, 'pengiriman' => 60, 'penerimaan' => 60],
-            ['tanggal' => '26 Jan 2016', 'target' => 205, 'pengiriman' => 205, 'penerimaan' => 205],
-            ['tanggal' => '31 Jan 2016', 'target' => 20, 'pengiriman' => 20, 'penerimaan' => 20],
-            ['tanggal' => '31 Jan 2016', 'target' => 10, 'pengiriman' => 10, 'penerimaan' => 10],
-            ['tanggal' => '12 Feb 2016', 'target' => 150, 'pengiriman' => 150, 'penerimaan' => 150],
-            ['tanggal' => '20 Feb 2016', 'target' => 66, 'pengiriman' => 66, 'penerimaan' => 66],
-            ['tanggal' => '20 Feb 2016', 'target' => 66, 'pengiriman' => 0, 'penerimaan' => 'TIDAK DILAKUKAN OPERATOR PROVINSI'],
-            ['tanggal' => '20 Feb 2016', 'target' => 60, 'pengiriman' => 0, 'penerimaan' => 'TIDAK DILAKUKAN OPERATOR PROVINSI'],
-            ['tanggal' => '20 Feb 2016', 'target' => 180, 'pengiriman' => 0, 'penerimaan' => 'TIDAK DILAKUKAN OPERATOR PROVINSI'],
-            ['tanggal' => '20 Feb 2016', 'target' => 5, 'pengiriman' => 5, 'penerimaan' => 5],
-            ['tanggal' => '20 Feb 2016', 'target' => 5, 'pengiriman' => 5, 'penerimaan' => 5],
-            ['tanggal' => '20 Feb 2016', 'target' => 5, 'pengiriman' => 5, 'penerimaan' => 5],
-            ['tanggal' => '25 Feb 2016', 'target' => 205, 'pengiriman' => 205, 'penerimaan' => 48],
-            ['tanggal' => '29 Feb 2016', 'target' => 10, 'pengiriman' => 10, 'penerimaan' => 10],
-            ['tanggal' => '29 Feb 2016', 'target' => 20, 'pengiriman' => 20, 'penerimaan' => 20],
-          ];
-        @endphp
-        
+        <tr id="noDataRow" class="hidden">
+          <td colspan="5" class="px-4 py-8 text-center text-sm text-gray-500">
+            Tidak ada data untuk tahun yang dipilih.
+          </td>
+        </tr>
         @foreach($dataProdusen as $index => $item)
-        <tr class="hover:bg-gray-50">
-          <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+        @php
+          $parts = explode(' ', $item['tanggal']);
+          $yr = end($parts);
+        @endphp
+        <tr class="produsen-row hover:bg-gray-50" data-tahun="{{ $yr }}">
+          <td class="produsen-index px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
             {{ $index + 1 }}
           </td>
           <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
@@ -177,3 +179,47 @@
 </div>
 
 @endsection
+
+<script>
+  function filterTableByTahun(selectedYear) {
+      const rows = document.querySelectorAll('.produsen-row');
+      const noDataRow = document.getElementById('noDataRow');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+          if (row.getAttribute('data-tahun') === selectedYear) {
+              row.classList.remove('hidden');
+              visibleCount++;
+          } else {
+              row.classList.add('hidden');
+          }
+      });
+
+      // Update index numbering
+      let indexNum = 1;
+      rows.forEach(row => {
+          if (!row.classList.contains('hidden')) {
+              const indexCell = row.querySelector('.produsen-index');
+              if (indexCell) {
+                  indexCell.innerText = indexNum++;
+              }
+          }
+      });
+
+      if (visibleCount === 0) {
+          if (noDataRow) noDataRow.classList.remove('hidden');
+      } else {
+          if (noDataRow) noDataRow.classList.add('hidden');
+      }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+      const selectFilter = document.getElementById('tahunFilter');
+      if (selectFilter) {
+          filterTableByTahun(selectFilter.value);
+          selectFilter.addEventListener('change', function() {
+              filterTableByTahun(this.value);
+          });
+      }
+  });
+</script>

@@ -3,6 +3,16 @@
 @section('content')
 <x-common.page-breadcrumb pageTitle="{{$title}}" />
 
+    @php
+        $years = $bidangs->map(function($b) {
+            return $b->created_at->format('Y');
+        })->unique()->sort()->values();
+        $currentYear = date('Y');
+        if (!$years->contains($currentYear)) {
+            $years->push($currentYear);
+            $years = $years->sort()->values();
+        }
+    @endphp
     <!-- Bagian Tahun -->
     <div class="flex flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 mb-6 dark:border-gray-800 dark:bg-gray-900">
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -14,13 +24,14 @@
         </div>
 
         <!-- Dropdown -->
-        <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent w-full sm:w-auto">
-            <select
-                class="dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:placeholder:text-gray-500 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden"
-                :class="isOptionSelected && 'text-gray-800'" @change="isOptionSelected = true">
-                <option value="2026" class="text-gray-700 dark:text-gray-300">
-                2026
-                </option>
+        <div x-data="{ isOptionSelected: true }" class="relative z-20 bg-transparent w-full sm:w-auto">
+            <select id="tahunFilter"
+                class="dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:placeholder:text-gray-500 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden">
+                @foreach ($years as $yr)
+                    <option value="{{ $yr }}" {{ $yr == $currentYear ? 'selected' : '' }} class="text-gray-700 dark:text-gray-300">
+                        {{ $yr }}
+                    </option>
+                @endforeach
             </select>
             <span
                 class="pointer-events-none absolute top-1/2 right-3.5 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
@@ -31,13 +42,6 @@
                 </svg>
             </span>
         </div>
-
-        <!-- Tombol -->
-        <button
-            type="button"
-            class="flex justify-center items-center rounded-lg bg-brand-500 px-5 py-2 text-sm font-medium text-white hover:bg-brand-600 w-full sm:w-auto h-10 whitespace-nowrap dark:bg-brand-600 dark:hover:bg-brand-700">
-            Tampilkan
-            </button>
         </div>
 
         <button class="gap-2 rounded-full border border-gray-300
@@ -141,9 +145,14 @@
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+                <tr id="noDataRow" class="hidden">
+                    <td colspan="4" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                        Tidak ada data bidang kerja untuk tahun yang dipilih.
+                    </td>
+                </tr>
                 @foreach ($bidangs as $index => $bidang)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center dark:text-gray-300">
+                    <tr class="bidang-row hover:bg-gray-50 dark:hover:bg-gray-800" data-tahun="{{ $bidang->created_at->format('Y') }}">
+                        <td class="bidang-index px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center dark:text-gray-300">
                             {{ $index + 1 }}
                         </td>
                         <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -214,9 +223,49 @@
 
     {{-- Handle Slug Otomatis --}}
     <script>
+        function filterBidangByTahun(selectedYear) {
+            const rows = document.querySelectorAll('.bidang-row');
+            const noDataRow = document.getElementById('noDataRow');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                if (row.getAttribute('data-tahun') === selectedYear) {
+                    row.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+
+            // Update index numbering
+            let indexNum = 1;
+            rows.forEach(row => {
+                if (!row.classList.contains('hidden')) {
+                    const indexCell = row.querySelector('.bidang-index');
+                    if (indexCell) {
+                        indexCell.innerText = indexNum++;
+                    }
+                }
+            });
+
+            if (visibleCount === 0) {
+                if (noDataRow) noDataRow.classList.remove('hidden');
+            } else {
+                if (noDataRow) noDataRow.classList.add('hidden');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
-        const namaInput = document.getElementById('nama_bidang');
-        const slugInput = document.getElementById('slug');
+            const selectFilter = document.getElementById('tahunFilter');
+            if (selectFilter) {
+                filterBidangByTahun(selectFilter.value);
+                selectFilter.addEventListener('change', function() {
+                    filterBidangByTahun(this.value);
+                });
+            }
+
+            const namaInput = document.getElementById('nama_bidang');
+            const slugInput = document.getElementById('slug');
 
         namaInput.addEventListener('input', function () {
             if (slugInput.dataset.manual === "true") return;

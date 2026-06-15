@@ -18,7 +18,7 @@
                         </div>
                         <div>
                             <h4 class="text-2xl font-bold text-gray-900 dark:text-white">Matriks Peran Hasil (MPH)</h4>
-                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ $title }} - Tahun 2026</p>
+                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ $title }} - Tahun <span id="mphTahunLabel">2026</span></p>
                         </div>
                     </div>
                 </div>
@@ -126,7 +126,7 @@
                 <div class="space-y-6">
                     <!-- Kegiatan 1 -->
                     @foreach ($kegiatans as $kegiatan)
-                        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                        <div data-tahun="{{ $kegiatan?->tahun_kegiatan }}" class="mph-kegiatan-card overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
                             <!-- Header Kegiatan -->
                             <div class="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white px-6 py-5 dark:border-gray-700 dark:from-gray-800 dark:to-gray-900">
                                 <div class="flex items-center justify-between">
@@ -251,6 +251,21 @@
                             </div>
                         </div>
                     @endforeach
+                    <div id="noMphKegiatanRow" class="hidden rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center dark:border-gray-700 dark:bg-gray-800">
+                        <div class="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-brand-50 dark:bg-brand-900/30 mx-auto">
+                            <svg class="h-10 w-10 text-brand-500 dark:text-brand-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                    d="M9 17v-2a4 4 0 014-4h4M9 5h6a2 2 0 012 2v12a2 2 0 01-2 2H9a2 2 0 01-2-2V7a2 2 0 012-2z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                            Tidak Ada Matriks Peran Hasil (MPH)
+                        </h3>
+                        <p class="mt-2 max-w-md text-sm text-gray-500 dark:text-gray-400 mx-auto">
+                            Tidak ada data kegiatan dan penugasan pegawai untuk tahun yang dipilih.
+                        </p>
+                    </div>
                 </div>
             @endif
         </div>
@@ -280,4 +295,29 @@
 
 
     </div>
+    <script>
+        function filterMphByTahun(selectedYear) {
+            const label = document.getElementById('mphTahunLabel');
+            if (label) label.innerText = selectedYear;
+
+            const cards = document.querySelectorAll('.mph-kegiatan-card');
+            const emptyRow = document.getElementById('noMphKegiatanRow');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                if (card.getAttribute('data-tahun') === selectedYear) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            if (visibleCount === 0) {
+                if (emptyRow) emptyRow.classList.remove('hidden');
+            } else {
+                if (emptyRow) emptyRow.classList.add('hidden');
+            }
+        }
+    </script>
 </x-ui.smart-modal>

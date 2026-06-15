@@ -9,39 +9,91 @@
 @section('content')
     <x-common.page-breadcrumb pageTitle="{{ $title }}" />
 
-    <!-- Bagian Filter Tahun (opsional, bisa diaktifkan jika diperlukan) -->
+    @php
+        $years = $agendas->flatMap(function($agenda) {
+            if (!$agenda->tanggal_mulai || !$agenda->tanggal_selesai) return [];
+            $start = \Carbon\Carbon::parse($agenda->tanggal_mulai)->year;
+            $end = \Carbon\Carbon::parse($agenda->tanggal_selesai)->year;
+            return range($start, $end);
+        })->unique()->sort()->values();
+
+        $currentYear = date('Y');
+        if (!$years->contains($currentYear)) {
+            $years->push((int)$currentYear);
+            $years = $years->sort()->values();
+        }
+    @endphp
+
+    <!-- Bagian Filter Tahun dan Bulan -->
     <div
         class="flex flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 mb-6 dark:border-gray-800 dark:bg-gray-900">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <!-- Label -->
-            <div class="flex items-center h-10">
+        <div class="flex flex-wrap items-center gap-4 w-full sm:w-auto">
+            <!-- Filter Group: Tahun -->
+            <div class="flex items-center gap-2">
                 <label class="text-sm font-medium text-gray-700 whitespace-nowrap dark:text-gray-300">
-                    Tampilkan Data Tahun
+                    Tahun:
                 </label>
+                <div x-data="{ isOptionSelected: true }" class="relative z-20 bg-transparent">
+                    <select id="tahunFilter"
+                        class="dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:placeholder:text-gray-500 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-28 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-3 pr-8 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden">
+                        @foreach ($years as $year)
+                            <option value="{{ $year }}" {{ $year == date('Y') ? 'selected' : '' }} class="text-gray-700 dark:text-gray-300">
+                                {{ $year }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <span
+                        class="pointer-events-none absolute top-1/2 right-2.5 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+                        <svg class="stroke-current" width="14" height="14" viewBox="0 0 20 20" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </span>
+                </div>
             </div>
 
-            <!-- Dropdown -->
-            <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent w-full sm:w-auto">
-                <select id="tahunFilter"
-                    class="dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:placeholder:text-gray-500 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden"
-                    :class="isOptionSelected && 'text-gray-800'" @change="isOptionSelected = true">
-                    <option value="2026" class="text-gray-700 dark:text-gray-300">2026</option>
-                </select>
-                <span
-                    class="pointer-events-none absolute top-1/2 right-3.5 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                    <svg class="stroke-current" width="16" height="16" viewBox="0 0 20 20" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </span>
+            <!-- Filter Group: Bulan -->
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-medium text-gray-700 whitespace-nowrap dark:text-gray-300">
+                    Bulan:
+                </label>
+                <div x-data="{ isOptionSelected: true }" class="relative z-20 bg-transparent">
+                    <select id="bulanFilter"
+                        class="dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:placeholder:text-gray-500 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-3 pr-8 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden">
+                        @php
+                            $indonesianMonths = [
+                                '01' => 'Januari',
+                                '02' => 'Februari',
+                                '03' => 'Maret',
+                                '04' => 'April',
+                                '05' => 'Mei',
+                                '06' => 'Juni',
+                                '07' => 'Juli',
+                                '08' => 'Agustus',
+                                '09' => 'September',
+                                '10' => 'Oktober',
+                                '11' => 'November',
+                                '12' => 'Desember'
+                            ];
+                            $currentMonthVal = date('m');
+                        @endphp
+                        @foreach ($indonesianMonths as $num => $name)
+                            <option value="{{ $num }}" {{ $num == $currentMonthVal ? 'selected' : '' }} class="text-gray-700 dark:text-gray-300">
+                                {{ $name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <span
+                        class="pointer-events-none absolute top-1/2 right-2.5 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+                        <svg class="stroke-current" width="14" height="14" viewBox="0 0 20 20" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </span>
+                </div>
             </div>
-
-            <!-- Tombol Tampilkan -->
-            <button id="filterButton" type="button"
-                class="flex justify-center items-center rounded-lg bg-brand-500 px-5 py-2 text-sm font-medium text-white hover:bg-brand-600 w-full sm:w-auto h-10 whitespace-nowrap dark:bg-brand-600 dark:hover:bg-brand-700">
-                Tampilkan
-            </button>
         </div>
 
         <!-- Tombol Tambah Agenda -->
@@ -192,7 +244,7 @@
                         </label>
                         <input type="text" x-model="formData.satuan_target" name="satuan_target" id="satuan_target"
                             placeholder="Masukkan Satuan Target"
-                            class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-5₀₀" />
+                            class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
                     </div>
 
                     <!-- Realisasi -->
@@ -202,7 +254,7 @@
                         </label>
                         <input type="number" x-model="formData.realisasi" name="realisasi" id="realisasi"
                             placeholder="Masukkan Realisasi"
-                            class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-5₀₀" />
+                            class="h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500" />
                     </div>
 
                     <!-- Link Bukti -->
@@ -287,6 +339,12 @@
                 </tr>
             </thead>
             <tbody id="agendaTableBody" class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+                <!-- Empty state placeholder -->
+                <tr id="noDataRow" class="hidden">
+                    <td colspan="10" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                        Tidak ada data agenda untuk bulan yang dipilih.
+                    </td>
+                </tr>
                 @foreach ($agendas as $index => $agenda)
                     @php
                         $startMonth = \Carbon\Carbon::parse($agenda->tanggal_mulai)->startOfMonth();
@@ -302,11 +360,20 @@
                         });
 
                         $isCkpPimpinan = $ckpSelesai100Persen || $agenda->ckpBulanan->count() >= $totalBulan;
+
+                        // Calculate spanned months in YYYY-MM format
+                        $spannedMonths = [];
+                        $current = $startMonth->copy();
+                        while ($current->lessThanOrEqualTo($endMonth)) {
+                            $spannedMonths[] = $current->format('Y-m');
+                            $current->addMonth();
+                        }
                     @endphp
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 agenda-row {{ $isCkpPimpinan ? 'bg-green-100/50 hover:bg-green-100/80 dark:bg-green-900/50 hover:dark:bg-green-900/80' : '' }}"
+                        data-months='@json($spannedMonths)'
                         data-tahun="{{ date('Y', strtotime($agenda->tanggal_mulai)) }}">
                         <td
-                            class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center dark:text-gray-300">
+                            class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center dark:text-gray-300 agenda-index">
                             {{ $index + 1 }}
                         </td>
                         <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -738,7 +805,6 @@
             document.getElementById('saveAgendaButton')?.addEventListener('click', saveAgenda);
             
             // Listen event yang sama dengan yang di-dispatch tombol Edit
-            // Event ini terpanggil SEBELUM Alpine handle, jadi kita simpan data dulu
             window.addEventListener('open-smart-modal', function(e) {
                 const detail = e.detail;
                 if (detail.modalId !== 'modal-agenda' || detail.mode !== 'edit') return;
@@ -750,9 +816,6 @@
                     indikatorId: String(detail.data.iki_jpt || '')
                 };
 
-                // Tunggu Alpine selesai toggle modal (x-show jalan setelah event handler selesai)
-                // Kita poll sampai select IKI berisi "Memuat..." yang artinya loadIki sudah terpanggil
-                // ATAU langsung set timeout yang cukup untuk Alpine render
                 const checkAndLoad = (attempt) => {
                     const selectEl = document.getElementById('iki_jpt');
                     if (!selectEl) {
@@ -776,28 +839,58 @@
                 requestAnimationFrame(() => checkAndLoad(0));
             }); 
 
-            const filterButton = document.getElementById('filterButton');
             const tahunSelect = document.getElementById('tahunFilter');
+            const bulanSelect = document.getElementById('bulanFilter');
             const rows = document.querySelectorAll('.agenda-row');
-            let currentTahun = 'all';
+            
+            let currentTahun = tahunSelect ? tahunSelect.value : String(new Date().getFullYear());
+            let currentBulan = bulanSelect ? bulanSelect.value : String(new Date().getMonth() + 1).padStart(2, '0');
 
             function filterTable() {
-                if (currentTahun === 'all') {
-                    rows.forEach(row => row.style.display = '');
-                } else {
-                    rows.forEach(row => {
-                        const rowTahun = row.getAttribute('data-tahun');
-                        row.style.display = rowTahun === currentTahun ? '' : 'none';
-                    });
+                let visibleIndex = 1;
+                rows.forEach(row => {
+                    const rowMonths = JSON.parse(row.getAttribute('data-months') || '[]');
+                    const targetYearMonth = `${currentTahun}-${currentBulan}`;
+                    const hasMatch = rowMonths.includes(targetYearMonth);
+                    
+                    if (hasMatch) {
+                        row.style.display = '';
+                        const indexCell = row.querySelector('.agenda-index');
+                        if (indexCell) {
+                            indexCell.textContent = visibleIndex++;
+                        }
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                const noDataRow = document.getElementById('noDataRow');
+                if (noDataRow) {
+                    if (visibleIndex === 1) {
+                        noDataRow.classList.remove('hidden');
+                    } else {
+                        noDataRow.classList.add('hidden');
+                    }
                 }
             }
 
-            if (filterButton && tahunSelect) {
-                filterButton.addEventListener('click', function() {
+
+
+            if (tahunSelect) {
+                tahunSelect.addEventListener('change', function() {
                     currentTahun = tahunSelect.value;
                     filterTable();
                 });
             }
+
+            if (bulanSelect) {
+                bulanSelect.addEventListener('change', function() {
+                    currentBulan = bulanSelect.value;
+                    filterTable();
+                });
+            }
+
+            filterTable();
         });
     </script>
 @endsection

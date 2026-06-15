@@ -3,6 +3,14 @@
 @section('content')
     <x-common.page-breadcrumb pageTitle="{{ $title }}" />
 
+    @php
+        $years = $kegiatans->pluck('tahun_kegiatan')->unique()->sort()->values();
+        $currentYear = date('Y');
+        if (!$years->contains($currentYear)) {
+            $years->push($currentYear);
+            $years = $years->sort()->values();
+        }
+    @endphp
     <!-- Bagian Tahun -->
     <div
         class="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 mb-6 gap-4 sm:gap-0 dark:border-gray-800 dark:bg-gray-900">
@@ -16,13 +24,14 @@
             </div>
 
             <!-- Dropdown -->
-            <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent w-full sm:w-auto">
-                <select
-                    class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
-                    :class="isOptionSelected && 'text-gray-800'" @change="isOptionSelected = true">
-                    <option value="2026" class="text-gray-700 dark:text-gray-300">
-                        2026
-                    </option>
+            <div x-data="{ isOptionSelected: true }" class="relative z-20 bg-transparent w-full sm:w-auto">
+                <select id="tahunFilter"
+                    class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500">
+                    @foreach ($years as $yr)
+                        <option value="{{ $yr }}" {{ $yr == $currentYear ? 'selected' : '' }} class="text-gray-700 dark:text-gray-300">
+                            {{ $yr }}
+                        </option>
+                    @endforeach
                 </select>
                 <span
                     class="pointer-events-none absolute top-1/2 right-3.5 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
@@ -102,8 +111,8 @@
     </div>
 
     <!-- Container untuk Card Kegiatan -->
-    <div class="space-y-6">
-        @foreach ($kegiatans as $kegiatan)
+    <div class="space-y-6" id="kegiatanContainer">
+        @forelse ($kegiatans as $kegiatan)
             @php
                 $isKegiatanBerjalan = $kegiatan->subKegiatans->contains(function ($sub) {
                     return $sub->penugasans->contains(function ($penugasan) {
@@ -114,7 +123,7 @@
                 });
             @endphp
             <!-- CARD PER KEGIATAN dengan Accordion -->
-            <div x-data="{ openSubKegiatan: false }" class="rounded-2xl border border-gray-200 bg-white overflow-hidden dark:border-gray-800 dark:bg-gray-900">
+            <div x-data="{ openSubKegiatan: false }" data-tahun="{{ $kegiatan->tahun_kegiatan }}" class="kegiatan-card rounded-2xl border border-gray-200 bg-white overflow-hidden dark:border-gray-800 dark:bg-gray-900">
                 <!-- HEADER CARD (Sebagai Tombol Accordion) -->
                 <div class="bg-white px-6 py-4 border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -292,7 +301,16 @@
                     @include('pages.main.components.tables.tagihan-kerja.table-sub-kegiatan')
                 </div>
             </div>
-        @endforeach
+        @empty
+            <div id="noKegiatanInitial" class="rounded-2xl border border-gray-200 bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-900">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Belum ada data kegiatan.</p>
+            </div>
+        @endforelse
+
+        <!-- Empty State Container (for dynamic filtering) -->
+        <div id="noKegiatanRow" class="hidden rounded-2xl border border-gray-200 bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-900">
+            <p class="text-sm text-gray-500 dark:text-gray-400">Tidak ada data kegiatan untuk tahun yang dipilih.</p>
+        </div>
     </div>
 
     {{-- MODAL KEGIATAN --}}
@@ -397,6 +415,52 @@
 
                 requestAnimationFrame(() => checkAndLoad(0));
             });
+        });
+
+        // Client-side year filtering for Tagihan Kerja
+        function filterKegiatanByTahun(selectedYear) {
+            const cards = document.querySelectorAll('.kegiatan-card');
+            const noKegiatanRow = document.getElementById('noKegiatanRow');
+            const noKegiatanInitial = document.getElementById('noKegiatanInitial');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                if (card.getAttribute('data-tahun') === selectedYear) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            if (noKegiatanInitial) {
+                if (visibleCount > 0) {
+                    noKegiatanInitial.classList.add('hidden');
+                } else {
+                    noKegiatanInitial.classList.remove('hidden');
+                }
+            }
+
+            if (visibleCount === 0) {
+                if (noKegiatanRow) noKegiatanRow.classList.remove('hidden');
+            } else {
+                if (noKegiatanRow) noKegiatanRow.classList.add('hidden');
+            }
+
+            // Sync with MPH modal filtering
+            if (typeof filterMphByTahun === 'function') {
+                filterMphByTahun(selectedYear);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectFilter = document.getElementById('tahunFilter');
+            if (selectFilter) {
+                filterKegiatanByTahun(selectFilter.value);
+                selectFilter.addEventListener('change', function() {
+                    filterKegiatanByTahun(this.value);
+                });
+            }
         });
     </script>
 @endsection

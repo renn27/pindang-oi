@@ -3,6 +3,14 @@
 @section('content')
     <x-common.page-breadcrumb pageTitle="{{ $title }}" />
 
+    @php
+        $years = $rencanaJpts->pluck('tahun')->unique()->sort()->values();
+        $currentYear = date('Y');
+        if (!$years->contains($currentYear)) {
+            $years->push($currentYear);
+            $years = $years->sort()->values();
+        }
+    @endphp
     <!-- Bagian Tahun -->
     <div
         class="flex flex-row justify-between items-center rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 mb-6 dark:border-gray-800 dark:bg-gray-900">
@@ -15,13 +23,14 @@
             </div>
 
             <!-- Dropdown Tahun -->
-            <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent w-full sm:w-auto">
-                <select
-                    class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
-                    :class="isOptionSelected && 'text-gray-800'" @change="isOptionSelected = true">
-                    <option value="2025" class="text-gray-700 dark:text-gray-300">
-                        2026
-                    </option>
+            <div x-data="{ isOptionSelected: true }" class="relative z-20 bg-transparent w-full sm:w-auto">
+                <select id="tahunFilter"
+                    class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500">
+                    @foreach ($years as $yr)
+                        <option value="{{ $yr }}" {{ $yr == $currentYear ? 'selected' : '' }} class="text-gray-700 dark:text-gray-300">
+                            {{ $yr }}
+                        </option>
+                    @endforeach
                 </select>
                 <span
                     class="pointer-events-none absolute top-1/2 right-3.5 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
@@ -32,12 +41,6 @@
                     </svg>
                 </span>
             </div>
-
-            <!-- Tombol -->
-            <button type="button"
-                class="flex justify-center items-center rounded-lg bg-brand-500 px-5 py-2 text-sm font-medium text-white hover:bg-brand-600 w-full sm:w-auto h-10 whitespace-nowrap dark:bg-brand-600 dark:hover:bg-brand-700">
-                Tampilkan
-            </button>
         </div>
         <button
             class="gap-2 rounded-full border border-gray-300
@@ -370,11 +373,16 @@
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+                <tr id="noDataRow" class="hidden">
+                    <td colspan="4" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                        Tidak ada data rencana kerja untuk tahun yang dipilih.
+                    </td>
+                </tr>
                 <!-- Baris Rencana Kerja -->
                 @forelse ($rencanaJpts as $index => $rencanaJpt)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <tr class="rk-row hover:bg-gray-50 dark:hover:bg-gray-800" data-tahun="{{ $rencanaJpt->tahun }}" data-id="{{ $rencanaJpt->id }}">
                         <td
-                            class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center dark:text-gray-300">
+                            class="rk-index px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 text-center dark:text-gray-300">
                             {{ $index + 1 }}
                         </td>
                         <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-300">
@@ -616,7 +624,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr>
+                    <tr id="noDataInitial">
                         <td colspan="4" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                             Tidak ada data rencana kerja.
                         </td>
@@ -659,6 +667,76 @@
                         }
                     });
                 });
+
+                // Client-side year filtering for RK & IKI JPT
+                function filterTableByTahun(selectedYear) {
+                    const rows = document.querySelectorAll('.rk-row');
+                    const noDataRow = document.getElementById('noDataRow');
+                    const noDataInitial = document.getElementById('noDataInitial');
+                    let visibleCount = 0;
+
+                    rows.forEach(row => {
+                        const rowTahun = row.getAttribute('data-tahun');
+                        const rkId = row.getAttribute('data-id');
+                        const indicatorRow = document.getElementById(`indicator-${rkId}`);
+
+                        if (rowTahun === selectedYear) {
+                            row.classList.remove('hidden');
+                            visibleCount++;
+                        } else {
+                            row.classList.add('hidden');
+                            if (indicatorRow) {
+                                indicatorRow.classList.add('hidden');
+                                // Reset expand button text & icon
+                                const btn = row.querySelector('.expand-indicator-btn');
+                                if (btn) {
+                                    const icon = btn.querySelector('svg');
+                                    if (icon) icon.style.transform = 'rotate(0deg)';
+                                    btn.innerHTML = `
+                                        <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                        Tampilkan Indikator
+                                    `;
+                                }
+                            }
+                        }
+                    });
+
+                    // Update index numbers
+                    let indexNum = 1;
+                    rows.forEach(row => {
+                        if (!row.classList.contains('hidden')) {
+                            const indexCell = row.querySelector('.rk-index');
+                            if (indexCell) {
+                                indexCell.innerText = indexNum++;
+                            }
+                        }
+                    });
+
+                    if (noDataInitial) {
+                        if (visibleCount > 0) {
+                            noDataInitial.classList.add('hidden');
+                        } else {
+                            noDataInitial.classList.remove('hidden');
+                        }
+                    }
+
+                    if (visibleCount === 0) {
+                        if (noDataRow) noDataRow.classList.remove('hidden');
+                    } else {
+                        if (noDataRow) noDataRow.classList.add('hidden');
+                    }
+                }
+
+                // Bind select change
+                const selectFilter = document.getElementById('tahunFilter');
+                if (selectFilter) {
+                    filterTableByTahun(selectFilter.value);
+                    selectFilter.addEventListener('change', function() {
+                        filterTableByTahun(this.value);
+                    });
+                }
             });
         </script>
     @endpush

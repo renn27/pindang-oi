@@ -17,7 +17,7 @@
 
             <!-- Dropdown Bulan -->
             <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent w-full sm:w-auto">
-                <select name="bulan"
+                <select name="bulan" onchange="this.form.submit()"
                     class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
                     :class="isOptionSelected && 'text-gray-800'" @change="isOptionSelected = true">
                     <option value="all" {{ $bulan === 'all' ? 'selected' : '' }} class="text-gray-700 dark:text-gray-300">Semua Bulan</option>
@@ -39,7 +39,7 @@
 
             <!-- Dropdown Tahun -->
             <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent w-full sm:w-auto">
-                <select name="tahun"
+                <select name="tahun" onchange="this.form.submit()"
                     class="shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 h-10 w-full sm:w-36 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none pl-4 pr-10 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:outline-hidden dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500"
                     :class="isOptionSelected && 'text-gray-800'" @change="isOptionSelected = true">
                     @foreach ($tahunList as $thn)
@@ -57,11 +57,6 @@
                     </svg>
                 </span>
             </div>
-
-            <button type="submit"
-                class="flex justify-center items-center rounded-lg bg-brand-500 px-5 py-2 text-sm font-medium text-white hover:bg-brand-600 w-full sm:w-auto h-10 whitespace-nowrap dark:bg-brand-600 dark:hover:bg-brand-700">
-                Tampilkan
-            </button>
 
             <a href="{{ route('ckp.pegawai.index') }}"
                 class="flex justify-center items-center rounded-lg border border-gray-300 bg-white px-5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 w-full sm:w-auto h-10 whitespace-nowrap dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
