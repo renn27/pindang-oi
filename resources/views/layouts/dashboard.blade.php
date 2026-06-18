@@ -91,7 +91,8 @@
             }
         })();
     </script>
-
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@0"></script>
 </head>
 
 <body x-data="{ 'loaded': true }" x-init="$store.sidebar.isExpanded = window.innerWidth >= 1280;
@@ -163,6 +164,9 @@ window.addEventListener('resize', checkMobile);">
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', () => {
+                if (window.lucide) {
+                    lucide.createIcons();
+                }
                 const messages = [];
 
                 @if (session('success'))

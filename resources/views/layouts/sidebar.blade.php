@@ -102,7 +102,8 @@
                                             <!-- Icon -->
                                             <span
                                                 :class="{{ $item['is_active'] ?? false ? 'true' : 'false' }} ?
-                                                    'menu-item-icon-active' : 'menu-item-icon-inactive'">
+                                                    'menu-item-icon-active' : 'menu-item-icon-inactive'"
+                                                style="{{ !empty($item['color']) ? 'color: ' . $item['color'] . ' !important;' : '' }}">
                                                 {!! MenuHelper::getIconSvg($item['icon']) !!}
                                             </span>
 
@@ -151,7 +152,8 @@
                                                                 'menu-dropdown-item-active' :
                                                                 'menu-dropdown-item-inactive'">
                                                             @if (!empty($subItem['icon']))
-                                                                <span class="shrink-0 w-5 h-5 flex items-center justify-center">
+                                                                <span class="shrink-0 w-5 h-5 flex items-center justify-center"
+                                                                    style="{{ !empty($subItem['color']) ? 'color: ' . $subItem['color'] . ' !important;' : '' }}">
                                                                     {!! MenuHelper::getIconSvg($subItem['icon']) !!}
                                                                 </span>
                                                             @endif
@@ -198,7 +200,8 @@
                                             <!-- Icon -->
                                             <span
                                                 :class="{{ $item['is_active'] ?? false ? 'true' : 'false' }} ?
-                                                    'menu-item-active' : 'menu-item-inactive'">
+                                                    'menu-item-icon-active' : 'menu-item-icon-inactive'"
+                                                style="{{ !empty($item['color']) ? 'color: ' . $item['color'] . ' !important;' : '' }}">
                                                 {!! MenuHelper::getIconSvg($item['icon']) !!}
                                             </span>
 

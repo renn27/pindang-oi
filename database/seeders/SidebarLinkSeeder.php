@@ -20,7 +20,7 @@ class SidebarLinkSeeder extends Seeder
         SidebarLink::create([
             'name' => 'Pengumuman',
             'url' => '/pengumuman',
-            'icon' => 'announcement',
+            'icon' => 'megaphone',
             'sort_order' => 1,
             'is_external' => true,
             'is_special' => true,
@@ -30,7 +30,7 @@ class SidebarLinkSeeder extends Seeder
         SidebarLink::create([
             'name' => 'BESTI OGAN ILIR',
             'url' => 'https://besti.bpsoganilir.com/',
-            'icon' => 'besti',
+            'icon' => 'award',
             'sort_order' => 2,
             'is_external' => true,
         ]);
@@ -39,7 +39,7 @@ class SidebarLinkSeeder extends Seeder
         SidebarLink::create([
             'name' => 'GC PBI 2026',
             'url' => 'https://gcpbi.bpsoganilir.com/',
-            'icon' => 'gcpbi',
+            'icon' => 'globe',
             'sort_order' => 3,
             'is_external' => true,
         ]);
@@ -48,7 +48,7 @@ class SidebarLinkSeeder extends Seeder
         SidebarLink::create([
             'name' => 'GC PLN 2026',
             'url' => 'https://gcpln.bpsoganilir.com/',
-            'icon' => 'gcpln',
+            'icon' => 'zap',
             'sort_order' => 4,
             'is_external' => true,
         ]);
@@ -57,7 +57,7 @@ class SidebarLinkSeeder extends Seeder
         SidebarLink::create([
             'name' => 'MUSI',
             'url' => 'https://webapps.bps.go.id/sumsel/musi',
-            'icon' => 'musi',
+            'icon' => 'database',
             'sort_order' => 5,
             'is_external' => true,
         ]);
@@ -66,7 +66,7 @@ class SidebarLinkSeeder extends Seeder
         $sakip = SidebarLink::create([
             'name' => 'SAKIP',
             'url' => null,
-            'icon' => 'sakip',
+            'icon' => 'file-check',
             'sort_order' => 6,
             'is_external' => true,
         ]);
@@ -76,7 +76,7 @@ class SidebarLinkSeeder extends Seeder
             'parent_id' => $sakip->id,
             'name' => 'Bukti Dukung SAKIP',
             'url' => 'https://drive.google.com/drive/folders/1hbkLUr_y6KWMF_Hz2iZibHuyVbC2qiMv?usp=sharing',
-            'icon' => 'drive',
+            'icon' => 'folder-open',
             'sort_order' => 1,
             'is_external' => true,
         ]);
@@ -85,7 +85,7 @@ class SidebarLinkSeeder extends Seeder
             'parent_id' => $sakip->id,
             'name' => 'SINERGI',
             'url' => 'https://sinergi.web.bps.go.id/#/auth/login?next=/',
-            'icon' => 'sinergi',
+            'icon' => 'link',
             'sort_order' => 2,
             'is_external' => true,
         ]);
@@ -94,7 +94,7 @@ class SidebarLinkSeeder extends Seeder
         $se = SidebarLink::create([
             'name' => 'SE 2026',
             'url' => null,
-            'icon' => 'se-main',
+            'icon' => 'trending-up',
             'sort_order' => 7,
             'is_external' => true,
             'color' => '#ea580c',
@@ -105,7 +105,7 @@ class SidebarLinkSeeder extends Seeder
             'parent_id' => $se->id,
             'name' => 'DASHBOARD SE2026',
             'url' => 'https://dashboard-se2026.apps.bps.go.id/se2026',
-            'icon' => 'dashboardse2026',
+            'icon' => 'layout-dashboard',
             'sort_order' => 1,
             'is_external' => true,
             'color' => '#ea580c',
@@ -115,7 +115,7 @@ class SidebarLinkSeeder extends Seeder
             'parent_id' => $se->id,
             'name' => 'MANGCEK SE2026',
             'url' => 'https://mangcek.bpsoganilir.com/admin',
-            'icon' => 'mangcek',
+            'icon' => 'check-square',
             'sort_order' => 2,
             'is_external' => true,
             'color' => '#ea580c',
@@ -125,7 +125,7 @@ class SidebarLinkSeeder extends Seeder
             'parent_id' => $se->id,
             'name' => 'SEMPATI SE2026',
             'url' => 'https://se2026.bpssumsel.com/',
-            'icon' => 'sempati',
+            'icon' => 'activity',
             'sort_order' => 3,
             'is_external' => true,
             'color' => '#ea580c',
@@ -135,7 +135,7 @@ class SidebarLinkSeeder extends Seeder
             'parent_id' => $se->id,
             'name' => 'ASISTEN SE2026',
             'url' => 'https://asistense2026.bpsoganilir.com/',
-            'icon' => 'asisten',
+            'icon' => 'bot',
             'sort_order' => 4,
             'is_external' => true,
             'color' => '#ea580c',

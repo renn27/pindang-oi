@@ -69,6 +69,17 @@ class SidebarLinkController extends Controller
         $isSpecial = $request->has('is_special') ? (bool) $request->is_special : false;
 
         DB::transaction(function () use ($validated, $isSpecial) {
+            // Tentukan parent_id untuk pergeseran urutan
+            $parentId = null;
+            if ($validated['type'] === 'sub') {
+                $parentId = $validated['parent_id'];
+            }
+
+            // Geser urutan link lain yang nilainya >= sort_order baru (+1)
+            SidebarLink::where('parent_id', $parentId)
+                ->where('sort_order', '>=', $validated['sort_order'])
+                ->increment('sort_order');
+
             // Tentukan parameter parent berdasarkan tipe link
             $parentData = [
                 'name' => $validated['name'],
@@ -143,29 +154,67 @@ class SidebarLinkController extends Controller
 
         $isSpecial = $request->has('is_special') ? (bool) $request->is_special : false;
 
-        $updateData = [
-            'name' => $validated['name'],
-            'icon' => $validated['icon'] ?? null,
-            'color' => $validated['color'] ?? null,
-            'background_color' => $validated['background_color'] ?? null,
-            'sort_order' => $validated['sort_order'],
-            'is_special' => $isSpecial,
-            'is_external' => true,
-        ];
+        $oldOrder = $sidebarLink->sort_order;
+        $oldParentId = $sidebarLink->parent_id;
 
-        // Sesuaikan parameter berdasarkan tipe link
-        if ($validated['type'] === 'group') {
-            $updateData['url'] = null;
-            $updateData['parent_id'] = null;
-        } elseif ($validated['type'] === 'direct') {
-            $updateData['url'] = $validated['url'];
-            $updateData['parent_id'] = null;
-        } elseif ($validated['type'] === 'sub') {
-            $updateData['url'] = $validated['url'];
-            $updateData['parent_id'] = $validated['parent_id'];
+        $newOrder = $validated['sort_order'];
+        $newParentId = null;
+        if ($validated['type'] === 'sub') {
+            $newParentId = $validated['parent_id'];
         }
 
-        $sidebarLink->update($updateData);
+        DB::transaction(function () use ($sidebarLink, $oldOrder, $oldParentId, $newOrder, $newParentId, $validated, $isSpecial) {
+            $updateData = [
+                'name' => $validated['name'],
+                'icon' => $validated['icon'] ?? null,
+                'color' => $validated['color'] ?? null,
+                'background_color' => $validated['background_color'] ?? null,
+                'sort_order' => $newOrder,
+                'is_special' => $isSpecial,
+                'is_external' => true,
+            ];
+
+            // Sesuaikan parameter berdasarkan tipe link
+            if ($validated['type'] === 'group') {
+                $updateData['url'] = null;
+                $updateData['parent_id'] = null;
+            } elseif ($validated['type'] === 'direct') {
+                $updateData['url'] = $validated['url'];
+                $updateData['parent_id'] = null;
+            } elseif ($validated['type'] === 'sub') {
+                $updateData['url'] = $validated['url'];
+                $updateData['parent_id'] = $newParentId;
+            }
+
+            // Pergeseran urutan jika ada perubahan parent atau urutan
+            if ($oldParentId !== $newParentId) {
+                // Skenario C: Berubah parent/grup
+                // 1. Rapatkan barisan pada parent lama
+                SidebarLink::where('parent_id', $oldParentId)
+                    ->where('sort_order', '>', $oldOrder)
+                    ->decrement('sort_order');
+
+                // 2. Buat celah pada parent baru
+                SidebarLink::where('parent_id', $newParentId)
+                    ->where('sort_order', '>=', $newOrder)
+                    ->increment('sort_order');
+            } else {
+                // Sibling reordering (parent tetap sama)
+                if ($newOrder < $oldOrder) {
+                    // Skenario A: Pindah urutan ke atas
+                    SidebarLink::where('parent_id', $oldParentId)
+                        ->whereBetween('sort_order', [$newOrder, $oldOrder - 1])
+                        ->increment('sort_order');
+                } elseif ($newOrder > $oldOrder) {
+                    // Skenario B: Pindah urutan ke bawah
+                    SidebarLink::where('parent_id', $oldParentId)
+                        ->whereBetween('sort_order', [$oldOrder + 1, $newOrder])
+                        ->decrement('sort_order');
+                }
+            }
+
+            $sidebarLink->update($updateData);
+        });
 
         return redirect()
             ->route('sidebar-links.index')
@@ -177,7 +226,17 @@ class SidebarLinkController extends Controller
         $this->authorize('kelola-master-data');
 
         try {
-            $sidebarLink->delete();
+            $parentId = $sidebarLink->parent_id;
+            $deletedOrder = $sidebarLink->sort_order;
+
+            DB::transaction(function () use ($sidebarLink, $parentId, $deletedOrder) {
+                $sidebarLink->delete();
+
+                // Rapatkan barisan link tersisa di parent/grup yang sama
+                SidebarLink::where('parent_id', $parentId)
+                    ->where('sort_order', '>', $deletedOrder)
+                    ->decrement('sort_order');
+            });
 
             return redirect()
                 ->route('sidebar-links.index')

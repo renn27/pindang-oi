@@ -1,12 +1,13 @@
 <?php
-
+ 
 namespace App\Http\Controllers;
-
+ 
 use Illuminate\Http\Request;
 use App\Models\Bidang;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-
+use Illuminate\Support\Facades\DB;
+ 
 class BidangController extends Controller
 {
     public function index() {
@@ -14,13 +15,13 @@ class BidangController extends Controller
         $bidangs = Bidang::orderBy('urutan', 'asc')
             ->orderBy('nama_bidang', 'asc')
             ->get();
-
+ 
         return view('pages.main.admin.bidang-kerja.index', [
             'title'   => 'Seluruh Bidang Kerja',
             'bidangs' => $bidangs,
         ]);
     }
-
+ 
     public function store(Request $request) {
         $this->authorize('kelola-master-data');
         $validatedData = $request->validate([
@@ -29,19 +30,25 @@ class BidangController extends Controller
             'detail_bidang' => 'required|string|max:255',
             'urutan' => 'required|integer|min:1',
         ]);
-
-            // Kalau slug kosong (misal user hapus)
+ 
+        // Kalau slug kosong (misal user hapus)
         if (empty($validatedData['slug'])) {
             $validatedData['slug'] = Str::slug($validatedData['nama_bidang']);
         }
-
-        $bidang= Bidang::create($validatedData);
-
+ 
+        $bidang = DB::transaction(function () use ($validatedData) {
+            // Geser urutan bidang lain yang >= urutan baru (+1)
+            Bidang::where('urutan', '>=', $validatedData['urutan'])
+                ->increment('urutan');
+ 
+            return Bidang::create($validatedData);
+        });
+ 
         return redirect()
-        ->route('bidang.index', $bidang->slug)
-        ->with('success', 'Bidang berhasil ditambahkan');
+            ->route('bidang.index', $bidang->slug)
+            ->with('success', 'Bidang berhasil ditambahkan');
     }
-
+ 
     public function update(Request $request, Bidang $bidang) {
         $this->authorize('kelola-master-data');
         $validatedData = $request->validate([
@@ -51,11 +58,28 @@ class BidangController extends Controller
                     ->ignore($bidang->id_bidang, 'id_bidang'),
             ],
             'detail_bidang' => 'required|string|max:255',
+            'urutan' => 'required|integer|min:1',
         ]);
-
+ 
+        $oldUrutan = $bidang->urutan;
+        $newUrutan = $validatedData['urutan'];
+ 
         try {
-            $bidang->update($validatedData);
-
+            DB::transaction(function () use ($bidang, $oldUrutan, $newUrutan, $validatedData) {
+                // Pergeseran urutan jika ada perubahan
+                if ($newUrutan < $oldUrutan) {
+                    // Geser ke bawah (+1) untuk urutan di antara newUrutan s/d oldUrutan - 1
+                    Bidang::whereBetween('urutan', [$newUrutan, $oldUrutan - 1])
+                        ->increment('urutan');
+                } elseif ($newUrutan > $oldUrutan) {
+                    // Geser ke atas (-1) untuk urutan di antara oldUrutan + 1 s/d newUrutan
+                    Bidang::whereBetween('urutan', [$oldUrutan + 1, $newUrutan])
+                        ->decrement('urutan');
+                }
+ 
+                $bidang->update($validatedData);
+            });
+ 
             // Redirect dengan flash message
             return redirect()->route('bidang.index')
                 ->with('success', 'Bidang berhasil diperbarui!');
@@ -65,12 +89,20 @@ class BidangController extends Controller
                 ->withInput();
         }
     }
-
+ 
     public function delete(Bidang $bidang) {
         $this->authorize('kelola-master-data');
         try {
-            $bidang->delete();
-
+            $deletedUrutan = $bidang->urutan;
+ 
+            DB::transaction(function () use ($bidang, $deletedUrutan) {
+                $bidang->delete();
+ 
+                // Rapatkan barisan bidang kerja tersisa (-1)
+                Bidang::where('urutan', '>', $deletedUrutan)
+                    ->decrement('urutan');
+            });
+ 
             return redirect()
                 ->route('bidang.index')
                 ->with('success', 'Bidang berhasil dihapus');
