@@ -133,7 +133,7 @@
         {{-- ===== RANGKUMAN KINERJA PEGAWAI ===== --}}
         <div class="mb-8 grid grid-cols-1 lg:grid-cols-12 gap-5">
             <!-- Left Side: Rekap Penugasan Anda -->
-            <div class="lg:col-span-7 h-full rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 flex flex-col">
+            <div class="lg:col-span-12 h-full rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 flex flex-col">
                 <div class="flex flex-1 flex-col">
                     <div class="mb-4 flex items-center gap-3">
                         <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-blue-100 bg-blue-50 text-blue-600 dark:border-blue-900/40 dark:bg-blue-900/20 dark:text-blue-300">
@@ -225,7 +225,7 @@
                 </div>
             </div>
 
-            <!-- Right Side: Peringkat & Penilaian Kinerja Anda -->
+            {{-- Right Side: Peringkat & Penilaian Kinerja Anda (TEMPORARILY HIDDEN)
             <div class="lg:col-span-5 h-full rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 flex flex-col justify-between">
                 <div>
                     <div class="flex items-start justify-between gap-4 mb-4">
@@ -360,6 +360,7 @@
                     </button>
                 @endif
             </div>
+            --}}
         </div>
     @endif
 
@@ -613,16 +614,17 @@
             </div>
         @endif
 
+        {{-- ===== BEST EMPLOYEE FOR REGULAR EMPLOYEES (TEMPORARILY COMMENTED) =====
         @if ($bestEmployee)
-            {{-- ===== BEST EMPLOYEE FOR REGULAR EMPLOYEES ===== --}}
             <div class="mt-8">
                 <x-profile.employe-rank-card
                     :bestEmployee="$bestEmployee"
                     :showHeader="true" />
             </div>
         @endif
+        --}}
 
-        {{-- ===== RANK EMPLOYEE FOR REGULAR EMPLOYEES ===== --}}
+        {{-- ===== RANK EMPLOYEE FOR REGULAR EMPLOYEES (TEMPORARILY COMMENTED) =====
         <div id="container-rank-pegawai" class="mt-8">
             @auth
                 <x-dashboard.vis-rank-pegawai
@@ -631,6 +633,7 @@
                     :perPageOptions="$rankPegawaiPerPageOptions" />
             @endauth
         </div>
+        --}}
     @else()
         {{-- ===== CARD BESAR ANALYTICS DASHBOARD ===== --}}
         <div class="mb-8">
@@ -764,14 +767,15 @@
 
                     </div>
 
-                    {{-- ===== BEST EMPLOYEE ===== --}}
+                    {{-- ===== BEST EMPLOYEE (TEMPORARILY COMMENTED) =====
                     <div class="mb-10">
                         <x-profile.employe-rank-card
                             :bestEmployee="$bestEmployee"
                             :showHeader="true" />
                     </div>
+                    --}}
 
-                    {{-- ===== RANK EMPLOYEE ===== --}}
+                    {{-- ===== RANK EMPLOYEE (TEMPORARILY COMMENTED) =====
                     <div id="container-rank-pegawai">
                         @auth
                             <x-dashboard.vis-rank-pegawai
@@ -780,6 +784,7 @@
                                 :perPageOptions="$rankPegawaiPerPageOptions" />
                         @endauth
                     </div>
+                    --}}
 
                 </div>
 
@@ -808,8 +813,9 @@
         </div>
     @endif
 
-    {{-- Modal Perhitungan Rumus Component --}}
+    {{-- Modal Perhitungan Rumus Component (TEMPORARILY COMMENTED)
     <x-dashboard.modal-perhitungan-rumus />
+    --}}
 
 </div>
 
