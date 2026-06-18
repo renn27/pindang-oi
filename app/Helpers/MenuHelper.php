@@ -32,6 +32,7 @@ class MenuHelper
                     ['icon' => 'admin', 'name' => 'Jenis Kegiatan', 'path' => '/jenis-kegiatan'],
                     ['icon' => 'admin', 'name' => 'Kelola Role Pegawai', 'path' => '/role-pegawai'],
                     ['icon' => 'admin','name' => 'Kelola Pengumuman', 'path' => '/announcements'],
+                    ['icon' => 'admin', 'name' => 'Kelola Link Sidebar', 'path' => '/sidebar-links'],
                 ],
             ],
             [
@@ -136,91 +137,41 @@ class MenuHelper
 
     public static function getOthersItems()
     {
-        return [
-            [
-                'icon' => 'announcement',
-                'name' => 'Pengumuman',
-                'path' => '/pengumuman',
-                'is_special' => true,
-            ],
-            [
-                'icon' => 'besti',
-                'name' => 'BESTI OGAN ILIR',
-                'path' => 'https://besti.bpsoganilir.com/',
-                'is_external' => true,
-            ],
-            [
-                'icon' => 'gcpbi',
-                'name' => 'GC PBI 2026',
-                'path' => 'https://gcpbi.bpsoganilir.com/',
-                'is_external' => true,
-            ],
-            [
-                'icon' => 'gcpln',
-                'name' => 'GC PLN 2026',
-                'path' => 'https://gcpln.bpsoganilir.com/',
-                'is_external' => true,
-            ],
-            [
-                'icon' => 'musi',
-                'name' => 'MUSI',
-                'path' => 'https://webapps.bps.go.id/sumsel/musi',
-                'is_external' => true,
-            ],
-            [
-                'icon' => 'sakip',
-                'name' => 'SAKIP',
-                'subItems' => [
-                    [
-                        'icon' => 'drive',
-                        'name' => 'Bukti Dukung SAKIP',
-                        'path' => 'https://drive.google.com/drive/folders/1hbkLUr_y6KWMF_Hz2iZibHuyVbC2qiMv?usp=sharing',
-                        'is_external' => true,
-                        ],
-                    [
-                        'icon' => 'sinergi',
-                        'name' => 'SINERGI',
-                        'path' => 'https://sinergi.web.bps.go.id/#/auth/login?next=/',
-                        'is_external' => true,
-                    ],
+        $links = \App\Models\SidebarLink::with('children')
+            ->whereNull('parent_id')
+            ->orderBy('sort_order', 'asc')
+            ->get();
 
-                ],
+        return $links->map(function ($link) {
+            $item = [
+                'icon' => $link->icon,
+                'name' => $link->name,
                 'is_external' => true,
-            ],
-            [
-                'icon' => 'se-main',
-                'name' => 'SE 2026',
-                'subItems' => [
-                    [
-                        'icon' => 'dashboardse2026',
-                        'name' => 'DASHBOARD SE2026',
-                        'path' => 'https://dashboard-se2026.apps.bps.go.id/se2026',
-                        'is_external' => true,
-                    ],
-                    [
-                        'icon' => 'mangcek',
-                        'name' => 'MANGCEK SE2026',
-                        'path' => 'https://mangcek.bpsoganilir.com/admin',
-                        'is_external' => true,
-                    ],
-                    [
-                        'icon' => 'sempati',
-                        'name' => 'SEMPATI SE2026',
-                        'path' => 'https://se2026.bpssumsel.com/',
-                        'is_external' => true,
-                    ],
-                    [
-                        'icon' => 'asisten',
-                        'name' => 'ASISTEN SE2026',
-                        'path' => 'https://asistense2026.bpsoganilir.com/',
-                        'is_external' => true,
-                    ],
+                'is_special' => (bool) $link->is_special,
+                'color' => $link->color,
+                'background_color' => $link->background_color,
+            ];
 
-                ],
-                'is_external' => true,
-                'is_special_se' => true,
-            ],
-        ];
+            if ($link->url) {
+                $item['path'] = $link->url;
+            }
+
+            if ($link->children->isNotEmpty()) {
+                $item['subItems'] = $link->children->map(function ($child) {
+                    return [
+                        'icon' => $child->icon,
+                        'name' => $child->name,
+                        'path' => $child->url,
+                        'is_external' => true,
+                        'is_special' => (bool) $child->is_special,
+                        'color' => $child->color,
+                        'background_color' => $child->background_color,
+                    ];
+                })->toArray();
+            }
+
+            return $item;
+        })->toArray();
     }
 
     public static function getMenuGroups()

@@ -112,6 +112,15 @@ Route::middleware(['auth', 'active.pegawai'])->group(function () {
     });
     // END BIDANG KERJA BY ADMIN
 
+    // CRUD SIDEBAR LINKS BY ADMIN
+    Route::prefix('sidebar-links')->middleware('can:kelola-master-data')->group(function () {
+        Route::get('/', [\App\Http\Controllers\SidebarLinkController::class, 'index'])->name('sidebar-links.index');
+        Route::post('/', [\App\Http\Controllers\SidebarLinkController::class, 'store'])->name('sidebar-links.store');
+        Route::put('/{sidebarLink}', [\App\Http\Controllers\SidebarLinkController::class, 'update'])->name('sidebar-links.update');
+        Route::delete('/{sidebarLink}', [\App\Http\Controllers\SidebarLinkController::class, 'delete'])->name('sidebar-links.delete');
+    });
+    // END SIDEBAR LINKS BY ADMIN
+
     // CRUD ANNOUNCEMENT BY ADMIN
     Route::prefix('announcements')->middleware('can:kelola-pengumuman')->group(function () {
         Route::get('/', [AnnouncementController::class, 'index'])

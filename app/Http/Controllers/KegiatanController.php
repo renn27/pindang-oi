@@ -70,6 +70,7 @@ class KegiatanController extends Controller
                 'pegawais.nama_pegawai',
                 'roles.nama_role',
             ]);
+        $allBidangs = Bidang::orderBy('urutan')->get(['id_bidang', 'nama_bidang']);
 
         return view('pages.main.pegawai.tagihan-kerja.index', [
             'title'     => $bidang->detail_bidang,
@@ -78,7 +79,8 @@ class KegiatanController extends Controller
             // 'subKegiatans' => $subKegiatans,
             'pegawais'  => $pegawais,
             'rkJpts'    => $rkJpts,
-            'ketuaTims' => $ketuaTims
+            'ketuaTims' => $ketuaTims,
+            'allBidangs'=> $allBidangs,
         ]);
     }
 
@@ -95,6 +97,7 @@ class KegiatanController extends Controller
         }
 
         $validated = $request->validate([
+            'id_bidang' => ['required', 'exists:bidangs,id_bidang'],
             'nama_rk_kegiatan' => ['required', 'string', 'max:255'],
             'rk_jpt' => ['required', 'exists:rencana_jpts,id'],
             'iki_jpt' => [
@@ -109,16 +112,14 @@ class KegiatanController extends Controller
             'tahun_kegiatan' => ['required'],
         ]);
 
-        // 🔐 PAKSA id_bidang dari route
-        $validated['id_bidang'] = $bidang->id_bidang;
-
         try {
             // Simpan
-            Kegiatan::create($validated);
+            $kegiatan = Kegiatan::create($validated);
+            $kegiatan->refresh();
 
             // Redirect dengan flash message
             return redirect()
-                ->route('kegiatan.index', $bidang->slug)
+                ->route('kegiatan.index', $kegiatan->bidang->slug)
                 ->with('success', 'Kegiatan berhasil ditambahkan.');
         } catch (\Exception $e) {
             dd($e->getMessage());
@@ -146,6 +147,7 @@ class KegiatanController extends Controller
 
         // ✅ Validasi
         $validated = $request->validate([
+            'id_bidang' => ['required', 'exists:bidangs,id_bidang'],
             'nama_rk_kegiatan' => ['required', 'string', 'max:255'],
             'rk_jpt' => ['required', 'exists:rencana_jpts,id'],
             'iki_jpt' => [
@@ -157,12 +159,10 @@ class KegiatanController extends Controller
             'tahun_kegiatan' => ['required'],
         ]);
 
-        // 🔐 PERTAHANKAN id_bidang (tidak boleh diubah lewat form)
-        $validated['id_bidang'] = $kegiatan->id_bidang;
-
         try {
             // 🔄 Update data
             $kegiatan->update($validated);
+            $kegiatan->refresh();
 
             return redirect()
                 ->route('kegiatan.index', $kegiatan->bidang->slug)

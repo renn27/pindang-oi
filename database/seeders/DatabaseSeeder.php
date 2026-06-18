@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             PegawaiRoleSeeder::class,
             KegiatanSeeder::class,
             SubKegiatanSeeder::class,
+            SidebarLinkSeeder::class,
         ]);
     }
 }

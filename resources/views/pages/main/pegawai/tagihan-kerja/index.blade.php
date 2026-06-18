@@ -182,6 +182,7 @@
                                             key: '{{ $kegiatan->id_kegiatan }}',
                                             data: {
                                                 id_kegiatan: '{{ $kegiatan->id_kegiatan }}',
+                                                id_bidang: '{{ $kegiatan->id_bidang }}',
                                                 nama_rk_kegiatan: @js($kegiatan->nama_rk_kegiatan),
                                                 tahun_kegiatan: '{{ $kegiatan->tahun_kegiatan }}',
                                                 id_penanggung_jawab: '{{ $kegiatan->id_penanggung_jawab }}',

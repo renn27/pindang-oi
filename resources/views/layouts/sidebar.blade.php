@@ -90,7 +90,8 @@
                                 <li>
                                     @if (isset($item['subItems']))
                                         <!-- Menu Item with Submenu -->
-                                        <button @click="toggle('{{ $key }}')" class="menu-item group w-full {{ !empty($item['is_special_se']) ? 'menu-item-special-se' : '' }}"
+                                        <button @click="toggle('{{ $key }}')" class="menu-item group w-full"
+                                            style="{{ !empty($item['color']) ? 'color: ' . $item['color'] . ' !important;' : '' }} {{ !empty($item['background_color']) ? 'background-color: ' . $item['background_color'] . ' !important;' : '' }}"
                                             :class="[
                                                 {{ $item['is_active'] ?? false ? 'true' : 'false' }} ?
                                                 'menu-item-active' : 'menu-item-inactive',
@@ -144,8 +145,8 @@
                                                             class="menu-dropdown-item
                                                                 {{ !empty($subItem['is_placeholder']) ?
                                                                     'italic text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400'
-                                                                    : '' }}
-                                                                {{ !empty($subItem['is_special_se']) ? 'menu-dropdown-item-special-se' : '' }}"
+                                                                    : '' }}"
+                                                            style="{{ !empty($subItem['color']) ? 'color: ' . $subItem['color'] . ' !important;' : '' }} {{ !empty($subItem['background_color']) ? 'background-color: ' . $subItem['background_color'] . ' !important;' : '' }}"
                                                             :class="{{ $subItem['is_active'] ?? false ? 'true' : 'false' }} ?
                                                                 'menu-dropdown-item-active' :
                                                                 'menu-dropdown-item-inactive'">
@@ -186,8 +187,8 @@
                                             @if (!empty($item['is_external'])) target="_blank" rel="noopener noreferrer" @endif
                                             class="menu-item group w-full
                                             {{ $item['is_active'] ?? false ? 'menu-item-active' : 'menu-item-inactive' }}
-                                            {{ !empty($item['is_special']) ? 'menu-item-special' : '' }}
-                                            {{ !empty($item['is_special_se']) ? 'menu-item-special-se' : '' }}"
+                                            {{ !empty($item['is_special']) ? 'menu-item-special' : '' }}"
+                                            style="{{ !empty($item['color']) ? 'color: ' . $item['color'] . ' !important;' : '' }} {{ !empty($item['background_color']) ? 'background-color: ' . $item['background_color'] . ' !important;' : '' }}"
                                             :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar
                                                 .isMobileOpen) ?
                                             'xl:justify-center' :
