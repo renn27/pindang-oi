@@ -92,6 +92,8 @@
             }"
             class="flex flex-col h-[80vh] md:h-[85vh] overflow-hidden">
             @csrf
+            {{-- Hidden input is_special selalu ada di form, valuenya dikontrol Alpine --}}
+            <input type="hidden" name="is_special" :value="formData.is_special ? '1' : '0'">
             <template x-if="mode === 'edit'">
                 <input type="hidden" name="_method" value="PUT">
             </template>
@@ -267,17 +269,23 @@
                     <!-- is_special (Hanya untuk link utama/direct/group) -->
                     <div x-show="formData.type !== 'sub'" x-transition class="flex flex-col gap-1 bg-amber-50 border border-amber-200/50 p-4 rounded-xl dark:bg-amber-950/20 dark:border-amber-900/30">
                         <div class="flex items-center gap-3">
-                            <input type="checkbox" x-model="formData.is_special" name="is_special" value="1" id="is_special"
+                            {{-- Checkbox visual yang mengubah formData.is_special (boolean) --}}
+                            <input type="checkbox"
+                                :checked="formData.is_special"
+                                @change="formData.is_special = $event.target.checked"
+                                id="is_special"
                                 class="h-4.5 w-4.5 rounded-sm border-gray-300 text-brand-500 focus:ring-brand-500/10">
-                            <label for="is_special" class="text-sm font-semibold text-gray-800 dark:text-white">
+                            <label for="is_special" class="text-sm font-semibold text-gray-800 dark:text-white cursor-pointer">
                                 Style Khusus (Highlight Menu)
                             </label>
                         </div>
+
                         <p class="text-xs text-gray-500 pl-7.5 dark:text-gray-400 mt-1">
                             Menceklis style highlight akan membuat link menjadi eye catching seperti link pengumuman.
                         </p>
                     </div>
                 </div>
+
 
                 <!-- Good UX - Inline Children Builder (Khusus Create Mode Tipe Grup Dropdown) -->
                 <div x-show="formData.type === 'group' && mode === 'create'" x-transition class="border-t border-gray-200 pt-4 mt-4 dark:border-gray-700">

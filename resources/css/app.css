@@ -1126,8 +1126,19 @@ tr.ckp-siap-row:hover {
     @apply bg-gradient-to-r from-brand-200 to-sky-300 text-black shadow-lg relative overflow-hidden animate-pulse;
 }
 
+/* Override warna text & icon anak agar tidak dikalahkan oleh menu-item-inactive/active */
+.menu-item-special span,
+.menu-item-special svg {
+    @apply !text-black;
+}
+
 .menu-item-special:hover {
     @apply scale-[1.02] shadow-xl;
+}
+
+.menu-item-special:hover span,
+.menu-item-special:hover svg {
+    @apply !text-gray-900;
 }
 
 /* efek glow */

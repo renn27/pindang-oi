@@ -93,19 +93,21 @@
                                         <button @click="toggle('{{ $key }}')" class="menu-item group w-full"
                                             style="{{ !empty($item['color']) ? 'color: ' . $item['color'] . ' !important;' : '' }} {{ !empty($item['background_color']) ? 'background-color: ' . $item['background_color'] . ' !important;' : '' }}"
                                             :class="[
-                                                {{ $item['is_active'] ?? false ? 'true' : 'false' }} ?
-                                                'menu-item-active' : 'menu-item-inactive',
+                                                {{ !empty($item['is_special']) ? "'menu-item-special'" : ($item['is_active'] ?? false ? "'menu-item-active'" : "'menu-item-inactive'") }},
                                                 !$store.sidebar.isExpanded && !$store.sidebar.isHovered ?
                                                 'xl:justify-center' : 'xl:justify-start'
                                             ]">
 
                                             <!-- Icon -->
                                             <span
+                                                @if (empty($item['is_special']))
                                                 :class="{{ $item['is_active'] ?? false ? 'true' : 'false' }} ?
                                                     'menu-item-icon-active' : 'menu-item-icon-inactive'"
+                                                @endif
                                                 style="{{ !empty($item['color']) ? 'color: ' . $item['color'] . ' !important;' : '' }}">
                                                 {!! MenuHelper::getIconSvg($item['icon']) !!}
                                             </span>
+
 
                                             <!-- Text -->
                                             <span
@@ -188,8 +190,7 @@
                                         <a href="{{ $item['path'] }}"
                                             @if (!empty($item['is_external'])) target="_blank" rel="noopener noreferrer" @endif
                                             class="menu-item group w-full
-                                            {{ $item['is_active'] ?? false ? 'menu-item-active' : 'menu-item-inactive' }}
-                                            {{ !empty($item['is_special']) ? 'menu-item-special' : '' }}"
+                                            {{ !empty($item['is_special']) ? 'menu-item-special' : ($item['is_active'] ?? false ? 'menu-item-active' : 'menu-item-inactive') }}"
                                             style="{{ !empty($item['color']) ? 'color: ' . $item['color'] . ' !important;' : '' }} {{ !empty($item['background_color']) ? 'background-color: ' . $item['background_color'] . ' !important;' : '' }}"
                                             :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar
                                                 .isMobileOpen) ?
@@ -199,8 +200,10 @@
 
                                             <!-- Icon -->
                                             <span
+                                                @if (empty($item['is_special']))
                                                 :class="{{ $item['is_active'] ?? false ? 'true' : 'false' }} ?
                                                     'menu-item-icon-active' : 'menu-item-icon-inactive'"
+                                                @endif
                                                 style="{{ !empty($item['color']) ? 'color: ' . $item['color'] . ' !important;' : '' }}">
                                                 {!! MenuHelper::getIconSvg($item['icon']) !!}
                                             </span>

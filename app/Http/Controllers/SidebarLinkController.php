@@ -66,7 +66,7 @@ class SidebarLinkController extends Controller
             'children.*.background_color' => ['nullable', 'string', 'max:100'],
         ]);
 
-        $isSpecial = $request->has('is_special') ? (bool) $request->is_special : false;
+        $isSpecial = $request->boolean('is_special');
 
         DB::transaction(function () use ($validated, $isSpecial) {
             // Tentukan parent_id untuk pergeseran urutan
@@ -152,7 +152,7 @@ class SidebarLinkController extends Controller
             'is_special' => ['nullable', 'boolean'],
         ]);
 
-        $isSpecial = $request->has('is_special') ? (bool) $request->is_special : false;
+        $isSpecial = $request->boolean('is_special');
 
         $oldOrder = $sidebarLink->sort_order;
         $oldParentId = $sidebarLink->parent_id;
