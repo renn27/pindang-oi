@@ -115,6 +115,34 @@ class PanduanFiturSeeder extends Seeder
                 </ol>',
                 'sort_order' => 40,
             ],
+            [
+                'type' => 'user',
+                'role_tab' => 'Admin',
+                'menu_name' => 'Kelola Link Sidebar',
+                'slug' => 'admin-kelola-sidebar-links',
+                'title' => 'Manajemen Link Menu Sidebar',
+                'explanation' => 'Mengatur menu eksternal dan grup tautan di bagian bawah sidebar (Informasi). Semua link otomatis terbuka di tab baru.',
+                'route_target' => 'sidebar-links.index',
+                'roles_allowed' => ['Admin'],
+                'output' => 'Daftar link eksternal atau grup menu yang muncul di bagian bawah sidebar utama.',
+                'form_details' => [
+                    ['field' => 'Nama Link / Grup (name)', 'type' => 'String', 'required' => 'Ya', 'rules' => 'Maksimal 255 karakter', 'validation' => 'Wajib diisi.'],
+                    ['field' => 'Tipe Link (type)', 'type' => 'Enum / Dropdown', 'required' => 'Ya', 'rules' => 'Pilihan: direct, group, sub', 'validation' => 'Direct untuk link langsung, group untuk grup yang memiliki sub-menu, sub untuk sub-menu di dalam group.'],
+                    ['field' => 'Parent Group (parent_id)', 'type' => 'Integer / Dropdown', 'required' => 'Ya (jika Tipe = sub)', 'rules' => 'Harus berupa link bertipe group yang ada', 'validation' => 'Menghubungkan sub-link ke grup induk.'],
+                    ['field' => 'URL (url)', 'type' => 'String', 'required' => 'Ya (jika Tipe = direct atau sub)', 'rules' => 'Maksimal 255 karakter', 'validation' => 'Tautan tujuan url eksternal.'],
+                    ['field' => 'Icon (icon)', 'type' => 'String', 'required' => 'Tidak (Nullable)', 'rules' => 'Maksimal 255 karakter (SVG/Heroicons)', 'validation' => 'Ikon visual menu.'],
+                    ['field' => 'Urutan (sort_order)', 'type' => 'Integer', 'required' => 'Ya', 'rules' => 'Minimal 0', 'validation' => 'Mengatur posisi urutan link. Tautan lain dengan urutan sama atau lebih besar akan digeser otomatis.'],
+                    ['field' => 'Is Special (is_special)', 'type' => 'Boolean / Checkbox', 'required' => 'Tidak', 'rules' => '0 atau 1', 'validation' => 'Menandakan jika tautan memerlukan sorotan khusus.']
+                ],
+                'tutorial' => '<ol class="list-decimal pl-5 space-y-2">
+                    <li>Buka menu <strong>Kelola Link Sidebar</strong> di bawah menu Admin.</li>
+                    <li>Gunakan tombol <strong>Tambah Link Sidebar</strong> untuk mendaftarkan menu eksternal baru.</li>
+                    <li>Tentukan tipe menu (Direct, Group, atau Sub) sesuai kebutuhan layout.</li>
+                    <li>Isi parameter seperti nama, URL tujuan, ikon, dan nomor urutan tampil.</li>
+                    <li>Klik <strong>Simpan</strong>. Menu eksternal akan langsung tampil di sidebar utama.</li>
+                </ol>',
+                'sort_order' => 45,
+            ],
 
             // ==================== PIMPINAN ROLE ====================
             [
@@ -584,6 +612,21 @@ class PanduanFiturSeeder extends Seeder
     $path = $request->file(\'image\')->store(\'announcements\', \'public\');
     $validated[\'image\'] = $path;
 }</code></pre>'
+            ],
+            'admin-kelola-sidebar-links' => [
+                'controller' => 'app/Http/Controllers/SidebarLinkController.php',
+                'model' => 'app/Models/SidebarLink.php',
+                'view' => 'resources/views/pages/main/admin/sidebar-links/index.blade.php',
+                'route' => 'Route::prefix(\'sidebar-links\')->name(\'sidebar-links.\')',
+                'policy' => 'middleware(\'can:kelola-master-data\')',
+                'middleware' => 'auth, active.pegawai',
+                'tutorial' => '<p class="mb-3">Penggeseran urutan menu otomatis saat link baru disimpan dalam transaksi DB:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">DB::transaction(function () use ($validated, $isSpecial) {
+    $parentId = ($validated[\'type\'] === \'sub\') ? $validated[\'parent_id\'] : null;
+    SidebarLink::where(\'parent_id\', $parentId)
+        ->where(\'sort_order\', \'>=\', $validated[\'sort_order\'])
+        ->increment(\'sort_order\');
+    SidebarLink::create($parentData);
+});</code></pre>'
             ],
             'pimpinan-rk-iki' => [
                 'controller' => 'app/Http/Controllers/RencanaJPTController.php',
