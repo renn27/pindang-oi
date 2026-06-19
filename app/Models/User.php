@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'nama_pegawai',
+        'username',
     ];
 
     /**
@@ -61,9 +63,19 @@ class User extends Authenticatable
         return $this->name;
     }
 
+    public function setNamaPegawaiAttribute($value)
+    {
+        $this->attributes['name'] = $value;
+    }
+
     public function getUsernameAttribute(): string
     {
         return $this->name;
+    }
+
+    public function setUsernameAttribute($value)
+    {
+        $this->attributes['name'] = $value;
     }
 
     public function getActiveRoleAttribute(): string
@@ -122,6 +134,11 @@ class User extends Authenticatable
     }
 
     public function ckps()
+    {
+        return $this->hasMany(User::class, 'id', 'id')->whereRaw('1 = 0');
+    }
+
+    public function roles()
     {
         return $this->hasMany(User::class, 'id', 'id')->whereRaw('1 = 0');
     }

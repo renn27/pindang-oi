@@ -67,24 +67,6 @@
                     Lihat MPH
                 </button>
 
-            @if(auth()->user()->isKetuaTim() || auth()->user()->isActiveRole('Admin'))
-                <!-- Tombol Asisten AI -->
-                <button
-                    class="flex items-center justify-center gap-2 rounded-full border border-purple-300
-                        bg-purple-50 px-4 py-3 text-sm font-medium text-purple-700
-                        shadow-theme-xs hover:bg-purple-100 hover:text-purple-800 hover:border-purple-400
-                        transition-colors duration-200 w-full sm:w-auto
-                        dark:border-purple-900 dark:bg-purple-950/20 dark:text-purple-300 dark:hover:bg-purple-900/40 dark:hover:border-purple-700"
-                    @click="$dispatch('open-smart-modal', {
-                        modalId: 'modal-ai-draft',
-                        type: 'auto'
-                    })">
-                    <svg class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l-.813-5.096L3 15l5.096-.813L9 9l.813 5.096L15 15l-5.187.904zM18 10.5l-.563-2.437L15 7.5l2.437-.563L18 4.5l.563 2.437L21 7.5l-2.437.563L18 10.5z" />
-                    </svg>
-                    Asisten AI
-                </button>
-            @endif
 
             @can('create', App\Models\Kegiatan::class)
                 <!-- Tombol Tambah Kegiatan -->
@@ -329,8 +311,6 @@
     {{-- MODAL TRANSFER KEGIATAN --}}
     @include('pages.main.components.modals.tagihan-kerja.modal-transfer-kegiatan')
 
-    {{-- MODAL AI DRAFT --}}
-    @include('pages.main.components.modals.tagihan-kerja.modal-ai-draft')
 
     <style>
         [x-cloak] {

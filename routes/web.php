@@ -22,7 +22,8 @@ use App\Http\Controllers\JenisKegiatanController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PushSubscriptionController;
-use App\Http\Controllers\AiDraftController;
+use App\Http\Controllers\PanduanPenggunaController;
+use App\Http\Controllers\PanduanDeveloperController;
 use Illuminate\Support\Facades\Auth;
 
 // ROUTE DASHBOARD VISUALISASI DATA
@@ -138,11 +139,9 @@ Route::middleware(['auth', 'active.pegawai'])->group(function () {
     // Halaman pengumuman untuk pegawai
     Route::get('/pengumuman', [AnnouncementController::class, 'pegawaiIndex'])->name('announcements.pegawai');
 
-    Route::get('/panduan-pengguna', function () {
-        return view('pages.main.panduan-pengguna.index', ['title' => 'Panduan Pengguna']);
-    })->name('panduan-pengguna.index');
+    Route::get('/panduan-pengguna', [PanduanPenggunaController::class, 'index'])->name('panduan-pengguna.index');
+    Route::get('/panduan-developer', [PanduanDeveloperController::class, 'index'])->name('panduan-developer.index');
 
-    Route::post('/ai/draft-form', AiDraftController::class)->name('ai.draft-form');
 
     Route::get('/api/active-announcements', [AnnouncementController::class, 'getActiveAnnouncements']);
 
