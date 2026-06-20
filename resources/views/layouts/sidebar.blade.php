@@ -143,7 +143,7 @@
                                             <ul class="mt-2 space-y-1 ml-9">
                                                 @foreach ($item['subItems'] as $subItem)
                                                     <li>
-                                                        <a href="{{ $subItem['path'] }}"
+                                                        <a href="{{ $subItem['path'] ?? '#' }}"
                                                             @if (!empty($subItem['is_external'])) target="_blank" rel="noopener noreferrer" @endif
                                                             class="menu-dropdown-item
                                                                 {{ !empty($subItem['is_placeholder']) ?
@@ -187,7 +187,7 @@
                                         </div>
                                     @else
                                         <!-- Simple Menu Item -->
-                                        <a href="{{ $item['path'] }}"
+                                        <a href="{{ $item['path'] ?? '#' }}"
                                             @if (!empty($item['is_external'])) target="_blank" rel="noopener noreferrer" @endif
                                             class="menu-item group w-full
                                             {{ !empty($item['is_special']) ? 'menu-item-special' : ($item['is_active'] ?? false ? 'menu-item-active' : 'menu-item-inactive') }}"

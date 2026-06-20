@@ -146,22 +146,19 @@ class MenuHelper
             $item = [
                 'icon' => $link->icon,
                 'name' => $link->name,
+                'path' => $link->url ?? '#',
                 'is_external' => true,
                 'is_special' => (bool) $link->is_special,
                 'color' => $link->color,
                 'background_color' => $link->background_color,
             ];
 
-            if ($link->url) {
-                $item['path'] = $link->url;
-            }
-
             if ($link->children->isNotEmpty()) {
                 $item['subItems'] = $link->children->map(function ($child) {
                     return [
                         'icon' => $child->icon,
                         'name' => $child->name,
-                        'path' => $child->url,
+                        'path' => $child->url ?? '#',
                         'is_external' => true,
                         'is_special' => (bool) $child->is_special,
                         'color' => $child->color,
