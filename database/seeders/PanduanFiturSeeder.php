@@ -563,6 +563,8 @@ class PanduanFiturSeeder extends Seeder
                 'route' => 'Route::prefix(\'bidang-kerja\')->name(\'bidang.\')',
                 'policy' => 'middleware(\'can:kelola-master-data\')',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_bidangs_table',
+                'policy_path' => 'app/Providers/AuthServiceProvider.php',
                 'tutorial' => '<p class="mb-3">Logika pembuatan bidang diimplementasikan di method <code>store</code>:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">public function store(Request $request) {
     $validated = $request->validate([
         \'nama_bidang\' => \'required|unique:bidangs,nama_bidang\',
@@ -580,6 +582,8 @@ class PanduanFiturSeeder extends Seeder
                 'route' => 'Route::prefix(\'jenis-kegiatan\')->name(\'jenis-kegiatan.\')',
                 'policy' => 'middleware(\'can:kelola-master-data\')',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_jenis_kegiatans_table',
+                'policy_path' => 'app/Providers/AuthServiceProvider.php',
                 'tutorial' => '<p class="mb-3">Menyimpan jenis kegiatan baru beserta penanda wajib DL/TL:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">public function store(Request $request) {
     $validated = $request->validate([
         \'jenis_kegiatan\' => \'required|unique:jenis_kegiatans\',
@@ -596,6 +600,8 @@ class PanduanFiturSeeder extends Seeder
                 'route' => 'Route::prefix(\'role-pegawai\')->name(\'pegawai-role.\')',
                 'policy' => '$this->authorize(\'kelola-master-data\')',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_pegawais_table',
+                'policy_path' => 'app/Providers/AuthServiceProvider.php',
                 'tutorial' => '<p class="mb-3">Sinkronisasi peran pegawai dilakukan dalam DB Transaction:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">DB::transaction(function () use ($validated, $roles) {
     $pegawai = Pegawai::create($validated);
     $pegawai->roles()->sync($roles);
@@ -608,6 +614,8 @@ class PanduanFiturSeeder extends Seeder
                 'route' => 'Route::prefix(\'announcements\')->name(\'announcements.\')',
                 'policy' => 'middleware(\'can:kelola-pengumuman\')',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_announcements_table',
+                'policy_path' => 'app/Providers/AuthServiceProvider.php',
                 'tutorial' => '<p class="mb-3">Menyimpan pengumuman dengan upload file banner:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">if ($request->hasFile(\'image\')) {
     $path = $request->file(\'image\')->store(\'announcements\', \'public\');
     $validated[\'image\'] = $path;
@@ -620,6 +628,8 @@ class PanduanFiturSeeder extends Seeder
                 'route' => 'Route::prefix(\'sidebar-links\')->name(\'sidebar-links.\')',
                 'policy' => 'middleware(\'can:kelola-master-data\')',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_sidebar_links_table',
+                'policy_path' => 'app/Providers/AuthServiceProvider.php',
                 'tutorial' => '<p class="mb-3">Penggeseran urutan menu otomatis saat link baru disimpan dalam transaksi DB:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">DB::transaction(function () use ($validated, $isSpecial) {
     $parentId = ($validated[\'type\'] === \'sub\') ? $validated[\'parent_id\'] : null;
     SidebarLink::where(\'parent_id\', $parentId)
@@ -635,6 +645,8 @@ class PanduanFiturSeeder extends Seeder
                 'route' => 'Route::prefix(\'rencana-indikator-jpt\')->name(\'rencana-indikator-jpt.\')',
                 'policy' => 'middleware(\'can:kelola-master-data\')',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_rencana_jpts_table',
+                'policy_path' => 'app/Providers/AuthServiceProvider.php',
                 'tutorial' => '<p class="mb-3">Pengambilan list Rencana JPT beserta relasi IKI JPT:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">$rencanaJpts = RencanaJPT::with([\'indikatorjpts\'])->get();</code></pre>'
             ],
             'pimpinan-agenda' => [
@@ -644,6 +656,8 @@ class PanduanFiturSeeder extends Seeder
                 'route' => 'Route::prefix(\'agenda-pimpinan\')->name(\'agenda.\')',
                 'policy' => 'middleware(\'can:kelola-master-data\')',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_agenda_pimpinans_table',
+                'policy_path' => 'app/Providers/AuthServiceProvider.php',
                 'tutorial' => '<p class="mb-3">Metode konversi agenda pimpinan ke baris CKP utama:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">// Logika konversi agenda ke CKP
 $ckp = CkpPegawai::create([
     \'uraian\' => $agenda->nama_agenda,
@@ -658,6 +672,8 @@ $ckp = CkpPegawai::create([
                 'route' => 'Route::get(\'/rencana-kerja-dl\')',
                 'policy' => 'middleware(\'can:acceptDL,App\Models\Penugasan,penugasan\')',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_penugasans_table',
+                'policy_path' => 'app/Policies/PenugasanPolicy.php',
                 'tutorial' => '<p class="mb-3">Pimpinan menyetujui status DL yang diajukan Ketua Tim:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">public function update_rk_dl(Request $request, Penugasan $penugasan) {
     $penugasan->update([\'status_dl\' => $request->status]);
 }</code></pre>'
@@ -669,6 +685,7 @@ $ckp = CkpPegawai::create([
                 'route' => 'Route::post(\'/pegawai/{pegawai}/send-todo-reminder\')',
                 'policy' => 'auth',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_pegawais_table',
                 'tutorial' => '<p class="mb-3">Mengirim notifikasi push manual ke gawai pegawai:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">public function sendPegawaiTodoReminder(Pegawai $pegawai) {
     app(PushNotificationService::class)->sendPush($pegawai, \'Pengingat Tugas\', \'Anda memiliki tugas belum selesai.\');
 }</code></pre>'
@@ -680,6 +697,8 @@ $ckp = CkpPegawai::create([
                 'route' => 'Route::post(\'/kegiatan/bidang/{bidang}\')',
                 'policy' => 'middleware(\'can:create,App\Models\Kegiatan\')',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_kegiatans_table',
+                'policy_path' => 'app/Policies/KegiatanPolicy.php',
                 'tutorial' => '<p class="mb-3">Membuat Kegiatan baru di bawah naungan Bidang Kerja:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">Kegiatan::create([
     \'id_bidang\' => $request->id_bidang,
     \'nama_rk_kegiatan\' => $request->nama_rk_kegiatan,
@@ -693,6 +712,8 @@ $ckp = CkpPegawai::create([
                 'route' => 'Route::post(\'/kegiatan/{kegiatan}/sub-kegiatan\')',
                 'policy' => 'middleware(\'can:create,kegiatan\')',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_sub_kegiatans_table',
+                'policy_path' => 'app/Policies/KegiatanPolicy.php',
                 'tutorial' => '<p class="mb-3">Membuat Sub-Kegiatan baru di bawah Kegiatan utama:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">$sub = $kegiatan->subKegiatans()->create([
     \'nama_sub_kegiatan\' => $request->nama_sub_kegiatan,
     \'target\' => $request->target,
@@ -705,6 +726,8 @@ $ckp = CkpPegawai::create([
                 'route' => 'Route::post(\'/sub-kegiatan/{subKegiatan}/penugasan\')',
                 'policy' => 'middleware(\'can:create,App\Models\Penugasan,subKegiatan\')',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_penugasans_table',
+                'policy_path' => 'app/Policies/PenugasanPolicy.php',
                 'tutorial' => '<p class="mb-3">Mengecek overlap tanggal DL/TL sebelum menugaskan anggota:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">$bentrok = Penugasan::where(\'id_anggota\', $id)->where(function($q) use ($start, $end) {
     $q->whereBetween(\'tanggal_mulai\', [$start, $end])
       ->orWhereBetween(\'tanggal_selesai\', [$start, $end]);
@@ -717,6 +740,8 @@ $ckp = CkpPegawai::create([
                 'route' => 'Route::post(\'/penugasan/{penugasan}/pengirimans/{pengirimans}/penerimaan\')',
                 'policy' => 'middleware(\'can:receive,penugasan\')',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_penerimaans_table',
+                'policy_path' => 'app/Policies/PenugasanPolicy.php',
                 'tutorial' => '<p class="mb-3">Ketua Tim menerima berkas pengiriman anggota:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">Penerimaan::create([
     \'id_pengiriman\' => $pengiriman->id_pengiriman,
     \'status\' => \'Diterima\',
@@ -730,6 +755,7 @@ $ckp = CkpPegawai::create([
                 'route' => 'Route::prefix(\'ckp\')->group(...)',
                 'policy' => 'auth',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'recreate_ckp_pegawais_table',
                 'tutorial' => '<p class="mb-3">Konversi sub-kegiatan berprogres menjadi CKP Ketua Tim:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">$ckp = CkpPegawai::create([
     \'uraian\' => $sub->nama_sub_kegiatan,
     \'target\' => 100,
@@ -743,6 +769,8 @@ $ckp = CkpPegawai::create([
                 'route' => 'Route::post(\'/kegiatan/{kegiatan}/transfer\')',
                 'policy' => 'middleware(\'can:transfer,kegiatan\')',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_kegiatan_transfers_table',
+                'policy_path' => 'app/Policies/KegiatanPolicy.php',
                 'tutorial' => '<p class="mb-3">Mentransfer kegiatan dan memperbarui flag transfer:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">$kegiatan->update([
     \'id_penanggung_jawab\' => $request->to_ketua_id,
     \'transferred_at\' => now(),
@@ -755,6 +783,8 @@ $ckp = CkpPegawai::create([
                 'route' => 'Route::delete(\'/kegiatan/{kegiatan}\')',
                 'policy' => 'middleware(\'can:delete,kegiatan\')',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_kegiatans_table',
+                'policy_path' => 'app/Policies/KegiatanPolicy.php',
                 'tutorial' => '<p class="mb-3">Sebelum menghapus kegiatan, pastikan tidak ada transaksi berjalan:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">if ($kegiatan->subKegiatans()->whereHas(\'penugasans.pengirimans\')->exists()) {
     throw new \Exception(\'Kegiatan tidak dapat dihapus karena sudah ada realisasi!\');
 }</code></pre>'
@@ -766,6 +796,7 @@ $ckp = CkpPegawai::create([
                 'route' => 'Route::get(\'/\')',
                 'policy' => 'auth',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_penugasans_table',
                 'tutorial' => '<p class="mb-3">Query mengambil tugas berjalan milik anggota yang sedang login:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">$penugasans = Penugasan::where(\'id_anggota\', auth()->id())->where(\'status\', \'Belum Dikirim\')->get();</code></pre>'
             ],
             'anggota-kirim-laporan' => [
@@ -775,6 +806,8 @@ $ckp = CkpPegawai::create([
                 'route' => 'Route::post(\'/penugasan/{penugasan}/pengirimans\')',
                 'policy' => 'middleware(\'can:send,penugasan\')',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_pengirimans_table',
+                'policy_path' => 'app/Policies/PenugasanPolicy.php',
                 'tutorial' => '<p class="mb-3">Menyimpan pengiriman realisasi tugas baru:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">Pengiriman::create([
     \'id_penugasan\' => $penugasan->id_penugasan,
     \'jumlah_dikirim\' => $request->jumlah_dikirim,
@@ -788,6 +821,8 @@ $ckp = CkpPegawai::create([
                 'route' => 'Route::post(\'/penugasan/{penugasan}/pengirimans\')',
                 'policy' => 'middleware(\'can:send,penugasan\')',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_pengirimans_table',
+                'policy_path' => 'app/Policies/PenugasanPolicy.php',
                 'tutorial' => '<p class="mb-3">Kirim ulang laporan revisi (sama dengan store tetapi status sebelumnya dinonaktifkan):</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">// Logic kirim ulang revisi
 $pengiriman->update([\'status\' => \'Revisi\']);</code></pre>'
             ],
@@ -798,6 +833,7 @@ $pengiriman->update([\'status\' => \'Revisi\']);</code></pre>'
                 'route' => 'Route::prefix(\'ckp\')->group(...)',
                 'policy' => 'auth',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'recreate_ckp_pegawais_table',
                 'tutorial' => '<p class="mb-3">Mengambil penugasan berstatus diterima untuk bulan target:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">$accepted = Penugasan::where(\'id_anggota\', auth()->id())->whereHas(\'pengirimans.penerimaan\', function($q) {
     $q->where(\'status\', \'Diterima\');
 })->get();</code></pre>'
@@ -809,6 +845,7 @@ $pengiriman->update([\'status\' => \'Revisi\']);</code></pre>'
                 'route' => 'Route::get(\'/\')',
                 'policy' => 'auth',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_penugasans_table',
                 'tutorial' => '<p class="mb-3">Perhitungan nilai kinerja dihitung secara global:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">$skor = ($rrKirim + $rrTerima + $waktu + $kualitas) / 4 * $koefisienBeban;</code></pre>'
             ],
             'anggota-batal-pengiriman' => [
@@ -818,6 +855,7 @@ $pengiriman->update([\'status\' => \'Revisi\']);</code></pre>'
                 'route' => 'Route::delete(\'pengirimans/{pengiriman}\')',
                 'policy' => 'auth',
                 'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_pengirimans_table',
                 'tutorial' => '<p class="mb-3">Membatalkan pengiriman berkas jika belum diperiksa:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">if ($pengiriman->status === \'Menunggu Pemeriksaan\') {
     $pengiriman->delete();
 }</code></pre>'
@@ -834,6 +872,39 @@ $pengiriman->update([\'status\' => \'Revisi\']);</code></pre>'
             $slug = $item['slug'];
             if (isset($devMeta[$slug])) {
                 $meta = $devMeta[$slug];
+                
+                // Read Migration Code
+                $migrationPath = null;
+                $migrationCode = null;
+                if (!empty($meta['migration_pattern'])) {
+                    $migrationPattern = base_path('database/migrations/*' . $meta['migration_pattern'] . '*.php');
+                    $migrationFiles = glob($migrationPattern);
+                    if (!empty($migrationFiles)) {
+                        $firstFile = $migrationFiles[0];
+                        $migrationPath = str_replace(base_path() . DIRECTORY_SEPARATOR, '', $firstFile);
+                        $migrationPath = str_replace('\\', '/', $migrationPath);
+                        $migrationCode = file_get_contents($firstFile);
+                    }
+                }
+                
+                // Read Model Code
+                $modelCode = null;
+                if (!empty($meta['model']) && file_exists(base_path($meta['model']))) {
+                    $modelCode = file_get_contents(base_path($meta['model']));
+                }
+                
+                // Read Controller Code
+                $controllerCode = null;
+                if (!empty($meta['controller']) && file_exists(base_path($meta['controller']))) {
+                    $controllerCode = file_get_contents(base_path($meta['controller']));
+                }
+
+                // Read Policy Code
+                $policyCode = null;
+                if (!empty($meta['policy_path']) && file_exists(base_path($meta['policy_path']))) {
+                    $policyCode = file_get_contents(base_path($meta['policy_path']));
+                }
+
                 PanduanFitur::create([
                     'type' => 'developer',
                     'role_tab' => $item['role_tab'],
@@ -852,6 +923,12 @@ $pengiriman->update([\'status\' => \'Revisi\']);</code></pre>'
                     'route_definition' => $meta['route'],
                     'policy_gate' => $meta['policy'],
                     'middleware' => $meta['middleware'],
+                    'migration_path' => $migrationPath,
+                    'migration_code' => $migrationCode,
+                    'model_code' => $modelCode,
+                    'controller_code' => $controllerCode,
+                    'policy_path' => $meta['policy_path'] ?? null,
+                    'policy_code' => $policyCode,
                     'sort_order' => $item['sort_order'],
                 ]);
             }

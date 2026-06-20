@@ -14,6 +14,7 @@ const toastConfig = {
 }
 
 const SwalHelper = {
+    raw: Swal,
     fire: (...args) => Swal.fire(...args),
     close: () => Swal.close(),
     

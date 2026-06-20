@@ -115,7 +115,7 @@
                 </div>
 
                 {{-- Detail Konten Kanan --}}
-                <div class="flex-1">
+                <div class="flex-1 min-w-0">
                     <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900 shadow-xs min-h-[400px]">
                         <template x-if="activeGuide">
                             <div class="space-y-6">
@@ -159,7 +159,7 @@
                                 <template x-if="activeGuide.form_details && activeGuide.form_details.length > 0">
                                     <div class="space-y-3">
                                         <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">Detail Pengisian Form / Modal</h3>
-                                        <div class="border border-gray-150 dark:border-gray-800 rounded-xl overflow-hidden shadow-xs">
+                                        <div class="border border-gray-150 dark:border-gray-800 rounded-xl overflow-x-auto overflow-hidden shadow-xs">
                                             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800 text-xs">
                                                 <thead class="bg-gray-50 dark:bg-gray-800">
                                                     <tr>

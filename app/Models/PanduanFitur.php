@@ -29,6 +29,12 @@ class PanduanFitur extends Model
         'route_definition',
         'policy_gate',
         'middleware',
+        'migration_path',
+        'migration_code',
+        'model_code',
+        'controller_code',
+        'policy_path',
+        'policy_code',
         'sort_order',
     ];
 
