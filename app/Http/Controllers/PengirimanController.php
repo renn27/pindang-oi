@@ -21,7 +21,7 @@ class PengirimanController extends Controller
         // Validasi
         $validated = $request->validate([
             'tanggal_pengiriman' => ['required', 'date'],
-            'jumlah_dikirim'     => ['required', 'integer', 'min:1'],
+            'jumlah_dikirim'     => ['required', 'integer', 'min:1', 'max:' . $penugasan->target],
             'bulan_pengiriman'   => ['required', 'string', 'size:7'],
             'tipe_pengiriman'    => ['required', 'string', 'in:Cicilan,Pelunasan'],
             'media_pengiriman'   => ['required', 'string', 'max:255'],

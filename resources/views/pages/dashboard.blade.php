@@ -225,7 +225,7 @@
                 </div>
             </div>
 
-            {{-- Right Side: Peringkat & Penilaian Kinerja Anda (TEMPORARILY HIDDEN)
+            <!-- Right Side: Peringkat & Penilaian Kinerja Anda -->
             <div class="lg:col-span-5 h-full rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 flex flex-col justify-between">
                 <div>
                     <div class="flex items-start justify-between gap-4 mb-4">
@@ -360,7 +360,6 @@
                     </button>
                 @endif
             </div>
-            --}}
         </div>
     @endif
 
@@ -614,7 +613,7 @@
             </div>
         @endif
 
-        {{-- ===== BEST EMPLOYEE FOR REGULAR EMPLOYEES (TEMPORARILY COMMENTED) =====
+        <!-- BEST EMPLOYEE FOR REGULAR EMPLOYEES -->
         @if ($bestEmployee)
             <div class="mt-8">
                 <x-profile.employe-rank-card
@@ -622,9 +621,8 @@
                     :showHeader="true" />
             </div>
         @endif
-        --}}
 
-        {{-- ===== RANK EMPLOYEE FOR REGULAR EMPLOYEES (TEMPORARILY COMMENTED) =====
+        <!-- RANK EMPLOYEE FOR REGULAR EMPLOYEES -->
         <div id="container-rank-pegawai" class="mt-8">
             @auth
                 <x-dashboard.vis-rank-pegawai
@@ -633,7 +631,6 @@
                     :perPageOptions="$rankPegawaiPerPageOptions" />
             @endauth
         </div>
-        --}}
     @else()
         {{-- ===== CARD BESAR ANALYTICS DASHBOARD ===== --}}
         <div class="mb-8">
@@ -767,15 +764,14 @@
 
                     </div>
 
-                    {{-- ===== BEST EMPLOYEE (TEMPORARILY COMMENTED) =====
+                    <!-- BEST EMPLOYEE -->
                     <div class="mb-10">
                         <x-profile.employe-rank-card
                             :bestEmployee="$bestEmployee"
                             :showHeader="true" />
                     </div>
-                    --}}
 
-                    {{-- ===== RANK EMPLOYEE (TEMPORARILY COMMENTED) =====
+                    <!-- RANK EMPLOYEE -->
                     <div id="container-rank-pegawai">
                         @auth
                             <x-dashboard.vis-rank-pegawai
@@ -784,7 +780,6 @@
                                 :perPageOptions="$rankPegawaiPerPageOptions" />
                         @endauth
                     </div>
-                    --}}
 
                 </div>
 
@@ -813,9 +808,8 @@
         </div>
     @endif
 
-    {{-- Modal Perhitungan Rumus Component (TEMPORARILY COMMENTED)
+    <!-- Modal Perhitungan Rumus Component -->
     <x-dashboard.modal-perhitungan-rumus />
-    --}}
 
 </div>
 

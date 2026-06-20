@@ -277,30 +277,30 @@ class DashboardAnalyticsService {
                 COUNT(DISTINCT CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN penugasans.id_penugasan END) AS total_selesai,
                 COUNT(DISTINCT CASE WHEN lp.tipe_pengiriman='Cicilan'   THEN penugasans.id_penugasan END) AS total_cicilan_diterima,
                 COALESCE(SUM(penugasans.target),0) AS target_pegawai,
-                COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN lp.jumlah_dikirim ELSE 0 END),0) AS progress_pelunasan,
-                COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Cicilan'   THEN lp.jumlah_dikirim ELSE 0 END),0) AS progress_cicilan,
+                COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN LEAST(lp.jumlah_dikirim, penugasans.target) ELSE 0 END),0) AS progress_pelunasan,
+                COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Cicilan'   THEN LEAST(lp.jumlah_dikirim, penugasans.target) ELSE 0 END),0) AS progress_cicilan,
                 COALESCE(SUM(CASE
                     WHEN lp.tipe_pengiriman='Cicilan' AND penugasans.target>0
-                        THEN CAST(lp.jumlah_dikirim AS DECIMAL(10,4))
-                            *CAST(lp.jumlah_dikirim AS DECIMAL(10,4))
+                        THEN LEAST(CAST(lp.jumlah_dikirim AS DECIMAL(10,4)), CAST(penugasans.target AS DECIMAL(10,4)))
+                            *LEAST(CAST(lp.jumlah_dikirim AS DECIMAL(10,4)), CAST(penugasans.target AS DECIMAL(10,4)))
                             /CAST(penugasans.target AS DECIMAL(10,4))
                     ELSE 0 END),0) AS b_efektif_cicilan,
                 COALESCE(AVG(CASE WHEN lp.tipe_pengiriman IS NOT NULL  THEN lp.rating_kirim  END),0) AS rating_kirim_avg,
                 CASE WHEN COALESCE(SUM(penugasans.target),0)=0 OR ?=0 THEN 0.0
                 ELSE GREATEST(0.0, ? - COALESCE(SUM(penugasans.target),0) + (
-                        COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN lp.jumlah_dikirim ELSE 0 END),0)
+                        COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN LEAST(lp.jumlah_dikirim, penugasans.target) ELSE 0 END),0)
                         +COALESCE(SUM(CASE
                             WHEN lp.tipe_pengiriman='Cicilan' AND penugasans.target>0
-                                THEN CAST(lp.jumlah_dikirim AS DECIMAL(10,4))
-                                    *CAST(lp.jumlah_dikirim AS DECIMAL(10,4))
+                                THEN LEAST(CAST(lp.jumlah_dikirim AS DECIMAL(10,4)), CAST(penugasans.target AS DECIMAL(10,4)))
+                                    *LEAST(CAST(lp.jumlah_dikirim AS DECIMAL(10,4)), CAST(penugasans.target AS DECIMAL(10,4)))
                                     /CAST(penugasans.target AS DECIMAL(10,4))
                             ELSE 0 END),0)
                     )) / NULLIF(?,0)
-                    *(COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN lp.jumlah_dikirim ELSE 0 END),0)
+                    *(COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN LEAST(lp.jumlah_dikirim, penugasans.target) ELSE 0 END),0)
                       +COALESCE(SUM(CASE
                             WHEN lp.tipe_pengiriman='Cicilan' AND penugasans.target>0
-                                THEN CAST(lp.jumlah_dikirim AS DECIMAL(10,4))
-                                    *CAST(lp.jumlah_dikirim AS DECIMAL(10,4))
+                                THEN LEAST(CAST(lp.jumlah_dikirim AS DECIMAL(10,4)), CAST(penugasans.target AS DECIMAL(10,4)))
+                                    *LEAST(CAST(lp.jumlah_dikirim AS DECIMAL(10,4)), CAST(penugasans.target AS DECIMAL(10,4)))
                                     /CAST(penugasans.target AS DECIMAL(10,4))
                             ELSE 0 END),0))
                     / NULLIF(COALESCE(SUM(penugasans.target),0),0) * 100.0
@@ -322,14 +322,14 @@ class DashboardAnalyticsService {
                     WHEN lp.tipe_pengiriman='Pelunasan' THEN lp.rr_kirim*1.0
                     WHEN lp.tipe_pengiriman='Cicilan'   THEN lp.rr_kirim
                         *CASE WHEN penugasans.target=0 THEN 0.0
-                          ELSE CAST(lp.jumlah_dikirim AS DECIMAL(10,4))/CAST(penugasans.target AS DECIMAL(10,4)) END
+                          ELSE LEAST(CAST(lp.jumlah_dikirim AS DECIMAL(10,4)), CAST(penugasans.target AS DECIMAL(10,4)))/CAST(penugasans.target AS DECIMAL(10,4)) END
                     ELSE 0.0 END),0)/COUNT(DISTINCT penugasans.id_penugasan) END AS f3_rr_kirim,
                 CASE WHEN COUNT(DISTINCT penugasans.id_penugasan)=0 THEN 0.0
                 ELSE COALESCE(SUM(CASE
                     WHEN lp.tipe_pengiriman='Pelunasan' THEN lp.rating_kirim*20.0*1.0
                     WHEN lp.tipe_pengiriman='Cicilan'   THEN lp.rating_kirim*20.0
                         *CASE WHEN penugasans.target=0 THEN 0.0
-                          ELSE CAST(lp.jumlah_dikirim AS DECIMAL(10,4))/CAST(penugasans.target AS DECIMAL(10,4)) END
+                          ELSE LEAST(CAST(lp.jumlah_dikirim AS DECIMAL(10,4)), CAST(penugasans.target AS DECIMAL(10,4)))/CAST(penugasans.target AS DECIMAL(10,4)) END
                     ELSE 0.0 END),0)/COUNT(DISTINCT penugasans.id_penugasan) END AS f4_rating_kirim,
                 CASE WHEN ?=0 OR COUNT(DISTINCT penugasans.id_penugasan)=0 THEN 1.0
                 ELSE LEAST(1.15,GREATEST(0.85,COALESCE(SUM(penugasans.target),0)/?))
@@ -339,14 +339,14 @@ class DashboardAnalyticsService {
         return \DB::query()->fromSub($inner, 'ranked')
             ->selectRaw('ranked.*,
                 (f1_penyelesaian+f2_kecepatan+f3_rr_kirim+f4_rating_kirim)/4.0 AS rata_rata_base,
-                CASE WHEN koefisien_beban >= 1.0
+                LEAST(100.0, CASE WHEN koefisien_beban >= 1.0
                     THEN (f1_penyelesaian+f2_kecepatan+f3_rr_kirim+f4_rating_kirim)/4.0
                          + LEAST(
                              (f1_penyelesaian+f2_kecepatan+f3_rr_kirim+f4_rating_kirim)/4.0 * (koefisien_beban - 1.0),
                              GREATEST(0.0, 100.0 - (f1_penyelesaian+f2_kecepatan+f3_rr_kirim+f4_rating_kirim)/4.0)
                            )
                     ELSE GREATEST(0.0, (f1_penyelesaian+f2_kecepatan+f3_rr_kirim+f4_rating_kirim)/4.0 * koefisien_beban)
-                END AS rata_rata_final')
+                END) AS rata_rata_final')
             // Prioritas: pegawai TANPA penugasan aktif selalu di bawah pegawai yang punya penugasan
             ->orderByRaw('CASE WHEN total_penugasan = 0 THEN 1 ELSE 0 END')
             ->orderByDesc('rata_rata_final')
@@ -391,7 +391,7 @@ class DashboardAnalyticsService {
                 
                 $bobot = 0.0;
                 if ($isActiveMonth) {
-                    $bobot = $isPelunasan ? 1.0 : ($isCicilan && $target > 0 ? $jml / $target : 0.0);
+                    $bobot = $isPelunasan ? 1.0 : ($isCicilan && $target > 0 ? min(1.0, $jml / $target) : 0.0);
                 }
                 
                 $row->is_pelunasan      = $isPelunasan && $isActiveMonth;

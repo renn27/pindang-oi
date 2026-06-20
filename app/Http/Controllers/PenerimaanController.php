@@ -36,7 +36,7 @@ class PenerimaanController extends Controller
         // Validasi
         $validated = $request->validate([
             'tanggal_penerimaan' => ['required', 'date', 'date_format:Y-m-d'],
-            'jumlah_diterima'    => ['required', 'integer', 'min:1'],
+            'jumlah_diterima'    => ['required', 'integer', 'min:1', 'max:' . $pengirimans->jumlah_dikirim],
             'status'             => ['required', 'in:Diterima,Revisi'],
             'catatan'            => ['nullable', 'string', 'max:255'],
         ]);
