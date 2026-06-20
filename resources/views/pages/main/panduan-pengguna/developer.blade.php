@@ -459,12 +459,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
     <style>
         /* Custom overrides to make Prism Tomorrow look even cleaner and fit our container */
-        pre[class*="language-"] {
+        pre, pre[class*="language-"] {
             margin: 0 !important;
             padding: 0 !important;
             background: transparent !important;
             max-height: 300px !important;
             overflow: auto !important;
+            max-width: 100% !important;
+            width: 100% !important;
         }
         code[class*="language-"] {
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
