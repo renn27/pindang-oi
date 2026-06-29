@@ -133,7 +133,7 @@
         {{-- ===== RANGKUMAN KINERJA PEGAWAI ===== --}}
         <div class="mb-8 grid grid-cols-1 lg:grid-cols-12 gap-5">
             <!-- Left Side: Rekap Penugasan Anda -->
-            <div class="lg:col-span-12 h-full rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 flex flex-col">
+            <div class="lg:col-span-7 h-full rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 flex flex-col">
                 <div class="flex flex-1 flex-col">
                     <div class="mb-4 flex items-center gap-3">
                         <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-blue-100 bg-blue-50 text-blue-600 dark:border-blue-900/40 dark:bg-blue-900/20 dark:text-blue-300">
@@ -610,6 +610,16 @@
                         </p>
                     </div>
                 </div>
+            </div>
+        @endif
+
+        <!-- REKAP SUB KEGIATAN PERSONAL (KETUA TIM / ANGGOTA TIM) -->
+        @if (isset($myRekapSubKegiatan) && $myRekapSubKegiatan && (auth()->user()->isKetuaTim() || auth()->user()->isAnggotaTim()))
+            <div class="mt-8">
+                <x-dashboard.vis-rekap-sub-kegiatan-personal
+                    :rekapSubKegiatan="$myRekapSubKegiatan"
+                    :selectedMonth="$selectedMonth"
+                    :selectedYear="$selectedYear" />
             </div>
         @endif
 

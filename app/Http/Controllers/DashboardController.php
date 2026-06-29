@@ -72,6 +72,15 @@ class DashboardController extends Controller
             return $item->nip_bps === '340017814';
         })->values();
 
+        // Rekap sub kegiatan personal untuk ketua tim / anggota tim
+        // Mencari data rekap berdasarkan id_pegawai user yang sedang login
+        $myRekapSubKegiatan = null;
+        if ($user && ($user->isKetuaTim() || $user->isAnggotaTim())) {
+            $myRekapSubKegiatan = $rekapSubKegiatan->first(function ($item) use ($user) {
+                return $item->id_pegawai == $user->id_pegawai;
+            });
+        }
+
         return view('pages.dashboard', [
             'title'                       => 'Dashboard',
             'unfinishedTerlewatAsAnggota' => $unfinishedTerlewatAsAnggota,
@@ -90,6 +99,7 @@ class DashboardController extends Controller
             'rekapAnggotaTable'           => $rekapAnggotaTable,
             'rekapSubKegiatan'            => $rekapSubKegiatan,
             'rekapSubKegiatanTable'       => $rekapSubKegiatanTable,
+            'myRekapSubKegiatan'          => $myRekapSubKegiatan,
             'rankPegawaiPerPage'          => $rankPegawaiPerPage,
             'rekapPenugasanPerPage'       => $rekapPenugasanPerPage,
             'rankPegawaiPerPageOptions'   => $rankPegawaiPerPageOptions,
