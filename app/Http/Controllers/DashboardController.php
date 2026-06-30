@@ -56,6 +56,23 @@ class DashboardController extends Controller
 
         $bestEmployee = $rankPegawaiAllTable->first();
 
+        // 🏆 Load Peringkat Ketua Tim (Katim)
+        $showKatimLeaderboard = \App\Services\FeatureToggleService::isEnabled('best_katim_leaderboard', $user);
+
+        $rankKetuaTimAllTable = collect();
+        $bestKetuaTim = null;
+
+        if ($showKatimLeaderboard) {
+            $rankKetuaTimAll = $analytics->rankKetuaTimAll($selectedMonth, $selectedYear, false);
+
+            // Filter out Sukendro from the Katim rank table
+            $rankKetuaTimAllTable = $rankKetuaTimAll->reject(function ($item) {
+                return $item->nip_bps === '340017814';
+            })->values();
+
+            $bestKetuaTim = $rankKetuaTimAllTable->first();
+        }
+
         // Rekap penugasan anggota difilter per bulan yang dipilih
         $rekapAnggota = $analytics->getRekapPenugasanPegawai($selectedMonth, $selectedYear, false);
 
@@ -93,8 +110,11 @@ class DashboardController extends Controller
             'selectedMonth'               => $selectedMonth,
             'selectedYear'                => $selectedYear,
             'bestEmployee'                => $bestEmployee,
+            'bestKetuaTim'                => $bestKetuaTim,
+            'showKatimLeaderboard'        => $showKatimLeaderboard,
             'rankPegawaiAll'              => $rankPegawaiAll,
             'rankPegawaiAllTable'         => $rankPegawaiAllTable,
+            'rankKetuaTimAllTable'        => $rankKetuaTimAllTable,
             'rekapAnggota'                => $rekapAnggota,
             'rekapAnggotaTable'           => $rekapAnggotaTable,
             'rekapSubKegiatan'            => $rekapSubKegiatan,
