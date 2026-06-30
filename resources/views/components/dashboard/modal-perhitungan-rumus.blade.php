@@ -77,7 +77,7 @@
                                     <p class="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">Skor Akhir (Base + Bonus Fairness)</p>
                                     <p class="text-3xl font-black text-brand-700 dark:text-brand-300 mt-0.5" x-text="calcData.breakdown.rata_rata_final + '%'"></p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 space-y-0.5">
-                                        <span>Base: <span class="font-mono" x-text="calcData.breakdown.rata_rata_base + '%'"></span></span>
+                                        <span>Base: <span class="font-mono" x-text="calcData.breakdown.rata_rata_base + '%'"></span> <span class="text-[10px] text-gray-400 dark:text-gray-500 font-sans" x-text="calcData.breakdown.f5 ? '((F1+F2+F3+F4+F5)/5)' : '((F1+F2+F3+F4)/4)'"></span></span>
                                         <span class="mx-1">+</span>
                                         <span>Bonus: <span class="font-mono"
                                             :class="(calcData.breakdown.bonus_aktual ?? 0) >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
@@ -137,7 +137,7 @@
                                 <div class="flex items-center justify-between mb-3">
                                     <h4 class="font-bold text-blue-800 dark:text-blue-300 flex items-center gap-2">
                                         <span class="rounded-full bg-blue-200 dark:bg-blue-800 w-6 h-6 flex items-center justify-center text-xs font-black">1</span>
-                                        F1 — Penyelesaian <span class="text-xs font-normal text-blue-600 dark:text-blue-400">(bobot 25%)</span>
+                                        F1 — Penyelesaian <span class="text-xs font-normal text-blue-600 dark:text-blue-400" x-text="calcData.breakdown.f5 ? '(bobot 20%)' : '(bobot 25%)'"></span>
                                     </h4>
                                     <span class="text-lg font-black text-blue-700 dark:text-blue-300" x-text="calcData.breakdown.f1.nilai + '%'"></span>
                                 </div>
@@ -160,7 +160,7 @@
                                 <div class="flex items-center justify-between mb-3">
                                     <h4 class="font-bold text-green-800 dark:text-green-300 flex items-center gap-2">
                                         <span class="rounded-full bg-green-200 dark:bg-green-800 w-6 h-6 flex items-center justify-center text-xs font-black">2</span>
-                                        F2 — Kecepatan Kirim <span class="text-xs font-normal text-green-600 dark:text-green-400">(Pelunasan only, bobot 25%)</span>
+                                        F2 — Kecepatan Kirim <span class="text-xs font-normal text-green-600 dark:text-green-400" x-text="calcData.breakdown.f5 ? '(Pelunasan only, bobot 20%)' : '(Pelunasan only, bobot 25%)'"></span>
                                     </h4>
                                     <span class="text-lg font-black text-green-700 dark:text-green-300" x-text="calcData.breakdown.f2.nilai + '%'"></span>
                                 </div>
@@ -189,7 +189,7 @@
                                 <div class="flex items-center justify-between mb-3">
                                     <h4 class="font-bold text-amber-800 dark:text-amber-300 flex items-center gap-2">
                                         <span class="rounded-full bg-amber-200 dark:bg-amber-800 w-6 h-6 flex items-center justify-center text-xs font-black">3</span>
-                                        F3 — RR Kirim <span class="text-xs font-normal text-amber-600 dark:text-amber-400">(bobot parsial, bobot 25%)</span>
+                                        F3 — RR Kirim <span class="text-xs font-normal text-amber-600 dark:text-amber-400" x-text="calcData.breakdown.f5 ? '(bobot parsial, bobot 20%)' : '(bobot parsial, bobot 25%)'"></span>
                                     </h4>
                                     <span class="text-lg font-black text-amber-700 dark:text-amber-300" x-text="calcData.breakdown.f3.nilai + '%'"></span>
                                 </div>
@@ -235,7 +235,7 @@
                                 <div class="flex items-center justify-between mb-3">
                                     <h4 class="font-bold text-rose-800 dark:text-rose-300 flex items-center gap-2">
                                         <span class="rounded-full bg-rose-200 dark:bg-rose-800 w-6 h-6 flex items-center justify-center text-xs font-black">4</span>
-                                        F4 — Rating Kirim <span class="text-xs font-normal text-rose-600 dark:text-rose-400">(bobot parsial, bobot 25%)</span>
+                                        F4 — Rating Kirim <span class="text-xs font-normal text-rose-600 dark:text-rose-400" x-text="calcData.breakdown.f5 ? '(bobot parsial, bobot 20%)' : '(bobot parsial, bobot 25%)'"></span>
                                     </h4>
                                     <span class="text-lg font-black text-rose-700 dark:text-rose-300" x-text="calcData.breakdown.f4.nilai + '%'"></span>
                                 </div>
@@ -275,6 +275,53 @@
                                     </template>
                                 </div>
                             </div>
+
+                            <!-- F5: Kinerja Pengawasan Tim (Katim only) -->
+                            <template x-if="calcData.breakdown.f5">
+                                <div class="rounded-xl border border-indigo-200 bg-indigo-50/50 dark:border-indigo-800/30 dark:bg-indigo-900/10 p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h4 class="font-bold text-indigo-800 dark:text-indigo-300 flex items-center gap-2">
+                                            <span class="rounded-full bg-indigo-200 dark:bg-indigo-800 w-6 h-6 flex items-center justify-center text-xs font-black">5</span>
+                                            F5 — Kinerja Pengawasan Tim <span class="text-xs font-normal text-indigo-600 dark:text-indigo-400">(bobot 20%)</span>
+                                        </h4>
+                                        <span class="text-lg font-black text-indigo-700 dark:text-indigo-300" x-text="calcData.breakdown.f5.nilai + '%'"></span>
+                                    </div>
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-xs text-left">
+                                            <thead class="text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                <tr class="border-b border-indigo-200 dark:border-indigo-800/30">
+                                                    <th class="pb-1 font-semibold">Sub Kegiatan</th>
+                                                    <th class="pb-1 font-semibold">Anggota Tim</th>
+                                                    <th class="pb-1 text-center font-semibold">Tipe</th>
+                                                    <th class="pb-1 text-center font-semibold">RR Terima</th>
+                                                    <th class="pb-1 text-center font-semibold">Rating Terima</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="font-mono divide-y divide-indigo-100 dark:divide-indigo-800/20">
+                                                <template x-for="(d, i) in calcData.breakdown.f5.detail" :key="i">
+                                                    <tr :class="i > 0 && d.id_sub_kegiatan !== calcData.breakdown.f5.detail[i - 1].id_sub_kegiatan ? 'border-t-2 border-indigo-200 dark:border-indigo-800/40' : ''" class="text-gray-700 dark:text-gray-300">
+                                                        <td class="py-1.5 pr-2 max-w-[180px] truncate font-sans text-xs font-semibold text-indigo-900 dark:text-indigo-300"
+                                                            x-text="i === 0 || d.id_sub_kegiatan !== calcData.breakdown.f5.detail[i - 1].id_sub_kegiatan ? '(' + d.sub_kegiatan_index + ') ' + d.nama_sub_kegiatan : ''">
+                                                        </td>
+                                                        <td class="py-1.5 pr-2 max-w-[120px] truncate font-sans text-gray-600 dark:text-gray-400" x-text="d.nama_anggota"></td>
+                                                        <td class="py-1.5 text-center font-sans text-gray-500 dark:text-gray-400" x-text="d.tipe_pengiriman"></td>
+                                                        <td class="py-1.5 text-center" x-text="d.rr_terima + '%'"></td>
+                                                        <td class="py-1.5 text-center" x-text="d.rating_terima ? d.rating_terima + '⭐' : '—'"></td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="mt-3 text-xs font-mono text-indigo-700 dark:text-indigo-400 border-t border-indigo-200 dark:border-indigo-800/30 pt-2 space-y-1">
+                                        <div class="flex justify-between"><span class="text-gray-500">Rerata RR Terima Tim</span><span x-text="calcData.breakdown.f5.avg_rr_terima + '%'"></span></div>
+                                        <div class="flex justify-between"><span class="text-gray-500">Rerata Rating Terima Tim (rating × 20)</span><span x-text="calcData.breakdown.f5.avg_rating_terima + '%'"></span></div>
+                                        <div class="flex justify-between border-t border-indigo-200 dark:border-indigo-800/40 pt-1 mt-1 font-bold text-indigo-800 dark:text-indigo-300">
+                                            <span>F5 = (Rerata RR Terima + Rerata Rating Terima) / 2</span>
+                                            <span x-text="calcData.breakdown.f5.nilai + '%'"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
 
                         </div>
                     </template>

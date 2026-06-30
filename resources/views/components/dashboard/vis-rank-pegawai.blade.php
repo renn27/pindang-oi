@@ -1,9 +1,10 @@
 {{-- resources/views/components/dashboard/vis-rank-pegawai.blade.php --}}
-@props(['rankPegawaiAll', 'perPage' => 5, 'perPageOptions' => [5, 10, 25, 50]])
+@props(['rankPegawaiAll', 'perPage' => 5, 'perPageOptions' => [5, 10, 25, 50], 'isKatim' => false])
 
 <div
     x-data="{
         rawData: {{ Js::from($rankPegawaiAll) }},
+        isKatim: {{ Js::from($isKatim) }},
         currentPage: 1,
         perPage: {{ (int) $perPage }},
         perPageOptions: {{ Js::from($perPageOptions) }},
@@ -108,7 +109,15 @@
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
                 <thead class="bg-gray-50 dark:bg-gray-800/50">
                     <tr>
-                        @foreach(['Rank', 'Nama Pegawai', 'RR Kirim', 'Rating ⭐', 'Rating %', 'Skor Cepat', 'Rata-rata', 'Aksi'] as $h)
+                        @php
+                            $headers = ['Rank', 'Nama Pegawai', 'RR Kirim', 'Rating ⭐', 'Rating %', 'Skor Cepat'];
+                            if ($isKatim) {
+                                $headers[] = 'Nilai F5';
+                            }
+                            $headers[] = 'Rata-rata';
+                            $headers[] = 'Aksi';
+                        @endphp
+                        @foreach($headers as $h)
                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">{{ $h }}</th>
                         @endforeach
                     </tr>
@@ -122,6 +131,9 @@
                             <td class="px-6 py-4"><div class="flex gap-1 justify-center">@for($s=0;$s<5;$s++)<div class="h-4 w-4 rounded bg-gray-200 dark:bg-gray-700"></div>@endfor</div></td>
                             <td class="px-6 py-4 text-center"><div class="h-4 w-10 rounded bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
                             <td class="px-6 py-4 text-center"><div class="h-4 w-12 rounded bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
+                            @if($isKatim)
+                                <td class="px-6 py-4 text-center"><div class="h-4 w-12 rounded bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
+                            @endif
                             <td class="px-6 py-4 text-center"><div class="h-6 w-16 rounded-full bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
                             <td class="px-6 py-4 text-center"><div class="h-7 w-16 rounded-lg bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
                         </tr>
@@ -142,6 +154,9 @@
                     <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">Rating ⭐</th>
                     <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">Rating %</th>
                     <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">Skor Cepat</th>
+                    <template x-if="isKatim">
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">Nilai F5</th>
+                    </template>
                     <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">Rata-rata</th>
                     <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">Aksi</th>
                 </tr>
@@ -149,7 +164,7 @@
             <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
                 <template x-if="rawData.length === 0">
                     <tr>
-                        <td colspan="8" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                        <td :colspan="isKatim ? 9 : 8" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
                             <div class="flex flex-col items-center justify-center gap-3">
                                 <svg class="w-12 h-12 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5 2.197v-1a6 6 0 00-12 0v1" />
@@ -182,18 +197,27 @@
                         </td>
 
                         {{-- Nama --}}
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="px-6 py-4 whitespace-normal min-w-[200px] max-w-xs">
                             <div class="flex flex-col gap-1">
                                 <div class="font-medium text-gray-800 dark:text-white" x-text="pegawai.nama_pegawai || 'N/A'"></div>
-                                <template x-if="!pegawai.has_penugasan_aktif">
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 w-fit">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                        Tidak ada penugasan bulan ini
-                                    </span>
+                                <template x-if="!isKatim">
+                                    <div>
+                                        <template x-if="!pegawai.has_penugasan_aktif">
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 w-fit">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                                Tidak ada penugasan bulan ini
+                                            </span>
+                                        </template>
+                                        <template x-if="pegawai.has_penugasan_aktif">
+                                            <span class="text-xs text-gray-400 dark:text-gray-500"
+                                                x-text="(pegawai.total_penugasan_dikerjakan ?? 0) + ' dari ' + (pegawai.total_penugasan ?? 0) + ' penugasan dikerjakan'"
+                                            ></span>
+                                        </template>
+                                    </div>
                                 </template>
-                                <template x-if="pegawai.has_penugasan_aktif">
+                                <template x-if="isKatim">
                                     <span class="text-xs text-gray-400 dark:text-gray-500"
-                                        x-text="(pegawai.total_penugasan_dikerjakan ?? 0) + ' dari ' + (pegawai.total_penugasan ?? 0) + ' penugasan dikerjakan'"
+                                        x-text="'Memimpin ' + (pegawai.total_sub_kegiatan_dipimpin ?? 0) + ' sub kegiatan aktif, dengan ' + (pegawai.total_penugasan_anggota_diterima ?? 0) + '/' + (pegawai.total_penugasan_anggota ?? 0) + ' penugasan sudah selesai Diterima'"
                                     ></span>
                                 </template>
                             </div>
@@ -247,6 +271,13 @@
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             <span class="font-medium text-gray-800 dark:text-white" x-text="Number(pegawai.avg_skor_cepat ?? 0).toFixed(2) + '%'"></span>
                         </td>
+
+                        {{-- F5 (Katim only) --}}
+                        <template x-if="isKatim">
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <span class="font-semibold text-blue-600 dark:text-blue-400" x-text="Number(pegawai.f5_nilai ?? 0).toFixed(2) + '%'"></span>
+                            </td>
+                        </template>
 
                         {{-- Rata-rata --}}
                         <td class="px-6 py-4 whitespace-nowrap text-center">

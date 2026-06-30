@@ -1,9 +1,9 @@
-@props(['bestEmployee', 'showHeader' => false])
+@props(['bestEmployee', 'showHeader' => false, 'title' => 'Best Employee'])
 
 <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900 lg:p-6">
     @if ($showHeader)
         <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <h3 class="text-xl font-bold text-gray-800 dark:text-white">Best Employee</h3>
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">{{ $title }}</h3>
             <div class="inline-flex w-fit items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700 dark:border-amber-800/40 dark:bg-amber-900/20 dark:text-amber-300">
                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"/>
@@ -41,7 +41,7 @@
                         <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                             <path d="M5 3.5A1.5 1.5 0 0 1 6.5 2h7A1.5 1.5 0 0 1 15 3.5V4h1.25A1.75 1.75 0 0 1 18 5.75v.5A4.75 4.75 0 0 1 13.53 11 4.52 4.52 0 0 1 11 12.42V15h2a1 1 0 1 1 0 2H7a1 1 0 1 1 0-2h2v-2.58A4.52 4.52 0 0 1 6.47 11 4.75 4.75 0 0 1 2 6.25v-.5A1.75 1.75 0 0 1 3.75 4H5v-.5ZM5 6H3.75a.25.25 0 0 0-.25.25v.5a3.25 3.25 0 0 0 2.35 3.12A4.5 4.5 0 0 1 5 7.25V6Zm9.15 3.87A3.25 3.25 0 0 0 16.5 6.75v-.5A.25.25 0 0 0 16.25 6H15v1.25c0 .95-.3 1.83-.85 2.62Z"/>
                         </svg>
-                        Best Employee
+                        {{ $title }}
                     </span>
                 </div>
             </div>

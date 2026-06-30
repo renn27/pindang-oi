@@ -623,23 +623,68 @@
             </div>
         @endif
 
-        <!-- BEST EMPLOYEE FOR REGULAR EMPLOYEES -->
-        @if ($bestEmployee)
-            <div class="mt-8">
+        <!-- BEST EMPLOYEE & BEST KETUA TIM FOR REGULAR EMPLOYEES -->
+        <div class="mt-8 {{ $showKatimLeaderboard ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : '' }}">
+            @if ($bestEmployee)
+                <div class="{{ $showKatimLeaderboard ? '' : 'w-full' }}">
+                    <x-profile.employe-rank-card
+                        :bestEmployee="$bestEmployee"
+                        :showHeader="true"
+                        title="Best Employee" />
+                </div>
+            @endif
+            @if ($showKatimLeaderboard && $bestKetuaTim)
                 <x-profile.employe-rank-card
-                    :bestEmployee="$bestEmployee"
-                    :showHeader="true" />
-            </div>
-        @endif
+                    :bestEmployee="$bestKetuaTim"
+                    :showHeader="true"
+                    title="Best Ketua Tim" />
+            @endif
+        </div>
 
-        <!-- RANK EMPLOYEE FOR REGULAR EMPLOYEES -->
-        <div id="container-rank-pegawai" class="mt-8">
-            @auth
-                <x-dashboard.vis-rank-pegawai
-                    :rankPegawaiAll="$rankPegawaiAllTable"
-                    :perPage="$rankPegawaiPerPage"
-                    :perPageOptions="$rankPegawaiPerPageOptions" />
-            @endauth
+        <!-- RANK TABLES FOR REGULAR EMPLOYEES -->
+        <div id="container-rank-pegawai" class="mt-8" x-data="{ activeRankTab: 'pegawai' }">
+            @if ($showKatimLeaderboard)
+                <div class="mb-4 border-b border-gray-200 dark:border-gray-800">
+                    <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+                        <button
+                            @click="activeRankTab = 'pegawai'"
+                            :class="activeRankTab === 'pegawai' ? 'border-brand-500 text-brand-600 dark:border-brand-400 dark:text-brand-400 font-bold' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 font-medium'"
+                            class="whitespace-nowrap pb-4 px-1 border-b-2 text-sm transition-colors cursor-pointer"
+                        >
+                            Peringkat Pegawai (Anggota)
+                        </button>
+                        <button
+                            @click="activeRankTab = 'ketua'"
+                            :class="activeRankTab === 'ketua' ? 'border-brand-500 text-brand-600 dark:border-brand-400 dark:text-brand-400 font-bold' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 font-medium'"
+                            class="whitespace-nowrap pb-4 px-1 border-b-2 text-sm transition-colors cursor-pointer"
+                        >
+                            Peringkat Ketua Tim (Katim)
+                        </button>
+                    </nav>
+                </div>
+            @endif
+
+            <div x-show="activeRankTab === 'pegawai'" class="transition-opacity duration-200">
+                @auth
+                    <x-dashboard.vis-rank-pegawai
+                        :rankPegawaiAll="$rankPegawaiAllTable"
+                        :perPage="$rankPegawaiPerPage"
+                        :perPageOptions="$rankPegawaiPerPageOptions" />
+                @endauth
+            </div>
+
+            @if ($showKatimLeaderboard)
+                <div x-show="activeRankTab === 'ketua'" x-cloak class="transition-opacity duration-200">
+                    @auth
+                        <x-dashboard.vis-rank-pegawai
+                            :rankPegawaiAll="$rankKetuaTimAllTable"
+                            :perPage="$rankPegawaiPerPage"
+                            :perPageOptions="$rankPegawaiPerPageOptions"
+                            :isKatim="true" />
+                    @endauth
+                </div>
+            @endif
+        </div>
         </div>
     @else()
         {{-- ===== CARD BESAR ANALYTICS DASHBOARD ===== --}}
@@ -774,21 +819,67 @@
 
                     </div>
 
-                    <!-- BEST EMPLOYEE -->
-                    <div class="mb-10">
-                        <x-profile.employe-rank-card
-                            :bestEmployee="$bestEmployee"
-                            :showHeader="true" />
+                    <!-- BEST EMPLOYEE & BEST KETUA TIM -->
+                    <div class="mb-10 {{ $showKatimLeaderboard ? 'grid grid-cols-1 md:grid-cols-2 gap-6' : '' }}">
+                        @if ($bestEmployee)
+                            <div class="{{ $showKatimLeaderboard ? '' : 'w-full' }}">
+                                <x-profile.employe-rank-card
+                                    :bestEmployee="$bestEmployee"
+                                    :showHeader="true"
+                                    title="Best Employee" />
+                            </div>
+                        @endif
+                        @if ($showKatimLeaderboard && $bestKetuaTim)
+                            <x-profile.employe-rank-card
+                                :bestEmployee="$bestKetuaTim"
+                                :showHeader="true"
+                                title="Best Ketua Tim" />
+                        @endif
                     </div>
 
-                    <!-- RANK EMPLOYEE -->
-                    <div id="container-rank-pegawai">
-                        @auth
-                            <x-dashboard.vis-rank-pegawai
-                                :rankPegawaiAll="$rankPegawaiAllTable"
-                                :perPage="$rankPegawaiPerPage"
-                                :perPageOptions="$rankPegawaiPerPageOptions" />
-                        @endauth
+                    <!-- RANK TABLES -->
+                    <div id="container-rank-pegawai" class="mb-10" x-data="{ activeRankTab: 'pegawai' }">
+                        @if ($showKatimLeaderboard)
+                            <div class="mb-4 border-b border-gray-200 dark:border-gray-800">
+                                <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+                                    <button
+                                        @click="activeRankTab = 'pegawai'"
+                                        :class="activeRankTab === 'pegawai' ? 'border-brand-500 text-brand-600 dark:border-brand-400 dark:text-brand-400 font-bold' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 font-medium'"
+                                        class="whitespace-nowrap pb-4 px-1 border-b-2 text-sm transition-colors cursor-pointer"
+                                    >
+                                        Peringkat Pegawai (Anggota)
+                                    </button>
+                                    <button
+                                        @click="activeRankTab = 'ketua'"
+                                        :class="activeRankTab === 'ketua' ? 'border-brand-500 text-brand-600 dark:border-brand-400 dark:text-brand-400 font-bold' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 font-medium'"
+                                        class="whitespace-nowrap pb-4 px-1 border-b-2 text-sm transition-colors cursor-pointer"
+                                    >
+                                        Peringkat Ketua Tim (Katim)
+                                    </button>
+                                </nav>
+                            </div>
+                        @endif
+
+                        <div x-show="activeRankTab === 'pegawai'" class="transition-opacity duration-200">
+                            @auth
+                                <x-dashboard.vis-rank-pegawai
+                                    :rankPegawaiAll="$rankPegawaiAllTable"
+                                    :perPage="$rankPegawaiPerPage"
+                                    :perPageOptions="$rankPegawaiPerPageOptions" />
+                            @endauth
+                        </div>
+
+                        @if ($showKatimLeaderboard)
+                            <div x-show="activeRankTab === 'ketua'" x-cloak class="transition-opacity duration-200">
+                                @auth
+                                    <x-dashboard.vis-rank-pegawai
+                                        :rankPegawaiAll="$rankKetuaTimAllTable"
+                                        :perPage="$rankPegawaiPerPage"
+                                        :perPageOptions="$rankPegawaiPerPageOptions"
+                                        :isKatim="true" />
+                                @endauth
+                            </div>
+                        @endif
                     </div>
 
                 </div>
