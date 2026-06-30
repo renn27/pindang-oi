@@ -21,8 +21,10 @@ use App\Services\PushNotificationService;
 
 class MasterKegiatanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->query('search_anggota');
+
         // Data referensi untuk dropdown modal
         $pegawais = Pegawai::active()->orderBy('nama_pegawai')->get(['id_pegawai', 'nama_pegawai']);
         $rkJpts = RencanaJPT::orderBy('nama_rencana_jpt')->get(['id', 'nama_rencana_jpt']);
@@ -48,12 +50,34 @@ class MasterKegiatanController extends Controller
             ]);
 
         // Ambil semua kegiatan beserta relasinya untuk setiap bidang tanpa filter role
-        $bidangs = Bidang::with([
-            'kegiatans' => function ($query) {
+        $bidangsQuery = Bidang::query();
+        if ($search) {
+            $bidangsQuery->whereHas('kegiatans.subKegiatans.penugasans.anggota', function ($q) use ($search) {
+                $q->where('nama_pegawai', 'like', '%' . $search . '%');
+            });
+        }
+
+        $bidangs = $bidangsQuery->with([
+            'kegiatans' => function ($query) use ($search) {
+                if ($search) {
+                    $query->whereHas('subKegiatans.penugasans.anggota', function ($q) use ($search) {
+                        $q->where('nama_pegawai', 'like', '%' . $search . '%');
+                    });
+                }
                 $query->with([
-                    'subKegiatans' => function ($subQuery) {
+                    'subKegiatans' => function ($subQuery) use ($search) {
+                        if ($search) {
+                            $subQuery->whereHas('penugasans.anggota', function ($q) use ($search) {
+                                $q->where('nama_pegawai', 'like', '%' . $search . '%');
+                            });
+                        }
                         $subQuery->with([
-                            'penugasans' => function ($penugasanQuery) {
+                            'penugasans' => function ($penugasanQuery) use ($search) {
+                                if ($search) {
+                                    $penugasanQuery->whereHas('anggota', function ($q) use ($search) {
+                                        $q->where('nama_pegawai', 'like', '%' . $search . '%');
+                                    });
+                                }
                                 $penugasanQuery->with(['anggota', 'jenisKegiatan']);
                             }
                         ]);
@@ -64,6 +88,16 @@ class MasterKegiatanController extends Controller
                 ]);
             }
         ])->orderBy('nama_bidang')->get();
+
+        if ($request->ajax()) {
+            return view('pages.main.pegawai.rencana-kerja.partials.kegiatan-list', [
+                'bidangs' => $bidangs,
+                'pegawais' => $pegawais,
+                'rkJpts' => $rkJpts,
+                'jenisKegiatans' => $jenisKegiatans,
+                'ketuaTims' => $ketuaTims
+            ]);
+        }
 
         return view('pages.main.pegawai.rencana-kerja.master-kegiatan', [
             'title' => "Master Kegiatan",
@@ -275,8 +309,10 @@ class MasterKegiatanController extends Controller
         return Excel::download(new MphAllExport($bidangs), 'matriks_peran_hasil.xlsx');
     }
 
-    public function index_rk_dl()
+    public function index_rk_dl(Request $request)
     {
+        $search = $request->query('search_anggota');
+
         $pegawai = Auth::user();
         $activeRole = $pegawai->active_role;
 
@@ -291,22 +327,35 @@ class MasterKegiatanController extends Controller
                 'roles.nama_role',
             ]);
 
-        $filterPenugasan = function ($q) {
+        $filterPenugasan = function ($q) use ($search) {
             $q->where(function ($query) {
                 $query->where('butuh_dl', true)->orWhere('butuh_translok', true);
             });
+            if ($search) {
+                $q->whereHas('anggota', function ($aq) use ($search) {
+                    $aq->where('nama_pegawai', 'like', '%' . $search . '%');
+                });
+            }
         };
 
-        $bidangs = Bidang::whereHas('kegiatans', function ($kegiatanQuery) {
-            $kegiatanQuery->whereHas('subKegiatans.penugasans', function ($q) {
-                    $q->where(function ($query) {
-                        $query->where('butuh_dl', true)->orWhere('butuh_translok', true);
-                    });
+        $filterDLAndSearch = function ($q) use ($search) {
+            $q->where(function ($query) {
+                $query->where('butuh_dl', true)->orWhere('butuh_translok', true);
+            });
+            if ($search) {
+                $q->whereHas('anggota', function ($aq) use ($search) {
+                    $aq->where('nama_pegawai', 'like', '%' . $search . '%');
                 });
-        })->with(['kegiatans' => function ($kegiatanQuery) use ($filterPenugasan) {
-            $kegiatanQuery->whereHas('subKegiatans.penugasans', $filterPenugasan)
-            ->with(['subKegiatans' => function ($subQuery) use ($filterPenugasan) {
-            $subQuery->whereHas('penugasans', $filterPenugasan)
+            }
+        };
+
+        $bidangsQuery = Bidang::query();
+        $bidangsQuery->whereHas('kegiatans.subKegiatans.penugasans', $filterDLAndSearch);
+
+        $bidangs = $bidangsQuery->with(['kegiatans' => function ($kegiatanQuery) use ($filterPenugasan, $filterDLAndSearch) {
+            $kegiatanQuery->whereHas('subKegiatans.penugasans', $filterDLAndSearch)
+            ->with(['subKegiatans' => function ($subQuery) use ($filterPenugasan, $filterDLAndSearch) {
+            $subQuery->whereHas('penugasans', $filterDLAndSearch)
                 ->with(['penugasans' => function ($penugasanQuery) use ($filterPenugasan) {
                     $penugasanQuery->where($filterPenugasan)
                         ->with(['anggota', 'jenisKegiatan']);
@@ -361,6 +410,18 @@ class MasterKegiatanController extends Controller
         $ditolak = $allPenugasans->filter(fn($p) =>
             $p->status_dl === 'Ditolak' || $p->status_translok === 'Ditolak'
         )->count();
+
+        if ($request->ajax()) {
+            return view('pages.main.pegawai.rencana-kerja.partials.rencana-kerja-dl-list', [
+                'bidangs' => $bidangs,
+                'pegawais' => $pegawais,
+                'ketuaTims' => $ketuaTims,
+                'allPenugasans' => $allPenugasans,
+                'menunggu' => $menunggu,
+                'diterima' => $diterima,
+                'ditolak' => $ditolak,
+            ]);
+        }
 
         return view('pages.main.pegawai.rencana-kerja.rencana-kerja-dl', [
             'title' => "Rencana Kerja Perlu DL",

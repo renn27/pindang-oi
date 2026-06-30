@@ -31,243 +31,86 @@
     <div class="space-y-6">
         <!-- Tampilan Card Fungsi dengan Accordion -->
         <x-common.component-card title="Matriks Peran Hasil">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-                <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Kelola dan pantau seluruh matriks peran hasil berdasarkan fungsi bidang.
-                </p>
-                <div class="flex flex-wrap items-center gap-3">
-                    <a href="{{ route('kegiatan.export-mph-all') }}"
-                        class="flex items-center gap-2 rounded-lg border border-green-500 dark:border-green-600 bg-green-50 dark:bg-green-900/30 px-4 py-2 text-sm font-medium text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-800/30 hover:text-green-800 dark:hover:text-green-300 transition-colors">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 384 512">
-                            <path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c-8.1-10.5-6.3-25.5-4.2-33.7s-23.2-12.3-33.7-4.2L192 280.9l-37.1-47.6z" />
-                        </svg>
-                        Export Excel
-                    </a>
-                </div>
-            </div>
+            <div x-data="{
+                searchQuery: '',
+                isLoading: false,
 
-            <div class="space-y-4">
-                @foreach ($bidangs as $bidang)
-                    @php
-                        $totalKegiatan = $bidang->kegiatans->count();
-                        $totalSub = $bidang->kegiatans->sum(fn($k) => $k->subKegiatans ? $k->subKegiatans->count() : 0);
-                        $totalPenugasan = $bidang->kegiatans->sum(fn($k) => $k->subKegiatans ? $k->subKegiatans->sum(fn($s) => $s->penugasans ? $s->penugasans->count() : 0) : 0);
-                    @endphp
+                init() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    this.searchQuery = urlParams.get('search_anggota') || '';
+                },
 
-                    <div x-data="{ open: false }" class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md">
+                fetchData() {
+                    this.isLoading = true;
+                    const url = new URL(window.location.href);
+                    if (this.searchQuery) {
+                        url.searchParams.set('search_anggota', this.searchQuery);
+                    } else {
+                        url.searchParams.delete('search_anggota');
+                    }
 
-                        <!-- Header Fungsi -->
-                        <button @click="open = !open"
-                            class="flex w-full flex-col md:flex-row md:items-center justify-between p-4 md:p-5 text-left bg-gray-50/50 hover:bg-blue-50/50 dark:bg-gray-800 dark:hover:bg-gray-700/80 transition-colors">
-                            <div class="flex-1 mb-4 md:mb-0">
-                                <h3 class="text-base font-bold text-gray-800 dark:text-white tracking-wide">{{ $bidang->nama_bidang }}</h3>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Fungsi / Bidang Pimpinan</p>
-                            </div>
+                    window.history.replaceState({}, '', url.toString());
 
-                            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto md:mr-6">
-                                <div class="flex-1 md:flex-none bg-blue-50 dark:bg-blue-900/30 px-4 py-2 rounded-lg border border-blue-100 dark:border-blue-800/50 text-center min-w-[100px]">
-                                    <span class="block text-[10px] uppercase tracking-wider text-blue-600 dark:text-blue-400 font-semibold mb-0.5">Kegiatan</span>
-                                    <span class="block text-xl font-bold text-blue-700 dark:text-blue-300">{{ $totalKegiatan }}</span>
-                                </div>
-                                <div class="flex-1 md:flex-none bg-teal-50 dark:bg-teal-900/30 px-4 py-2 rounded-lg border border-teal-100 dark:border-teal-800/50 text-center min-w-[100px]">
-                                    <span class="block text-[10px] uppercase tracking-wider text-teal-600 dark:text-teal-400 font-semibold mb-0.5">Sub Kegiatan</span>
-                                    <span class="block text-xl font-bold text-teal-700 dark:text-teal-300">{{ $totalSub }}</span>
-                                </div>
-                                <div class="flex-1 md:flex-none bg-purple-50 dark:bg-purple-900/30 px-4 py-2 rounded-lg border border-purple-100 dark:border-purple-800/50 text-center min-w-[100px]">
-                                    <span class="block text-[10px] uppercase tracking-wider text-purple-600 dark:text-purple-400 font-semibold mb-0.5">Penugasan</span>
-                                    <span class="block text-xl font-bold text-purple-700 dark:text-purple-300">{{ $totalPenugasan }}</span>
-                                </div>
-                            </div>
+                    fetch(url.toString(), {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('kegiatan-list-container').innerHTML = html;
+                    })
+                    .catch(err => console.error(err))
+                    .finally(() => {
+                        this.isLoading = false;
+                    });
+                },
 
-                            <div class="hidden md:flex items-center justify-center h-10 w-10 rounded-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-sm text-gray-500 dark:text-gray-400">
-                                <svg :class="{ 'rotate-180': open }" class="h-5 w-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
-                        </button>
-
-                        <!-- Accordion -->
-                        <div x-show="open" x-collapse class="border-t border-gray-100 dark:border-gray-700">
-
-                            @if ($bidang->kegiatans->count() > 0)
-                                <div class="overflow-x-auto">
-                                    <table class="min-w-full border border-gray-200 dark:border-gray-700">
-
-                                        <!-- HEADER -->
-                                        <thead class="bg-gray-50 dark:bg-gray-900">
-                                            <tr>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase border dark:border-gray-700">
-                                                    Kegiatan</th>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase border dark:border-gray-700">
-                                                    Sub Kegiatan</th>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase border dark:border-gray-700">
-                                                    Nama Pegawai</th>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase border dark:border-gray-700">
-                                                    Jenis Kegiatan</th>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase border dark:border-gray-700">
-                                                    Target</th>
-                                                <th
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase border dark:border-gray-700">
-                                                    Satuan</th>
-                                            </tr>
-                                        </thead>
-
-                                        <!-- BODY -->
-                                        <tbody>
-
-                                            @foreach ($bidang->kegiatans as $kegiatan)
-                                                {{-- Kalau belum ada sub --}}
-                                                @if ($kegiatan->subKegiatans->count() === 0)
-                                                    <tr>
-                                                        <td class="px-4 py-3 align-top border dark:border-gray-700">
-                                                            <div class="flex flex-col">
-                                                                <span class="font-medium text-gray-800 dark:text-gray-300">
-                                                                    {{ $kegiatan->nama_rk_kegiatan }}
-                                                                </span>
-                                                                <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                                    Ketua:
-                                                                    {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
-                                                                </span>
-                                                            </div>
-                                                        </td>
-
-                                                        <td
-                                                            class="px-4 py-3 text-gray-500 dark:text-gray-400 italic border dark:border-gray-700">
-                                                            Belum ada sub kegiatan
-                                                        </td>
-
-                                                        <td colspan="4"
-                                                            class="px-4 py-3 text-center text-gray-500 dark:text-gray-400 italic border dark:border-gray-700">
-                                                            Belum ada penugasan
-                                                        </td>
-                                                    </tr>
-                                                @else
-                                                    @foreach ($kegiatan->subKegiatans as $subIndex => $subKegiatan)
-                                                        @php($penugasanCount = max($subKegiatan->penugasans->count(), 1))
-
-                                                        {{-- Kalau belum ada penugasan --}}
-                                                        @if ($subKegiatan->penugasans->count() === 0)
-                                                            <tr>
-
-                                                                {{-- MERGED KEGIATAN --}}
-                                                                @if ($subIndex === 0)
-                                                                    <td rowspan="{{ $kegiatan->subKegiatans->sum(fn($s) => max($s->penugasans->count(), 1)) }}"
-                                                                        class="px-4 py-3 align-top border dark:border-gray-700">
-                                                                        <div class="flex flex-col">
-                                                                            <span
-                                                                                class="font-medium text-gray-800 dark:text-gray-300">
-                                                                                {{ $kegiatan->nama_rk_kegiatan }}
-                                                                            </span>
-                                                                            <span
-                                                                                class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                                                Ketua:
-                                                                                {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
-                                                                            </span>
-                                                                        </div>
-                                                                    </td>
-                                                                @endif
-
-                                                                {{-- MERGED SUB --}}
-                                                                <td rowspan="1"
-                                                                    class="px-4 py-3 align-top border dark:border-gray-700 text-gray-800 dark:text-gray-300">
-                                                                    {{ $subKegiatan->nama_sub_kegiatan }}
-                                                                </td>
-
-                                                                <td colspan="4"
-                                                                    class="px-4 py-3 text-center text-gray-500 dark:text-gray-400 italic border dark:border-gray-700">
-                                                                    Belum ada penugasan
-                                                                </td>
-
-                                                            </tr>
-                                                        @else
-                                                            @foreach ($subKegiatan->penugasans as $penugasanIndex => $penugasan)
-                                                                <tr>
-
-                                                                    {{-- KEGIATAN --}}
-                                                                    @if ($subIndex === 0 && $penugasanIndex === 0)
-                                                                        <td rowspan="{{ $kegiatan->subKegiatans->sum(fn($s) => max($s->penugasans->count(), 1)) }}"
-                                                                            class="px-4 py-3 align-top border dark:border-gray-700">
-                                                                            <div class="flex flex-col">
-                                                                                <span
-                                                                                    class="font-medium text-gray-800 dark:text-gray-300">
-                                                                                    {{ $kegiatan->nama_rk_kegiatan }}
-                                                                                </span>
-                                                                                <span
-                                                                                    class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                                                    Ketua:
-                                                                                    {{ $kegiatan->penanggungJawab->nama_pegawai ?? '-' }}
-                                                                                </span>
-                                                                            </div>
-                                                                        </td>
-                                                                    @endif
-
-                                                                    {{-- SUB KEGIATAN --}}
-                                                                    @if ($penugasanIndex === 0)
-                                                                        <td rowspan="{{ $penugasanCount }}"
-                                                                            class="px-4 py-3 align-top border dark:border-gray-700 text-gray-800 dark:text-gray-300">
-                                                                            {{ $subKegiatan->nama_sub_kegiatan }}
-                                                                        </td>
-                                                                    @endif
-
-                                                                    <td
-                                                                        class="px-4 py-3 border dark:border-gray-700 text-gray-800 dark:text-gray-300">
-                                                                        {{ $penugasan->anggota->nama_pegawai ?? '-' }}
-                                                                    </td>
-
-                                                                    <td
-                                                                        class="px-4 py-3 border dark:border-gray-700 text-gray-800 dark:text-gray-300">
-                                                                        {{ $penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri' }}
-                                                                    </td>
-
-                                                                    <td
-                                                                        class="px-4 py-3 border dark:border-gray-700 text-gray-800 dark:text-gray-300">
-                                                                        {{ $penugasan->target ?? '-' }}
-                                                                    </td>
-
-                                                                    <td
-                                                                        class="px-4 py-3 border dark:border-gray-700 text-gray-800 dark:text-gray-300">
-                                                                        {{ $penugasan->satuan_target ?? '-' }}
-                                                                    </td>
-
-                                                                </tr>
-                                                            @endforeach
-                                                        @endif
-                                                    @endforeach
-                                                @endif
-                                            @endforeach
-
-                                        </tbody>
-                                    </table>
-                                </div>
-                            @else
-                                <div class="p-4 text-center border-t dark:border-gray-700">
-                                    <p class="text-sm text-gray-500 dark:text-gray-400 italic">
-                                        Belum ada kegiatan untuk fungsi ini
-                                    </p>
-                                </div>
-                            @endif
-
-                        </div>
-                    </div>
-                @endforeach
-
-
-                {{-- Kalau belum ada bidang --}}
-                @if ($bidangs->count() === 0)
-                    <div
-                        class="text-center py-8 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                clearSearch() {
+                    this.searchQuery = '';
+                    this.fetchData();
+                }
+            }">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 border-b border-gray-100 dark:border-gray-800 pb-5">
+                    <div class="flex-1">
                         <p class="text-sm text-gray-500 dark:text-gray-400">
-                            Belum ada fungsi/bidang yang dibuat
+                            Kelola dan pantau seluruh matriks peran hasil berdasarkan fungsi bidang.
                         </p>
                     </div>
-                @endif
-            </div>
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+                        <!-- Search input bar -->
+                        <div class="relative flex-1 sm:w-64">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </span>
+                            <input type="text" 
+                                x-model="searchQuery" 
+                                x-on:input.debounce.300ms="fetchData()"
+                                placeholder="Cari nama anggota..." 
+                                class="w-full pl-9 pr-8 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all"
+                            />
+                            <button x-show="searchQuery !== ''" @click="clearSearch()" type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" style="display: none;">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <a href="{{ route('kegiatan.export-mph-all') }}"
+                            class="flex items-center justify-center gap-2 rounded-lg border border-green-500 dark:border-green-600 bg-green-50 dark:bg-green-900/30 px-4 py-2 text-sm font-medium text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-800/30 hover:text-green-800 dark:hover:text-green-300 transition-colors shrink-0">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 384 512">
+                                <path d="M48 448V64c0-8.8 7.2-16 16-16H224v80c0 17.7 14.3 32 32 32h80V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16zM64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V154.5c0-17-6.7-33.3-18.7-45.3L274.7 18.7C262.7 6.7 246.5 0 229.5 0H64zm90.9 233.3c-8.1-10.5-23.2-12.3-33.7-4.2s-12.3 23.2-4.2 33.7L161.6 320l-44.5 57.3c-8.1 10.5-6.3 25.5 4.2 33.7s25.5 6.3 33.7-4.2L192 359.1l37.1 47.6c8.1 10.5 23.2 12.3 33.7 4.2s12.3-23.2 4.2-33.7L222.4 320l44.5-57.3c-8.1-10.5-6.3-25.5-4.2-33.7s-23.2-12.3-33.7-4.2L192 280.9l-37.1-47.6z" />
+                            </svg>
+                            Export Excel
+                        </a>
+                    </div>
+                </div>
 
+                <div id="kegiatan-list-container" :class="{ 'opacity-50 pointer-events-none transition-opacity duration-200': isLoading }">
+                    @include('pages.main.pegawai.rencana-kerja.partials.kegiatan-list')
+                </div>
+            </div>
         </x-common.component-card>
     </div>
 
