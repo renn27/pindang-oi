@@ -156,98 +156,75 @@
     <div class="space-y-8">
         <!-- Tampilan Card Fungsi dengan Accordion -->
         <x-common.component-card title="Daftar Rencana Kerja Perlu DL / Translok">
-                                                                                @endif
-                                                                            @endif
+            <div x-data="{
+                searchQuery: '',
+                isLoading: false,
 
-                                                                            @can('acceptDL', $penugasan)
-                                                                                @if ($penugasan->status_dl === 'ACC')
-                                                                                    @if (Auth::user()->active_role === 'Pimpinan')
-                                                                                        <form id="del-dl-{{ $penugasan->id_penugasan }}" action="{{ route('kalenderDL.delete', $penugasan->id_penugasan) }}" method="POST" class="w-full">@csrf @method('DELETE')
-                                                                                            <button type="button" onclick="SwalHelper.confirmDelete('del-dl-{{ $penugasan->id_penugasan }}', 'Kalender DL milik {{ $penugasan->anggota->nama_pegawai }}')" class="w-full flex items-center justify-center gap-1 px-2.5 py-1 text-[10px] font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded transition-colors shadow-sm" title="Hapus Kalender DL">
-                                                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                                                                                HAPUS
-                                                                                            </button>
-                                                                                        </form>
-                                                                                    @endif
-                                                                                @elseif (Auth::user()->active_role === 'Pimpinan' && in_array($penugasan->status_dl, ['Menunggu', null]))
-                                                                                    <button type="button" @click="$dispatch('open-smart-modal', { modalId: 'modal-verifikasi-dl', key: @js($penugasan->id_penugasan), data: { nama_pegawai: @js($penugasan->anggota->nama_pegawai), jenis_kegiatan: @js($penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri'), tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')), tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')), } })" class="w-full px-2.5 py-1 text-[10px] font-bold bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors shadow-sm">Verifikasi</button>
-                                                                                @endif
-                                                                            @endcan
-                                                                        </div>
-                                                                    @endif
+                init() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    this.searchQuery = urlParams.get('search_anggota') || '';
+                },
 
-                                                                    {{-- AKSI TRANSLOK --}}
-                                                                    @if($penugasan->butuh_translok)
-                                                                        <div class="flex flex-wrap items-center gap-1.5 pt-3 border-t border-gray-200 dark:border-gray-700/50 min-h-[38px]">
-                                                                            @if ($penugasan->status_translok === 'Ditolak')
-                                                                                @if (Auth::user()->active_role === 'Ketua Tim' && Auth::user()->id_pegawai === $penugasan->subKegiatan->kegiatan->id_penanggung_jawab)
-                                                                                    <button type="button" @click="$dispatch('open-smart-modal', { modalId: 'modal-verifikasi-translok', key: @js($penugasan->id_penugasan), data: { nama_pegawai: @js($penugasan->anggota->nama_pegawai), jenis_kegiatan: @js($penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri'), tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')), tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')), } })" class="px-2.5 py-1 text-[10px] font-bold bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors shadow-sm w-full flex justify-center">Ajukan Kembali</button>
-                                                                                @endif
-                                                                                @if (Auth::user()->active_role === 'Pimpinan')
-                                                                                    <span class="px-2 py-1 text-[9px] font-medium text-gray-400 dark:text-gray-500 italic">Menunggu Pengajuan</span>
-                                                                                @endif
-                                                                            @endif
+                fetchData() {
+                    this.isLoading = true;
+                    const url = new URL(window.location.href);
+                    if (this.searchQuery) {
+                        url.searchParams.set('search_anggota', this.searchQuery);
+                    } else {
+                        url.searchParams.delete('search_anggota');
+                    }
 
-                                                                            @can('acceptTranslok', $penugasan)
-                                                                                @if ($penugasan->status_translok === 'ACC')
-                                                                                    @if (Auth::user()->active_role === 'Pimpinan')
-                                                                                        <form id="del-trl-{{ $penugasan->id_penugasan }}" action="{{ route('kalenderDL.delete', $penugasan->id_penugasan) }}" method="POST" class="w-full">@csrf @method('DELETE')
-                                                                                            <button type="button" onclick="SwalHelper.confirmDelete('del-trl-{{ $penugasan->id_penugasan }}', 'Kalender Translok milik {{ $penugasan->anggota->nama_pegawai }}')" class="w-full flex items-center justify-center gap-1 px-2.5 py-1 text-[10px] font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded transition-colors shadow-sm" title="Hapus Kalender Translok">
-                                                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                                                                                HAPUS
-                                                                                            </button>
-                                                                                        </form>
-                                                                                    @endif
-                                                                                @elseif (Auth::user()->active_role === 'Pimpinan' && in_array($penugasan->status_translok, ['Menunggu', null]))
-                                                                                    <button type="button" @click="$dispatch('open-smart-modal', { modalId: 'modal-verifikasi-translok', key: @js($penugasan->id_penugasan), data: { nama_pegawai: @js($penugasan->anggota->nama_pegawai), jenis_kegiatan: @js($penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri'), tanggal_mulai: @js($penugasan->tanggal_mulai->format('d M Y')), tanggal_selesai: @js($penugasan->tanggal_selesai->format('d M Y')), } })" class="w-full px-2.5 py-1 text-[10px] font-bold bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors shadow-sm">Verifikasi</button>
-                                                                                @endif
-                                                                            @endcan
-                                                                        </div>
-                                                                    @endif
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
-                                                @endforeach
-                                            @endforeach
+                    window.history.replaceState({}, '', url.toString());
 
-                                            @if ($bidang->kegiatans->count() === 0)
-                                                <tr>
-                                                    <td colspan="8"
-                                                        class="px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
-                                                        Belum ada kegiatan untuk bidang ini
-                                                    </td>
-                                                </tr>
-                                            @endif
-                                        </tbody>
-                                    </table>
-                                </div>
-                            @else
-                                <div class="p-4 text-center border border-gray-200 dark:border-gray-700 border-t-0">
-                                    <p class="text-sm text-gray-500 dark:text-gray-400 italic">Belum ada kegiatan untuk fungsi ini
-                                    </p>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                @endforeach
+                    fetch(url.toString(), {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('rencana-kerja-dl-list-container').innerHTML = html;
+                    })
+                    .catch(err => console.error(err))
+                    .finally(() => {
+                        this.isLoading = false;
+                    });
+                },
 
-                @if ($bidangs->count() === 0)
-                    <div
-                        class="text-center py-8 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
-                        <div
-                            class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 mb-3">
-                            <svg class="h-6 w-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                clearSearch() {
+                    this.searchQuery = '';
+                    this.fetchData();
+                }
+            }">
+                <!-- Search input bar -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 border-b border-gray-100 dark:border-gray-800 pb-5">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Pantau daftar penugasan dinas luar dan translok serta status verifikasinya.
+                    </p>
+                    <div class="relative w-full sm:w-64">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
-                        </div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Belum ada fungsi/bidang yang dibuat</p>
+                        </span>
+                        <input type="text" 
+                            x-model="searchQuery" 
+                            x-on:input.debounce.300ms="fetchData()"
+                            placeholder="Cari nama anggota..." 
+                            class="w-full pl-9 pr-8 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all"
+                        />
+                        <button x-show="searchQuery !== ''" @click="clearSearch()" type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" style="display: none;">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
                     </div>
-                @endif
+                </div>
+
+                <div id="rencana-kerja-dl-list-container" :class="{ 'opacity-50 pointer-events-none transition-opacity duration-200': isLoading }">
+                    @include('pages.main.pegawai.rencana-kerja.partials.rencana-kerja-dl-list')
+                </div>
             </div>
         </x-common.component-card>
     </div>
-
 @endsection
