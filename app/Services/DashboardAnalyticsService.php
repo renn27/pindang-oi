@@ -119,6 +119,238 @@ class DashboardAnalyticsService {
         return $allData->map(fn($item) => $this->decorateRankItem($item, $details, $gs));
     }
 
+    public function rankKetuaTimAll($month = null, $year = null, bool $excludeSpecial = false): Collection
+    {
+        [$month, $year, $bf, $gs, $startOfMonth, $endOfMonth] = $this->rankInit($month, $year, $excludeSpecial);
+
+        // 1. Ambil list Katim aktif bulan ini dan sub-kegiatan yang mereka pimpin
+        $rekapSub = $this->getRekapSubKegiatanKetua($month, $year, $excludeSpecial);
+        $ketuaIds = $rekapSub->pluck('id_pegawai')->all();
+
+        if (empty($ketuaIds)) {
+            return collect();
+        }
+
+        // 2. Ambil query rank base untuk ketua-ketua ini
+        $allData = $this->buildRankBaseQuery($bf, $gs, $startOfMonth, $endOfMonth, $excludeSpecial)
+            ->whereIn('ranked.id_pegawai', $ketuaIds)
+            ->get();
+
+        $details = $this->buildDetailsQuery($bf, $allData->pluck('id_pegawai'), $startOfMonth, $endOfMonth);
+
+        // 3. Decorate each ketua dengan menyertakan F5
+        $rankedKetua = $allData->map(function ($item) use ($details, $gs, $bf, $startOfMonth, $endOfMonth) {
+            // Jalankan dekorasi dasar (F1-F4)
+            $item = $this->decorateRankItem($item, $details, $gs);
+
+            // Hitung F5 untuk ketua ini
+            $f5Data = $this->calculateF5ForKetuaSingle($item->id_pegawai, $startOfMonth, $endOfMonth, $bf);
+
+            $f5Val = $f5Data['nilai'];
+            $item->f5_nilai = $f5Val;
+            $item->total_sub_kegiatan_dipimpin = $f5Data['total_sub_kegiatan'] ?? 0;
+            $item->total_penugasan_anggota = $f5Data['total_penugasan_anggota'] ?? 0;
+            $item->total_penugasan_anggota_diterima = $f5Data['total_penugasan_anggota_diterima'] ?? 0;
+
+            // Recalculate rata-rata_base dengan F5 included: (F1+F2+F3+F4+F5)/5
+            $f1 = (float)($item->breakdown_formula['f1']['nilai'] ?? 0);
+            $f2 = (float)($item->breakdown_formula['f2']['nilai'] ?? 0);
+            $f3 = (float)($item->breakdown_formula['f3']['nilai'] ?? 0);
+            $f4 = (float)($item->breakdown_formula['f4']['nilai'] ?? 0);
+            $f5 = (float)$f5Val;
+
+            $rataRataBase = ($f1 + $f2 + $f3 + $f4 + $f5) / 5.0;
+            $item->rata_rata_base = round($rataRataBase, 2);
+
+            // Recalculate rata-rata_final: base * koef_beban (tanpa bonus flat)
+            $koef = (float)($item->koefisien_beban ?? 1.0);
+            if ($koef >= 1.0) {
+                $bonusMax   = $rataRataBase * ($koef - 1.0);
+                $bonusRuang = max(0.0, 100.0 - $rataRataBase);
+                $bonusAktual = min($bonusMax, $bonusRuang);
+                $rataRataFinal = $rataRataBase + $bonusAktual;
+            } else {
+                $bonusAktual = $rataRataBase * ($koef - 1.0);
+                $rataRataFinal = $rataRataBase + $bonusAktual;
+            }
+
+            $item->rata_rata_final = round($rataRataFinal, 2);
+            $item->rata_rata = round($rataRataFinal, 2);
+
+            // Update breakdown_formula to include f5
+            $breakdown = $item->breakdown_formula;
+            $breakdown['f5'] = [
+                'nilai' => round($f5, 2),
+                'avg_rr_terima' => round($f5Data['avg_rr_terima'], 2),
+                'avg_rating_terima' => round($f5Data['avg_rating_terima'], 2),
+                'detail' => $f5Data['detail']
+            ];
+            $breakdown['rata_rata_base'] = round($rataRataBase, 2);
+            $breakdown['rata_rata_final'] = round($rataRataFinal, 2);
+            $breakdown['bonus_aktual'] = round($bonusAktual, 2);
+            $breakdown['ruang_ke_100'] = round(max(0.0, 100.0 - $rataRataBase), 2);
+            $breakdown['penentu_bonus'] = ($koef < 1.0) ? 'penalty' : (($breakdown['ruang_ke_100'] <= $bonusAktual) ? 'ruang_ke_100' : 'beban_kerja');
+
+            $item->breakdown_formula = $breakdown;
+
+            return $item;
+        });
+
+        // 4. Sortir ulang berdasarkan rata_rata_final baru
+        return $rankedKetua->sortByDesc('rata_rata_final')->values();
+    }
+
+    public function calculateF5ForKetuaSingle($ketuaId, Carbon $startOfMonth, Carbon $endOfMonth, string $bf): array
+    {
+        $som = $startOfMonth->toDateString();
+        $eom = $endOfMonth->toDateString();
+
+        // Ambil semua SubKegiatan yang aktif di bulan filter beserta relasinya
+        $subKegiatans = SubKegiatan::where('tanggal_mulai', '<=', $eom)
+            ->where('tanggal_selesai', '>=', $som)
+            ->with([
+                'kegiatan',
+                'kegiatan.transfer',
+                'penugasans' => fn($q) => $q->whereNull('deleted_at')->with('anggota'),
+                'penugasans.pengirimans.penerimaan'
+            ])
+            ->get();
+
+        // Filter sub-kegiatan yang aktif diketuai oleh ketuaId
+        $mySubKegiatans = $subKegiatans->filter(function ($sub) use ($ketuaId, $endOfMonth) {
+            if (!$sub->kegiatan) return false;
+            if ($sub->kegiatan->transfer) {
+                $transferredAt = \Carbon\Carbon::parse($sub->kegiatan->transfer->transferred_at);
+                $transferredMonth = $transferredAt->format('Y-m');
+                $filterMonth = $endOfMonth->format('Y-m');
+
+                if ($filterMonth < $transferredMonth) {
+                    return ($sub->kegiatan->transfer->from_ketua_id ?? 'tanpa-ketua') === $ketuaId;
+                }
+
+                // Cek 100% sebelum transfer
+                $totalTargetPenugasan = $sub->penugasans->sum('target');
+                $penugasanTargetSelesaiSebelumTransfer = $sub->penugasans->sum(function($p) use ($transferredAt) {
+                    $pengirimansSebelumTransfer = $p->pengirimans->filter(function($k) use ($transferredAt) {
+                        return $k->penerimaan &&
+                               $k->penerimaan->status === 'Diterima' &&
+                               \Carbon\Carbon::parse($k->penerimaan->created_at)->lt($transferredAt);
+                    });
+
+                    $adaPelunasan = $pengirimansSebelumTransfer->contains(fn($k) =>
+                        $k->tipe_pengiriman === 'Pelunasan'
+                    );
+
+                    return $pengirimansSebelumTransfer->sum(fn($k) =>
+                        $k->tipe_pengiriman === ($adaPelunasan ? 'Pelunasan' : 'Cicilan')
+                            ? $k->jumlah_dikirim ?? 0
+                            : 0
+                    );
+                });
+
+                $is100PercentBeforeTransfer = ($totalTargetPenugasan > 0) && ($penugasanTargetSelesaiSebelumTransfer >= $totalTargetPenugasan);
+                if ($is100PercentBeforeTransfer) {
+                    return ($sub->kegiatan->transfer->from_ketua_id ?? 'tanpa-ketua') === $ketuaId;
+                }
+            }
+            return ($sub->kegiatan->id_penanggung_jawab ?? 'tanpa-ketua') === $ketuaId;
+        });
+
+        $penugasans = collect();
+        foreach ($mySubKegiatans as $sub) {
+            foreach ($sub->penugasans as $p) {
+                $penugasans->push($p);
+            }
+        }
+
+        if ($penugasans->isEmpty()) {
+            return [
+                'nilai' => 0.0,
+                'avg_rr_terima' => 0.0,
+                'avg_rating_terima' => 0.0,
+                'detail' => []
+            ];
+        }
+
+        $penugasanIds = $penugasans->pluck('id_penugasan')->all();
+
+        // Query pengiriman & penerimaan terbaru yang diterima untuk bulan aktif
+        $latestDiterima = Pengiriman::query()
+            ->select('pengirimans.id_penugasan', 'pengirimans.tipe_pengiriman', 'penerimaans.jumlah_diterima', 'penerimaans.rr_terima', 'penerimaans.rating_terima')
+            ->joinSub(
+                Pengiriman::selectRaw('id_penugasan, bulan_pengiriman, MAX(created_at) as lc')
+                    ->whereNull('deleted_at')
+                    ->whereIn('id_penugasan', $penugasanIds)
+                    ->groupBy('id_penugasan', 'bulan_pengiriman'),
+                'lat',
+                fn($j) => $j->on('pengirimans.id_penugasan',     '=', 'lat.id_penugasan')
+                             ->on('pengirimans.bulan_pengiriman', '=', 'lat.bulan_pengiriman')
+                             ->on('pengirimans.created_at',       '=', 'lat.lc')
+            )
+            ->join('penerimaans', 'penerimaans.id_pengiriman', '=', 'pengirimans.id_pengiriman')
+            ->where('penerimaans.status', 'Diterima')
+            ->whereIn('pengirimans.tipe_pengiriman', ['Cicilan', 'Pelunasan'])
+            ->where('pengirimans.bulan_pengiriman', $bf)
+            ->whereNull('pengirimans.deleted_at')
+            ->get()
+            ->keyBy('id_penugasan');
+
+        $sumRr = 0.0;
+        $sumRating = 0.0;
+        $detail = [];
+        $subKegiatanIndices = [];
+        $indexCounter = 1;
+        $totalDiterimaCount = 0;
+
+        foreach ($penugasans as $p) {
+            $diterima = $latestDiterima->get($p->id_penugasan);
+            if ($diterima) {
+                $totalDiterimaCount++;
+            }
+
+            $rr = $diterima ? (float)$diterima->rr_terima : 0.0;
+            $ratingStar = $diterima ? (float)$diterima->rating_terima : 0.0;
+            $ratingPercent = $ratingStar * 20.0;
+
+            $sumRr += $rr;
+            $sumRating += $ratingPercent;
+
+            $subKegId = $p->id_sub_kegiatan;
+            if (!isset($subKegiatanIndices[$subKegId])) {
+                $subKegiatanIndices[$subKegId] = $indexCounter++;
+            }
+
+            $detail[] = [
+                'id_sub_kegiatan' => $subKegId,
+                'sub_kegiatan_index' => $subKegiatanIndices[$subKegId],
+                'nama_sub_kegiatan' => $p->subKegiatan->nama_sub_kegiatan ?? '-',
+                'nama_anggota' => $p->anggota->nama_pegawai ?? '-',
+                'target' => (int)$p->target,
+                'jumlah_diterima' => $diterima ? (int)$diterima->jumlah_diterima : 0,
+                'tipe_pengiriman' => $diterima ? $diterima->tipe_pengiriman : '—',
+                'rr_terima' => round($rr, 2),
+                'rating_terima' => $ratingStar,
+                'rating_terima_persen' => round($ratingPercent, 2),
+            ];
+        }
+
+        $count = $penugasans->count();
+        $avgRr = $sumRr / $count;
+        $avgRating = $sumRating / $count;
+        $f5Val = ($avgRr + $avgRating) / 2.0;
+
+        return [
+            'nilai' => round($f5Val, 2),
+            'avg_rr_terima' => round($avgRr, 2),
+            'avg_rating_terima' => round($avgRating, 2),
+            'detail' => $detail,
+            'total_sub_kegiatan' => $mySubKegiatans->count(),
+            'total_penugasan_anggota' => $penugasans->count(),
+            'total_penugasan_anggota_diterima' => $totalDiterimaCount
+        ];
+    }
+
+
     public function rankPegawai(int $perPage = 5, $month = null, $year = null, bool $excludeSpecial = true)
     {
         [$month, $year, $bf, $gs, $startOfMonth, $endOfMonth] = $this->rankInit($month, $year, $excludeSpecial);
@@ -314,7 +546,7 @@ class DashboardAnalyticsService {
                     THEN 80.0+CAST(GREATEST(1,DATEDIFF(penugasans.tanggal_selesai,penugasans.tanggal_mulai))
                                  -GREATEST(0,DATEDIFF(lp.tanggal_pengiriman,penugasans.tanggal_mulai)) AS DECIMAL(10,4))
                              /GREATEST(1,DATEDIFF(penugasans.tanggal_selesai,penugasans.tanggal_mulai))*20.0
-                    ELSE GREATEST(70.0,80.0-LEAST(10.0,
+                    ELSE GREATEST(50.0,80.0-LEAST(30.0,
                            CAST(GREATEST(0,DATEDIFF(lp.tanggal_pengiriman,penugasans.tanggal_mulai))
                               -GREATEST(1,DATEDIFF(penugasans.tanggal_selesai,penugasans.tanggal_mulai)) AS DECIMAL(10,4))
                            /GREATEST(1,DATEDIFF(penugasans.tanggal_selesai,penugasans.tanggal_mulai))*10.0))
