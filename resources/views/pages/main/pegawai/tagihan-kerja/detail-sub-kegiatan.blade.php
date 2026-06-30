@@ -1,11 +1,98 @@
 @extends('layouts.dashboard')
 
 @section('content')
+    @php
+        // Gabungkan penugasan untuk menghitung progres keseluruhan
+        $allPenugasans = $penugasanButuhDLAtauTranslok->concat($penugasanTidakButuhDLAtauTranslok);
+        
+        $totalTargetPenugasan = $allPenugasans->sum('target');
+        
+        $penugasanTargetSelesai = $allPenugasans->sum(function($p) {
+            $adaPelunasan = $p->pengirimans->contains(fn($k) =>
+                $k->tipe_pengiriman === 'Pelunasan' && $k->penerimaan?->status === 'Diterima'
+            );
+
+            return $p->pengirimans->sum(fn($k) =>
+                $k->penerimaan?->status === 'Diterima' &&
+                $k->tipe_pengiriman === ($adaPelunasan ? 'Pelunasan' : 'Cicilan')
+                    ? $k->jumlah_dikirim ?? 0
+                    : 0
+            );
+        });
+
+        $progressPercent = $totalTargetPenugasan ? round(($penugasanTargetSelesai / $totalTargetPenugasan) * 100) : 0;
+        
+        // Hitung persentase untuk masing-masing kategori
+        $targetDL = $penugasanButuhDLAtauTranslok->sum('target');
+        $selesaiDL = $penugasanButuhDLAtauTranslok->sum(function($p) {
+            $adaPelunasan = $p->pengirimans->contains(fn($k) =>
+                $k->tipe_pengiriman === 'Pelunasan' && $k->penerimaan?->status === 'Diterima'
+            );
+            return $p->pengirimans->sum(fn($k) =>
+                $k->penerimaan?->status === 'Diterima' &&
+                $k->tipe_pengiriman === ($adaPelunasan ? 'Pelunasan' : 'Cicilan') ? $k->jumlah_dikirim ?? 0 : 0
+            );
+        });
+        $percentDL = $targetDL ? round(($selesaiDL / $targetDL) * 100) : 0;
+
+        $targetNonDL = $penugasanTidakButuhDLAtauTranslok->sum('target');
+        $selesaiNonDL = $penugasanTidakButuhDLAtauTranslok->sum(function($p) {
+            $adaPelunasan = $p->pengirimans->contains(fn($k) =>
+                $k->tipe_pengiriman === 'Pelunasan' && $k->penerimaan?->status === 'Diterima'
+            );
+            return $p->pengirimans->sum(fn($k) =>
+                $k->penerimaan?->status === 'Diterima' &&
+                $k->tipe_pengiriman === ($adaPelunasan ? 'Pelunasan' : 'Cicilan') ? $k->jumlah_dikirim ?? 0 : 0
+            );
+        });
+        $percentNonDL = $targetNonDL ? round(($selesaiNonDL / $targetNonDL) * 100) : 0;
+    @endphp
+
     <x-common.page-breadcrumb 
         pageTitle="Detail Sub Kegiatan" 
         backTitle="Daftar Kegiatan"
         backUrl="{{ route('kegiatan.index', $subKegiatan->kegiatan->bidang->slug) }}" 
     />
+
+    <!-- Box Ringkasan Progres Terbobot (Weighted Average) -->
+    <div class="mb-6 rounded-2xl border border-blue-100 bg-blue-50/50 p-5 dark:border-blue-900/30 dark:bg-blue-950/20">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h3 class="text-base font-semibold text-blue-900 dark:text-blue-300">
+                    Progres Keseluruhan Sub Kegiatan
+                </h3>
+                <p class="text-xs text-blue-700/80 dark:text-blue-400/80 mt-1">
+                    Akumulasi progres seluruh target tugas (baik Dinas Luar maupun Non Dinas Luar) secara terbobot konsisten dengan list depan.
+                </p>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-2xl font-bold text-blue-900 dark:text-blue-300">
+                    {{ $progressPercent }}%
+                </span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
+                    {{ $penugasanTargetSelesai }} / {{ $totalTargetPenugasan }} Target Selesai
+                </span>
+            </div>
+        </div>
+        
+        <div class="mt-4 pt-4 border-t border-blue-100/60 dark:border-blue-900/40 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div>
+                <span class="font-medium text-gray-500 dark:text-gray-400">Breakdown Kategori (Pembulatan):</span>
+                <ul class="mt-1 space-y-1 text-gray-700 dark:text-gray-300">
+                    <li>• Perlu DL/Translok: <strong class="font-semibold">{{ $percentDL }}%</strong> ({{ $selesaiDL }}/{{ $targetDL }} target)</li>
+                    <li>• Tidak Perlu DL/Translok: <strong class="font-semibold">{{ $percentNonDL }}%</strong> ({{ $selesaiNonDL }}/{{ $targetNonDL }} target)</li>
+                </ul>
+            </div>
+            <div>
+                <span class="font-medium text-gray-500 dark:text-gray-400">Rumus Perhitungan Terbobot (Weighted Average):</span>
+                <div class="mt-1 font-mono text-[11px] bg-white dark:bg-gray-800 p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 leading-relaxed">
+                    Progres = ((% Perlu DL * Target DL) + (% Non-DL * Target Non-DL)) / Total Target<br>
+                    Progres = (({{ $percentDL }}% * {{ $targetDL }}) + ({{ $percentNonDL }}% * {{ $targetNonDL }})) / {{ $totalTargetPenugasan }}<br>
+                    Progres = ({{ $selesaiDL }} + {{ $selesaiNonDL }}) / {{ $totalTargetPenugasan }} = {{ $penugasanTargetSelesai }} / {{ $totalTargetPenugasan }} = <strong>{{ $progressPercent }}%</strong>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 mb-6 dark:border-gray-800 dark:bg-gray-900">
         <!-- Header Kegiatan -->
