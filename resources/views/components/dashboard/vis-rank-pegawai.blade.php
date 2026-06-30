@@ -110,12 +110,12 @@
                 <thead class="bg-gray-50 dark:bg-gray-800/50">
                     @if ($isKatim)
                         <tr class="border-b border-gray-200 dark:border-gray-800">
-                            <th colspan="2" class="px-6 py-2"></th>
-                            <th colspan="4" class="px-6 py-2 text-center text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider bg-gray-100/50 dark:bg-gray-800/20 border-x border-gray-200/50 dark:border-gray-800/20">
-                                Kinerja Mandiri (Sebagai Anggota)
+                            <th colspan="2" class="px-6 py-2 border-r-2 border-gray-200 dark:border-gray-800"></th>
+                            <th colspan="4" class="whitespace-nowrap px-6 py-2 text-center text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider bg-indigo-50/50 dark:bg-indigo-950/20 border-r-2 border-indigo-100 dark:border-indigo-900/30">
+                                Kinerja Anggota
                             </th>
-                            <th colspan="1" class="px-6 py-2 text-center text-[10px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-wider bg-blue-50/30 dark:bg-blue-900/10 border-r border-gray-200/50 dark:border-gray-800/20">
-                                Kinerja Pengawasan (Sebagai Katim)
+                            <th colspan="1" class="whitespace-nowrap px-6 py-2 text-center text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider bg-emerald-50/50 dark:bg-emerald-950/20 border-r-2 border-emerald-100 dark:border-emerald-900/30">
+                                Kinerja Katim
                             </th>
                             <th colspan="2" class="px-6 py-2"></th>
                         </tr>
@@ -130,7 +130,7 @@
                             $headers[] = 'Aksi';
                         @endphp
                         @foreach($headers as $h)
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">{{ $h }}</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider {{ in_array($h, ['Nama Pegawai', 'Skor Cepat', 'Nilai F5']) ? 'border-r-2 border-gray-200 dark:border-gray-800' : '' }}">{{ $h }}</th>
                         @endforeach
                     </tr>
                 </thead>
@@ -138,13 +138,13 @@
                     @for ($i = 0; $i < 5; $i++)
                         <tr class="animate-pulse">
                             <td class="px-6 py-4"><div class="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700"></div></td>
-                            <td class="px-6 py-4"><div class="h-4 w-32 rounded bg-gray-200 dark:bg-gray-700"></div></td>
+                            <td class="px-6 py-4 border-r-2 border-gray-200 dark:border-gray-800"><div class="h-4 w-32 rounded bg-gray-200 dark:bg-gray-700"></div></td>
                             <td class="px-6 py-4 text-center"><div class="h-5 w-14 rounded-full bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
                             <td class="px-6 py-4"><div class="flex gap-1 justify-center">@for($s=0;$s<5;$s++)<div class="h-4 w-4 rounded bg-gray-200 dark:bg-gray-700"></div>@endfor</div></td>
                             <td class="px-6 py-4 text-center"><div class="h-4 w-10 rounded bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
-                            <td class="px-6 py-4 text-center"><div class="h-4 w-12 rounded bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
+                            <td class="px-6 py-4 text-center border-r-2 border-gray-200 dark:border-gray-800"><div class="h-4 w-12 rounded bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
                             @if($isKatim)
-                                <td class="px-6 py-4 text-center"><div class="h-4 w-12 rounded bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
+                                <td class="px-6 py-4 text-center border-r-2 border-gray-200 dark:border-gray-800"><div class="h-4 w-12 rounded bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
                             @endif
                             <td class="px-6 py-4 text-center"><div class="h-6 w-16 rounded-full bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
                             <td class="px-6 py-4 text-center"><div class="h-7 w-16 rounded-lg bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
@@ -161,25 +161,25 @@
             <thead class="bg-gray-50 dark:bg-gray-800/50">
                 @if ($isKatim)
                     <tr class="border-b border-gray-200 dark:border-gray-800">
-                        <th colspan="2" class="px-6 py-2"></th>
-                        <th colspan="4" class="px-6 py-2 text-center text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider bg-gray-100/50 dark:bg-gray-800/20 border-x border-gray-200/50 dark:border-gray-800/20">
-                            Kinerja Mandiri (Sebagai Anggota)
+                        <th colspan="2" class="px-6 py-2 border-r-2 border-gray-200 dark:border-gray-800"></th>
+                        <th colspan="4" class="whitespace-nowrap px-6 py-2 text-center text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider bg-indigo-50/50 dark:bg-indigo-950/20 border-r-2 border-indigo-100 dark:border-indigo-900/30">
+                            Kinerja Anggota
                         </th>
-                        <th colspan="1" class="px-6 py-2 text-center text-[10px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-wider bg-blue-50/30 dark:bg-blue-900/10 border-r border-gray-200/50 dark:border-gray-800/20">
-                            Kinerja Pengawasan (Sebagai Katim)
+                        <th colspan="1" class="whitespace-nowrap px-6 py-2 text-center text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider bg-emerald-50/50 dark:bg-emerald-950/20 border-r-2 border-emerald-100 dark:border-emerald-900/30">
+                            Kinerja Katim
                         </th>
                         <th colspan="2" class="px-6 py-2"></th>
                     </tr>
                 @endif
                 <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-16">Rank</th>
-                    <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Nama Pegawai</th>
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider border-r-2 border-gray-200 dark:border-gray-800">Nama Pegawai</th>
                     <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">RR Kirim</th>
                     <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">Rating ⭐</th>
                     <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">Rating %</th>
-                    <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">Skor Cepat</th>
+                    <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center border-r-2 border-gray-200 dark:border-gray-800">Skor Cepat</th>
                     <template x-if="isKatim">
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">Nilai F5</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center border-r-2 border-gray-200 dark:border-gray-800 bg-emerald-50/10 dark:bg-emerald-900/5">Nilai F5</th>
                     </template>
                     <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">Rata-rata</th>
                     <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">Aksi</th>
@@ -221,7 +221,7 @@
                         </td>
 
                         {{-- Nama --}}
-                        <td class="px-6 py-4 whitespace-normal min-w-[200px] max-w-xs">
+                        <td class="px-6 py-4 whitespace-normal min-w-[200px] max-w-xs border-r-2 border-gray-200 dark:border-gray-800">
                             <div class="flex flex-col gap-1">
                                 <div class="font-medium text-gray-800 dark:text-white" x-text="pegawai.nama_pegawai || 'N/A'"></div>
                                 <template x-if="!isKatim">
@@ -292,14 +292,14 @@
                         </td>
 
                         {{-- Skor Cepat --}}
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <td class="px-6 py-4 whitespace-nowrap text-center border-r-2 border-gray-200 dark:border-gray-800">
                             <span class="font-medium text-gray-800 dark:text-white" x-text="Number(pegawai.avg_skor_cepat ?? 0).toFixed(2) + '%'"></span>
                         </td>
 
                         {{-- F5 (Katim only) --}}
                         <template x-if="isKatim">
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <span class="font-semibold text-blue-600 dark:text-blue-400" x-text="Number(pegawai.f5_nilai ?? 0).toFixed(2) + '%'"></span>
+                            <td class="px-6 py-4 whitespace-nowrap text-center border-r-2 border-gray-200 dark:border-gray-800 bg-emerald-50/5 dark:bg-emerald-950/5">
+                                <span class="font-semibold text-emerald-600 dark:text-emerald-400" x-text="Number(pegawai.f5_nilai ?? 0).toFixed(2) + '%'"></span>
                             </td>
                         </template>
 
