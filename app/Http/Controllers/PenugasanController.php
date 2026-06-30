@@ -625,6 +625,25 @@ class PenugasanController extends Controller
         $existing = [];
 
         $idAnggota = $validated['id_anggota'] ?? null;
+
+        // 🔐 VALIDATION: Pastikan anggota aktif di seluruh rentang penugasan
+        if ($idAnggota) {
+            $pegawaiObj = \App\Models\Pegawai::find($idAnggota);
+            if ($pegawaiObj) {
+                foreach ($allDates as $tgl) {
+                    $m = $tgl['mulai'] ?? null;
+                    $s = $tgl['selesai'] ?? null;
+                    if ($m && $s) {
+                        if (!$pegawaiObj->isActiveDuring($m, $s)) {
+                            throw ValidationException::withMessages([
+                                'tanggal_mulai' => 'Gagal: Pegawai ' . $pegawaiObj->nama_pegawai . ' berstatus nonaktif pada sebagian atau seluruh rentang tanggal penugasan (' . $m . ' s.d. ' . $s . ').'
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
         $butuhDl = $validated['butuh_dl'] ?? 0;
         $butuhTranslok = $validated['butuh_translok'] ?? 0;
         $wajibCekBentrok = ($butuhDl == 1 || $butuhTranslok == 1);

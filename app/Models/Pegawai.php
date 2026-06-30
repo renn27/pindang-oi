@@ -43,19 +43,80 @@ class Pegawai extends Authenticatable
         'remember_token',
     ];
 
+    public function statusPeriods()
+    {
+        return $this->hasMany(PegawaiStatusPeriod::class, 'id_pegawai', 'id_pegawai');
+    }
+
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        $today = now()->toDateString();
+        return $query->whereHas('statusPeriods', function ($q) use ($today) {
+            $q->where('status', 'Aktif')
+              ->where('start_date', '<=', $today)
+              ->where(function ($sub) use ($today) {
+                  $sub->whereNull('end_date')
+                      ->orWhere('end_date', '>=', $today);
+              });
+        });
     }
 
     public function scopeActiveInMonth($query, int $month, int $year)
     {
-        $period = sprintf('%04d-%02d-01', $year, $month);
+        $startOfMonth = sprintf('%04d-%02d-01', $year, $month);
+        $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth()->toDateString();
 
-        return $query->where(function ($q) use ($period) {
-            $q->whereNull('inactive_from_month')
-                ->orWhere('inactive_from_month', '>', $period);
+        return $query->whereHas('statusPeriods', function ($q) use ($startOfMonth, $endOfMonth) {
+            $q->where('status', 'Aktif')
+              ->where('start_date', '<=', $endOfMonth)
+              ->where(function ($sub) use ($startOfMonth) {
+                  $sub->whereNull('end_date')
+                      ->orWhere('end_date', '>=', $startOfMonth);
+              });
         });
+    }
+
+    public function isCurrentlyActive(): bool
+    {
+        $today = now()->toDateString();
+        return $this->statusPeriods()
+            ->where('status', 'Aktif')
+            ->where('start_date', '<=', $today)
+            ->where(function ($q) use ($today) {
+                $q->whereNull('end_date')
+                  ->orWhere('end_date', '>=', $today);
+            })
+            ->exists();
+    }
+
+    public function isActiveDuring(string $startDate, string $endDate): bool
+    {
+        $start = Carbon::parse($startDate)->startOfMonth();
+        $end = Carbon::parse($endDate)->startOfMonth();
+
+        $current = $start->copy();
+        while ($current->lte($end)) {
+            $month = $current->month;
+            $year = $current->year;
+
+            // Check if active in this month
+            $isActive = $this->statusPeriods()
+                ->where('status', 'Aktif')
+                ->where('start_date', '<=', $current->endOfMonth()->toDateString())
+                ->where(function ($q) use ($current) {
+                    $q->whereNull('end_date')
+                      ->orWhere('end_date', '>=', $current->startOfMonth()->toDateString());
+                })
+                ->exists();
+
+            if (!$isActive) {
+                return false;
+            }
+
+            $current->addMonth();
+        }
+
+        return true;
     }
 
     public function isSuperUser(): bool

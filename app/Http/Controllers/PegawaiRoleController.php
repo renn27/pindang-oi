@@ -51,6 +51,13 @@ class PegawaiRoleController extends Controller
             ]);
 
             $pegawai->roles()->sync($roles->pluck('id'));
+
+            // Inisialisasi periode aktif pertama pegawai baru
+            $pegawai->statusPeriods()->create([
+                'status' => 'Aktif',
+                'start_date' => now()->startOfMonth()->toDateString(),
+                'end_date' => null,
+            ]);
         });
 
         return back()->with('success', 'Pegawai berhasil ditambahkan.');
@@ -85,18 +92,88 @@ class PegawaiRoleController extends Controller
             'inactive_from_month.date_format' => 'Format bulan mulai nonaktif tidak valid.',
         ]);
 
-        $pegawai->update($pegawai->is_active
-            ? [
-                'is_active' => false,
-                'inactive_from_month' => Carbon::createFromFormat('Y-m', $validated['inactive_from_month'])->startOfMonth(),
-            ]
-            : [
-                'is_active' => true,
-                'inactive_from_month' => null,
-            ]
-        );
+        $prevStatusActive = $pegawai->is_active;
 
-        $status = $pegawai->is_active ? 'diaktifkan kembali' : 'dinonaktifkan';
+        DB::transaction(function () use ($pegawai, $validated, $prevStatusActive) {
+            if ($prevStatusActive) {
+                // MENONAKTIFKAN PEGAWAI
+                $deactiveMonth = Carbon::createFromFormat('Y-m', $validated['inactive_from_month'])->startOfMonth();
+                $activeEnd = $deactiveMonth->copy()->subDay()->toDateString();
+
+                $ongoingActive = $pegawai->statusPeriods()
+                    ->where('status', 'Aktif')
+                    ->whereNull('end_date')
+                    ->first();
+
+                if ($ongoingActive) {
+                    if ($ongoingActive->start_date->greaterThanOrEqualTo($deactiveMonth)) {
+                        // Jika aktif dimulai pada/setelah bulan nonaktif, hapus periode aktif ini
+                        $ongoingActive->delete();
+                        // Cari periode nonaktif sebelumnya dan buka kembali
+                        $prevInactive = $pegawai->statusPeriods()
+                            ->where('status', 'Nonaktif')
+                            ->orderBy('start_date', 'desc')
+                            ->first();
+                        if ($prevInactive) {
+                            $prevInactive->update(['end_date' => null]);
+                        }
+                    } else {
+                        // Tutup periode aktif dan buat periode nonaktif baru
+                        $ongoingActive->update(['end_date' => $activeEnd]);
+                        $pegawai->statusPeriods()->create([
+                            'status' => 'Nonaktif',
+                            'start_date' => $deactiveMonth->toDateString(),
+                            'end_date' => null,
+                        ]);
+                    }
+                }
+
+                // Hitung is_active legacy untuk hari ini
+                $isCurrentlyActive = now()->startOfMonth()->lt($deactiveMonth);
+                $pegawai->update([
+                    'is_active' => $isCurrentlyActive,
+                    'inactive_from_month' => $deactiveMonth->toDateString(),
+                ]);
+            } else {
+                // MENGAKTIFKAN KEMBALI PEGAWAI
+                $reactivateMonth = now()->startOfMonth();
+                $inactiveEnd = $reactivateMonth->copy()->subDay()->toDateString();
+
+                $ongoingInactive = $pegawai->statusPeriods()
+                    ->where('status', 'Nonaktif')
+                    ->whereNull('end_date')
+                    ->first();
+
+                if ($ongoingInactive) {
+                    if ($ongoingInactive->start_date->greaterThanOrEqualTo($reactivateMonth)) {
+                        // Diaktifkan kembali di bulan yang sama dengan penonaktifan
+                        $ongoingInactive->delete();
+                        $prevActive = $pegawai->statusPeriods()
+                            ->where('status', 'Aktif')
+                            ->orderBy('start_date', 'desc')
+                            ->first();
+                        if ($prevActive) {
+                            $prevActive->update(['end_date' => null]);
+                        }
+                    } else {
+                        // Tutup periode nonaktif dan buat periode aktif baru
+                        $ongoingInactive->update(['end_date' => $inactiveEnd]);
+                        $pegawai->statusPeriods()->create([
+                            'status' => 'Aktif',
+                            'start_date' => $reactivateMonth->toDateString(),
+                            'end_date' => null,
+                        ]);
+                    }
+                }
+
+                $pegawai->update([
+                    'is_active' => true,
+                    'inactive_from_month' => null,
+                ]);
+            }
+        });
+
+        $status = $prevStatusActive ? 'dinonaktifkan' : 'diaktifkan kembali';
 
         return back()->with('success', "Pegawai berhasil {$status}.");
     }

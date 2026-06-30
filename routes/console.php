@@ -17,3 +17,28 @@ Schedule::command('notifications:send-monthly-todo-recaps')
     ->monthlyOn(1, '08:00')
     ->timezone('Asia/Jakarta')
     ->withoutOverlapping();
+
+// Sinkronisasi harian kolom legacy is_active di tabel pegawais berdasarkan status periods hari itu
+Schedule::call(function () {
+    $today = now()->toDateString();
+    
+    $activeIds = \Illuminate\Support\Facades\DB::table('pegawai_status_periods')
+        ->where('status', 'Aktif')
+        ->where('start_date', '<=', $today)
+        ->where(function ($q) use ($today) {
+            $q->whereNull('end_date')
+              ->orWhere('end_date', '>=', $today);
+        })
+        ->pluck('id_pegawai')
+        ->toArray();
+
+    \Illuminate\Support\Facades\DB::table('pegawais')
+        ->whereNull('deleted_at')
+        ->whereIn('id_pegawai', $activeIds)
+        ->update(['is_active' => true]);
+
+    \Illuminate\Support\Facades\DB::table('pegawais')
+        ->whereNull('deleted_at')
+        ->whereNotIn('id_pegawai', $activeIds)
+        ->update(['is_active' => false]);
+})->dailyAt('00:01')->timezone('Asia/Jakarta');

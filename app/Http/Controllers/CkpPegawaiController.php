@@ -150,8 +150,25 @@ class CkpPegawaiController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        // Load semua penugasan beserta relasi sekaligus — 1 query, dipakai semua step
+        $year = (int) substr($request->bulan_ckp, 0, 4);
+        $month = (int) substr($request->bulan_ckp, 5, 2);
+        $startOfMonth = sprintf('%04d-%02d-01', $year, $month);
+        $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth()->toDateString();
+
+        // Load penugasan beserta relasi, disaring hanya untuk anggota yang aktif di bulan ckp berjalan
         $penugasans = $subKegiatan->penugasans()
+            ->whereExists(function ($query) use ($startOfMonth, $endOfMonth) {
+                $query->select(DB::raw(1))
+                    ->from('pegawais')
+                    ->join('pegawai_status_periods', 'pegawai_status_periods.id_pegawai', '=', 'pegawais.id_pegawai')
+                    ->whereColumn('pegawais.id_pegawai', 'penugasans.id_anggota')
+                    ->where('pegawai_status_periods.status', 'Aktif')
+                    ->where('pegawai_status_periods.start_date', '<=', $endOfMonth)
+                    ->where(function ($sub) use ($startOfMonth) {
+                        $sub->whereNull('pegawai_status_periods.end_date')
+                            ->orWhere('pegawai_status_periods.end_date', '>=', $startOfMonth);
+                    });
+            })
             ->with(['latestPengiriman.penerimaan', 'latestPenerimaan'])
             ->get();
 

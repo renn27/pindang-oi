@@ -635,8 +635,22 @@ class DashboardAnalyticsService {
 
         $bf = sprintf('%04d-%02d', $year, $month);
 
+        $activeEmployeeFilter = function ($query) use ($startOfMonth, $endOfMonth) {
+            $query->select(\DB::raw(1))
+                ->from('pegawais')
+                ->join('pegawai_status_periods', 'pegawai_status_periods.id_pegawai', '=', 'pegawais.id_pegawai')
+                ->whereColumn('pegawais.id_pegawai', 'penugasans.id_anggota')
+                ->where('pegawai_status_periods.status', 'Aktif')
+                ->where('pegawai_status_periods.start_date', '<=', $endOfMonth->toDateString())
+                ->where(function ($sub) use ($startOfMonth) {
+                    $sub->whereNull('pegawai_status_periods.end_date')
+                        ->orWhere('pegawai_status_periods.end_date', '>=', $startOfMonth->toDateString());
+                });
+        };
+
         $totalPenugasan = Penugasan::where('tanggal_mulai', '<=', $endOfMonth) 
                         ->where('tanggal_selesai', '>=', $startOfMonth)
+                        ->whereExists($activeEmployeeFilter)
                         ->whereDoesntHave('pengirimans', function ($qp) use ($bf) {
                             $qp->where('tipe_pengiriman', 'Pelunasan')
                                ->where('bulan_pengiriman', '<', $bf)
@@ -648,6 +662,7 @@ class DashboardAnalyticsService {
                         
         $penugasanSelesai = Penugasan::where('tanggal_mulai', '<=', $endOfMonth) 
                         ->where('tanggal_selesai', '>=', $startOfMonth)
+                        ->whereExists($activeEmployeeFilter)
                         ->whereDoesntHave('pengirimans', function ($qp) use ($bf) {
                             $qp->where('tipe_pengiriman', 'Pelunasan')
                                ->where('bulan_pengiriman', '<', $bf)
