@@ -55,22 +55,22 @@
     />
 
     <!-- Box Ringkasan Progres Terbobot (Weighted Average) -->
-    <div class="mb-6 rounded-2xl border border-blue-100 bg-blue-50/50 p-4 dark:border-blue-900/30 dark:bg-blue-950/20">
+    <div class="mb-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white shadow-md dark:from-blue-700 dark:to-indigo-700">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-300">
-                    Progres Sub Kegiatan (Keseluruhan)
+                <h3 class="text-sm font-bold text-white tracking-wide uppercase">
+                    Progres Sub Kegiatan Berdasarkan Target
                 </h3>
-                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-xs text-blue-800/80 dark:text-blue-400/80">
-                    <span>• Perlu DL/Translok: <strong>{{ $percentDL }}%</strong> ({{ $selesaiDL }}/{{ $targetDL }})</span>
-                    <span>• Tidak Perlu DL/Translok: <strong>{{ $percentNonDL }}%</strong> ({{ $selesaiNonDL }}/{{ $targetNonDL }})</span>
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-xs text-blue-100 font-medium">
+                    <span>• Perlu DL/Translok : <strong>({{ $selesaiDL }}/{{ $targetDL }})</strong></span>
+                    <span>• Tidak Perlu DL/Translok : <strong>({{ $selesaiNonDL }}/{{ $targetNonDL }})</strong></span>
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <span class="text-xl font-bold text-blue-900 dark:text-blue-300">
+                <span class="text-2xl font-black text-white">
                     {{ $progressPercent }}%
                 </span>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/20 text-white backdrop-blur-sm">
                     {{ $penugasanTargetSelesai }} / {{ $totalTargetPenugasan }} Tugas
                 </span>
             </div>
