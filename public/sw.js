@@ -9,7 +9,7 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('push', (event) => {
     const fallback = {
         title: 'Pindang OI',
-        body: 'Ada notifikasi baru.',
+        body: 'Notifikasi untuk kamu hehe.',
         icon: '/images/logo/logo-icon.svg',
         badge: '/images/logo/logo-icon.svg',
         data: { url: '/' },

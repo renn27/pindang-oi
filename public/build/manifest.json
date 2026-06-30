@@ -14,7 +14,7 @@
     "src": "node_modules/flatpickr/dist/flatpickr.min.css"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BlWNhhVs.css",
+    "file": "assets/app-hphx6l_1.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
