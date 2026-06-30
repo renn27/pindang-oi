@@ -685,7 +685,6 @@
                 </div>
             @endif
         </div>
-        </div>
     @else()
         {{-- ===== CARD BESAR ANALYTICS DASHBOARD ===== --}}
         <div class="mb-8">
