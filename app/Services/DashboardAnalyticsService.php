@@ -273,8 +273,11 @@ class DashboardAnalyticsService {
             ->selectRaw("
                 pegawais.id_pegawai, pegawais.nama_pegawai, pegawais.photo, pegawais.nip_bps, pegawais.jabatan,
                 COUNT(DISTINCT penugasans.id_penugasan) AS total_penugasan,
+
                 COUNT(DISTINCT lp.id_penugasan) AS total_penugasan_dikerjakan,
+                
                 COUNT(DISTINCT CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN penugasans.id_penugasan END) AS total_selesai,
+                
                 COUNT(DISTINCT CASE WHEN lp.tipe_pengiriman='Cicilan'   THEN penugasans.id_penugasan END) AS total_cicilan_diterima,
                 COALESCE(SUM(penugasans.target),0) AS target_pegawai,
                 COALESCE(SUM(CASE WHEN lp.tipe_pengiriman='Pelunasan' THEN LEAST(lp.jumlah_dikirim, penugasans.target) ELSE 0 END),0) AS progress_pelunasan,
