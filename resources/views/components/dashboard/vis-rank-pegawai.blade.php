@@ -108,6 +108,18 @@
         <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
                 <thead class="bg-gray-50 dark:bg-gray-800/50">
+                    @if ($isKatim)
+                        <tr class="border-b border-gray-200 dark:border-gray-800">
+                            <th colspan="2" class="px-6 py-2"></th>
+                            <th colspan="4" class="px-6 py-2 text-center text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider bg-gray-100/50 dark:bg-gray-800/20 border-x border-gray-200/50 dark:border-gray-800/20">
+                                Kinerja Mandiri (Sebagai Anggota)
+                            </th>
+                            <th colspan="1" class="px-6 py-2 text-center text-[10px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-wider bg-blue-50/30 dark:bg-blue-900/10 border-r border-gray-200/50 dark:border-gray-800/20">
+                                Kinerja Pengawasan (Sebagai Katim)
+                            </th>
+                            <th colspan="2" class="px-6 py-2"></th>
+                        </tr>
+                    @endif
                     <tr>
                         @php
                             $headers = ['Rank', 'Nama Pegawai', 'RR Kirim', 'Rating ⭐', 'Rating %', 'Skor Cepat'];
@@ -147,6 +159,18 @@
     <div x-show="!isLoading" class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
             <thead class="bg-gray-50 dark:bg-gray-800/50">
+                @if ($isKatim)
+                    <tr class="border-b border-gray-200 dark:border-gray-800">
+                        <th colspan="2" class="px-6 py-2"></th>
+                        <th colspan="4" class="px-6 py-2 text-center text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider bg-gray-100/50 dark:bg-gray-800/20 border-x border-gray-200/50 dark:border-gray-800/20">
+                            Kinerja Mandiri (Sebagai Anggota)
+                        </th>
+                        <th colspan="1" class="px-6 py-2 text-center text-[10px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-wider bg-blue-50/30 dark:bg-blue-900/10 border-r border-gray-200/50 dark:border-gray-800/20">
+                            Kinerja Pengawasan (Sebagai Katim)
+                        </th>
+                        <th colspan="2" class="px-6 py-2"></th>
+                    </tr>
+                @endif
                 <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-16">Rank</th>
                     <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Nama Pegawai</th>
