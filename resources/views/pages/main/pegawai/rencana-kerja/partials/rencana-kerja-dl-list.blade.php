@@ -266,37 +266,119 @@
 
                                                 {{-- KOLOM AKSI --}}
                                                 <td class="px-4 py-3 align-top border border-gray-200 dark:border-gray-700">
-                                                    <div class="flex flex-col gap-1.5">
+                                                    <div class="flex flex-col gap-2">
+                                                        {{-- AKSI DL --}}
                                                         @if ($penugasan->butuh_dl)
-                                                            <button @click="$dispatch('open-smart-modal', {
-                                                                modalId: 'modal-verifikasi-dl',
-                                                                key: '{{ $penugasan->id_penugasan }}',
-                                                                data: {
-                                                                    nama_pegawai: '{{ $penugasan->anggota->nama_pegawai ?? '-' }}',
-                                                                    jenis_kegiatan: '{{ $penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri' }}',
-                                                                    tanggal_mulai: '{{ $penugasan->tanggal_mulai->format('d M Y') }}',
-                                                                    tanggal_selesai: '{{ $penugasan->tanggal_selesai->format('d M Y') }}'
-                                                                }
-                                                            })"
-                                                                class="w-full text-center px-3 py-1.5 text-[10px] font-semibold bg-gray-50 dark:bg-gray-700 border dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600/80 transition-colors">
-                                                                Verif DL
-                                                            </button>
+                                                            <div class="flex flex-col gap-1">
+                                                                @if ($penugasan->status_dl === 'Ditolak')
+                                                                    @if (Auth::user()->active_role === 'Ketua Tim' && Auth::user()->id_pegawai === $penugasan->subKegiatan->kegiatan->id_penanggung_jawab)
+                                                                        <button type="button" @click="$dispatch('open-smart-modal', {
+                                                                            modalId: 'modal-verifikasi-dl',
+                                                                            key: '{{ $penugasan->id_penugasan }}',
+                                                                            data: {
+                                                                                nama_pegawai: '{{ $penugasan->anggota->nama_pegawai ?? '-' }}',
+                                                                                jenis_kegiatan: '{{ $penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri' }}',
+                                                                                tanggal_mulai: '{{ $penugasan->tanggal_mulai->format('d M Y') }}',
+                                                                                tanggal_selesai: '{{ $penugasan->tanggal_selesai->format('d M Y') }}'
+                                                                            }
+                                                                        })"
+                                                                            class="w-full text-center px-3 py-1.5 text-[10px] font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                                                                            Ajukan Kembali DL
+                                                                        </button>
+                                                                    @endif
+                                                                    @if (Auth::user()->active_role === 'Pimpinan')
+                                                                        <span class="w-full text-center px-2 py-1 text-[9px] font-medium text-gray-400 dark:text-gray-500 italic block">Menunggu Pengajuan DL</span>
+                                                                    @endif
+                                                                @endif
+
+                                                                @can('acceptDL', $penugasan)
+                                                                    @if ($penugasan->status_dl === 'ACC')
+                                                                        @if (Auth::user()->active_role === 'Pimpinan')
+                                                                            <form id="del-dl-{{ $penugasan->id_penugasan }}" action="{{ route('kalenderDL.delete', $penugasan->id_penugasan) }}" method="POST" class="w-full">
+                                                                                @csrf
+                                                                                @method('DELETE')
+                                                                                <button type="button" onclick="SwalHelper.confirmDelete('del-dl-{{ $penugasan->id_penugasan }}', 'Kalender DL milik {{ $penugasan->anggota->nama_pegawai }}')"
+                                                                                    class="w-full flex items-center justify-center gap-1 px-3 py-1.5 text-[10px] font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg transition-colors"
+                                                                                    title="Hapus Kalender DL">
+                                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                                                    HAPUS DL
+                                                                                </button>
+                                                                            </form>
+                                                                        @endif
+                                                                    @elseif (Auth::user()->active_role === 'Pimpinan' && in_array($penugasan->status_dl, ['Menunggu', null]))
+                                                                        <button @click="$dispatch('open-smart-modal', {
+                                                                            modalId: 'modal-verifikasi-dl',
+                                                                            key: '{{ $penugasan->id_penugasan }}',
+                                                                            data: {
+                                                                                nama_pegawai: '{{ $penugasan->anggota->nama_pegawai ?? '-' }}',
+                                                                                jenis_kegiatan: '{{ $penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri' }}',
+                                                                                tanggal_mulai: '{{ $penugasan->tanggal_mulai->format('d M Y') }}',
+                                                                                tanggal_selesai: '{{ $penugasan->tanggal_selesai->format('d M Y') }}'
+                                                                            }
+                                                                        })"
+                                                                            class="w-full text-center px-3 py-1.5 text-[10px] font-semibold bg-gray-50 dark:bg-gray-700 border dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600/80 transition-colors">
+                                                                            Verif DL
+                                                                        </button>
+                                                                    @endif
+                                                                @endcan
+                                                            </div>
                                                         @endif
 
+                                                        {{-- AKSI TRANSLOK --}}
                                                         @if ($penugasan->butuh_translok)
-                                                            <button @click="$dispatch('open-smart-modal', {
-                                                                modalId: 'modal-verifikasi-translok',
-                                                                key: '{{ $penugasan->id_penugasan }}',
-                                                                data: {
-                                                                    nama_pegawai: '{{ $penugasan->anggota->nama_pegawai ?? '-' }}',
-                                                                    jenis_kegiatan: '{{ $penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri' }}',
-                                                                    tanggal_mulai: '{{ $penugasan->tanggal_mulai->format('d M Y') }}',
-                                                                    tanggal_selesai: '{{ $penugasan->tanggal_selesai->format('d M Y') }}'
-                                                                }
-                                                            })"
-                                                                class="w-full text-center px-3 py-1.5 text-[10px] font-semibold bg-gray-50 dark:bg-gray-700 border dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600/80 transition-colors">
-                                                                Verif Translok
-                                                            </button>
+                                                            <div class="flex flex-col gap-1 @if($penugasan->butuh_dl) pt-2 border-t border-gray-100 dark:border-gray-700 @endif">
+                                                                @if ($penugasan->status_translok === 'Ditolak')
+                                                                    @if (Auth::user()->active_role === 'Ketua Tim' && Auth::user()->id_pegawai === $penugasan->subKegiatan->kegiatan->id_penanggung_jawab)
+                                                                        <button type="button" @click="$dispatch('open-smart-modal', {
+                                                                            modalId: 'modal-verifikasi-translok',
+                                                                            key: '{{ $penugasan->id_penugasan }}',
+                                                                            data: {
+                                                                                nama_pegawai: '{{ $penugasan->anggota->nama_pegawai ?? '-' }}',
+                                                                                jenis_kegiatan: '{{ $penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri' }}',
+                                                                                tanggal_mulai: '{{ $penugasan->tanggal_mulai->format('d M Y') }}',
+                                                                                tanggal_selesai: '{{ $penugasan->tanggal_selesai->format('d M Y') }}'
+                                                                            }
+                                                                        })"
+                                                                            class="w-full text-center px-3 py-1.5 text-[10px] font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                                                                            Ajukan Kembali TR
+                                                                        </button>
+                                                                    @endif
+                                                                    @if (Auth::user()->active_role === 'Pimpinan')
+                                                                        <span class="w-full text-center px-2 py-1 text-[9px] font-medium text-gray-400 dark:text-gray-500 italic block">Menunggu Pengajuan TR</span>
+                                                                    @endif
+                                                                @endif
+
+                                                                @can('acceptTranslok', $penugasan)
+                                                                    @if ($penugasan->status_translok === 'ACC')
+                                                                        @if (Auth::user()->active_role === 'Pimpinan')
+                                                                            <form id="del-trl-{{ $penugasan->id_penugasan }}" action="{{ route('kalenderDL.delete', $penugasan->id_penugasan) }}" method="POST" class="w-full">
+                                                                                @csrf
+                                                                                @method('DELETE')
+                                                                                <button type="button" onclick="SwalHelper.confirmDelete('del-trl-{{ $penugasan->id_penugasan }}', 'Kalender Translok milik {{ $penugasan->anggota->nama_pegawai }}')"
+                                                                                    class="w-full flex items-center justify-center gap-1 px-3 py-1.5 text-[10px] font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg transition-colors"
+                                                                                    title="Hapus Kalender Translok">
+                                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                                                    HAPUS TR
+                                                                                </button>
+                                                                            </form>
+                                                                        @endif
+                                                                    @elseif (Auth::user()->active_role === 'Pimpinan' && in_array($penugasan->status_translok, ['Menunggu', null]))
+                                                                        <button @click="$dispatch('open-smart-modal', {
+                                                                            modalId: 'modal-verifikasi-translok',
+                                                                            key: '{{ $penugasan->id_penugasan }}',
+                                                                            data: {
+                                                                                nama_pegawai: '{{ $penugasan->anggota->nama_pegawai ?? '-' }}',
+                                                                                jenis_kegiatan: '{{ $penugasan->jenisKegiatan?->jenis_kegiatan ?? 'Isi Sendiri' }}',
+                                                                                tanggal_mulai: '{{ $penugasan->tanggal_mulai->format('d M Y') }}',
+                                                                                tanggal_selesai: '{{ $penugasan->tanggal_selesai->format('d M Y') }}'
+                                                                            }
+                                                                        })"
+                                                                            class="w-full text-center px-3 py-1.5 text-[10px] font-semibold bg-gray-50 dark:bg-gray-700 border dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600/80 transition-colors">
+                                                                            Verif Translok
+                                                                        </button>
+                                                                    @endif
+                                                                @endcan
+                                                            </div>
                                                         @endif
                                                     </div>
                                                 </td>
