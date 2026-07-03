@@ -875,14 +875,22 @@ $pengiriman->update([\'status\' => \'Revisi\']);</code></pre>'
 })->get();</code></pre>'
             ],
             'anggota-rating-nilai' => [
-                'controller' => 'app/Services/KinerjaCalculatorService.php',
+                'controller' => 'app/Services/DashboardAnalyticsService.php',
                 'model' => 'app/Models/Penugasan.php',
                 'view' => 'resources/views/pages/dashboard.blade.php',
                 'route' => 'Route::get(\'/\')',
                 'policy' => 'auth',
                 'middleware' => 'auth, active.pegawai',
                 'migration_pattern' => 'create_penugasans_table',
-                'tutorial' => '<p class="mb-3">Perhitungan nilai kinerja dihitung secara global:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">$skor = ($rrKirim + $rrTerima + $waktu + $kualitas) / 4 * $koefisienBeban;</code></pre>'
+                'tutorial' => '<p class="mb-3">Perhitungan nilai performa pegawai (F1-F4 dan Koefisien Beban Kerja):</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">$f1 = $this-&gt;calculateF1($pegawai, $month);
+$f2 = $this-&gt;calculateF2($pegawai, $month);
+$f3 = $this-&gt;calculateF3($pegawai, $month);
+$f4 = $this-&gt;calculateF4($pegawai, $month);
+$baseScore = ($f1 + $f2 + $f3 + $f4) / 4;
+
+$koef = $avgTargetPegawai &gt; 0 ? ($totalTarget / $avgTargetPegawai) : 1.0;
+$koef = min(1.15, max(0.85, $koef));
+$finalScore = $baseScore * $koef; // dengan pembatasan max 100%</code></pre>'
             ],
             'anggota-batal-pengiriman' => [
                 'controller' => 'app/Http/Controllers/PengirimanController.php',
