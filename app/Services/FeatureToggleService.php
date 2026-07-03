@@ -16,7 +16,7 @@ class FeatureToggleService
      */
     private static array $features = [
         'best_katim_leaderboard' => [
-            'enabled_for_all' => true,
+            'enabled_for_all' => false,
             'allowed_nips'    => [
                 '340017814', // Pak Sukendro
             ],
