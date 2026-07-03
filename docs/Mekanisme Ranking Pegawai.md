@@ -638,3 +638,64 @@ Jika koefisien < 1.0:
 3. total_selesai DESC (lebih banyak Pelunasan = lebih atas jika skor sama)
 4. nama_pegawai ASC (alfabetis jika semua sama)
 ```
+
+---
+
+## 8. 👑 Mekanisme Ranking Ketua Tim (Katim)
+
+> **Terakhir diperbarui:** Juli 2026  
+> **File referensi:** `app/Services/DashboardAnalyticsService.php` (fungsi `rankKetuaTimAll`)  
+> **Perubahan utama:** Penilaian Ketua Tim **murni ditentukan dari F5 (Kinerja Pengawasan)** dengan penyesuaian **Koefisien Beban Tim (Fairness)**. Formula F1–F4 individu dinonaktifkan untuk Katim.
+
+Berbeda dengan ranking pegawai biasa, Ketua Tim (Katim) dinilai berdasarkan performa pengawasan terhadap sub-kegiatan yang mereka pimpin beserta seluruh anggota tim di bawahnya.
+
+### 🔬 Formula Penilaian Katim
+
+#### 1. Skor Dasar (Base Score — F5)
+Skor dasar Ketua Tim diambil 100% dari nilai **F5 (Kinerja Pengawasan)**:
+```
+rata_rata_base = F5
+```
+F5 dihitung dari rata-rata performa seluruh anggota tim di bawah sub-kegiatan yang dipimpin oleh Katim tersebut pada bulan aktif:
+- **RR Terima**: Rata-rata response rate pengiriman anggota tim yang sudah berstatus 'Diterima'.
+- **Rating Terima**: Rata-rata rating bintang dari pengiriman anggota tim yang sudah berstatus 'Diterima'.
+
+#### 2. Koefisien Beban Kerja Tim (Fairness)
+Untuk memberikan keadilan bagi Katim yang memimpin tim dengan beban kerja (volume target) yang besar, diterapkan **Koefisien Beban Tim**:
+```
+rasio_beban = total_target_tim / avg_target_tim
+```
+* **total_target_tim**: Jumlah total target penugasan dari seluruh anggota tim di bawah pimpinan Katim tersebut (di bulan evaluasi aktif, baik status 'Diterima' maupun belum).
+* **avg_target_tim**: Rata-rata dari total target tim seluruh Katim aktif di kantor pada bulan tersebut.
+
+Koefisien beban tim dibatasi antara **0.85 hingga 1.15**:
+```
+koefisien_beban = min(1.15, max(0.85, rasio_beban))
+```
+
+#### 3. Perhitungan Skor Akhir (Rata-rata Final)
+Bonus atau penalti dari koefisien beban diterapkan ke **Rata-rata Base (F5)** untuk menghasilkan skor akhir:
+
+* **Jika koefisien_beban ≥ 1.0 (Bonus Beban Kerja)**
+  ```
+  bonus_max       = rata_rata_base × (koefisien_beban - 1.0)
+  ruang_skor      = max(0.0, 100.0 - rata_rata_base)
+  bonus_aktual    = min(bonus_max, ruang_skor)
+  rata_rata_final = rata_rata_base + bonus_aktual
+  ```
+
+* **Jika koefisien_beban < 1.0 (Penalti Beban Kerja)**
+  ```
+  bonus_aktual    = rata_rata_base × (koefisien_beban - 1.0) (bernilai negatif)
+  rata_rata_final = rata_rata_base + bonus_aktual
+  ```
+
+---
+
+### 🔢 Urutan Prioritas Ranking Katim
+
+```
+1. Katim dengan penugasan/sub-kegiatan aktif di atas Katim tanpa sub-kegiatan
+2. rata_rata_final DESC (skor tertinggi duluan)
+3. nama_pegawai ASC (alfabetis jika skor sama)
+```

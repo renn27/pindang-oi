@@ -414,6 +414,25 @@ class PanduanFiturSeeder extends Seeder
                 </ol>',
                 'sort_order' => 150,
             ],
+            [
+                'type' => 'user',
+                'role_tab' => 'Ketua Tim',
+                'menu_name' => '8. Nilai & Ranking Ketua Tim',
+                'slug' => 'ketua-rating-nilai',
+                'title' => 'Logika Perhitungan & Perankingan Ketua Tim',
+                'explanation' => 'Penilaian kinerja Ketua Tim dihitung murni dari nilai **F5 (Kinerja Pengawasan)** terhadap seluruh anggota tim, disesuaikan dengan koefisien fairness berdasarkan volume beban kerja tim.',
+                'route_target' => 'dashboard',
+                'roles_allowed' => ['Ketua Tim', 'Pimpinan', 'Admin'],
+                'output' => 'Daftar peringkat Ketua Tim di halaman peringkat kantor.',
+                'form_details' => [
+                    ['field' => 'Skor Pengawasan (F5) & Fairness Beban Kerja Tim', 'type' => 'Kalkulasi Sistem', 'required' => 'Tidak ada form', 'rules' => 'F5 diambil 100% sebagai skor dasar, lalu dikalikan koefisien beban tim (0.85 s.d 1.15)', 'validation' => 'Koefisien dihitung dari rasio total target tim terhadap rata-rata target tim seluruh Katim di kantor.']
+                ],
+                'tutorial' => '<ol class="list-decimal pl-5 space-y-2">
+                    <li>Pastikan seluruh anggota tim melaporkan tugas mereka tepat waktu dan berikan rating bintang kualitas terbaik (5★) untuk menjaga skor F5 maksimal.</li>
+                    <li>Katim yang memimpin tim dengan total target di atas rata-rata kantor akan menerima bonus performa hingga +15% (koefisien 1.15). Sebaliknya, total target di bawah rata-rata mendapat penyesuaian (koefisien minimal 0.85).</li>
+                </ol>',
+                'sort_order' => 155,
+            ],
 
             // ==================== ANGGOTA TIM ROLE ====================
             [
@@ -518,18 +537,21 @@ class PanduanFiturSeeder extends Seeder
                 'role_tab' => 'Anggota Tim',
                 'menu_name' => '5. Nilai & Rating Kinerja',
                 'slug' => 'anggota-rating-nilai',
-                'title' => 'Logika Perhitungan Skor Kinerja Tugas',
-                'explanation' => 'Setiap pengiriman laporan yang disetujui menghasilkan skor kuantitas (RR Kirim dan RR Terima) serta skor kualitas (100% dikonversi dari rating 1-5★ Ketua Tim). Sistem juga membandingkan waktu submit riil terhadap deadline efektif penugasan untuk menghitung skor ketepatan waktu.',
+                'title' => 'Logika Perhitungan & Perankingan Pegawai',
+                'explanation' => 'Kinerja pegawai dinilai dari rata-rata 4 formula utama: F1 (Penyelesaian Target), F2 (Kecepatan Pengiriman), F3 (Response Rate Kirim), dan F4 (Rating Kualitas). Hasil rata-rata base kemudian disesuaikan dengan koefisien fairness beban kerja.',
                 'route_target' => 'dashboard',
                 'roles_allowed' => ['Anggota Tim', 'Ketua Tim', 'Pimpinan', 'Admin'],
-                'output' => 'Peningkatan nilai kinerja individu di halaman peringkat kantor.',
+                'output' => 'Daftar peringkat pegawai di halaman peringkat kantor.',
                 'form_details' => [
-                    ['field' => 'Skor Kuantitas & Kualitas', 'type' => 'Visual Display / Kalkulasi Sistem', 'required' => 'Tidak ada form modal', 'rules' => 'Skor kualitas didasarkan pada rating bintang 1-5 dari Ketua Tim', 'validation' => 'Skor ketepatan waktu didasarkan pada perbandingan tanggal pengiriman riil terhadap deadline efektif.']
+                    ['field' => 'Skor Performa Pegawai (F1–F4)', 'type' => 'Kalkulasi Sistem', 'required' => 'Tidak ada form', 'rules' => 'Rerata base F1–F4 disesuaikan dengan koefisien beban kerja (0.85 s.d 1.15) berdasarkan target pribadi dibandingkan rata-rata target kantor.', 'validation' => 'Hanya mengevaluasi penugasan aktif pada bulan evaluasi berjalan yang berstatus Diterima.']
                 ],
-                'tutorial' => '<ol class="list-decimal pl-5 space-y-2">
-                    <li>Kerjakan tugas dan kirim laporan sedini mungkin sebelum deadline untuk menjaga nilai Kecepatan tetap tinggi (5★).</li>
-                    <li>Pastikan kualitas dokumen rapi agar mendapatkan rating maksimal dari Ketua Tim (5★ = 100% kualitas).</li>
-                </ol>',
+                'tutorial' => '<ul class="list-disc pl-5 space-y-2">
+                    <li><strong>F1 — Penyelesaian:</strong> Mengukur persentase volume target yang sudah selesai (cicilan dihargai proporsional secara kuadratik).</li>
+                    <li><strong>F2 — Kecepatan:</strong> Mengukur kecepatan pengiriman berkas realisasi terhadap deadline penugasan.</li>
+                    <li><strong>F3 — RR Kirim:</strong> Mengukur response rate keaktifan pelaporan tugas.</li>
+                    <li><strong>F4 — Rating Kualitas:</strong> Rata-rata rating bintang dari Ketua Tim (1-5★) dikonversi ke skala 100%.</li>
+                    <li><strong>Koefisien Beban Kerja:</strong> Memberikan bonus performa (hingga +15%) untuk pegawai dengan beban target besar, atau penyesuaian (hingga -15%) jika di bawah rata-rata.</li>
+                </ul>',
                 'sort_order' => 200,
             ],
             [
@@ -788,6 +810,20 @@ $ckp = CkpPegawai::create([
                 'tutorial' => '<p class="mb-3">Sebelum menghapus kegiatan, pastikan tidak ada transaksi berjalan:</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">if ($kegiatan->subKegiatans()->whereHas(\'penugasans.pengirimans\')->exists()) {
     throw new \Exception(\'Kegiatan tidak dapat dihapus karena sudah ada realisasi!\');
 }</code></pre>'
+            ],
+            'ketua-rating-nilai' => [
+                'controller' => 'app/Services/DashboardAnalyticsService.php',
+                'model' => 'app/Models/Penugasan.php',
+                'view' => 'resources/views/pages/dashboard.blade.php',
+                'route' => 'Route::get(\'/\')',
+                'policy' => 'auth',
+                'middleware' => 'auth, active.pegawai',
+                'migration_pattern' => 'create_penugasans_table',
+                'tutorial' => '<p class="mb-3">Perhitungan nilai kinerja Ketua Tim (F5 + Fairness Beban Kerja Tim):</p><pre class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-xs"><code class="language-php">// Skor dasar murni F5 (Pengawasan Tim)
+$baseScore = $f5;
+$koef = $avgTargetTim > 0 ? ($item->total_target_tim / $avgTargetTim) : 1.0;
+$koef = min(1.15, max(0.85, $koef));
+$finalScore = $baseScore * $koef; // dengan pembatasan bonus ruang ke 100%</code></pre>'
             ],
             'anggota-pantau-todo' => [
                 'controller' => 'app/Http/Controllers/DashboardController.php',
