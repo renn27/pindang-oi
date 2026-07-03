@@ -68,9 +68,16 @@
             return 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 dark:from-red-900/30 dark:to-pink-900/30 dark:text-red-300';
         },
 
-        getRatingStars(rating) {
+        getRatingStars(ratingPersen) {
+            let rating = (ratingPersen ?? 0) / 20.0;
             let full = Math.floor(rating);
-            let half = (rating - full) >= 0.5 ? 1 : 0;
+            let diff = rating - full;
+            let half = 0;
+            if (diff >= 0.75) {
+                full += 1;
+            } else if (diff >= 0.25) {
+                half = 1;
+            }
             let empty = 5 - full - half;
             return { full, half, empty };
         }
@@ -111,26 +118,30 @@
                     @if ($isKatim)
                         <tr class="border-b border-gray-200 dark:border-gray-800">
                             <th colspan="2" class="px-6 py-2 border-r-2 border-gray-200 dark:border-gray-800"></th>
-                            <th colspan="4" class="whitespace-nowrap px-6 py-2 text-center text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider bg-indigo-50/50 dark:bg-indigo-950/20 border-r-2 border-indigo-100 dark:border-indigo-900/30">
-                                Kinerja Anggota
-                            </th>
-                            <th colspan="1" class="whitespace-nowrap px-6 py-2 text-center text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider bg-emerald-50/50 dark:bg-emerald-950/20 border-r-2 border-emerald-100 dark:border-emerald-900/30">
-                                Kinerja Katim
+                            <th colspan="3" class="whitespace-nowrap px-6 py-2 text-center text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider bg-indigo-50/50 dark:bg-indigo-950/20 border-r-2 border-indigo-100 dark:border-indigo-900/30">
+                                Kinerja Tim
                             </th>
                             <th colspan="2" class="px-6 py-2"></th>
                         </tr>
                     @endif
                     <tr>
                         @php
-                            $headers = ['Rank', 'Nama Pegawai', 'RR Kirim', 'Rating ⭐', 'Rating %', 'Skor Cepat'];
+                            $headers = ['Rank', 'Nama Pegawai'];
                             if ($isKatim) {
-                                $headers[] = 'Nilai F5';
+                                $headers[] = 'RR Terima';
+                                $headers[] = 'Rating ⭐';
+                                $headers[] = 'Rating %';
+                            } else {
+                                $headers[] = 'RR Kirim';
+                                $headers[] = 'Rating ⭐';
+                                $headers[] = 'Rating %';
+                                $headers[] = 'Skor Cepat';
                             }
                             $headers[] = 'Rata-rata';
                             $headers[] = 'Aksi';
                         @endphp
                         @foreach($headers as $h)
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider {{ in_array($h, ['Nama Pegawai', 'Skor Cepat', 'Nilai F5']) ? 'border-r-2 border-gray-200 dark:border-gray-800' : '' }}">{{ $h }}</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider {{ ($h === 'Nama Pegawai' || ($h === 'Skor Cepat' && !$isKatim) || ($h === 'Rating %' && $isKatim)) ? 'border-r-2 border-gray-200 dark:border-gray-800' : '' }}">{{ $h }}</th>
                         @endforeach
                     </tr>
                 </thead>
@@ -141,9 +152,8 @@
                             <td class="px-6 py-4 border-r-2 border-gray-200 dark:border-gray-800"><div class="h-4 w-32 rounded bg-gray-200 dark:bg-gray-700"></div></td>
                             <td class="px-6 py-4 text-center"><div class="h-5 w-14 rounded-full bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
                             <td class="px-6 py-4"><div class="flex gap-1 justify-center">@for($s=0;$s<5;$s++)<div class="h-4 w-4 rounded bg-gray-200 dark:bg-gray-700"></div>@endfor</div></td>
-                            <td class="px-6 py-4 text-center"><div class="h-4 w-10 rounded bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
-                            <td class="px-6 py-4 text-center border-r-2 border-gray-200 dark:border-gray-800"><div class="h-4 w-12 rounded bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
-                            @if($isKatim)
+                            <td class="px-6 py-4 text-center {{ $isKatim ? 'border-r-2 border-gray-200 dark:border-gray-800' : '' }}"><div class="h-4 w-10 rounded bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
+                            @if(!$isKatim)
                                 <td class="px-6 py-4 text-center border-r-2 border-gray-200 dark:border-gray-800"><div class="h-4 w-12 rounded bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
                             @endif
                             <td class="px-6 py-4 text-center"><div class="h-6 w-16 rounded-full bg-gray-200 dark:bg-gray-700 mx-auto"></div></td>
@@ -162,11 +172,8 @@
                 @if ($isKatim)
                     <tr class="border-b border-gray-200 dark:border-gray-800">
                         <th colspan="2" class="px-6 py-2 border-r-2 border-gray-200 dark:border-gray-800"></th>
-                        <th colspan="4" class="whitespace-nowrap px-6 py-2 text-center text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider bg-indigo-50/50 dark:bg-indigo-950/20 border-r-2 border-indigo-100 dark:border-indigo-900/30">
-                            Kinerja Anggota
-                        </th>
-                        <th colspan="1" class="whitespace-nowrap px-6 py-2 text-center text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider bg-emerald-50/50 dark:bg-emerald-950/20 border-r-2 border-emerald-100 dark:border-emerald-900/30">
-                            Kinerja Katim
+                        <th colspan="3" class="whitespace-nowrap px-6 py-2 text-center text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider bg-indigo-50/50 dark:bg-indigo-950/20 border-r-2 border-indigo-100 dark:border-indigo-900/30">
+                            Kinerja Tim
                         </th>
                         <th colspan="2" class="px-6 py-2"></th>
                     </tr>
@@ -174,12 +181,11 @@
                 <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider w-16">Rank</th>
                     <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider border-r-2 border-gray-200 dark:border-gray-800">Nama Pegawai</th>
-                    <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">RR Kirim</th>
+                    <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center" x-text="isKatim ? 'RR Terima' : 'RR Kirim'"></th>
                     <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">Rating ⭐</th>
-                    <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">Rating %</th>
-                    <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center border-r-2 border-gray-200 dark:border-gray-800">Skor Cepat</th>
-                    <template x-if="isKatim">
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center border-r-2 border-gray-200 dark:border-gray-800 bg-emerald-50/10 dark:bg-emerald-900/5">Nilai F5</th>
+                    <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center" :class="isKatim ? 'border-r-2 border-gray-200 dark:border-gray-800' : ''">Rating %</th>
+                    <template x-if="!isKatim">
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center border-r-2 border-gray-200 dark:border-gray-800">Skor Cepat</th>
                     </template>
                     <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">Rata-rata</th>
                     <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-center">Aksi</th>
@@ -260,12 +266,12 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex flex-col items-center space-y-1">
                                 <div class="flex justify-center items-center gap-0.5">
-                                    <template x-for="n in getRatingStars(pegawai.rating_kirim ?? 0).full">
+                                    <template x-for="n in getRatingStars(pegawai.rating_persen ?? 0).full">
                                         <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.173c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.921-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.176 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.393c-.783-.57-.38-1.81.588-1.81h4.173a1 1 0 00.95-.69l1.286-3.966z"/>
                                         </svg>
                                     </template>
-                                    <template x-if="getRatingStars(pegawai.rating_kirim ?? 0).half === 1">
+                                    <template x-if="getRatingStars(pegawai.rating_persen ?? 0).half === 1">
                                         <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 20 20">
                                             <defs>
                                                 <linearGradient :id="'hs-' + pegawai.id_pegawai">
@@ -276,13 +282,13 @@
                                             <path :fill="'url(#hs-' + pegawai.id_pegawai + ')'" stroke="currentColor" stroke-width="1" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.173c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.921-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.176 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.393c-.783-.57-.38-1.81.588-1.81h4.173a1 1 0 00.95-.69l1.286-3.966z"/>
                                         </svg>
                                     </template>
-                                    <template x-for="n in getRatingStars(pegawai.rating_kirim ?? 0).empty">
+                                    <template x-for="n in getRatingStars(pegawai.rating_persen ?? 0).empty">
                                         <svg class="w-4 h-4 text-gray-300 fill-current dark:text-gray-600" viewBox="0 0 20 20">
                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.966a1 1 0 00.95.69h4.173c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.966c.3.921-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.176 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118L2.05 9.393c-.783-.57-.38-1.81.588-1.81h4.173a1 1 0 00.95-.69l1.286-3.966z"/>
                                         </svg>
                                     </template>
                                 </div>
-                                <span class="text-xs text-gray-600 dark:text-gray-400" x-text="Number(pegawai.rating_kirim ?? 0).toFixed(1) + '/5.0'"></span>
+                                <span class="text-xs text-gray-600 dark:text-gray-400" x-text="Number((pegawai.rating_persen ?? 0) / 20.0).toFixed(1) + '/5.0'"></span>
                             </div>
                         </td>
 
@@ -291,15 +297,10 @@
                             <span class="font-medium text-gray-800 dark:text-white" x-text="Math.round(pegawai.rating_persen ?? 0) + '%'"></span>
                         </td>
 
-                        {{-- Skor Cepat --}}
-                        <td class="px-6 py-4 whitespace-nowrap text-center border-r-2 border-gray-200 dark:border-gray-800">
-                            <span class="font-medium text-gray-800 dark:text-white" x-text="Number(pegawai.avg_skor_cepat ?? 0).toFixed(2) + '%'"></span>
-                        </td>
-
-                        {{-- F5 (Katim only) --}}
-                        <template x-if="isKatim">
-                            <td class="px-6 py-4 whitespace-nowrap text-center border-r-2 border-gray-200 dark:border-gray-800 bg-emerald-50/5 dark:bg-emerald-950/5">
-                                <span class="font-semibold text-emerald-600 dark:text-emerald-400" x-text="Number(pegawai.f5_nilai ?? 0).toFixed(2) + '%'"></span>
+                        {{-- Skor Cepat (Anggota only) --}}
+                        <template x-if="!isKatim">
+                            <td class="px-6 py-4 whitespace-nowrap text-center border-r-2 border-gray-200 dark:border-gray-800">
+                                <span class="font-medium text-gray-800 dark:text-white" x-text="Number(pegawai.avg_skor_cepat ?? 0).toFixed(2) + '%'"></span>
                             </td>
                         </template>
 

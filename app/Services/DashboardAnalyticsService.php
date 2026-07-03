@@ -151,19 +151,34 @@ class DashboardAnalyticsService {
             $item->total_sub_kegiatan_dipimpin = $f5Data['total_sub_kegiatan'] ?? 0;
             $item->total_penugasan_anggota = $f5Data['total_penugasan_anggota'] ?? 0;
             $item->total_penugasan_anggota_diterima = $f5Data['total_penugasan_anggota_diterima'] ?? 0;
+            $item->total_target_tim = (float)($f5Data['total_target_tim'] ?? 0.0);
+            $item->f5_data = $f5Data;
 
-            // Recalculate rata-rata_base dengan F5 included: (F1+F2+F3+F4+F5)/5
-            $f1 = (float)($item->breakdown_formula['f1']['nilai'] ?? 0);
-            $f2 = (float)($item->breakdown_formula['f2']['nilai'] ?? 0);
-            $f3 = (float)($item->breakdown_formula['f3']['nilai'] ?? 0);
-            $f4 = (float)($item->breakdown_formula['f4']['nilai'] ?? 0);
-            $f5 = (float)$f5Val;
+            return $item;
+        });
 
-            $rataRataBase = ($f1 + $f2 + $f3 + $f4 + $f5) / 5.0;
+        // Hitung rata-rata target tim dari semua Katim di bulan aktif ini
+        $avgTargetTim = $rankedKetua->avg('total_target_tim') ?? 0.0;
+        if ($avgTargetTim <= 0.0) {
+            $avgTargetTim = 1.0;
+        }
+
+        $rankedKetua = $rankedKetua->map(function ($item) use ($avgTargetTim) {
+            $f5Data = $item->f5_data;
+            unset($item->f5_data);
+
+            $f5 = (float)$item->f5_nilai;
+
+            // Rata-rata base murni F5 (Kinerja Pengawasan)
+            $rataRataBase = $f5;
             $item->rata_rata_base = round($rataRataBase, 2);
 
-            // Recalculate rata-rata_final: base * koef_beban (tanpa bonus flat)
-            $koef = (float)($item->koefisien_beban ?? 1.0);
+            // Koefisien beban tim (fairness)
+            $koef = $avgTargetTim > 0 ? (float)($item->total_target_tim / $avgTargetTim) : 1.0;
+            $koef = min(1.15, max(0.85, $koef));
+            $item->koefisien_beban = round($koef, 2);
+
+            // Hitung bonus/penalti
             if ($koef >= 1.0) {
                 $bonusMax   = $rataRataBase * ($koef - 1.0);
                 $bonusRuang = max(0.0, 100.0 - $rataRataBase);
@@ -177,8 +192,19 @@ class DashboardAnalyticsService {
             $item->rata_rata_final = round($rataRataFinal, 2);
             $item->rata_rata = round($rataRataFinal, 2);
 
-            // Update breakdown_formula to include f5
+            // Overwrite individual metrics with team metrics for Katim table display
+            $item->rr_kirim = round($f5Data['avg_rr_terima'], 2);
+            $item->rating_persen = round($f5Data['avg_rating_terima'], 2);
+            $item->rating_kirim = round($f5Data['avg_rating_terima'] / 20.0, 2);
+
+            // Update breakdown_formula to include f5 and team workload info
             $breakdown = $item->breakdown_formula;
+            $breakdown['is_katim'] = true;
+            $breakdown['total_sub_kegiatan'] = $item->total_sub_kegiatan_dipimpin;
+            $breakdown['total_target_tim'] = $item->total_target_tim;
+            $breakdown['avg_target_tim'] = round($avgTargetTim, 2);
+            $breakdown['koefisien_beban'] = round($koef, 2);
+
             $breakdown['f5'] = [
                 'nilai' => round($f5, 2),
                 'avg_rr_terima' => round($f5Data['avg_rr_terima'], 2),
@@ -346,7 +372,8 @@ class DashboardAnalyticsService {
             'detail' => $detail,
             'total_sub_kegiatan' => $mySubKegiatans->count(),
             'total_penugasan_anggota' => $penugasans->count(),
-            'total_penugasan_anggota_diterima' => $totalDiterimaCount
+            'total_penugasan_anggota_diterima' => $totalDiterimaCount,
+            'total_target_tim' => (float)$penugasans->sum('target')
         ];
     }
 
