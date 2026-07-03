@@ -282,7 +282,7 @@
                                                     id_sub_kegiatan: @js($subKegiatan->id_sub_kegiatan),
                                                     nama_sub_kegiatan: @js($subKegiatan->nama_sub_kegiatan),
                                                     nama_pegawai: @js($targetKetuaName),
-                                                    uraian: @js('Melaksanakan dan Mengetuai ' . $subKegiatan->nama_sub_kegiatan . ' dengan target ' . $penugasanTargetSelesai . ' dari total target ' . $totalTargetPenugasan),
+                                                    uraian: @js('Melaksanakan dan Mengetuai ' . $subKegiatan->nama_sub_kegiatan . ' dengan realisasi ' . $penugasanTargetSelesai . ' dari total target ' . $totalTargetPenugasan),
                                                     target_kuantitas: {{ $totalTargetPenugasan }},
                                                     realisasi_kuantitas: {{ $penugasanTargetSelesai }},
                                                     satuan: @js($subKegiatan->satuan_target),

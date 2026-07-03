@@ -571,7 +571,7 @@
                                                             id_agenda: @js($agenda->id_agenda),
                                                             nama_pegawai: @js(Auth::user()->nama_pegawai ?? ''),
                                                             nama_agenda: @js($agenda->nama_agenda),
-                                                            uraian: @js('Melaksanakan dan Menyelesaikan ' . $agenda->nama_agenda . ' dengan target ' . $realisasi . ' dari total target ' . $target),
+                                                            uraian: @js('Melaksanakan dan Menyelesaikan ' . $agenda->nama_agenda . ' dengan realisasi ' . $realisasi . ' dari total target ' . $target),
                                                             target_kuantitas: {{ $agenda->target }},
                                                             realisasi_kuantitas: {{ $realisasi }},
                                                             satuan: @js($agenda->satuan_target),
