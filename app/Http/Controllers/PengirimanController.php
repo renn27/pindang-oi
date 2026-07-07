@@ -18,6 +18,13 @@ class PengirimanController extends Controller
         // Autorisasi
         $this->authorize('send', $penugasan);
 
+        // ── Guard 0: Cek apakah penugasan diperbolehkan untuk dikirim ──────────────
+        if (!$penugasan->bolehKirimPenugasan()) {
+            return back()
+                ->with('error', 'Penugasan tidak dalam kondisi dapat dikirim. Periksa status persetujuan DL atau batas waktu.')
+                ->withInput();
+        }
+
         // Validasi
         $validated = $request->validate([
             'tanggal_pengiriman' => ['required', 'date'],

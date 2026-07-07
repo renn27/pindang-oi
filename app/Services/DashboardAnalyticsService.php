@@ -881,11 +881,12 @@ class DashboardAnalyticsService {
         $startOfMonth = Carbon::create($year, $month, 1)->startOfMonth();
         $endOfMonth   = Carbon::create($year, $month, 1)->endOfMonth();
 
-        $totalKegiatan = Kegiatan::whereHas('subKegiatans')
-                        ->withMin('subKegiatans', 'tanggal_mulai')
-                        ->withMax('subKegiatans', 'tanggal_selesai')
-                        ->having('sub_kegiatans_min_tanggal_mulai', '<=', $endOfMonth)
-                        ->having('sub_kegiatans_max_tanggal_selesai', '>=', $startOfMonth)
+        $totalKegiatan = Kegiatan::whereHas('subKegiatans', function ($q) use ($endOfMonth) {
+                            $q->where('tanggal_mulai', '<=', $endOfMonth);
+                        })
+                        ->whereHas('subKegiatans', function ($q) use ($startOfMonth) {
+                            $q->where('tanggal_selesai', '>=', $startOfMonth);
+                        })
                         ->count();
 
         $totalSubKegiatan = SubKegiatan::where('tanggal_mulai', '<=', $endOfMonth) 

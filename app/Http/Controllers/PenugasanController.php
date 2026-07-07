@@ -384,8 +384,12 @@ class PenugasanController extends Controller
                     'status_dl' => $validated['status_dl'],
                 ]);
 
-                if ($validated['status_dl'] === 'ACC') {
+                $hasAcc = $penugasan->status_dl === 'ACC' || $penugasan->status_translok === 'ACC';
+
+                if ($hasAcc) {
                     $this->insertKalenderDL($penugasan);
+                } else {
+                    KalenderDL::where('id_penugasan', $penugasan->id_penugasan)->delete();
                 }
             });
 
@@ -396,7 +400,7 @@ class PenugasanController extends Controller
             }
 
             return redirect()->back()
-                ->with('success', 'Status Dinas Luar berhasil diperbarui dan dimasukkan ke Kalender.');
+                ->with('success', 'Status Dinas Luar berhasil diperbarui.');
         } catch (\Exception $e) {
             Log::error('Update error: ' . $e->getMessage());
 
@@ -430,8 +434,12 @@ class PenugasanController extends Controller
                     'status_translok' => $validated['status_translok'],
                 ]);
 
-                if ($validated['status_translok'] === 'ACC') {
+                $hasAcc = $penugasan->status_dl === 'ACC' || $penugasan->status_translok === 'ACC';
+
+                if ($hasAcc) {
                     $this->insertKalenderDL($penugasan);
+                } else {
+                    KalenderDL::where('id_penugasan', $penugasan->id_penugasan)->delete();
                 }
             });
 
@@ -442,7 +450,7 @@ class PenugasanController extends Controller
             }
 
             return redirect()->back()
-                ->with('success', 'Status Translok berhasil diperbarui dan dimasukkan ke Kalender.');
+                ->with('success', 'Status Translok berhasil diperbarui.');
         } catch (\Exception $e) {
             Log::error('Update error: ' . $e->getMessage());
 
@@ -464,7 +472,10 @@ class PenugasanController extends Controller
             $dates[] = $date->format('Y-m-d');
         }
 
-        // Cek Bentrok
+        // Hapus dulu data kalender lama milik penugasan ini untuk menghindari duplicate key/entries
+        KalenderDL::where('id_penugasan', $penugasan->id_penugasan)->delete();
+
+        // Cek Bentrok dengan penugasan lain milik pegawai ini
         $adaBentrok = KalenderDL::where('id_pegawai', $penugasan->id_anggota)
             ->whereIn('tanggal_dl', $dates)
             ->exists();
