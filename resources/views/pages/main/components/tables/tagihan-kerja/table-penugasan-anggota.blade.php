@@ -38,7 +38,16 @@
 
 @endphp
 
-
+<style>
+    @keyframes wiggleFloat {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        25% { transform: translateY(-2px) rotate(-1deg); }
+        75% { transform: translateY(2px) rotate(1deg); }
+    }
+    .animate-wiggle-float {
+        animation: wiggleFloat 4s ease-in-out infinite;
+    }
+</style>
 
 <!-- Legenda Status Penugasan -->
 
@@ -542,13 +551,33 @@
 
 
 
-                                                            <span
+                                                            <div class="flex flex-col items-center gap-2">
+                                                                <span
+                                                                    class="inline-flex px-2 py-1 text-xs font-medium rounded-full {{ $statusClass }}">
+                                                                    {{ $statusLabel }}
+                                                                </span>
 
-                                                                class="inline-flex px-2 py-1 text-xs font-medium rounded-full {{ $statusClass }}">
-
-                                                                {{ $statusLabel }}
-
-                                                            </span>
+                                                                @if (!empty($penugasan->catatan_pimpinan))
+                                                                    @php
+                                                                        $bubbleColor = 'bg-blue-50/70 border-blue-200 text-blue-800 dark:bg-blue-950/20 dark:border-blue-900/40 dark:text-blue-300';
+                                                                        if ($dl === 'Ditolak' || $translok === 'Ditolak') {
+                                                                            $bubbleColor = 'bg-red-50/70 border-red-200 text-red-800 dark:bg-red-950/20 dark:border-red-900/40 dark:text-red-300';
+                                                                        } elseif ($dl === 'ACC' || $translok === 'ACC') {
+                                                                            $bubbleColor = 'bg-green-50/70 border-green-200 text-green-800 dark:bg-green-950/20 dark:border-green-900/40 dark:text-green-300';
+                                                                        }
+                                                                    @endphp
+                                                                    <div class="relative mt-1 px-3 py-1.5 rounded-xl border {{ $bubbleColor }} backdrop-blur-md shadow-sm max-w-[180px] text-[10px] text-left leading-normal animate-wiggle-float">
+                                                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-current opacity-20"></div>
+                                                                        <div class="font-bold flex items-center gap-1 mb-0.5 opacity-90 uppercase tracking-wider text-[9px]">
+                                                                            <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                                                            </svg>
+                                                                            Pesan Pimpinan:
+                                                                        </div>
+                                                                        <div class="break-words font-medium">{{ $penugasan->catatan_pimpinan }}</div>
+                                                                    </div>
+                                                                @endif
+                                                            </div>
 
                                                         </td>
 
@@ -1090,7 +1119,33 @@
 
                                                                     @can('delete', $penugasan)
 
-                                                                                                            <form id="delete-penugasan-{{ $penugasan->id_penugasan }}" action="{{ route('penugasan.delete', [
+                                                                        @if ($penugasan->ckpBulanan()->exists())
+
+                                                                            <button type="button" disabled
+
+                                                                                class="w-full text-left px-4 py-3 text-sm text-gray-400 bg-gray-50 dark:bg-gray-800 cursor-not-allowed flex items-center gap-2 border-t"
+
+                                                                                title="Penugasan sudah masuk CKP, tidak bisa dihapus">
+
+                                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+
+                                                                                    viewBox="0 0 24 24">
+
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+
+                                                                                        stroke-width="2"
+
+                                                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7" />
+
+                                                                                </svg>
+
+                                                                                Hapus Anggota (Sudah CKP)
+
+                                                                            </button>
+
+                                                                        @else
+
+                                                                            <form id="delete-penugasan-{{ $penugasan->id_penugasan }}" action="{{ route('penugasan.delete', [
 
                                                                             'subKegiatan' => $subKegiatan->id_sub_kegiatan,
 
@@ -1100,15 +1155,15 @@
 
 
 
-                                                                                                                @csrf
+                                                                                @csrf
 
-                                                                                                                @method('DELETE')
+                                                                                @method('DELETE')
 
 
 
-                                                                                                                <button type="button"
+                                                                                <button type="button"
 
-                                                                                                                    onclick="SwalHelper.confirmDelete(
+                                                                                    onclick="SwalHelper.confirmDelete(
 
                                                                                                                                                                                                     'delete-penugasan-{{ $penugasan->id_penugasan }}',
 
@@ -1116,27 +1171,29 @@
 
                                                                                                                                                                                                 )"
 
-                                                                                                                    class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 border-t">
+                                                                                    class="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 border-t">
 
 
 
-                                                                                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
 
-                                                                                                                        viewBox="0 0 24 24">
+                                                                                        viewBox="0 0 24 24">
 
-                                                                                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                                                        <path stroke-linecap="round" stroke-linejoin="round"
 
-                                                                                                                            stroke-width="2"
+                                                                                            stroke-width="2"
 
-                                                                                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7" />
+                                                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7" />
 
-                                                                                                                    </svg>
+                                                                                    </svg>
 
-                                                                                                                    Hapus Anggota
+                                                                                    Hapus Anggota
 
-                                                                                                                </button>
+                                                                                </button>
 
-                                                                                                            </form>
+                                                                            </form>
+
+                                                                        @endif
 
                                                                     @endcan
 

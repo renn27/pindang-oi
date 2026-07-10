@@ -46,6 +46,15 @@
                         s.d.
                         <span x-text="formData.tanggal_selesai"></span>
                     </div>
+
+                    @if (Auth::user()->active_role === 'Pimpinan')
+                        <div class="mt-4">
+                            <label for="catatan_pimpinan_translok" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Catatan/Pesan Pimpinan (Opsional)</label>
+                            <textarea id="catatan_pimpinan_translok" name="catatan_pimpinan" x-model="formData.catatan_pimpinan" rows="3"
+                                class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 px-3 py-2 text-sm text-gray-800 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all"
+                                placeholder="Masukkan pesan persetujuan atau alasan penolakan..."></textarea>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- FOOTER -->
@@ -120,6 +129,15 @@
                         s.d
                         <span x-text="formData.tanggal_selesai"></span>
                     </div>
+
+                    @if (Auth::user()->active_role === 'Pimpinan')
+                        <div class="mt-4">
+                            <label for="catatan_pimpinan_dl" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Catatan/Pesan Pimpinan (Opsional)</label>
+                            <textarea id="catatan_pimpinan_dl" name="catatan_pimpinan" x-model="formData.catatan_pimpinan" rows="3"
+                                class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 px-3 py-2 text-sm text-gray-800 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all"
+                                placeholder="Masukkan pesan persetujuan atau alasan penolakan..."></textarea>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- FOOTER -->

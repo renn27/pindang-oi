@@ -152,7 +152,7 @@
     <p>F5 dihitung berdasarkan rata-rata dari dua komponen kualitas tim berikut:</p>
     <ul class="bullet-list">
         <li><span class="highlight">RR Terima (Response Rate)</span>: Rata-rata persentase response rate pengiriman anggota tim yang sudah berstatus 'Diterima' di bawah sub-kegiatan yang dipimpin Katim.</li>
-        <li><span class="highlight">Rating Terima (Quality Score)</span>: Rata-rata nilai rating bintang (skala 1-5 bintang) yang dikonversi ke skala 100 (rating dikali 20) untuk seluruh pengiriman berstatus 'Diterima' di bawah sub-kegiatan Katim.</li>
+        <li><span class="highlight">Rating Terima (Quality Score)</span>: Rata-rata nilai rating bintang (skala 1-5 bintang) yang dikonversi ke skala 100% (rating dikali 20) untuk seluruh pengiriman berstatus 'Diterima' di bawah sub-kegiatan Katim.</li>
     </ul>
 
     <h2>3. Koefisien Beban Kerja Tim (Fairness Adjustment)</h2>

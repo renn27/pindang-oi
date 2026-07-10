@@ -207,6 +207,9 @@ class PushNotificationService
 
         $label = $type === 'dl' ? 'DL' : 'Translok';
         $body = "Pengajuan {$label} untuk {$this->penugasanLabel($penugasan)} {$this->statusText($status)}.";
+        if ($penugasan->catatan_pimpinan) {
+            $body .= " Catatan Pimpinan: \"{$penugasan->catatan_pimpinan}\"";
+        }
 
         $this->notifyPegawai(
             $penugasan->anggota,

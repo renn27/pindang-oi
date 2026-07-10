@@ -348,6 +348,12 @@ class PenugasanController extends Controller
         try {
             $penugasanForNotification = $penugasan->loadMissing(['anggota', 'subKegiatan.kegiatan']);
 
+            // Cek apakah penugasan sudah memiliki CKP sebelum menghapus
+            if ($penugasan->ckpBulanan()->exists()) {
+                return redirect()->back()
+                    ->with('error', 'Gagal menghapus! Penugasan ini tidak bisa dihapus karena sudah masuk ke dalam CKP.');
+            }
+
             $penugasan->forceDelete();
 
             app(PushNotificationService::class)->notifyPenugasanDeleted($penugasanForNotification);
@@ -365,6 +371,7 @@ class PenugasanController extends Controller
         $this->authorize('acceptDL', $penugasan);
         $validated = $request->validate([
             'status_dl' => ['required', 'in:Menunggu,ACC,Ditolak'],
+            'catatan_pimpinan' => ['nullable', 'string', 'max:500'],
         ]);
 
         // Cek role aktif
@@ -382,6 +389,7 @@ class PenugasanController extends Controller
             DB::transaction(function () use ($penugasan, $validated) {
                 $penugasan->update([
                     'status_dl' => $validated['status_dl'],
+                    'catatan_pimpinan' => $validated['status_dl'] === 'Menunggu' ? null : ($validated['catatan_pimpinan'] ?? null),
                 ]);
 
                 $hasAcc = $penugasan->status_dl === 'ACC' || $penugasan->status_translok === 'ACC';
@@ -415,6 +423,7 @@ class PenugasanController extends Controller
         $this->authorize('acceptTranslok', $penugasan);
         $validated = $request->validate([
             'status_translok' => ['required', 'in:Menunggu,ACC,Ditolak'],
+            'catatan_pimpinan' => ['nullable', 'string', 'max:500'],
         ]);
 
         // Cek role aktif
@@ -432,6 +441,7 @@ class PenugasanController extends Controller
             DB::transaction(function () use ($penugasan, $validated) {
                 $penugasan->update([
                     'status_translok' => $validated['status_translok'],
+                    'catatan_pimpinan' => $validated['status_translok'] === 'Menunggu' ? null : ($validated['catatan_pimpinan'] ?? null),
                 ]);
 
                 $hasAcc = $penugasan->status_dl === 'ACC' || $penugasan->status_translok === 'ACC';

@@ -62,7 +62,7 @@ class KalenderDLController extends Controller
             $penugasan = Penugasan::find($id_penugasan);
             
             // Cek apakah penugasan sudah memiliki CKP sebelum menghapus apapun
-            if ($penugasan && $penugasan->ckp()->exists()) {
+            if ($penugasan && $penugasan->ckpBulanan()->exists()) {
                 return redirect()->back()
                     ->with('error', 'Gagal menghapus! Penugasan ini tidak bisa dicabut karena sudah masuk ke dalam CKP.');
             }

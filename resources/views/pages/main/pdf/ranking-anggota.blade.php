@@ -174,13 +174,13 @@
     
     <div class="formula-box">
         Jika Tepat Waktu atau Lebih Cepat (lama_pengiriman &le; lama_rentang):<br>
-        &nbsp;&nbsp;F2 = 80 + ((lama_rentang - lama_pengiriman) / lama_rentang) * 20<br><br>
+        &nbsp;&nbsp;F2 = 80% + ((lama_rentang - lama_pengiriman) / lama_rentang) * 20%<br><br>
         Jika Terlambat (lama_pengiriman > lama_rentang):<br>
         &nbsp;&nbsp;keterlambatan_relatif = ((lama_pengiriman - lama_rentang) / lama_rentang) * 10<br>
-        &nbsp;&nbsp;F2 = max(70, 80 - min(10, keterlambatan_relatif))
+        &nbsp;&nbsp;F2 = max(70%, 80% - min(10%, keterlambatan_relatif))
     </div>
 
-    <p>Dengan formula ini, skor minimum kecepatan pengiriman dibatasi paling rendah adalah <strong>70 poin</strong> (floor limit) untuk keterlambatan yang sangat ekstrem.</p>
+    <p>Dengan formula ini, skor minimum kecepatan pengiriman dibatasi paling rendah adalah <strong>70%</strong> (floor limit) untuk keterlambatan yang sangat ekstrem.</p>
 
     <div class="page-break"></div>
 
@@ -196,7 +196,7 @@
     </div>
 
     <h3>🔴 F4 - Rating Kirim (Quality Review)</h3>
-    <p>F4 mengukur rata-rata kepuasan dan nilai kualitas yang diberikan oleh Ketua Tim (Katim) atau atasan penilai dalam skala 1 hingga 5 bintang. Konversi nilai ke skala 100 dilakukan dengan mengalikan rating dengan angka 20.</p>
+    <p>F4 mengukur rata-rata kepuasan dan nilai kualitas yang diberikan oleh Ketua Tim (Katim) atau atasan penilai dalam skala 1 hingga 5 bintang. Konversi nilai ke skala 100% dilakukan dengan mengalikan rating dengan angka 20.</p>
     
     <div class="formula-box">
         F4 = &Sigma; (rating_kirim * 20 * bobot) / n_penugasan
@@ -204,7 +204,7 @@
 
     <h2>3. Akumulasi Skor dan Koefisien Beban</h2>
     
-    <p>Setelah mendapatkan nilai F1, F2, F3, dan F4, sistem menghitung <strong>Rata-rata Base</strong>:</p>
+    <p>Setelah mendapatkan nilai F1, F2, F3, dan F4 (masing-masing berskala 0% s.d. 100%), sistem menghitung <strong>Rata-rata Base</strong>:</p>
     <div class="formula-box">
         Rata-rata Base = (F1 + F2 + F3 + F4) / 4
     </div>
