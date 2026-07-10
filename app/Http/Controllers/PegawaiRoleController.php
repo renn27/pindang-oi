@@ -306,6 +306,72 @@ class PegawaiRoleController extends Controller
             'active_role' => $role
         ]);
 
+        // Cek halaman sebelumnya (previous URL)
+        $previousUrl = url()->previous();
+
+        // Pastikan URL sebelumnya berasal dari domain/host aplikasi ini
+        $refererHost = parse_url($previousUrl, PHP_URL_HOST);
+        $currentHost = parse_url(config('app.url'), PHP_URL_HOST) ?? $request->getHost();
+
+        if ($refererHost === $currentHost && $previousUrl !== $request->url()) {
+            try {
+                // Buat request tiruan untuk memeriksa apakah halaman sebelumnya masih bisa diakses
+                $subRequest = Request::create($previousUrl, 'GET');
+                
+                // Gunakan resolver user dengan role yang baru di-update
+                $subRequest->setUserResolver(fn() => $user);
+
+                // Coba cocokkan rute untuk URL tersebut
+                $route = app('router')->getRoutes()->match($subRequest);
+
+                // Dapatkan middleware rute tersebut
+                $middlewares = app('router')->gatherRouteMiddleware($route);
+
+                // Cek otorisasi berdasarkan gate/policy di middleware 'can:...'
+                $isAuthorized = true;
+                foreach ($middlewares as $mw) {
+                    if (str_starts_with($mw, 'can:')) {
+                        $ability = substr($mw, 4);
+                        $parts = explode(',', $ability);
+                        $abilityName = $parts[0];
+                        $parameters = array_slice($parts, 1);
+
+                        // Bind route parameters
+                        $route->bind($subRequest);
+                        $routeParams = $route->parameters();
+
+                        $resolvedParams = [];
+                        foreach ($parameters as $param) {
+                            if (isset($routeParams[$param])) {
+                                $resolvedParams[] = $routeParams[$param];
+                            } else {
+                                $resolvedParams[] = $param;
+                            }
+                        }
+
+                        if (\Illuminate\Support\Facades\Gate::forUser($user)->denies($abilityName, $resolvedParams)) {
+                            $isAuthorized = false;
+                            break;
+                        }
+                    }
+                }
+
+                // Jika lolos pengecekan middleware, coba panggil router dispatch secara aman
+                if ($isAuthorized) {
+                    // Panggil dispatch secara in-memory untuk memicu check authorization di Controller/Policy
+                    $response = app('router')->dispatch($subRequest);
+                    
+                    // Jika response sukses (2xx) atau redirect (3xx), berarti authorized!
+                    if ($response->isSuccessful() || $response->isRedirection()) {
+                        return redirect($previousUrl)->with('success', 'Berhasil switching role');
+                    }
+                }
+            } catch (\Exception $e) {
+                // Jika terjadi exception (misal AuthorizationException/HttpException/403/dst)
+                // maka biarkan diredirect ke dashboard
+            }
+        }
+
         return redirect()
             ->route('dashboard')
             ->with('success', 'Berhasil switching role');
