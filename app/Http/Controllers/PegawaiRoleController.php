@@ -326,7 +326,10 @@ class PegawaiRoleController extends Controller
 
                 // Bind parameters and substitute bindings to resolve model instances (safe, no session side-effects)
                 $route->bind($subRequest);
-                app(\Illuminate\Routing\Middleware\SubstituteBindings::class)->handle($subRequest, function () {});
+                $subRequest->setRouteResolver(fn() => $route);
+                app(\Illuminate\Routing\Middleware\SubstituteBindings::class)->handle($subRequest, function ($req) {
+                    return $req;
+                });
                 $routeParams = $route->parameters();
 
                 // Dapatkan middleware rute tersebut
