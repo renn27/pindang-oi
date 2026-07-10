@@ -402,13 +402,22 @@ class PegawaiRoleController extends Controller
                                 }
                             }
                             
+                            $hasPolicy = false;
                             if ($modelInstance) {
-                                if (\Illuminate\Support\Facades\Gate::forUser($user)->denies($abilityName, $modelInstance)) {
-                                    $isAuthorized = false;
-                                }
+                                $hasPolicy = !is_null(\Illuminate\Support\Facades\Gate::getPolicyFor(get_class($modelInstance)));
                             } elseif ($modelClass) {
-                                if (\Illuminate\Support\Facades\Gate::forUser($user)->denies($abilityName, $modelClass)) {
-                                    $isAuthorized = false;
+                                $hasPolicy = !is_null(\Illuminate\Support\Facades\Gate::getPolicyFor($modelClass));
+                            }
+
+                            if ($hasPolicy) {
+                                if ($modelInstance) {
+                                    if (\Illuminate\Support\Facades\Gate::forUser($user)->denies($abilityName, $modelInstance)) {
+                                        $isAuthorized = false;
+                                    }
+                                } elseif ($modelClass) {
+                                    if (\Illuminate\Support\Facades\Gate::forUser($user)->denies($abilityName, $modelClass)) {
+                                        $isAuthorized = false;
+                                    }
                                 }
                             }
                         }
