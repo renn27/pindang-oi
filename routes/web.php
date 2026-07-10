@@ -30,6 +30,8 @@ use Illuminate\Support\Facades\Auth;
 
 Route::middleware(['auth', 'active.pegawai'])->group(function () {
     Route::get('/', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/panduan/ranking-anggota/pdf', [\App\Http\Controllers\DashboardController::class, 'downloadRankingAnggotaPdf'])->name('panduan.ranking-anggota.pdf');
+    Route::get('/panduan/ranking-katim/pdf', [\App\Http\Controllers\DashboardController::class, 'downloadRankingKatimPdf'])->name('panduan.ranking-katim.pdf');
     // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

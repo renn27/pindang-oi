@@ -198,4 +198,16 @@ class DashboardController extends Controller
 
         return in_array($perPage, $allowedOptions, true) ? $perPage : $default;
     }
+
+    public function downloadRankingAnggotaPdf()
+    {
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pages.main.pdf.ranking-anggota');
+        return $pdf->download('Panduan_Rumus_Kinerja_Pegawai_BPS.pdf');
+    }
+
+    public function downloadRankingKatimPdf()
+    {
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pages.main.pdf.ranking-katim');
+        return $pdf->download('Panduan_Rumus_Kinerja_Ketua_Tim_BPS.pdf');
+    }
 }
