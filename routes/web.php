@@ -41,20 +41,22 @@ Route::middleware(['auth', 'active.pegawai'])->group(function () {
 
 
     // Switching Role
-    Route::get('/role-pegawai', [PegawaiRoleController::class, 'index'])
-        ->name('pegawai-role.index');
+    Route::middleware('can:kelola-master-data')->group(function () {
+        Route::get('/role-pegawai', [PegawaiRoleController::class, 'index'])
+            ->name('pegawai-role.index');
 
-    Route::post('/role-pegawai', [PegawaiRoleController::class, 'store'])
-        ->name('pegawai-role.store');
+        Route::post('/role-pegawai', [PegawaiRoleController::class, 'store'])
+            ->name('pegawai-role.store');
 
-    Route::post('/role-pegawai/tambah', [PegawaiRoleController::class, 'storePegawai'])
-        ->name('pegawai-role.pegawai-store');
+        Route::post('/role-pegawai/tambah', [PegawaiRoleController::class, 'storePegawai'])
+            ->name('pegawai-role.pegawai-store');
 
-    Route::patch('/role-pegawai/{pegawai:id_pegawai}/status', [PegawaiRoleController::class, 'toggleActive'])
-        ->name('pegawai-role.toggle-active');
+        Route::patch('/role-pegawai/{pegawai:id_pegawai}/status', [PegawaiRoleController::class, 'toggleActive'])
+            ->name('pegawai-role.toggle-active');
 
-    Route::post('/role-pegawai/{pegawais:id_pegawai}', [PegawaiRoleController::class, 'update'])
-        ->name('pegawai-role.update');
+        Route::post('/role-pegawai/{pegawais:id_pegawai}', [PegawaiRoleController::class, 'update'])
+            ->name('pegawai-role.update');
+    });
 
     Route::post('/switch-role/{role}', [PegawaiRoleController::class, 'switchRolePegawai'])
         ->name('pegawai-role.switchRolePegawai');

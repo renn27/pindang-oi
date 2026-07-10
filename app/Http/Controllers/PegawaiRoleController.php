@@ -324,6 +324,11 @@ class PegawaiRoleController extends Controller
                 // Coba cocokkan rute untuk URL tersebut
                 $route = app('router')->getRoutes()->match($subRequest);
 
+                // Bind parameters and substitute bindings to resolve model instances (safe, no session side-effects)
+                $route->bind($subRequest);
+                app(\Illuminate\Routing\Middleware\SubstituteBindings::class)->handle($subRequest, function () {});
+                $routeParams = $route->parameters();
+
                 // Dapatkan middleware rute tersebut
                 $middlewares = app('router')->gatherRouteMiddleware($route);
 
@@ -336,16 +341,16 @@ class PegawaiRoleController extends Controller
                         $abilityName = $parts[0];
                         $parameters = array_slice($parts, 1);
 
-                        // Bind route parameters
-                        $route->bind($subRequest);
-                        $routeParams = $route->parameters();
-
                         $resolvedParams = [];
                         foreach ($parameters as $param) {
                             if (isset($routeParams[$param])) {
                                 $resolvedParams[] = $routeParams[$param];
                             } else {
-                                $resolvedParams[] = $param;
+                                if (class_exists($param)) {
+                                    $resolvedParams[] = $param;
+                                } else {
+                                    $resolvedParams[] = $param;
+                                }
                             }
                         }
 
@@ -356,19 +361,62 @@ class PegawaiRoleController extends Controller
                     }
                 }
 
-                // Jika lolos pengecekan middleware, coba panggil router dispatch secara aman
+                // Cek otorisasi Policy tingkat Controller secara in-memory
                 if ($isAuthorized) {
-                    // Panggil dispatch secara in-memory untuk memicu check authorization di Controller/Policy
-                    $response = app('router')->dispatch($subRequest);
-                    
-                    // Jika response sukses (2xx) atau redirect (3xx), berarti authorized!
-                    if ($response->isSuccessful() || $response->isRedirection()) {
-                        return redirect($previousUrl)->with('success', 'Berhasil switching role');
+                    $actionName = $route->getActionName();
+                    if ($actionName && strpos($actionName, '@') !== false) {
+                        [$controllerClass, $method] = explode('@', $actionName);
+                        
+                        $abilityMap = [
+                            'index' => 'viewAny',
+                            'show' => 'view',
+                            'create' => 'create',
+                            'store' => 'create',
+                            'edit' => 'update',
+                            'update' => 'update',
+                            'destroy' => 'delete',
+                            'delete' => 'delete',
+                        ];
+                        
+                        if (isset($abilityMap[$method])) {
+                            $abilityName = $abilityMap[$method];
+                            
+                            $modelInstance = null;
+                            foreach ($routeParams as $param) {
+                                if (is_object($param)) {
+                                    $modelInstance = $param;
+                                    break;
+                                }
+                            }
+                            
+                            $modelClass = null;
+                            if (!$modelInstance) {
+                                $controllerBaseName = class_basename($controllerClass);
+                                $modelName = str_replace('Controller', '', $controllerBaseName);
+                                $guessedClass = 'App\\Models\\' . $modelName;
+                                if (class_exists($guessedClass)) {
+                                    $modelClass = $guessedClass;
+                                }
+                            }
+                            
+                            if ($modelInstance) {
+                                if (\Illuminate\Support\Facades\Gate::forUser($user)->denies($abilityName, $modelInstance)) {
+                                    $isAuthorized = false;
+                                }
+                            } elseif ($modelClass) {
+                                if (\Illuminate\Support\Facades\Gate::forUser($user)->denies($abilityName, $modelClass)) {
+                                    $isAuthorized = false;
+                                }
+                            }
+                        }
                     }
                 }
+
+                if ($isAuthorized) {
+                    return redirect($previousUrl)->with('success', 'Berhasil switching role');
+                }
             } catch (\Exception $e) {
-                // Jika terjadi exception (misal AuthorizationException/HttpException/403/dst)
-                // maka biarkan diredirect ke dashboard
+                // Jika terjadi exception (route matching fail dll), diredirect ke dashboard
             }
         }
 
