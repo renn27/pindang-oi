@@ -635,7 +635,7 @@ Jika koefisien < 1.0:
 ```
 1. Pegawai WITH penugasan aktif di atas pegawai TANPA penugasan
 2. rata_rata_final DESC (skor tertinggi duluan)
-3. total_selesai DESC (lebih banyak Pelunasan = lebih atas jika skor sama)
+3. target_pegawai DESC (total target dokumen terbanyak = lebih atas jika skor sama)
 4. nama_pegawai ASC (alfabetis jika semua sama)
 ```
 

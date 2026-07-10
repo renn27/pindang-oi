@@ -612,7 +612,7 @@ class DashboardAnalyticsService {
             // Prioritas: pegawai TANPA penugasan aktif selalu di bawah pegawai yang punya penugasan
             ->orderByRaw('CASE WHEN total_penugasan = 0 THEN 1 ELSE 0 END')
             ->orderByDesc('rata_rata_final')
-            ->orderByDesc('total_selesai')
+            ->orderByDesc('target_pegawai')
             ->orderBy('nama_pegawai');
 
     }
