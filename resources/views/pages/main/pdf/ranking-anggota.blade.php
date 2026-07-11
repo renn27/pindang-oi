@@ -173,7 +173,7 @@
     <p>F2 menilai ketepatan waktu pengiriman penugasan bertipe <strong>Pelunasan</strong> yang berstatus Diterima dibandingkan dengan masa rentang deadline penugasan. Penugasan bertipe Cicilan tidak diikutkan dalam F2.</p>
     
     <div class="formula-box">
-        Jika Tepat Waktu atau Lebih Cepat (lama_pengiriman <= lama_rentang):<br>
+        Jika Tepat Waktu atau Lebih Cepat (lama_pengiriman &lt;= lama_rentang):<br>
         &nbsp;&nbsp;F2 = 80% + ((lama_rentang - lama_pengiriman) / lama_rentang) * 20%<br><br>
         Jika Terlambat (lama_pengiriman > lama_rentang):<br>
         &nbsp;&nbsp;keterlambatan_relatif = ((lama_pengiriman - lama_rentang) / lama_rentang) * 10<br>
@@ -222,7 +222,7 @@
             Pegawai mendapatkan bonus proporsional yang dibatasi agar skor akhir tidak melampaui 100%.<br>
             <code>rata_rata_final = rata_rata_base + min(rata_rata_base * (koefisien_beban - 1.0), 100 - rata_rata_base)</code>
         </li>
-        <li><strong>Jika beban kerja di bawah rata-rata (koefisien_beban < 1.0)</strong>:<br>
+        <li><strong>Jika beban kerja di bawah rata-rata (koefisien_beban &lt; 1.0)</strong>:<br>
             Pegawai mendapatkan penalti proporsional karena memikul tanggung jawab volume/total target penugasan yang lebih ringan.<br>
             <code>rata_rata_final = max(0, rata_rata_base * koefisien_beban)</code>
         </li>

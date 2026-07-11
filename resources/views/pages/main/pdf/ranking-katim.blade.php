@@ -179,7 +179,7 @@
             Katim mendapatkan bonus beban kerja tambahan, yang dibatasi agar skor akhir tidak melampaui batas maksimum 100.00%.<br>
             <code>rata_rata_final = rata_rata_base + min(rata_rata_base * (koefisien_beban - 1.0), 100 - rata_rata_base)</code>
         </li>
-        <li><strong>Jika beban kerja tim di bawah rata-rata kantor (koefisien_beban < 1.0)</strong>:<br>
+        <li><strong>Jika beban kerja tim di bawah rata-rata kantor (koefisien_beban &lt; 1.0)</strong>:<br>
             Katim mendapatkan penalti proporsional karena memikul tanggung jawab pengawasan volume/total target penugasan yang lebih ringan.<br>
             <code>rata_rata_final = max(0, rata_rata_base * koefisien_beban)</code>
         </li>
