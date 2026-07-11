@@ -148,7 +148,7 @@
     <h2>2. Bedah 4 Formula Utama</h2>
 
     <h3>🔵 F1 - Penyelesaian (Completion Rate)</h3>
-    <p>F1 mengukur sejauh mana target fisik yang dibebankan kepada pegawai telah diselesaikan dan diterima. Formula ini <strong>berbasis pada volume target dokumen</strong>, bukan jumlah baris penugasan.</p>
+    <p>F1 mengukur sejauh mana target fisik yang dibebankan kepada pegawai telah diselesaikan dan diterima. Formula ini <strong>berbasis pada volume/total target penugasan dari pegawai</strong>, bukan dari jumlah penugasannya.</p>
     
     <div class="formula-box">
         F1 = (d / c) * (b_efektif / a) * 100
@@ -156,13 +156,13 @@
 
     <p><strong>Variabel Penjelas:</strong></p>
     <ul class="bullet-list">
-        <li><span class="highlight">a</span>: Total target dokumen yang dibebankan secara personal kepada pegawai pada bulan aktif.</li>
-        <li><span class="highlight">c</span>: Total target dokumen kumulatif seluruh pegawai di kantor pada bulan aktif.</li>
+        <li><span class="highlight">a</span>: Total target penugasan yang dibebankan secara personal kepada pegawai pada bulan aktif.</li>
+        <li><span class="highlight">c</span>: Total target penugasan kumulatif seluruh pegawai di kantor pada bulan aktif.</li>
         <li><span class="highlight">b_efektif</span>: Bobot penyelesaian efektif pegawai, dihitung dari: <br>
             <code>b_efektif = progress_pelunasan + b_efektif_cicilan</code>
         </li>
         <li><span class="highlight">b_efektif_cicilan</span>: Kontribusi kuadratik cicilan berdasarkan sisa target per kegiatan, dirumuskan: <br>
-            <code>b_efektif_cicilan = &Sigma; (jumlah_dikirim&sup2; / target)</code>. Logika kuadratik ini memastikan pegawai yang mencicil lebih banyak (misal 8 dari 10) mendapatkan skor jauh lebih proporsional dibanding yang baru mencicil sedikit (misal 1 dari 10).
+            <code>b_efektif_cicilan = SUM(jumlah_dikirim^2 / target)</code>. Logika kuadratik ini memastikan pegawai yang mencicil lebih banyak (misal 8 dari 10) mendapatkan skor jauh lebih proporsional dibanding yang baru mencicil sedikit (misal 1 dari 10).
         </li>
         <li><span class="highlight">d</span>: Sisa kapasitas global tim yang berhasil diamankan setelah menghitung sisa beban pegawai ini: <br>
             <code>d = max(0, c - a + b_efektif)</code>
@@ -173,7 +173,7 @@
     <p>F2 menilai ketepatan waktu pengiriman penugasan bertipe <strong>Pelunasan</strong> yang berstatus Diterima dibandingkan dengan masa rentang deadline penugasan. Penugasan bertipe Cicilan tidak diikutkan dalam F2.</p>
     
     <div class="formula-box">
-        Jika Tepat Waktu atau Lebih Cepat (lama_pengiriman &le; lama_rentang):<br>
+        Jika Tepat Waktu atau Lebih Cepat (lama_pengiriman <= lama_rentang):<br>
         &nbsp;&nbsp;F2 = 80% + ((lama_rentang - lama_pengiriman) / lama_rentang) * 20%<br><br>
         Jika Terlambat (lama_pengiriman > lama_rentang):<br>
         &nbsp;&nbsp;keterlambatan_relatif = ((lama_pengiriman - lama_rentang) / lama_rentang) * 10<br>
@@ -192,14 +192,14 @@
     </ul>
     
     <div class="formula-box">
-        F3 = &Sigma; (rr_kirim * bobot) / n_penugasan
+        F3 = SUM(rr_kirim * bobot) / n_penugasan
     </div>
 
     <h3>🔴 F4 - Rating Kirim (Quality Review)</h3>
     <p>F4 mengukur rata-rata kepuasan dan nilai kualitas yang diberikan oleh Ketua Tim (Katim) atau atasan penilai dalam skala 1 hingga 5 bintang. Konversi nilai ke skala 100% dilakukan dengan mengalikan rating dengan angka 20.</p>
     
     <div class="formula-box">
-        F4 = &Sigma; (rating_kirim * 20 * bobot) / n_penugasan
+        F4 = SUM(rating_kirim * 20 * bobot) / n_penugasan
     </div>
 
     <h2>3. Akumulasi Skor dan Koefisien Beban</h2>
@@ -218,17 +218,17 @@
 
     <p><strong>Penerapan Skor Akhir (Rata-rata Final):</strong></p>
     <ul class="bullet-list">
-        <li><strong>Jika beban kerja di atas rata-rata (koefisien &ge; 1.0)</strong>:<br>
+        <li><strong>Jika beban kerja di atas rata-rata (koefisien_beban >= 1.0)</strong>:<br>
             Pegawai mendapatkan bonus proporsional yang dibatasi agar skor akhir tidak melampaui 100%.<br>
             <code>rata_rata_final = rata_rata_base + min(rata_rata_base * (koefisien_beban - 1.0), 100 - rata_rata_base)</code>
         </li>
-        <li><strong>Jika beban kerja di bawah rata-rata (koefisien &lt; 1.0)</strong>:<br>
-            Pegawai mendapatkan penalti proporsional karena memikul tanggung jawab volume dokumen yang lebih ringan.<br>
+        <li><strong>Jika beban kerja di bawah rata-rata (koefisien_beban < 1.0)</strong>:<br>
+            Pegawai mendapatkan penalti proporsional karena memikul tanggung jawab volume/total target penugasan yang lebih ringan.<br>
             <code>rata_rata_final = max(0, rata_rata_base * koefisien_beban)</code>
         </li>
     </ul>
 
-    <h2>4. Aturan Pemecah Dasi (Tie-Breaker)</h2>
+    <h2>4. Urutan Perangkingan</h2>
     <p>Apabila terdapat lebih dari satu pegawai yang mendapatkan nilai Rata-rata Final yang sama (contohnya sama-sama bernilai 100.00%), sistem akan menentukan peringkat berdasarkan urutan prioritas berikut:</p>
     <table class="info-table">
         <thead>
@@ -251,8 +251,8 @@
             </tr>
             <tr>
                 <td class="center">3</td>
-                <td><strong>Target Dokumen Terbanyak</strong></td>
-                <td>Pegawai dengan akumulasi target dokumen (<code>target_pegawai</code>) terbanyak diposisikan di atas.</td>
+                <td><strong>Target Penugasan Terbanyak</strong></td>
+                <td>Pegawai dengan akumulasi target penugasan (<code>target_pegawai</code>) terbanyak diposisikan di atas.</td>
             </tr>
             <tr>
                 <td class="center">4</td>

@@ -156,7 +156,7 @@
     </ul>
 
     <h2>3. Koefisien Beban Kerja Tim (Fairness Adjustment)</h2>
-    <p>Untuk memberikan aspek keadilan bagi Katim yang memimpin tim dengan volume target dokumen yang sangat besar, sistem menerapkan faktor penyesuaian **Koefisien Beban Tim**:</p>
+    <p>Untuk memberikan aspek keadilan bagi Katim yang memimpin tim dengan volume/total target penugasan yang sangat besar, sistem menerapkan faktor penyesuaian **Koefisien Beban Tim**:</p>
     
     <div class="formula-box">
         rasio_beban = total_target_tim / avg_target_tim<br>
@@ -165,8 +165,9 @@
 
     <p><strong>Variabel Penjelas:</strong></p>
     <ul class="bullet-list">
-        <li><span class="highlight">total_target_tim</span>: Jumlah total seluruh target dokumen dari semua anggota tim di bawah sub-kegiatan yang dipimpin oleh Katim tersebut (pada bulan evaluasi).</li>
+        <li><span class="highlight">total_target_tim</span>: Jumlah total seluruh target penugasan dari semua anggota tim di bawah sub-kegiatan yang dipimpin oleh Katim tersebut (pada bulan evaluasi).</li>
         <li><span class="highlight">avg_target_tim</span>: Rata-rata total target tim di kantor (rata-rata dari total target seluruh Katim aktif di bulan tersebut).</li>
+        <li><span class="highlight">koefisien_beban</span>: Faktor penyesuaian beban kerja tim yang diperoleh dari rasio beban kerja tim terhadap rata-rata kantor.</li>
         <li><span class="highlight">Batasan Koefisien</span>: Koefisien dibatasi paling rendah <strong>0.85</strong> (penalti minimum) dan paling tinggi <strong>1.15</strong> (bonus maksimum).</li>
     </ul>
 
@@ -174,17 +175,17 @@
     <p>Bonus atau penalti beban kerja tim diaplikasikan langsung pada nilai rata-rata base (F5) untuk menghasilkan skor akhir peringkat:</p>
     
     <ul class="bullet-list">
-        <li><strong>Jika beban kerja tim di atas rata-rata kantor (koefisien_beban &ge; 1.0)</strong>:<br>
+        <li><strong>Jika beban kerja tim di atas rata-rata kantor (koefisien_beban >= 1.0)</strong>:<br>
             Katim mendapatkan bonus beban kerja tambahan, yang dibatasi agar skor akhir tidak melampaui batas maksimum 100.00%.<br>
             <code>rata_rata_final = rata_rata_base + min(rata_rata_base * (koefisien_beban - 1.0), 100 - rata_rata_base)</code>
         </li>
-        <li><strong>Jika beban kerja tim di bawah rata-rata kantor (koefisien_beban &lt; 1.0)</strong>:<br>
-            Katim mendapatkan penalti beban kerja dikarenakan tanggung jawab pengawasan target dokumen yang lebih sedikit.<br>
-            <code>rata_rata_final = rata_rata_base + (rata_rata_base * (koefisien_beban - 1.0))</code> <em>(bernilai negatif/pengurangan)</em>
+        <li><strong>Jika beban kerja tim di bawah rata-rata kantor (koefisien_beban < 1.0)</strong>:<br>
+            Katim mendapatkan penalti proporsional karena memikul tanggung jawab pengawasan volume/total target penugasan yang lebih ringan.<br>
+            <code>rata_rata_final = max(0, rata_rata_base * koefisien_beban)</code>
         </li>
     </ul>
 
-    <h2>5. Kriteria Pemecah Dasi (Tie-Breaker) Katim</h2>
+    <h2>5. Urutan Penentu Rangking</h2>
     <p>Apabila terdapat lebih dari satu Ketua Tim yang mendapatkan nilai Rata-rata Final yang sama, urutan peringkat ditentukan berdasarkan prioritas kriteria berikut:</p>
     <table class="info-table">
         <thead>
